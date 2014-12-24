@@ -1,0 +1,5 @@
+for conf in `ls -d $HOME/.sh.d/*`; do
+  . $conf
+done
+
+# vim:ft=sh

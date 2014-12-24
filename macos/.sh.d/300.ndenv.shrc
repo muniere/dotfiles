@@ -1,0 +1,25 @@
+if (which ndenv > /dev/null) && [[ ! "$PATH" =~ "ndenv/shims" ]]; then
+  export PATH="${HOME}/.ndenv/shims:${PATH}"
+
+  if [ -n "${BASH_VERSION}" ] && [ -f "${HOME}/.ndenv/completions/ndenv.bash" ]; then
+    source "${HOME}/.ndenv/completions/ndenv.bash"
+  elif [ -n "${ZSH_VERSION}" ] && [ -f "${HOME}/.ndenv/completions/ndenv.zsh" ]; then
+    source "${HOME}/.ndenv/completions/ndenv.zsh"
+  fi
+
+  ndenv() {
+    typeset command
+    command="$1"
+    if [ "$#" -gt 0 ]; then
+      shift
+    fi
+
+    case "$command" in
+    rehash|shell)
+      eval "`ndenv "sh-$command" "$@"`";;
+    *)
+      command ndenv "$command" "$@";;
+    esac
+  }
+fi
+# vim: ft=sh sw=2 ts=2 sts=2

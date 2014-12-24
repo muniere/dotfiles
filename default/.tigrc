@@ -1,0 +1,7 @@
+bind generic G none
+bind generic g move-first-line
+bind generic G move-last-line
+bind generic <Ctrl-B> move-page-up
+bind generic <Ctrl-F> move-page-down
+set diff-options = -m --first-parent
+set main-view = id date author commit-title:graph=yes,refs=yes

@@ -1,0 +1,29 @@
+# .shrc for all
+
+# LANG
+export LC_ALL=C
+
+# PATH
+export PATH=`python <<EOF
+news = ['$HOME/.bin', '/usr/local/bin', '/usr/local/sbin', '/usr/bin', '/bin', '/usr/sbin', '/sbin']
+olds = '$PATH'.split(':')
+news.extend([e for e in olds if e not in news])
+print ':'.join(news)
+EOF`
+
+# Editor
+export EDITOR=vim
+
+function tstatus() {
+  if [ "`uname`" == "Linux" ]; then
+      addr=`ifconfig eth0 | awk '/inet addr/ { sub("inet addr:", "", $0); print $1 }'`
+      load=`uptime | sed 's/.*load average: \(.*\)/\1/g'`
+  elif [ "`uname`" == "Darwin" ]; then
+      addr=`ifconfig en0 | awk '/inet / { sub("inet", "", $0); print $1 }'`
+      load=`uptime | sed 's/.*load averages: \(.*\)/\1/g'`
+  fi
+  
+  echo "\"`hostname`($addr)\" [$load] `date +'%Y/%m/%d %H:%M:%S'`"
+}
+
+# vim: ft=sh sw=2 ts=2 sts=2

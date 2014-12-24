@@ -1,0 +1,9 @@
+{
+  "Keymap": {
+    "C-[": "peco.SelectAll",
+    "C-]": "peco.SelectNone",
+    "C-/": "peco.SelectVisible",
+    "C-b": "peco.SelectPreviousPage",
+    "C-f": "peco.SelectNextPage"
+  }
+}

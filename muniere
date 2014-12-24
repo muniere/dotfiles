@@ -1,0 +1,368 @@
+#!/usr/bin/env python
+
+import os
+import re
+import sys
+import glob
+import commands
+
+COMMAND_INDENT = 4
+
+CONFIGS = {
+  'bash': ['.sh.d', '.bash.d'],
+  'zsh' : ['.sh.d', '.zsh.d'],
+  'vim' : ['.vimrc', '.vim.d', '.vim'],
+  'tmux': ['.tmux.conf'],
+  'tig' : ['.tigrc'],
+  'peco': ['.peco']
+}
+
+PACKAGES = CONFIGS.keys()
+
+OPTIONS = [
+  {
+    'short': '-i',
+    'long': '--interactive',
+    'action': 'store_true',
+    'help': 'Run in interactive mode; confirm overwrite existing file or not.'
+  },
+  {
+    'short': '-d',
+    'long': '--debug',
+    'action': 'store_true',
+    'help': 'Run in debug mode; do not execute commands, but print them.'
+  },
+  {
+    'short': '-v',
+    'long': '--verbose',
+    'action': 'store_true',
+    'help': 'Run in verbose mode; print executed commands.'
+  }
+]
+
+UNAMES = [
+  { 'key': 'ubuntu', 'value': 'ubuntu' },
+  { 'key': 'debian', 'value': 'debian' },
+  { 'key': 'centos', 'value': 'centos' },
+  { 'key': 'darwin', 'value': 'macos'  },
+  { 'key': 'amzn'  , 'value': 'amazon' }
+]
+
+options = {}
+
+#
+# Parse cli arguments
+#
+def parse(arguments):
+
+  #
+  # Parse cli arguments (for < 2.7)
+  #
+  def parse_old(arguments):
+    from optparse import OptionParser
+
+    parser = OptionParser(usage="usage: %prog [options] (install|uninstall|update) [<package> <package> ...]")
+
+    for opt in OPTIONS:
+      parser.add_option(opt['short'], opt['long'], action=opt['action'], help=opt['help'])
+
+    parsed = parser.parse_args(arguments)
+
+    args = {
+      'action': parsed[1][0] if len(parsed[1]) > 0 else None,
+      'packages': parsed[1][1:]
+    }
+
+    opts = vars(parsed[0])
+
+    for k in opts.keys():
+      opts[k] = opts[k] or False
+
+    opts['verbose'] = opts['verbose'] or opts['debug']
+
+    return (args, opts, parser)
+
+  #
+  # Parse cli arguments (for >= 2.7)
+  #
+  def parse_new(arguments):
+    from argparse import ArgumentParser
+
+    parser = ArgumentParser(usage="usage: %(prog)s [options] (install|uninstall|update) [<package> <package> ...]")
+    parser.add_argument('action', help='specify action')
+    parser.add_argument('packages', help='specify packages to install.', nargs='*')
+
+    for opt in OPTIONS:
+      parser.add_argument(opt['short'], opt['long'], action=opt['action'], help=opt['help'])
+
+    parsed = vars(parser.parse_args(arguments))
+
+    args = {
+      'action': parsed.pop('action'),
+      'packages': parsed.pop('packages')
+    }
+
+    opts = parsed
+
+    for k in opts.keys():
+      opts[k] = opts[k] or False
+
+    opts['verbose'] = opts['verbose'] or opts['debug']
+
+    return (args, opts, parser)
+
+  #
+  # Main process
+  #
+  if sys.version_info < (2, 7):
+    return parse_old(arguments)
+  else:
+    return parse_new(arguments)
+
+#
+# Detect uname.
+#
+def uname():
+
+  if os.path.isfile('/etc/issue'):
+    uname = commands.getoutput('cat /etc/issue').lower()
+  else:
+    uname = commands.getoutput('uname -a').lower()
+
+  return next((x['value'] for x in UNAMES if re.match(x['key'], uname, flags=re.I)), None)
+
+#
+# Deploy config file recursive
+#
+def deploy(config, env=None):
+  if env is None:
+    deploy(config, uname())
+    deploy(config, 'default')
+    return True
+
+  dst_dir = os.path.join(os.environ['HOME'], os.path.dirname(config))
+
+  if not os.path.exists(dst_dir):
+    exec_cmd('mkdir -p %s' % dst_dir)
+
+  src = os.path.join(os.getcwd(), env, config)
+  dst = os.path.join(os.environ['HOME'], config)
+
+  symlink(src, dst)
+
+  return True
+
+#
+# Undeploy config files.
+#
+def undeploy(config):
+
+  target = os.path.join(os.environ['HOME'], config)
+
+  if os.path.islink(target):
+    return unlink(target)
+  elif not os.path.exists(target):
+    return True
+  elif os.path.isdir(target):
+    for f in os.listdir(target):
+      unlink(os.path.join(target, f))
+
+    if os.listdir(target) == []:
+      rmdir(target)
+
+  return True
+
+#
+# Create symlink.
+#
+# If destination file already exists and it is symlink, do nothing.
+#
+# If source file is directory and destination directory already exists,
+# create links in source directory into destination directory.
+#
+def symlink(src, dst, recursive=True):
+  global options
+
+  if not os.path.exists(src):
+    return False
+
+  if os.path.islink(dst):
+    return False
+
+  if os.path.isdir(src) and recursive:
+    if not os.path.exists(dst):
+      exec_cmd('mkdir -p %s' % dst)
+
+    for file in os.listdir(src):
+      new_src = os.path.join(src, file)
+      new_dst = os.path.join(dst, file)
+      symlink(new_src, new_dst, False)
+
+  else:
+    if options['interactive']:
+      cmd = 'ln -sfi %s %s' % (src, dst)
+    else:
+      cmd = 'ln -sf %s %s' % (src, dst)
+
+    return exec_cmd(cmd)
+
+#
+# Delete link.
+#
+def unlink(target):
+  if not os.path.islink(target):
+    return False
+
+  cmd = 'rm %s' % target
+
+  return exec_cmd(cmd)
+
+#
+# Delete directory.
+#
+def rmdir(target):
+  if not os.path.isdir(target):
+    return False
+
+  cmd = 'rm -r %s' % target
+
+  return exec_cmd(cmd)
+
+#
+# Execute `git pull` command.
+#
+def git_pull(src, dst):
+  if not os.path.exists(dst):
+    cmd = 'git clone %s %s' % (src, dst)
+  else:
+    cmd = 'cd %s; git pull origin master; cd -' % dst
+
+  return exec_cmd(cmd)
+
+#
+# Execute command.
+#
+def exec_cmd(cmd, verbose=False, debug=False, indent=COMMAND_INDENT):
+  global options
+
+  if options['verbose'] or options['debug'] or verbose or debug:
+    print (' ' * indent) + cmd + ' ... ',
+
+  output = None
+  if not options['debug'] or debug:
+    output = commands.getoutput(cmd)
+
+  if options['verbose'] or options['debug'] or verbose or debug:
+    print 'done'
+
+  return output
+
+#
+# Install config for the package.
+#
+def install(package):
+  global options
+
+  if not package in PACKAGES:
+    sys.stderr.write('undefined package: %s\n' % package)
+    return False
+
+  # progress
+  if options['verbose']:
+    print "installing %s ... " % package
+  else:
+    print "installing %s ... " % package,
+
+  # deploy
+  for conf in CONFIGS[package]:
+    deploy(conf)
+
+  # extra
+  if package == 'vim':
+    git_pull('https://github.com/Shougo/neobundle.vim',
+             os.environ['HOME'] + '/.vim/bundle/neobundle.vim')
+
+  # progress
+  print "done"
+
+#
+# Unnstall config for the package.
+#
+def uninstall(package):
+  global options
+
+  if not package in PACKAGES:
+    sys.stderr.write('undefined package: %s\n' % package)
+    return False
+
+  # progress
+  if options['verbose']:
+    print "uninstalling %s ... " % package
+  else:
+    print "uninstalling %s ... " % package,
+
+  # undeploy
+  for conf in CONFIGS[package]:
+    undeploy(conf)
+
+  # extra
+
+  # progress
+  print "done"
+
+#
+# Main process
+#
+if __name__ == '__main__':
+  (args, options, parser) = parse(sys.argv[1:])
+
+  action = args['action']
+  packages = args['packages']
+
+  if not action:
+    parser.print_help()
+    sys.exit(1)
+
+  if not packages:
+    packages = PACKAGES
+
+  if action == 'install':
+    for package in packages:
+      install(package)
+
+  elif action == 'uninstall':
+    for package in packages:
+      uninstall(package)
+
+  elif action == 'update':
+    print '=====> uninstall <====='
+    for package in packages:
+      uninstall(package)
+
+    print '=====> update <====='
+    stashed = False
+
+    if exec_cmd('git diff', verbose=True, indent=0):
+      exec_cmd('git stash', verbose=True, indent=0)
+      stashed = True
+
+    exec_cmd('git pull --rebase origin master', verbose=True, indent=0)
+
+    if stashed:
+      exec_cmd('git stash pop', verbose=True, indent=0)
+      stashed = False
+
+    print '=====> install <====='
+    for package in packages:
+      install(package)
+
+  elif action == 'init':
+    for src in glob.glob('conf/default/.*.example'):
+      dst = os.path.join(os.environ['HOME'], os.path.basename(src).replace('.example', ''))
+      exec_cmd('cat %s >> %s' % (src, dst), verbose=True, indent=0)
+
+  else:
+    print "unknown action %s" % action
+    sys.exit(1)
+
+# vim: ft=python sw=2 ts=2 sts=2

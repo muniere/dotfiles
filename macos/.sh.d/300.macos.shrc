@@ -1,0 +1,43 @@
+# LC
+export LC_ALL=
+
+# Java
+if (which java >/dev/null 2>&1); then
+  export JAVA_HOME=$(/usr/libexec/java_home)
+  export JAVA_OPTS="-Dfile.encoding=UTF-8"
+fi
+
+# ndenv
+if [ -d $HOME/.ndenv/bin ] && [[ ! "$PATH" =~ "$HOME/.ndenv/bin" ]]; then
+  export PATH="$HOME/.ndenv/bin:$PATH"
+fi
+
+# Homebrew
+if (which brew >/dev/null 2>&1); then
+
+  # Tomcat
+  if [ -d /usr/local/opt/tomcat/libexec ]; then
+    export CATALINA_HOME="/usr/local/opt/tomcat/libexec"
+  fi
+
+  # Maven
+  if [ -d /usr/local/opt/maven/libexec ]; then
+    export MAVEN_HOME="/usr/local/opt/maven/libexec"
+  fi
+
+  # pkgconfig
+  if [ -d /usr/local/opt/pkg-config ]; then
+    export PKG_CONFIG_PATH="/opt/X11/lib/pkgconfig"
+  fi
+fi
+
+# ls
+alias ls="ls -Gv"
+alias ll="ls -lhF"
+alias l="ls -lAhF"
+
+# grep
+alias grep="grep --color=always"
+alias egrep="egrep --color=always"
+
+# vim: ft=sh sw=2 ts=2 sts=2
