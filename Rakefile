@@ -5,12 +5,28 @@ VERBOSE = true
 NOOP = false
 
 CONFIGS = {
-  :bash => ['.sh.d' , '.bash.d'],
-  :zsh  => ['.sh.d' , '.zsh.d' ],
-  :vim  => ['.vimrc', '.vim.d', '.vim'],
-  :tmux => ['.tmux.conf'],
-  :tig  => ['.tigrc'],
-  :peco => ['.peco']
+  :bash => [
+    { :src => '.sh.d'     , :dst => '.sh.d'      },
+    { :src => '.bash.d'   , :dst => '.bash.d'    }
+  ],
+  :zsh  => [
+    { :src => '.sh.d'     , :dst => '.sh.d'      },
+    { :src => '.zsh.d'    , :dst => '.zsh.d'     }
+  ],
+  :vim  => [
+    { :src => '.vimrc'    , :dst => '.vimrc'     },
+    { :src => '.vim.d'    , :dst => '.vim.d'     },
+    { :src => '.vim'      , :dst => '.vim'       }
+  ],
+  :tmux => [
+    { :src => '.tmux.conf', :dst => '.tmux.conf' }
+  ],
+  :tig  => [
+    { :src => '.tigrc'    , :dst => '.tigrc'     }
+  ],
+  :peco => [
+    { :src => '.peco'     , :dst => '.peco'      }
+  ]
 }
 
 PACKAGES = CONFIGS.keys
@@ -114,12 +130,14 @@ class Helper
     end
 
     # directory: non-recursive
-    unless recursive
+    if !recursive
       return self.symlink_f(src, dst)
     end
 
     # directory: recursive
-    self.mkdir_p(dst) unless Dir.exists?(dst)
+    if !Dir.exists?(dst)
+      self.mkdir_p(dst) 
+    end
 
     success = true
 
@@ -212,11 +230,12 @@ class Action
       return success
     end
 
-    unless Dir.exists?(dir = File.join(ENV['HOME'], File.dirname(config)))
-      Helper.mkdir_p(dir)
-    end
+    src = File.join(Dir.pwd, system, config[:src])
+    dst = File.join(ENV['HOME'], config[:dst])
 
-    return Helper.symlink_r(File.join(Dir.pwd, system, config), File.join(ENV['HOME'], config))
+    return false if !File.exists?(src)
+
+    return Helper.symlink_r(src, dst)
   end
 
   #
@@ -224,9 +243,11 @@ class Action
   #
   def self.undeploy(config)
 
-    return true unless File.exists?(target = File.join(ENV['HOME'], config))
+    tgt = File.join(ENV['HOME'], config[:dst])
 
-    return Helper.unlink_r(target)
+    return true if !File.exists?(tgt)
+
+    return Helper.unlink_r(tgt)
   end
 
   #
@@ -279,8 +300,10 @@ class Action
     verbose = true
     noop = false
 
-    (confs = CONFIGS.values.flatten.uniq.sort).each do |conf| 
-      next unless File.exists?(path = File.join(ENV['HOME'], conf))
+    (confs = CONFIGS.values.flatten.map{ |conf| conf[:dst] }.uniq.sort).each do |conf| 
+      path = File.join(ENV['HOME'], conf)
+
+      next if !File.exists?(path)
 
       command = (Helper.sysname == 'macos') ? "ls -lFG #{path}" : "ls -lFo #{path}"
 
