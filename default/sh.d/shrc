@@ -1,0 +1,5 @@
+for conf in `ls -d $HOME/.sh.d/*.shrc`; do
+  . $conf
+done
+
+# vim: ft=sh sw=2 ts=2 sts=2

@@ -1,0 +1,11 @@
+if [ -f $HOME/.sh.d/shrc ]; then
+  . $HOME/.sh.d/shrc
+fi
+if [ -f /etc/bashrc ]; then
+  . /etc/bashrc
+fi
+for conf in `ls -d $HOME/.bash.d/*.bashrc`; do
+  . $conf
+done
+
+# vim: ft=sh sw=2 ts=2 sts=2

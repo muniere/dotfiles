@@ -1,3 +1,0 @@
-if [ -f $HOME/.bash.d/.bashrc ]; then
-    . ~/.bash.d/.bashrc
-fi

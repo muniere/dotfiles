@@ -6,26 +6,26 @@ NOOP = false
 
 CONFIGS = {
   :bash => [
-    { :src => '.sh.d'     , :dst => '.sh.d'      },
-    { :src => '.bash.d'   , :dst => '.bash.d'    }
+    { :src => 'sh.d'     , :dst => '.sh.d'      },
+    { :src => 'bash.d'   , :dst => '.bash.d'    }
   ],
   :zsh  => [
-    { :src => '.sh.d'     , :dst => '.sh.d'      },
-    { :src => '.zsh.d'    , :dst => '.zsh.d'     }
+    { :src => 'sh.d'     , :dst => '.sh.d'      },
+    { :src => 'zsh.d'    , :dst => '.zsh.d'     }
   ],
   :vim  => [
-    { :src => '.vimrc'    , :dst => '.vimrc'     },
-    { :src => '.vim.d'    , :dst => '.vim.d'     },
-    { :src => '.vim'      , :dst => '.vim'       }
+    { :src => 'vimrc'    , :dst => '.vimrc'     },
+    { :src => 'vim.d'    , :dst => '.vim.d'     },
+    { :src => 'vim'      , :dst => '.vim'       }
   ],
   :tmux => [
-    { :src => '.tmux.conf', :dst => '.tmux.conf' }
+    { :src => 'tmux.conf', :dst => '.tmux.conf' }
   ],
   :tig  => [
-    { :src => '.tigrc'    , :dst => '.tigrc'     }
+    { :src => 'tigrc'    , :dst => '.tigrc'     }
   ],
   :peco => [
-    { :src => '.peco'     , :dst => '.peco'      }
+    { :src => 'peco'     , :dst => '.peco'      }
   ]
 }
 
@@ -153,7 +153,7 @@ class Helper
   #
   def self.unlink_r(target)
 
-    return false if !File.exists?(target)
+    return false if !File.exists?(target) and !File.symlink?(target)
 
     # symlink
     if File.symlink?(target)
@@ -171,7 +171,7 @@ class Helper
     self.lsdir(target).each do |file|
       path = File.join(target, file)
 
-      next if !File.exists?(path) or !File.symlink?(path)
+      next if !File.symlink?(path)
 
       success &= self.rm(path)
     end
@@ -242,12 +242,7 @@ class Action
   # undeploy config file
   #
   def self.undeploy(config)
-
-    tgt = File.join(ENV['HOME'], config[:dst])
-
-    return true if !File.exists?(tgt)
-
-    return Helper.unlink_r(tgt)
+    return Helper.unlink_r(File.join(ENV['HOME'], config[:dst]))
   end
 
   #
@@ -340,9 +335,9 @@ end
 
 desc 'example configs'
 task :example do
-  Dir.glob('./default/.*.example').each do |example|
+  Dir.glob('./default/*.example').each do |example|
     src = example
-    dst = File.join(ENV['HOME'], File.basename(example).sub('.example', ''))
+    dst = File.join(ENV['HOME'], '.' + File.basename(example).sub('.example', ''))
     Helper.concat(src, dst)
   end
 end

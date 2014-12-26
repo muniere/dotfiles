@@ -1,5 +1,0 @@
-if [ -f $HOME/.sh.d/.shrc ]; then
-    . $HOME/.sh.d/.shrc
-fi
-
-# vim: ft=sh

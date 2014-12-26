@@ -370,4 +370,4 @@ filetype indent plugin on
 
 " }}}
 
-" vim:ft=vim
+" vim: ft=vim sw=2 ts=2 sts=2
