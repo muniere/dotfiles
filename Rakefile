@@ -39,6 +39,11 @@ SYSTEMS = [
   { :keyword => /amzn/i  , :name => 'amazon' }
 ]
 
+NEOBUNDLE = {
+  :src => 'https://github.com/Shougo/neobundle.vim',
+  :dst => File.join(ENV['HOME'], '/.vim/bundle/neobundle.vim')
+}
+
 #
 # Extended String
 #
@@ -176,7 +181,7 @@ class Helper
 
     if !File.exists?(target) and !File.symlink?(target)
       self.info("File already removed: #{target}")
-      return false
+      return true
     end
 
     # symlink
@@ -186,7 +191,8 @@ class Helper
 
     # file
     if File.file?(target)
-      return true
+      self.info("File is NOT LINK: #{target}")
+      return false
     end
 
     # directory
@@ -227,7 +233,10 @@ class Helper
   #
   # exec shell command
   #
-  def self.exec(command, verbose=VERBOSE, noop=NOOP)
+  def self.exec(command, options={})
+    verbose = !options[:verbose].nil? ? options[:verbose] : VERBOSE
+    noop = !options[:noop].nil? ? options[:noop] : NOOP
+
     if verbose
       STDERR.puts "[EXEC] #{command}".green 
     end
@@ -256,10 +265,7 @@ class Action
       return success
     end
 
-    src = File.join(Dir.pwd, system, config[:src])
-    dst = File.join(ENV['HOME'], config[:dst])
-
-    return Helper.symlink_r(src, dst)
+    return Helper.symlink_r(File.join(Dir.pwd, system, config[:src]), File.join(ENV['HOME'], config[:dst]))
   end
 
   #
@@ -287,9 +293,7 @@ class Action
 
     # extra
     if package == :vim
-      src = 'https://github.com/Shougo/neobundle.vim'
-      dst = File.join(ENV['HOME'], '/.vim/bundle/neobundle.vim')
-      success &= Helper.git_clone(src, dst)
+      success &= Helper.git_clone(NEOBUNDLE[:src], NEOBUNDLE[:dst])
     end
 
     return success
@@ -318,8 +322,6 @@ class Action
   def self.status
 
     success = true
-    verbose = true
-    noop = false
 
     (confs = CONFIGS.values.flatten.map{ |conf| conf[:dst] }.uniq.sort).each do |conf| 
       path = File.join(ENV['HOME'], conf)
@@ -328,7 +330,7 @@ class Action
 
       command = (Helper.sysname == 'macos') ? "ls -lFG #{path}" : "ls -lFo #{path}"
 
-      success &= Helper.exec(command, verbose, noop)
+      success &= Helper.exec(command, verbose: true, noop: false)
 
       puts if conf != confs.last 
     end
