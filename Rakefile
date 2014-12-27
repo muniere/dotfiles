@@ -58,6 +58,20 @@ end
 class Helper
 
   #
+  # output info
+  #
+  def self.info(message)
+    STDERR.puts "[INFO] #{message}".cyan if VERBOSE
+  end
+
+  #
+  # output warn
+  #
+  def self.warn(message)
+    STDERR.puts "[WARN] #{message}".yellow if VERBOSE
+  end
+
+  #
   # get system name
   #
   def self.sysname
@@ -121,8 +135,15 @@ class Helper
   #
   def self.symlink_r(src, dst, recursive=true)
 
-    return false if !File.exists?(src) 
-    return true if File.symlink?(dst)
+    if !File.exists?(src)
+      self.warn("File NOT FOUND: #{src}")
+      return false
+    end
+
+    if File.symlink?(dst)
+      self.info("File already exists: #{dst}")
+      return true
+    end
 
     # file
     if File.file?(src) 
@@ -153,7 +174,10 @@ class Helper
   #
   def self.unlink_r(target)
 
-    return false if !File.exists?(target) and !File.symlink?(target)
+    if !File.exists?(target) and !File.symlink?(target)
+      self.info("File already removed: #{target}")
+      return false
+    end
 
     # symlink
     if File.symlink?(target)
@@ -204,7 +228,9 @@ class Helper
   # exec shell command
   #
   def self.exec(command, verbose=VERBOSE, noop=NOOP)
-    puts command.green if verbose
+    if verbose
+      STDERR.puts "[EXEC] #{command}".green 
+    end
 
     return true if noop
 
@@ -233,8 +259,6 @@ class Action
     src = File.join(Dir.pwd, system, config[:src])
     dst = File.join(ENV['HOME'], config[:dst])
 
-    return false if !File.exists?(src)
-
     return Helper.symlink_r(src, dst)
   end
 
@@ -242,7 +266,9 @@ class Action
   # undeploy config file
   #
   def self.undeploy(config)
-    return Helper.unlink_r(File.join(ENV['HOME'], config[:dst]))
+    target = File.join(ENV['HOME'], config[:dst])
+
+    return Helper.unlink_r(target)
   end
 
   #
@@ -319,7 +345,10 @@ class Action
       src = tmpl
       dst = File.join(ENV['HOME'], '.' + File.basename(tmpl))
 
-      next if File.read(dst).include?(File.read(src))
+      if File.read(dst).include?(File.read(src))
+        Helper.info("File already setup: #{dst}")
+        next
+      end
 
       Helper.concat(src, dst)
     end
