@@ -309,6 +309,21 @@ class Action
 
     return success
   end
+
+  #
+  # setup rc files
+  #
+  def self.setup
+
+    Dir.glob('./default/tmpl.d/*').each do |tmpl|
+      src = tmpl
+      dst = File.join(ENV['HOME'], '.' + File.basename(tmpl))
+
+      next if File.read(dst).include?(File.read(src))
+
+      Helper.concat(src, dst)
+    end
+  end
 end
 
 #
@@ -333,13 +348,9 @@ task :status do
   Action.status
 end
 
-desc 'example configs'
-task :example do
-  Dir.glob('./default/*.example').each do |example|
-    src = example
-    dst = File.join(ENV['HOME'], '.' + File.basename(example).sub('.example', ''))
-    Helper.concat(src, dst)
-  end
+desc 'setup configs'
+task :setup do
+  Action.setup
 end
 
 # vim: ft=ruby sw=2 ts=2 sts=2
