@@ -161,7 +161,7 @@ class Helper
     end
 
     # directory: recursive
-    if !Dir.exists?(dst)
+    if !File.directory?(dst)
       self.mkdir_p(dst) 
     end
 
@@ -243,9 +243,14 @@ class Helper
 
     return true if noop
 
-    Process.waitpid(Process.spawn(command))
+    if RUBY_VERSION >= '1.9.3'
+      Process.waitpid(Process.spawn(command))
+    else
+      result = %x(#{command})
+      puts result if !result.nil? and !result.empty?
+    end
 
-    return $?.success?
+    return !$?.nil? && $?.success?
   end
 end
 
@@ -330,7 +335,7 @@ class Action
 
       command = (Helper.sysname == 'macos') ? "ls -lFG #{path}" : "ls -lFo #{path}"
 
-      success &= Helper.exec(command, verbose: true, noop: false)
+      success &= Helper.exec(command, :verbose => true, :noop => false)
 
       puts if conf != confs.last 
     end
@@ -347,7 +352,7 @@ class Action
       src = tmpl
       dst = File.join(ENV['HOME'], '.' + File.basename(tmpl))
 
-      if File.read(dst).include?(File.read(src))
+      if File.exists?(dst) and File.read(dst).include?(File.read(src))
         Helper.info("File already setup: #{dst}")
         next
       end
