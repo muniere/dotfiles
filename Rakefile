@@ -339,9 +339,9 @@ class Action
   end
 
   #
-  # setup rc files
+  # inject template into rc files
   #
-  def self.setup
+  def self.inject
 
     Dir.glob('./default/tmpl.d/*').each do |tmpl|
       src = tmpl
@@ -360,14 +360,15 @@ end
 #
 # Tasks
 #
-desc 'install config'
+desc 'install'
 task :install do
   PACKAGES.each do |package|
     Action.install(package)
   end
+  Action.inject
 end
 
-desc 'uninstall configs'
+desc 'uninstall'
 task :uninstall do
   PACKAGES.each do |package|
     Action.uninstall(package)
@@ -377,11 +378,6 @@ end
 desc 'show status'
 task :status do
   Action.status
-end
-
-desc 'setup configs'
-task :setup do
-  Action.setup
 end
 
 # vim: ft=ruby sw=2 ts=2 sts=2
