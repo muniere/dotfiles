@@ -7,7 +7,11 @@ export HISTTIMEFORMAT='%Y/%m/%d %T:$ '
 shopt -s histappend
 shopt -s checkwinsize
 
-function _color1 {
+function __color0 {
+  echo "\033[0m"
+}
+
+function __color1 {
   if [ $# -le 0 ]; then
     echo -en "\033[36m"
   elif [ $1 -eq 0 ]; then 
@@ -17,7 +21,7 @@ function _color1 {
   fi
 }
 
-function _color2 {
+function __color2 {
   if [ $# -le 0 ]; then 
     echo -en "\033[33m"
   elif [ $1 -eq 0 ]; then 
@@ -27,16 +31,27 @@ function _color2 {
   fi
 }
 
-function _reset {
-  echo "\033[0m"
+function __color3 {
+  if [ $# -le 0 ]; then 
+    echo -en "\033[35m"
+  elif [ $1 -eq 0 ]; then 
+    echo -en "\033[35m"
+  else 
+    echo -en "\033[31m"
+  fi
 }
 
-function _title {
+function __title {
   echo "\033]0;${PWD/$HOME/~}\007"
 }
 
 ## Prompt
-export PROMPT_COMMAND='status=$?; echo -ne "`_title`";PS1="`_reset`[`_color1 $status`\u`_reset`@`_color1 $status`\h`_reset`: `_color2`\w`_reset`]\n\$ "'
+if (type __git_ps1 &> /dev/null); then
+  export GIT_PS1_SHOWDIRTYSTATE=true
+  export PROMPT_COMMAND='status=$?; echo -ne "$(__title)";PS1="$(__color0)[$(__color1 $status)\u$(__color0)@$(__color1 $status)\h$(__color0): $(__color2)\w$(__color0)$(__color3)$(__git_ps1)$(__color0)]\n\$ "'
+else 
+  export PROMPT_COMMAND='status=$?; echo -ne "$(__title)";PS1="$(__color0)[$(__color1 $status)\u$(__color0)@$(__color1 $status)\h$(__color0): $(__color2)\w$(__color0)]\n\$ "'
+fi
 
 set show-all-if-ambiguous on
 set completion-ignore-case on
