@@ -53,6 +53,13 @@ function __color3 {
   fi
 }
 
+## Completion
+
+if [ -d $HOME/.bash_completion.d ] && [ -n "$(ls $HOME/.bash_completion.d)" ]; then
+  for comp in $(ls $HOME/.bash_completion.d/*); do
+    . $comp
+  done
+fi
 
 ## Prompt
 
