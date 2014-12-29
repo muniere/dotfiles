@@ -61,8 +61,8 @@ function sudo() {
 
 ### Completion 
 
-if [ -d ~/.share/zsh-completions ]; then
-  fpath=(~/.share/zsh-completions $fpath)
+if [ -d ~/.zsh-completions ]; then
+  fpath=(~/.zsh-completions $fpath)
 fi
 
 autoload -Uz colors; colors
