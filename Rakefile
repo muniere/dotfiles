@@ -16,7 +16,7 @@ CONFIGS = {
   :vim  => [
     { :src => 'vimrc'    , :dst => '.vimrc'     },
     { :src => 'vim.d'    , :dst => '.vim.d'     },
-    { :src => 'vim'      , :dst => '.vim'       }
+    { :src => 'vim'      , :dst => '.vim'       , :extra => Proc.new { Helper.git_clone(NEOBUNDLE[:src], NEOBUNDLE[:dst]) } }
   ],
   :tmux => [
     { :src => 'tmux.conf', :dst => '.tmux.conf' }
@@ -283,11 +283,10 @@ class Action
 
     CONFIGS[package].each do |conf|
       success &= self.deploy(conf)
-    end
 
-    # extra
-    if package == :vim
-      success &= Helper.git_clone(NEOBUNDLE[:src], NEOBUNDLE[:dst])
+      if conf[:extra].is_a?(Proc)
+        conf[:extra].call
+      end
     end
 
     return success
