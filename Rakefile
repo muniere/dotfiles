@@ -234,23 +234,12 @@ class Helper
   # exec shell command
   #
   def self.exec(command, options={})
-    verbose = !options[:verbose].nil? ? options[:verbose] : VERBOSE
-    noop = !options[:noop].nil? ? options[:noop] : NOOP
-
-    if verbose
+    if (options[:verbose].nil? ? VERBOSE : options[:verbose])
       STDERR.puts "[EXEC] #{command}".green 
     end
 
-    return true if noop
-
-    if RUBY_VERSION >= '1.9.3'
-      Process.waitpid(Process.spawn(command))
-    else
-      result = %x(#{command})
-      puts result if !result.nil? and !result.empty?
-    end
-
-    return !$?.nil? && $?.success?
+    return true if (options[:noop].nil? ? NOOP : options[:noop])
+    return Kernel.system(command)
   end
 end
 
