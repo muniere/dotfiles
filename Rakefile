@@ -4,33 +4,6 @@
 VERBOSE = true
 NOOP = false
 
-CONFIGS = {
-  :bash => [
-    { :src => 'sh.d'     , :dst => '.sh.d'      },
-    { :src => 'bash.d'   , :dst => '.bash.d'    }
-  ],
-  :zsh  => [
-    { :src => 'sh.d'     , :dst => '.sh.d'      },
-    { :src => 'zsh.d'    , :dst => '.zsh.d'     }
-  ],
-  :vim  => [
-    { :src => 'vimrc'    , :dst => '.vimrc'     },
-    { :src => 'vim.d'    , :dst => '.vim.d'     },
-    { :src => 'vim'      , :dst => '.vim'       , :extra => Proc.new { Helper.git_clone(NEOBUNDLE[:src], NEOBUNDLE[:dst]) } }
-  ],
-  :tmux => [
-    { :src => 'tmux.conf', :dst => '.tmux.conf' }
-  ],
-  :tig  => [
-    { :src => 'tigrc'    , :dst => '.tigrc'     }
-  ],
-  :peco => [
-    { :src => 'peco'     , :dst => '.peco'      }
-  ]
-}
-
-PACKAGES = CONFIGS.keys
-
 SYSTEMS = [
   { :keyword => /ubuntu/i, :name => 'ubuntu' },
   { :keyword => /debian/i, :name => 'debian' },
@@ -43,6 +16,19 @@ NEOBUNDLE = {
   :src => 'https://github.com/Shougo/neobundle.vim',
   :dst => File.join(ENV['HOME'], '/.vim/bundle/neobundle.vim')
 }
+
+DOTFILES = [
+  { :src => 'sh.d'     , :dst => '.sh.d'      },
+  { :src => 'bash.d'   , :dst => '.bash.d'    },
+  { :src => 'zsh.d'    , :dst => '.zsh.d'     },
+  { :src => 'tmux.conf', :dst => '.tmux.conf' },
+  { :src => 'tigrc'    , :dst => '.tigrc'     },
+  { :src => 'peco'     , :dst => '.peco'      },
+  { :src => 'vimrc'    , :dst => '.vimrc'     },
+  { :src => 'vim.d'    , :dst => '.vim.d'     },
+  { :src => 'vim'      , :dst => '.vim'       ,
+    :extra => Proc.new { Helper.git_clone(NEOBUNDLE[:src], NEOBUNDLE[:dst]) } },
+]
 
 #
 # Extended String
@@ -136,84 +122,6 @@ class Helper
   end
 
   #
-  # create symlink recursively
-  #
-  def self.symlink_r(src, dst, recursive=true)
-
-    if !File.exists?(src)
-      self.warn("File NOT FOUND: #{src}")
-      return false
-    end
-
-    if File.symlink?(dst)
-      self.info("File already exists: #{dst}")
-      return true
-    end
-
-    # file
-    if File.file?(src) 
-      return self.symlink_f(src, dst)
-    end
-
-    # directory: non-recursive
-    if !recursive
-      return self.symlink_f(src, dst)
-    end
-
-    # directory: recursive
-    if !File.directory?(dst)
-      self.mkdir_p(dst) 
-    end
-
-    success = true
-
-    self.lsdir(src).each do |conf|
-      success &= self.symlink_r(File.join(src, conf), File.join(dst, conf), recursive=false)
-    end
-
-    return success
-  end
-
-  #
-  # unlink recursively
-  #
-  def self.unlink_r(target)
-
-    if !File.exists?(target) and !File.symlink?(target)
-      self.info("File already removed: #{target}")
-      return true
-    end
-
-    # symlink
-    if File.symlink?(target)
-      return self.rm(target)
-    end
-
-    # file
-    if File.file?(target)
-      self.info("File is NOT LINK: #{target}")
-      return false
-    end
-
-    # directory
-    success = true
-
-    self.lsdir(target).each do |file|
-      path = File.join(target, file)
-
-      next if !File.symlink?(path)
-
-      success &= self.rm(path)
-    end
-
-    if self.lsdir(target).empty?
-      success &= self.rm_r(target)
-    end
-
-    return success
-  end
-
-  #
   # git clone
   #
   def self.git_clone(src=nil, dst=nil)
@@ -249,64 +157,123 @@ end
 class Action
 
   #
-  # deploy config file
+  # deploy dotfile
   #
-  def self.deploy(config, system=nil)
-    if system.nil?
-      success = false
-      success |= self.deploy(config, Helper.sysname) 
-      success |= self.deploy(config, 'default')
-      return success
+  def self.deploy(dotfile, env=nil)
+    if env.nil?
+      self.deploy(dotfile, Helper.sysname) 
+      self.deploy(dotfile, 'default')
+      return
     end
 
-    return Helper.symlink_r(File.join(Dir.pwd, system, config[:src]), File.join(ENV['HOME'], config[:dst]))
-  end
+    src = File.join(Dir.pwd, env, dotfile[:src])
+    dst = File.join(ENV['HOME'], dotfile[:dst])
 
-  #
-  # undeploy config file
-  #
-  def self.undeploy(config)
-    target = File.join(ENV['HOME'], config[:dst])
+    # check
+    return if !File.exists?(src)
 
-    return Helper.unlink_r(target)
-  end
+    # symlink
+    if File.symlink?(dst)
+      Helper.info("File already exists: #{dst}")
+      return
+    end
 
-  #
-  # install config for package
-  #
-  def self.install(package)
+    # file
+    if File.file?(src) 
+      Helper.symlink_f(src, dst)
+      return
+    end
 
-    return false unless PACKAGES.include?(package)
+    # directory
+    if !File.directory?(dst)
+      Helper.mkdir_p(dst) 
+    end
 
-    # deploy
-    success = true
+    Helper.lsdir(src).each do |conf|
+      s = File.join(src, conf)
+      d = File.join(dst, conf)
 
-    CONFIGS[package].each do |conf|
-      success &= self.deploy(conf)
-
-      if conf[:extra].is_a?(Proc)
-        conf[:extra].call
+      if File.exists?(d)
+        Helper.info("File already exists: #{d}")
+        next
       end
-    end
 
-    return success
+      Helper.symlink_f(s, d)
+    end
   end
 
   #
-  # uninstall config for package
+  # undeploy dotfile
   #
-  def self.uninstall(package)
+  def self.undeploy(dotfile, env=nil)
+    if env.nil?
+      self.undeploy(dotfile, Helper.sysname) 
+      self.undeploy(dotfile, 'default')
+      return
+    end
+    
+    src = File.join(Dir.pwd, env, dotfile[:src])
+    dst = File.join(ENV['HOME'], dotfile[:dst])
 
-    return false unless PACKAGES.include?(package)
+    # check
+    return if !File.exists?(src)
 
-    # undeploy
-    success = true
-
-    CONFIGS[package].each do |conf|
-      success &= self.undeploy(conf)
+    if !File.exists?(dst) and !File.symlink?(dst)
+      Helper.info("File already removed: #{dst}")
+      return
     end
 
-    return success
+    # symlink
+    if File.symlink?(dst)
+      Helper.rm(dst)
+      return
+    end
+
+    # file
+    if File.file?(dst)
+      Helper.info("File is NOT LINK: #{dst}")
+      return
+    end
+
+    # directory
+    Helper.lsdir(src).each do |file|
+      d = File.join(dst, file)
+
+      if !File.exists?(d) and !File.symlink?(d)
+        Helper.info("File already removed: #{d}")
+        return
+      end
+
+      if !File.symlink?(d)
+        Helper.info("File is NOT LINK: #{d}")
+        next
+      end
+
+      Helper.rm(d)
+    end
+
+    if Helper.lsdir(dst).empty?
+      Helper.rm_r(dst)
+    end
+  end
+
+  #
+  # install dotfile
+  #
+  def self.install(dotfile)
+
+    self.deploy(dotfile)
+
+    if dotfile[:extra].is_a?(Proc)
+      dotfile[:extra].call
+    end
+  end
+
+  #
+  # uninstall dotfile
+  #
+  def self.uninstall(dotfile)
+    self.undeploy(dotfile)
   end
 
   #
@@ -314,21 +281,14 @@ class Action
   #
   def self.status
 
-    success = true
+    (files = DOTFILES.map{ |dotfile| dotfile[:dst] }.uniq.sort).each do |file| 
+      next if !File.exists?(path = File.join(ENV['HOME'], file))
 
-    (confs = CONFIGS.values.flatten.map{ |conf| conf[:dst] }.uniq.sort).each do |conf| 
-      path = File.join(ENV['HOME'], conf)
+      Helper.exec((Helper.sysname == 'macos') ? "ls -lFG #{path}" : "ls -lFo #{path}",
+                  :verbose => true, :noop => false)
 
-      next if !File.exists?(path)
-
-      command = (Helper.sysname == 'macos') ? "ls -lFG #{path}" : "ls -lFo #{path}"
-
-      success &= Helper.exec(command, :verbose => true, :noop => false)
-
-      puts if conf != confs.last 
+      puts if file != files.last 
     end
-
-    return success
   end
 
   #
@@ -355,16 +315,16 @@ end
 #
 desc 'install'
 task :install do
-  PACKAGES.each do |package|
-    Action.install(package)
+  DOTFILES.each do |dotfile|
+    Action.install(dotfile)
   end
   Action.inject
 end
 
 desc 'uninstall'
 task :uninstall do
-  PACKAGES.each do |package|
-    Action.uninstall(package)
+  DOTFILES.each do |dotfile|
+    Action.uninstall(dotfile)
   end
 end
 
