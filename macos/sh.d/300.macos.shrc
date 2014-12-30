@@ -25,6 +25,11 @@ if (which brew >/dev/null 2>&1); then
     export MAVEN_HOME="/usr/local/opt/maven/libexec"
   fi
 
+  # Docker
+  if [ -d /usr/local/opt/docker ]; then
+    export DOCKER_HOST='tcp://localhost:4243'
+  fi
+
   # pkgconfig
   if [ -d /usr/local/opt/pkg-config ]; then
     export PKG_CONFIG_PATH="/opt/X11/lib/pkgconfig"
