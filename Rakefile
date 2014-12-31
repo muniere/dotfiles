@@ -470,31 +470,33 @@ task :status do
   Dotfile.status
 end
 
-namespace :brew do
+namespace :x do
 
-  desc 'install brew kegs'
-  task :install do
-    Homebrew.install
+  namespace :brew do
+
+    desc 'install brew kegs'
+    task :install do
+      Homebrew.install
+    end
+
+    desc 'uninstall brew kegs'
+    task :uninstall do
+      Homebrew.uninstall
+    end
   end
 
-  desc 'uninstall brew kegs'
-  task :uninstall do
-    Homebrew.uninstall
+  namespace :npm do
+
+    desc 'install npm packages'
+    task :install do
+      Npm.install
+    end
+
+    desc 'uninstall npm packages'
+    task :uninstall do
+      Npm.uninstall
+    end
   end
 end
-
-namespace :npm do
-
-  desc 'install npm packages'
-  task :install do
-    Npm.install
-  end
-
-  desc 'uninstall npm packages'
-  task :uninstall do
-    Npm.uninstall
-  end
-end
-
 
 # vim: ft=ruby sw=2 ts=2 sts=2
