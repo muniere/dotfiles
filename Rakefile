@@ -388,6 +388,66 @@ class Homebrew
   end
 end
 
+class RubyGem
+
+  #
+  # install gems based on Gemfile
+  #
+  def self.install
+
+    gems = []
+    self.gems.each do |gem| 
+      if system("gem which #{gem} &>/dev/null") 
+        Helper.info("Gem already installed: #{gem}")
+      else
+        gems.push(gem)
+      end
+    end
+
+    if !gems.empty?
+      Helper.exec("gem install #{gems.join(' ')}")
+    end
+  end
+
+  #
+  # uninstall gems based on Gemfile
+  #
+  def self.uninstall
+
+    gems = []
+    self.gems.each do |gem| 
+      if !system("gem which #{gem} &>/dev/null") 
+        Helper.info("Gem not installed: #{gem}")
+      else
+        gems.push(gem)
+      end
+    end
+
+    if !gems.empty?
+      Helper.exec("gem uninstall #{gems.join(' ')}")
+    end
+  end
+
+  private
+  def self.gems
+
+    if Helper.which(command = 'gem').nil?
+      Helper.error("Command not found: #{command}")
+      exit 1
+    end
+
+    if !File.exists?(gemfile = File.join(Helper.sysname, 'Gemfile'))
+      Helper.error("File not found: #{gemfile}")
+      exit 1
+    end
+
+    return File.read(gemfile).lines.select{ |line| line.match(/^gem/) }.map{ |line|
+      line.match(/^gem\s+["']([^"']+)["']/)[1] 
+    }
+  end
+end
+
+
 class Npm
 
   #
@@ -482,6 +542,19 @@ namespace :x do
     desc 'uninstall brew kegs'
     task :uninstall do
       Homebrew.uninstall
+    end
+  end
+
+  namespace :gem do
+
+    desc 'install gems'
+    task :install do
+      RubyGem.install
+    end
+
+    desc 'uninstall gems'
+    task :uninstall do
+      RubyGem.uninstall
     end
   end
 
