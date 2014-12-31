@@ -388,6 +388,65 @@ class Homebrew
   end
 end
 
+class Npm
+
+  #
+  # install npm packages based on packages.json
+  #
+  def self.install
+
+    packages = []
+    self.packages.each do |package| 
+      if system("npm ls -g #{package} &>/dev/null") 
+        Helper.info("Package already installed: #{package}")
+      else
+        packages.push(package)
+      end
+    end
+
+    if !packages.empty?
+      Helper.exec("npm -g install #{packages.join(' ')}")
+    end
+  end
+
+  #
+  # uninstall npm packages based on packages.json
+  #
+  def self.uninstall
+
+    packages = []
+    self.packages.each do |package| 
+      if !system("npm ls -g #{package} &>/dev/null") 
+        Helper.info("Package not installed: #{package}")
+      else
+        packages.push(package)
+      end
+    end
+
+    if !packages.empty?
+      Helper.exec("npm -g uninstall #{packages.join(' ')}")
+    end
+  end
+
+  private
+  def self.packages
+
+    if Helper.which(command = 'npm').nil?
+      Helper.error("Command not found: #{command}")
+      exit 1
+    end
+
+    if !File.exists?(package_json = File.join(Helper.sysname, 'package.json'))
+      Helper.error("File not found: #{package_json}")
+      exit 1
+    end
+
+    require 'json'
+
+    return JSON.parse(File.read(package_json))['dependencies'].keys
+  end
+end
+
 #
 # Tasks
 #
@@ -423,5 +482,19 @@ namespace :brew do
     Homebrew.uninstall
   end
 end
+
+namespace :npm do
+
+  desc 'install npm packages'
+  task :install do
+    Npm.install
+  end
+
+  desc 'uninstall npm packages'
+  task :uninstall do
+    Npm.uninstall
+  end
+end
+
 
 # vim: ft=ruby sw=2 ts=2 sts=2
