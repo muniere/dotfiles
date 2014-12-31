@@ -63,6 +63,13 @@ class Helper
   end
 
   #
+  # output error
+  #
+  def self.error(message)
+    STDERR.puts "[ERROR] #{message}".red
+  end
+
+  #
   # get system name
   #
   def self.sysname
@@ -77,6 +84,13 @@ class Helper
   #
   def self.lsdir(dir)
     return Dir.entries(dir) - ['.', '..']
+  end
+
+  #
+  # detect command path
+  #
+  def self.which(cmd)
+    return !(path = %x(which #{cmd})).empty? ? path.strip : nil
   end
 
   #
@@ -311,6 +325,70 @@ class Dotfile
 end
 
 #
+# Homebrew actions
+#
+class Homebrew
+
+  #
+  # install kegs based on Brewfile
+  #
+  def self.install
+
+    our_kegs = []
+    his_kegs = %x(brew list).lines.map{ |line| line.strip }
+
+    self.kegs.each do |keg| 
+      if his_kegs.include?(File.basename(keg)) 
+        Helper.info("Keg already installed: #{keg}")
+      else
+        our_kegs.push(keg)
+      end
+    end
+
+    if !our_kegs.empty?
+      Helper.exec("brew install #{our_kegs.join(' ')}")
+    end
+  end
+
+  #
+  # uninstall kegs based on Brewfile
+  #
+  def self.uninstall
+
+    our_kegs = []
+    his_kegs = %x(brew list).lines.map{ |line| line.strip }
+
+    self.kegs.each do |keg| 
+      if !his_kegs.include?(File.basename(keg)) 
+        Helper.info("Keg not installed: #{keg}")
+      else
+        our_kegs.push(File.basename(keg))
+      end
+    end
+
+    if !our_kegs.empty?
+      Helper.exec("brew uninstall #{our_kegs.join(' ')}")
+    end
+  end
+
+  private
+  def self.kegs
+
+    if Helper.which(command = 'brew').nil?
+      Helper.error("Command not found: #{command}")
+      exit 1
+    end
+
+    if !File.exists?(brewfile = File.join(Helper.sysname, 'Brewfile'))
+      Helper.error("File not found: #{brewfile}")
+      exit 1
+    end
+
+    return File.read(brewfile).lines.map{ |line| line.strip }
+  end
+end
+
+#
 # Tasks
 #
 desc 'install dotfiles'
@@ -331,6 +409,19 @@ end
 desc 'show dotfiles status'
 task :status do
   Dotfile.status
+end
+
+namespace :brew do
+
+  desc 'install brew kegs'
+  task :install do
+    Homebrew.install
+  end
+
+  desc 'uninstall brew kegs'
+  task :uninstall do
+    Homebrew.uninstall
+  end
 end
 
 # vim: ft=ruby sw=2 ts=2 sts=2
