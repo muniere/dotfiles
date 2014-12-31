@@ -152,9 +152,9 @@ class Helper
 end
 
 #
-# Actions
+# Dotfile actions
 #
-class Action
+class Dotfile
 
   #
   # deploy dotfile
@@ -313,24 +313,24 @@ end
 #
 # Tasks
 #
-desc 'install'
+desc 'install dotfiles'
 task :install do
   DOTFILES.each do |dotfile|
-    Action.install(dotfile)
+    Dotfile.install(dotfile)
   end
-  Action.inject
+  Dotfile.inject
 end
 
-desc 'uninstall'
+desc 'uninstall dotfiles'
 task :uninstall do
-  DOTFILES.each do |dotfile|
-    Action.uninstall(dotfile)
+  Dotfile.each do |dotfile|
+    Dotfile.uninstall(dotfile)
   end
 end
 
-desc 'show status'
+desc 'show dotfiles status'
 task :status do
-  Action.status
+  Dotfile.status
 end
 
 # vim: ft=ruby sw=2 ts=2 sts=2
