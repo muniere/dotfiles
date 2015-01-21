@@ -30,6 +30,13 @@ if (which brew >/dev/null 2>&1); then
     export DOCKER_HOST='tcp://localhost:4243'
   fi
 
+  # Go
+  if [ -d /usr/local/opt/go ]; then
+    export GOROOT=/usr/local/opt/go/libexec
+    export GOPATH=$HOME/.go
+    export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
+  fi
+
   # pkgconfig
   if [ -d /usr/local/opt/pkg-config ]; then
     export PKG_CONFIG_PATH="/opt/X11/lib/pkgconfig"
