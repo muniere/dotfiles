@@ -18,15 +18,17 @@ NEOBUNDLE = {
 }
 
 DOTFILES = [
-  { :src => 'sh.d'     , :dst => '.sh.d'      },
-  { :src => 'bash.d'   , :dst => '.bash.d'    },
-  { :src => 'zsh.d'    , :dst => '.zsh.d'     },
-  { :src => 'tmux.conf', :dst => '.tmux.conf' },
-  { :src => 'tigrc'    , :dst => '.tigrc'     },
-  { :src => 'peco'     , :dst => '.peco'      },
-  { :src => 'vimrc'    , :dst => '.vimrc'     },
-  { :src => 'vim.d'    , :dst => '.vim.d'     },
-  { :src => 'vim'      , :dst => '.vim'       ,
+  { :src => 'sh.d'             , :dst => '.sh.d'              },
+  { :src => 'bash.d'           , :dst => '.bash.d'            },
+  { :src => 'bash_completion.d', :dst => '.bash_completion.d' },
+  { :src => 'zsh.d'            , :dst => '.zsh.d'             },
+  { :src => 'zsh-completions'  , :dst => '.zsh-completions'   },
+  { :src => 'tmux.conf'        , :dst => '.tmux.conf'         },
+  { :src => 'tigrc'            , :dst => '.tigrc'             },
+  { :src => 'peco'             , :dst => '.peco'              },
+  { :src => 'vimrc'            , :dst => '.vimrc'             },
+  { :src => 'vim.d'            , :dst => '.vim.d'             },
+  { :src => 'vim'              , :dst => '.vim',
     :extra => Proc.new { Helper.git_clone(NEOBUNDLE[:src], NEOBUNDLE[:dst]) } },
 ]
 
