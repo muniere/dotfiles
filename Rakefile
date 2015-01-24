@@ -27,7 +27,6 @@ DOTFILES = [
   { :src => 'tigrc'            , :dst => '.tigrc'             },
   { :src => 'peco'             , :dst => '.peco'              },
   { :src => 'vimrc'            , :dst => '.vimrc'             },
-  { :src => 'vim.d'            , :dst => '.vim.d'             },
   { :src => 'vim'              , :dst => '.vim',
     :extra => Proc.new { Helper.git_clone(NEOBUNDLE[:src], NEOBUNDLE[:dst]) } },
 ]
