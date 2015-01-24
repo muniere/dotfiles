@@ -24,6 +24,7 @@ DOTFILES = [
   { :src => 'zsh.d'            , :dst => '.zsh.d'             },
   { :src => 'zsh-completions'  , :dst => '.zsh-completions'   },
   { :src => 'tmux.conf'        , :dst => '.tmux.conf'         },
+  { :src => 'gitconfig'        , :dst => '.gitconfig'         },
   { :src => 'tigrc'            , :dst => '.tigrc'             },
   { :src => 'peco'             , :dst => '.peco'              },
   { :src => 'vimrc'            , :dst => '.vimrc'             },

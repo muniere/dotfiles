@@ -1,0 +1,22 @@
+[user]
+    name = Hiromune Ikeda
+    email = muniere.fujiwara@gmail.com
+[push]
+    default = current
+[core]
+    excludesfile = ~/.gitignore
+    editor = vim
+[color]
+    ui = true
+    editor = vim
+[merge]
+    tool = vimdiff
+    ff = false
+[pull]
+    rebase = true
+[diff]
+	renames = true
+[alias]
+    b = branch -avv
+    br = branch -vv
+    cutoff = !git branch -vv | grep gone | xargs git branch -d
