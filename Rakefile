@@ -520,7 +520,7 @@ end
 
 desc 'uninstall dotfiles'
 task :uninstall do
-  Dotfile.each do |dotfile|
+  DOTFILES.each do |dotfile|
     Dotfile.uninstall(dotfile)
   end
 end

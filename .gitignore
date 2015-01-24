@@ -2,5 +2,3 @@
 *.DS_Store
 *.pyc
 *.swp
-**/vim/bundle/*
-!**/vim/bundle/.gitkeep
