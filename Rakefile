@@ -27,6 +27,7 @@ DOTFILES = [
   { :src => 'tigrc'            , :dst => '.tigrc'             },
   { :src => 'peco'             , :dst => '.peco'              },
   { :src => 'vimrc'            , :dst => '.vimrc'             },
+  { :src => 'vim/runtime'      , :dst => '.vim/runtime'       },
   { :src => 'vim'              , :dst => '.vim',
     :extra => Proc.new { Helper.git_clone(NEOBUNDLE[:src], NEOBUNDLE[:dst]) } },
 ]
@@ -256,7 +257,7 @@ class Dotfile
 
       if !File.exists?(d) and !File.symlink?(d)
         Helper.info("File already removed: #{d}")
-        return
+        next
       end
 
       if !File.symlink?(d)
