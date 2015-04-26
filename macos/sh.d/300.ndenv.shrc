@@ -1,5 +1,6 @@
-if (which ndenv > /dev/null) && [[ ! "$PATH" =~ "ndenv/shims" ]]; then
-  export PATH="${HOME}/.ndenv/shims:${PATH}"
+if (which ndenv > /dev/null); then
+
+  addpath $HOME/.ndenv/shims
 
   if [ -n "${BASH_VERSION}" ] && [ -f "${HOME}/.ndenv/completions/ndenv.bash" ]; then
     source "${HOME}/.ndenv/completions/ndenv.bash"

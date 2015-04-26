@@ -1,5 +1,6 @@
-if (which plenv > /dev/null) && [[ ! "$PATH" =~ "plenv/shims" ]]; then
-  export PATH="${HOME}/.plenv/shims:${PATH}"
+if (which plenv > /dev/null); then
+
+  addpath $HOME/.plenv/shims
 
   if [ -n "${BASH_VERSION}" ] && [ -f "/usr/local/opt/plenv/completions/plenv.bash" ]; then
     source "/usr/local/opt/plenv/completions/plenv.bash"

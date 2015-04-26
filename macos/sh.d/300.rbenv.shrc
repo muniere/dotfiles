@@ -1,5 +1,6 @@
-if (which rbenv > /dev/null) && [[ ! "$PATH" =~ "rbenv/shims" ]]; then
-  export PATH="${HOME}/.rbenv/shims:${PATH}"
+if (which rbenv > /dev/null); then
+
+  addpath $HOME/.rbenv/shims
 
   if [ -n "${BASH_VERSION}" ] && [ -f "/usr/local/opt/rbenv/completions/rbenv.bash" ]; then
     source "/usr/local/opt/rbenv/completions/rbenv.bash"

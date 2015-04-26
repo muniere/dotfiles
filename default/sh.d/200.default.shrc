@@ -1,15 +1,33 @@
 # .shrc for all
 
-# LANG
+function addpath() {
+  # delete duplicated path
+  local lpath=$PATH
+  for del in $@; do
+    lpath=${lpath//$del/}
+  done
+
+  # add new path
+  local adds=""
+  for add in $@; do
+    if [ -z $adds ]; then
+      adds="$add"
+    else
+      adds="$adds:$add"
+    fi
+  done
+
+  lpath="${adds}:${lpath}"
+  lpath="$(echo $lpath | sed 's/::*/:/g')"
+
+  export PATH=$lpath
+}
+
+# Default LANG
 export LC_ALL=C
 
-# PATH
-export PATH=`python <<EOF
-news = ['$HOME/.bin', '/usr/local/bin', '/usr/local/sbin', '/usr/bin', '/bin', '/usr/sbin', '/sbin']
-olds = '$PATH'.split(':')
-news.extend([e for e in olds if e not in news])
-print ':'.join(news)
-EOF`
+# Default PATH
+addpath $HOME/.bin /usr/local/bin /usr/local/sbin /usr/bin /bin /usr/sbin /sbin
 
 # Editor
 export EDITOR=vim

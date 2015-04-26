@@ -8,8 +8,8 @@ if (which java >/dev/null 2>&1); then
 fi
 
 # ndenv
-if [ -d $HOME/.ndenv/bin ] && [[ ! "$PATH" =~ "$HOME/.ndenv/bin" ]]; then
-  export PATH="$HOME/.ndenv/bin:$PATH"
+if [ -d $HOME/.ndenv/bin ] ; then
+  addpath $HOME/.ndenv/bin
 fi
 
 # Homebrew
@@ -34,7 +34,8 @@ if (which brew >/dev/null 2>&1); then
   if [ -d /usr/local/opt/go ]; then
     export GOROOT=/usr/local/opt/go/libexec
     export GOPATH=$HOME/.go
-    export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
+
+    addpath $GOPATH/bin $GOROOT/bin
   fi
 
   # pkgconfig
