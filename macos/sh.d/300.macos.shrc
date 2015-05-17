@@ -1,5 +1,5 @@
 # LC
-export LC_ALL=
+export LC_ALL=C
 
 # Java
 if (which java >/dev/null 2>&1); then

@@ -77,7 +77,7 @@ setopt nonomatch
 setopt print_eight_bit
 setopt pushd_ignore_dups
 zstyle ':completion:*' verbose yes
-zstyle ':completion:*' group-name ''
+zstyle ':completion:*' completer _expand _complete _match
 zstyle ':completion:*:default' menu select=1
 zstyle ':completion:*:sudo:*' command-path /usr/local/sbin /usr/local/bin /usr/sbin /usr/bin /sbin /bin
 zstyle ':completion:*:options' description 'yes'
