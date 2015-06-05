@@ -220,13 +220,14 @@ nnoremap tm :tabmove
 " Temporary disable filetype for vundle plugin
 filetype off
 
-" NeoBundle {{{2
 if has('vim_starting')
-    set runtimepath+=~/.vim/bundle/neobundle.vim
-    call neobundle#begin(expand('~/.vim/bundle/'))
-    NeoBundleFetch 'Shougo/neobundle.vim'
-    call neobundle#end()
+  set runtimepath+=~/.vim/bundle/neobundle.vim
 endif
+
+call neobundle#begin(expand('~/.vim/bundle/'))
+
+" NeoBundle {{{2
+NeoBundleFetch 'Shougo/neobundle.vim'
 " }}}
 
 " ColorSchema {{{2
@@ -355,6 +356,17 @@ let g:yankring_history_file = '.yankring_history'
 NeoBundle 'fugitive.vim'
 " }}}
 
+call neobundle#end()
+
+" Enable filetype plugin
+filetype indent plugin on
+
+NeoBundleCheck
+
+" }}}
+
+" Utilization {{{1
+
 " JsonFormat {{{2
 command! -nargs=0 JsonFormat :execute '%!python -m json.tool' 
 " }}
@@ -364,11 +376,6 @@ command! -nargs=0 CdCurrent cd %:p:h
 " }}}
 
 let g:is_bash=1
-
-" Enable filetype plugin
-filetype indent plugin on
-
-NeoBundleCheck
 
 " }}}
 

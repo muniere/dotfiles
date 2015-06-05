@@ -3,6 +3,8 @@
 " Disable filetype plugin temporary for setting up vundle plugin
 filetype indent plugin off
 
+call neobundle#begin(expand('~/.vim/bundle/'))
+
 " Ruby {{{2
 NeoBundle 'ruby.vim'
 " }}}
@@ -55,8 +57,11 @@ NeoBundle 'nono/vim-handlebars'
 " YAML {{{2
 NeoBundle 'vim-scripts/yaml.vim'
 " }}}
+call neobundle#end()
 
 filetype indent plugin on
+
+NeoBundleCheck
 " }}}
 
 autocmd Filetype * set formatoptions-=r
