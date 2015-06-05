@@ -15,8 +15,8 @@
 [pull]
     rebase = true
 [diff]
-	renames = true
+    renames = true
 [alias]
     b = branch -avv
     br = branch -vv
-    cutoff = !git branch -vv | grep gone | xargs git branch -d
+    cutoff = !git branch -vv | grep gone | cut -b 3- | awk '{print $1}' | xargs git branch -d
