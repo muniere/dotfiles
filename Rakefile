@@ -511,6 +511,49 @@ class Npm
 end
 
 #
+# JetBrains actions
+#
+class JetBrains
+
+  #
+  # install preferences
+  #
+  # valid type is one of:
+  #  - :AppCode
+  #  - :IntelliJIdea
+  #
+  def self.install(type)
+    require 'pathname'
+
+    src_base = Pathname.new(File.expand_path("./macos/#{type.to_s}"))
+    src_paths = Dir.glob(File.join(src_base.to_s, "**/*")).select { |p| File.file?(p) }.map { |p| Pathname.new(p) }
+
+    dir_base = Pathname.new(File.expand_path('~/Library/Preferences'))
+    dir_paths = Dir.glob(File.join(dir_base.to_s, "#{type.to_s}*")).map { |p| Pathname.new(p) }
+    
+    src_paths.each do |src_path|
+      dir_paths.each do |dir_path|
+        dst_path = dir_path.join(src_path.relative_path_from(src_base))
+
+        src = src_path.to_s
+        dst = dst_path.to_s
+
+        if File.symlink?(dst)
+          Helper.info("File already exists: #{dst}")
+          next
+        end
+
+        if !Dir.exists?(dst_path.dirname.to_s)
+          Helper.mkdir_p(dst_path.dirname.to_s)
+        end
+
+        Helper.symlink(src, dst)
+      end
+    end
+  end
+end
+
+#
 # Tasks
 #
 desc 'install dotfiles'
@@ -572,6 +615,19 @@ namespace :x do
     task :uninstall do
       Npm.uninstall
     end
+  end
+
+  namespace :jet do
+
+    desc 'install jetbrains preferences'
+    task :install do
+      [:AppCode, :IntelliJIdea].each do |type|
+        JetBrains.install(type)
+      end
+    end
+
+    # TODO: define uninstall task
+
   end
 end
 
