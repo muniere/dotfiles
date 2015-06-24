@@ -1,0 +1,26 @@
+<keymap version="1" name="Muniere" parent="Mac OS X 10.5+">
+  <action id="Back">
+    <keyboard-shortcut first-keystroke="meta alt LEFT" />
+    <mouse-shortcut keystroke="button4" />
+    <keyboard-shortcut first-keystroke="meta CLOSE_BRACKET" />
+  </action>
+  <action id="EditorBackSpace">
+    <keyboard-shortcut first-keystroke="BACK_SPACE" />
+    <keyboard-shortcut first-keystroke="shift BACK_SPACE" />
+    <keyboard-shortcut first-keystroke="control H" />
+  </action>
+  <action id="Forward">
+    <keyboard-shortcut first-keystroke="meta alt RIGHT" />
+    <mouse-shortcut keystroke="button5" />
+    <keyboard-shortcut first-keystroke="meta BACK_SLASH" />
+  </action>
+  <action id="NextTab">
+    <keyboard-shortcut first-keystroke="control RIGHT" />
+    <keyboard-shortcut first-keystroke="shift meta BACK_SLASH" />
+  </action>
+  <action id="PreviousTab">
+    <keyboard-shortcut first-keystroke="control LEFT" />
+    <keyboard-shortcut first-keystroke="shift meta CLOSE_BRACKET" />
+  </action>
+  <action id="TypeHierarchy" />
+</keymap>
