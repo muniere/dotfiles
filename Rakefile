@@ -346,6 +346,11 @@ class Homebrew
   #
   def self.install
 
+    if Helper.which(command = 'brew').nil?
+      Helper.error("Command not found: #{command}")
+      exit 1
+    end
+
     our_kegs = []
     his_kegs = %x(brew list).lines.map{ |line| line.strip }
 
@@ -366,6 +371,11 @@ class Homebrew
   # uninstall kegs based on Brewfile
   #
   def self.uninstall
+
+    if Helper.which(command = 'brew').nil?
+      Helper.error("Command not found: #{command}")
+      exit 1
+    end
 
     our_kegs = []
     his_kegs = %x(brew list).lines.map{ |line| line.strip }
@@ -400,6 +410,83 @@ class Homebrew
   end
 end
 
+#
+# Homebrew cask actions
+#
+class HomebrewCask
+
+  #
+  # install kegs based on Brewfile
+  #
+  def self.install
+
+    if Helper.which(command = 'brew-cask').nil?
+      Helper.error("Command not found: #{command}")
+      exit 1
+    end
+
+    our_kegs = []
+    his_kegs = %x(brew-cask list).lines.map{ |line| line.strip }
+
+    self.kegs.each do |keg| 
+      if his_kegs.include?(File.basename(keg)) 
+        Helper.info("Cask-Keg already installed: #{keg}")
+      else
+        our_kegs.push(keg)
+      end
+    end
+
+    if !our_kegs.empty?
+      Helper.exec("brew-cask install #{our_kegs.join(' ')}")
+    end
+  end
+
+  #
+  # uninstall kegs based on Brewfile
+  #
+  def self.uninstall
+
+    if Helper.which(command = 'brew-cask').nil?
+      Helper.error("Command not found: #{command}")
+      exit 1
+    end
+
+    our_kegs = []
+    his_kegs = %x(brew list).lines.map{ |line| line.strip }
+
+    self.kegs.each do |keg| 
+      if !his_kegs.include?(File.basename(keg)) 
+        Helper.info("Cask-Keg not installed: #{keg}")
+      else
+        our_kegs.push(File.basename(keg))
+      end
+    end
+
+    if !our_kegs.empty?
+      Helper.exec("brew uninstall #{our_kegs.join(' ')}")
+    end
+  end
+
+  private
+  def self.kegs
+
+    if Helper.which(command = 'brew-cask').nil?
+      Helper.error("Command not found: #{command}")
+      exit 1
+    end
+
+    if !File.exists?(brewfile = File.join(Helper.sysname, 'Caskfile'))
+      Helper.error("File not found: #{brewfile}")
+      exit 1
+    end
+
+    return File.read(brewfile).lines.map{ |line| line.strip }
+  end
+end
+
+#
+# Rubygems actions
+#
 class RubyGem
 
   #
@@ -459,7 +546,9 @@ class RubyGem
   end
 end
 
-
+#
+# npm actions
+#
 class Npm
 
   #
@@ -577,7 +666,8 @@ end
 # Tasks
 #
 namespace :all do
-  NAMESPACES = [:dot, :brew, :gem, :npm, :jet]
+
+  NAMESPACES = [:dot, :brew, :cask, :gem, :npm, :jet]
 
   desc 'install all'
   task :install do
@@ -618,7 +708,6 @@ namespace :dot do
   end
 end
 
-
 namespace :brew do
 
   desc 'install brew kegs'
@@ -629,6 +718,19 @@ namespace :brew do
   desc 'uninstall brew kegs'
   task :uninstall do
     Homebrew.uninstall
+  end
+end
+
+namespace :cask do
+
+  desc 'install brew-cask kegs'
+  task :install do
+    HomebrewCask.install
+  end
+
+  desc 'uninstall brew-cask kegs'
+  task :uninstall do
+    HomebrewCask.uninstall
   end
 end
 
