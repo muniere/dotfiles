@@ -1,8 +1,17 @@
 #
 # Constants
 #
-VERBOSE = true
-NOOP = false
+unless ENV['VERBOSE'].nil?
+  VERBOSE = !!(ENV['VERBOSE'] =~ /true|yes|1/)
+else
+  VERBOSE = true
+end
+
+unless ENV['NOOP'].nil?
+  NOOP = !!(ENV['NOOP'] =~ /true|yes|1/)
+else
+  NOOP = false
+end
 
 SYSTEMS = [
   { :keyword => /ubuntu/i, :name => 'ubuntu' },
@@ -518,18 +527,18 @@ class JetBrains
   #
   # install preferences
   #
-  # valid type is one of:
+  # valid product is one of followings
   #  - :AppCode
   #  - :IntelliJIdea
   #
-  def self.install(type)
+  def self.install(product)
     require 'pathname'
 
-    src_base = Pathname.new(File.expand_path("./macos/#{type.to_s}"))
+    src_base = Pathname.new(File.expand_path("./macos/#{product.to_s}"))
     src_paths = Dir.glob(File.join(src_base.to_s, "**/*")).select { |p| File.file?(p) }.map { |p| Pathname.new(p) }
 
     dir_base = Pathname.new(File.expand_path('~/Library/Preferences'))
-    dir_paths = Dir.glob(File.join(dir_base.to_s, "#{type.to_s}*")).map { |p| Pathname.new(p) }
+    dir_paths = Dir.glob(File.join(dir_base.to_s, "#{product.to_s}*")).map { |p| Pathname.new(p) }
     
     src_paths.each do |src_path|
       dir_paths.each do |dir_path|
@@ -551,83 +560,120 @@ class JetBrains
       end
     end
   end
+
+  #
+  # install preferences
+  #
+  # valid product is one of followings
+  #  - :AppCode
+  #  - :IntelliJIdea
+  #
+  def self.uninstall(product)
+    # TODO: implement uninstall process
+  end
 end
 
 #
 # Tasks
 #
-desc 'install dotfiles'
-task :install do
-  DOTFILES.each do |dotfile|
-    Dotfile.install(dotfile)
+namespace :all do
+  NAMESPACES = [:dot, :brew, :gem, :npm, :jet]
+
+  desc 'install all'
+  task :install do
+    NAMESPACES.each do |ns|
+      Rake::Task["#{ns}:install"].invoke
+    end
   end
-  Dotfile.inject
+
+
+  desc 'uninstall all'
+  task :uninstall do
+    NAMESPACES.each do |ns|
+      Rake::Task["#{ns}:uninstall"].invoke
+    end
+  end
 end
 
-desc 'uninstall dotfiles'
-task :uninstall do
-  DOTFILES.each do |dotfile|
-    Dotfile.uninstall(dotfile)
+namespace :dot do
+
+  desc 'install dotfiles'
+  task :install do
+    DOTFILES.each do |dotfile|
+      Dotfile.install(dotfile)
+    end
+    Dotfile.inject
+  end
+
+  desc 'uninstall dotfiles'
+  task :uninstall do
+    DOTFILES.each do |dotfile|
+      Dotfile.uninstall(dotfile)
+    end
+  end
+
+  desc 'show dotfiles status'
+  task :status do
+    Dotfile.status
   end
 end
 
-desc 'show dotfiles status'
-task :status do
-  Dotfile.status
+
+namespace :brew do
+
+  desc 'install brew kegs'
+  task :install do
+    Homebrew.install
+  end
+
+  desc 'uninstall brew kegs'
+  task :uninstall do
+    Homebrew.uninstall
+  end
 end
 
-namespace :x do
+namespace :gem do
 
-  namespace :brew do
+  desc 'install gems'
+  task :install do
+    RubyGem.install
+  end
 
-    desc 'install brew kegs'
-    task :install do
-      Homebrew.install
-    end
+  desc 'uninstall gems'
+  task :uninstall do
+    RubyGem.uninstall
+  end
+end
 
-    desc 'uninstall brew kegs'
-    task :uninstall do
-      Homebrew.uninstall
+namespace :npm do
+
+  desc 'install npm packages'
+  task :install do
+    Npm.install
+  end
+
+  desc 'uninstall npm packages'
+  task :uninstall do
+    Npm.uninstall
+  end
+end
+
+namespace :jet do
+
+  PRODUCTS = [:AppCode, :IntelliJIdea]
+
+  desc 'install jetbrains preferences'
+  task :install do
+    PRODUCTS.each do |product|
+      JetBrains.install(product)
     end
   end
 
-  namespace :gem do
-
-    desc 'install gems'
-    task :install do
-      RubyGem.install
+  desc 'uninstall jetbrains preferences'
+  task :uninstall do
+    PRODUCTS.each do |product|
+      JetBrains.uninstall(product)
     end
-
-    desc 'uninstall gems'
-    task :uninstall do
-      RubyGem.uninstall
-    end
-  end
-
-  namespace :npm do
-
-    desc 'install npm packages'
-    task :install do
-      Npm.install
-    end
-
-    desc 'uninstall npm packages'
-    task :uninstall do
-      Npm.uninstall
-    end
-  end
-
-  namespace :jet do
-
-    desc 'install jetbrains preferences'
-    task :install do
-      [:AppCode, :IntelliJIdea].each do |type|
-        JetBrains.install(type)
-      end
-    end
-
-    # TODO: define uninstall task
-
   end
 end
 
