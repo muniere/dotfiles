@@ -7,6 +7,8 @@ if (which java >/dev/null 2>&1); then
   export JAVA_OPTS="-Dfile.encoding=UTF-8"
 fi
 
+# Homebrew Cask
+export HOMEBREW_CASK_OPTS="--appdir=/Applications"
 
 # Tomcat
 if [ -d /usr/local/opt/tomcat/libexec ]; then
