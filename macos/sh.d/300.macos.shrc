@@ -7,41 +7,33 @@ if (which java >/dev/null 2>&1); then
   export JAVA_OPTS="-Dfile.encoding=UTF-8"
 fi
 
-# ndenv
-if [ -d $HOME/.ndenv/bin ] ; then
-  addpath $HOME/.ndenv/bin
+
+# Tomcat
+if [ -d /usr/local/opt/tomcat/libexec ]; then
+  export CATALINA_HOME="/usr/local/opt/tomcat/libexec"
 fi
 
-# Homebrew
-if (which brew >/dev/null 2>&1); then
+# Maven
+if [ -d /usr/local/opt/maven/libexec ]; then
+  export MAVEN_HOME="/usr/local/opt/maven/libexec"
+fi
 
-  # Tomcat
-  if [ -d /usr/local/opt/tomcat/libexec ]; then
-    export CATALINA_HOME="/usr/local/opt/tomcat/libexec"
-  fi
+# Docker
+if [ -d /usr/local/opt/docker ]; then
+  export DOCKER_HOST="tcp://localhost:4243"
+fi
 
-  # Maven
-  if [ -d /usr/local/opt/maven/libexec ]; then
-    export MAVEN_HOME="/usr/local/opt/maven/libexec"
-  fi
+# Go
+if [ -d /usr/local/opt/go ]; then
+  export GOROOT=/usr/local/opt/go/libexec
+  export GOPATH=$HOME/.go
 
-  # Docker
-  if [ -d /usr/local/opt/docker ]; then
-    export DOCKER_HOST='tcp://localhost:4243'
-  fi
+  addpath $GOPATH/bin $GOROOT/bin
+fi
 
-  # Go
-  if [ -d /usr/local/opt/go ]; then
-    export GOROOT=/usr/local/opt/go/libexec
-    export GOPATH=$HOME/.go
-
-    addpath $GOPATH/bin $GOROOT/bin
-  fi
-
-  # pkgconfig
-  if [ -d /usr/local/opt/pkg-config ]; then
-    export PKG_CONFIG_PATH="/opt/X11/lib/pkgconfig"
-  fi
+# pkgconfig
+if [ -d /usr/local/opt/pkg-config ]; then
+  export PKG_CONFIG_PATH="/opt/X11/lib/pkgconfig"
 fi
 
 # ls
