@@ -41,6 +41,7 @@ watch
 wget
 zsh
 zsh-completions
+caskroom/cask/brew-cask
 homebrew/dupes/apple-gcc42
 homebrew/completions/docker-completion
 homebrew/completions/tmuxinator-completion
