@@ -1,0 +1,63 @@
+#compdef brew-cask
+
+_brew_all_casks() {
+  casks=($(brew-cask search))
+}
+
+_brew_installed_casks() {
+  installed_casks=($(brew-cask list))
+}
+
+local -a _1st_arguments
+_1st_arguments=(
+  'audit:verifies installability of casks'
+  'checklinks:checks for bad cask links'
+  'cleanup:cleans up cached downloads'
+  'create:creates a cask of the given name and opens it in an editor'
+  'doctor:checks for configuration issues'
+  'edit:edits the cask of the given name'
+  'fetch:downloads Cask resources to local cache'
+  'home:opens the homepage of the cask of the given name'
+  'info:displays information about the cask of the given name'
+  'install:installs the cask of the given name'
+  'list:with no args, lists installed casks; given installed casks, lists installed files'
+  'search:searches all known casks'
+  'uninstall:uninstalls the cask of the given name'
+)
+
+local expl
+local -a casks installed_casks 
+
+_arguments -C \
+  '(--verbose)--verbose[verbose]' \
+  '(--force)--force[force]' \
+  '(--caskroom)--caskroom[caskroom path]' \
+  '(--appdir)--appdir[app directory]' \
+  '(--colorpickerdir)--colorpickerdir[color picker directory]' \
+  '(--prefpanedir)--prefpanedir[prefpane directory]' \
+  '(--qlplugindir)--qlplugindir[qlplugin directory]' \
+  '(--fontdir)--fontdir[font directory]' \
+  '(--servicedir)--servicedir[service directory]' \
+  '(--input_methoddir)--input_methoddir[input method directory]' \
+  '(--internet_plugindir)--internet_plugindir[internet plugin directory]' \
+  '(--screen_saverdir)--screen_saverdir[screen saver directory]' \
+  '(--no-binaries)--no-binaries[do not install binaries]' \
+  '(--binarydir)--binarydir[binary directory]' \
+  '(--debug)--debug[debug]' \
+  '*:: :->subcmds' && return 0
+
+if (( CURRENT == 1 )); then
+  _describe -t commands "brew-cask subcommand" _1st_arguments
+  return
+fi
+
+case "$words[1]" in
+  list|uninstall)
+    _brew_installed_casks
+    _wanted installed_casks expl 'installed casks' compadd -a installed_casks ;;
+  audit|edit|home|info|install)
+    _brew_all_casks
+    _wanted casks expl 'all casks' compadd -a casks ;;
+esac
+
+# vim: ft=zsh sw=2 ts=2 sts=2
