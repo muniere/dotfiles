@@ -762,7 +762,7 @@ end
 
 namespace :jet do
 
-  PRODUCTS = [:AppCode, :IntelliJIdea]
+  PRODUCTS = [:AndroidStudio, :AppCode, :IntelliJIdea]
 
   desc 'install jetbrains preferences'
   task :install do
