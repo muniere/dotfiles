@@ -4,6 +4,9 @@
     "C-]": "peco.SelectNone",
     "C-/": "peco.SelectVisible",
     "C-b": "peco.SelectPreviousPage",
-    "C-f": "peco.SelectNextPage"
+    "C-f": "peco.SelectNextPage",
+    "C-p": "peco.SelectPrevious",
+    "C-n": "peco.SelectNext",
+    "C-c": "peco.Cancel"
   }
 }
