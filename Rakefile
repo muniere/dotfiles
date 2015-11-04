@@ -665,6 +665,16 @@ end
 #
 # Tasks
 #
+desc 'install dotfiles'
+task :install do
+  Rake::Task['dot:install'].invoke
+end
+
+desc 'uninstall dotfiels'
+task :uninstall do
+  Rake::Task['dot:uninstall'].invoke
+end
+
 namespace :all do
 
   NAMESPACES = [:dot, :brew, :cask, :gem, :npm, :jet]
