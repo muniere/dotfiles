@@ -15,6 +15,21 @@ if (which peco > /dev/null); then
   bindkey '^o'   peco-dir
 
   #
+  # <C-m>: find file
+  #
+  function peco-file () {
+    local selected
+    selected=$(find . -type f -maxdepth 5 | grep -v '/\.' | tail -n +2 | peco)
+    if [ -n "$selected" ]; then
+      BUFFER="${BUFFER}${selected}"
+      CURSOR=$#BUFFER
+    fi
+    zle reset-prompt
+  }
+  zle -N peco-file
+  bindkey '^j'   peco-file
+
+  #
   # <C-]>: src with ghq
   #
   function peco-src() {
