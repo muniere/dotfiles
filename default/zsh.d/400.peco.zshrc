@@ -4,7 +4,7 @@ if (which peco > /dev/null); then
   #
   function peco-dir () {
     local selected
-    selected=$(find . -type d -maxdepth 5 | grep -v '/\.' | tail -n +2 | peco)
+    selected=$(find . -type d -maxdepth 10 | grep -v '/\.' | tail -n +2 | peco)
     if [ -n "$selected" ]; then
       BUFFER="${BUFFER}${selected}"
       CURSOR=$#BUFFER
@@ -19,7 +19,7 @@ if (which peco > /dev/null); then
   #
   function peco-file () {
     local selected
-    selected=$(find . -type f -maxdepth 5 | grep -v '/\.' | tail -n +2 | peco)
+    selected=$(find . -type f -maxdepth 10 | grep -v '/\.' | tail -n +2 | peco)
     if [ -n "$selected" ]; then
       BUFFER="${BUFFER}${selected}"
       CURSOR=$#BUFFER
