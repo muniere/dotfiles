@@ -67,6 +67,7 @@ fi
 
 autoload -Uz colors; colors
 autoload -Uz compinit; compinit -u
+setopt auto_cd
 setopt auto_menu
 setopt autopushd
 setopt list_packed
