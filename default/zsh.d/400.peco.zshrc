@@ -1,6 +1,6 @@
 if (which peco > /dev/null); then
   #
-  # <C-o>: find directory
+  # <C-x><C-d>: find directory
   #
   function peco-dir () {
     local selected
@@ -12,10 +12,10 @@ if (which peco > /dev/null); then
     zle reset-prompt
   }
   zle -N peco-dir
-  bindkey '^o'   peco-dir
+  bindkey '^x^d' peco-dir
 
   #
-  # <C-m>: find file
+  # <C-x><C-f>: find file
   #
   function peco-file () {
     local selected
@@ -27,7 +27,7 @@ if (which peco > /dev/null); then
     zle reset-prompt
   }
   zle -N peco-file
-  bindkey '^j'   peco-file
+  bindkey '^x^f' peco-file
 
   #
   # <C-]>: src with ghq
@@ -42,12 +42,16 @@ if (which peco > /dev/null); then
     zle reset-prompt
   }
   zle -N peco-src
-  bindkey '^]'   peco-src
+  bindkey '^]' peco-src
 
   #
   # <C-@>: branch
   #
   function peco-branch () {
+    if [[ ! "$BUFFER" =~ "\s*git" ]]; then
+      return
+    fi
+
     local selected
     selected=$(git branch -vv | peco | awk '$0 = substr($0, 3) { print $1 }')
     if [ -n "$selected" ]; then
@@ -64,7 +68,6 @@ if (which peco > /dev/null); then
   #
   function peco-history() {
     local tac
-  
     if which tac > /dev/null; then
       tac="tac"
     else
