@@ -34,7 +34,7 @@ if (which peco > /dev/null); then
   #
   function peco-src() {
     local selected
-    selected="$(ghq list --full-path | peco)"
+    selected=$(ghq list --full-path | sed -e "s|${HOME}|~|" | peco)
     if [ -n "$selected" ]; then
       BUFFER="${BUFFER}${selected}"
       CURSOR=$#BUFFER
