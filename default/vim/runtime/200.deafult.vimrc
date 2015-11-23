@@ -406,6 +406,10 @@ NeoBundle 'toyamarinyon/vim-swift'
 NeoBundle 'keith/swift.vim'
 " }}}
 
+" Crystal {{{3
+NeoBundle 'rhysd/vim-crystal'
+" }}}
+
 call neobundle#end()
 
 filetype indent plugin on
