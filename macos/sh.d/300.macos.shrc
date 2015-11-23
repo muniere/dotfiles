@@ -28,7 +28,7 @@ fi
 # Go
 if [ -d /usr/local/opt/go ]; then
   export GOROOT=/usr/local/opt/go/libexec
-  export GOPATH=$HOME/.go
+  export GOPATH=$HOME/Projects
 
   addpath $GOPATH/bin $GOROOT/bin
 fi

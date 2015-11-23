@@ -21,4 +21,4 @@
     ba = branch -avv
     cutoff = !git branch -vv | grep gone | cut -b 3- | awk '{print $1}' | xargs git branch -d
 [ghq]
-    root = ~/Projects
+    root = ~/Projects/src
