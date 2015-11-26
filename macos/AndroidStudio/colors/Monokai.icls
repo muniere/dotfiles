@@ -72,6 +72,11 @@
         <option name="FONT_TYPE" value="2" />
       </value>
     </option>
+    <option name="CLASS_NAME_ATTRIBUTES">
+      <value>
+        <option name="FONT_TYPE" value="1" />
+      </value>
+    </option>
     <option name="CONSOLE_BLUE_OUTPUT">
       <value>
         <option name="FOREGROUND" value="5394ec" />
@@ -596,6 +601,12 @@
       </value>
     </option>
     <option name="STATIC_FIELD_ATTRIBUTES">
+      <value>
+        <option name="FOREGROUND" value="66d9ee" />
+        <option name="FONT_TYPE" value="1" />
+      </value>
+    </option>
+    <option name="STATIC_FINAL_FIELD_ATTRIBUTES">
       <value>
         <option name="FOREGROUND" value="66d9ee" />
         <option name="FONT_TYPE" value="1" />

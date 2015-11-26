@@ -1,7 +1,7 @@
 <scheme name="Monokai" version="141" parent_scheme="Default">
   <option name="LINE_SPACING" value="1.0" />
-  <option name="EDITOR_FONT_SIZE" value="13" />
-  <option name="EDITOR_FONT_NAME" value="Osaka" />
+  <option name="EDITOR_FONT_SIZE" value="14" />
+  <option name="EDITOR_FONT_NAME" value="Ricty" />
   <colors>
     <option name="ADDED_LINES_COLOR" value="295622" />
     <option name="CARET_COLOR" value="bbbbbb" />
@@ -47,12 +47,6 @@
       <value>
         <option name="FOREGROUND" value="ff0000" />
         <option name="FONT_TYPE" value="1" />
-      </value>
-    </option>
-    <option name="BASH.EXTERNAL_COMMAND">
-      <value>
-        <option name="FOREGROUND" value="c57633" />
-        <option name="FONT_TYPE" value="2" />
       </value>
     </option>
     <option name="BASH.INTERNAL_COMMAND">
@@ -250,7 +244,6 @@
     <option name="DEFAULT_FUNCTION_DECLARATION">
       <value>
         <option name="FOREGROUND" value="a7e22e" />
-        <option name="FONT_TYPE" value="1" />
       </value>
     </option>
     <option name="DEFAULT_GLOBAL_VARIABLE">
@@ -541,6 +534,11 @@
     <option name="PARAMETER_ATTRIBUTES">
       <value>
         <option name="FOREGROUND" value="fe9720" />
+      </value>
+    </option>
+    <option name="RUBY_EXPR_IN_STRING">
+      <value>
+        <option name="FOREGROUND" value="ff692f" />
       </value>
     </option>
     <option name="RUBY_HEREDOC_CONTENT">
