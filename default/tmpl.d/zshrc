@@ -1,3 +1,0 @@
-if [ -f $HOME/.zsh.d/zshrc ]; then
-    . $HOME/.zsh.d/zshrc
-fi

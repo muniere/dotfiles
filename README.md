@@ -1,40 +1,83 @@
 # dotfiles
 
-## Requirements
-
-- [Ruby](https://www.ruby-lang.org/) >= 1.8
-- [Rake](http://docs.seattlerb.org/rake/) >= 0.8.0
-
 ## Get started
 
 ```bash
+# clone
+$ git clone https://github.com/muniere/dotfiles.git
+
 # install 
-$ rake all:install
-
-# uninstall
-$ rake all:uninstall
-
-# dry-run is supported
-$ NOOP=true rake all:install
-$ NOOP=true rake all:uninstall
+$ ./xake install
 ```
 
-## Show tasks
+## Tasks
+
+Each task has following options:
+
+- `-n`: dry-run
+- `-v`: verbose 
+
+### Dotfile
 
 ```bash
-$ rake -T
-rake all:install     # install all
-rake all:uninstall   # uninstall all
-rake brew:install    # install brew kegs
-rake brew:uninstall  # uninstall brew kegs
-rake dot:install     # install dotfiles
-rake dot:status      # show dotfiles status
-rake dot:uninstall   # uninstall dotfiles
-rake gem:install     # install gems
-rake gem:uninstall   # uninstall gems
-rake jet:install     # install jetbrains preferences
-rake jet:uninstall   # uninstall jetbrains preferences
-rake npm:install     # install npm packages
-rake npm:uninstall   # uninstall npm packages
+# install 
+./xake install
+
+# uninstall
+./xake uninstall
+
+# status
+./xake status
 ```
 
+### Homebrew
+
+```bash
+# install
+./xake install brew
+
+# uninstall
+./xake uninstall brew
+
+# status
+./xake status bew
+```
+
+### Homebrew Cask
+
+```bash
+# install
+./xake install cask
+
+# uninstall
+./xake uninstall cask
+
+# status
+./xake status cask
+```
+
+### Rubygems
+
+```bash
+# install
+./xake install gem
+
+# uninstall
+./xake uninstall gem
+
+# status
+./xake status gem
+```
+
+### npm
+
+```bash
+# install
+./xake install npm
+
+# uninstall
+./xake uninstall npm
+
+# status
+./xake status npm
+```
