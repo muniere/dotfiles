@@ -174,10 +174,11 @@ class Install(DotfileAction):
             return
 
         # enable
-        with open(dst_path, "w") as dst_file:
-            if self.logger:
-                self.logger.execute("Enable %s" % xpath.reduceuser(src_path))
-            if not self.noop:
+        if self.logger:
+            self.logger.execute("Enable %s" % xpath.reduceuser(src_path))
+
+        if not self.noop:
+            with open(dst_path, "w") as dst_file:
                 dst_file.write(dst_str + src_str + "\n")
 
         return
@@ -277,10 +278,11 @@ class Uninstall(DotfileAction):
             return
 
         # disable
-        with open(dst_path, "w") as dst_file:
-            if self.logger:
-                self.logger.execute("Disable %s" % xpath.reduceuser(src_path))
-            if not self.noop:
+        if self.logger:
+            self.logger.execute("Disable %s" % xpath.reduceuser(src_path))
+
+        if not self.noop:
+            with open(dst_path, "w") as dst_file:
                 dst_file.write(dst_str.replace(src_str, ""))
 
         return
