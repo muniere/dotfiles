@@ -410,6 +410,10 @@ NeoBundle 'keith/swift.vim'
 NeoBundle 'rhysd/vim-crystal'
 " }}}
 
+" Elixir {{{3
+NeoBundle 'elixir-lang/vim-elixir'
+" }}}
+
 call neobundle#end()
 
 filetype indent plugin on
