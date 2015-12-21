@@ -2,7 +2,7 @@ if [ -d $HOME/.ndenv/bin ] ; then
   addpath $HOME/.ndenv/bin
 fi
 
-if (which ndenv > /dev/null); then
+if (which ndenv &> /dev/null); then
 
   addpath $HOME/.ndenv/shims
 

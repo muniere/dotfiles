@@ -1,4 +1,4 @@
-if (which peco > /dev/null); then
+if (which peco &> /dev/null); then
   #
   # <C-x><C-d>: find directory
   #
@@ -68,7 +68,7 @@ if (which peco > /dev/null); then
   #
   function peco-history() {
     local tac
-    if which tac > /dev/null; then
+    if which tac &> /dev/null; then
       tac="tac"
     else
       tac="tail -r"

@@ -1,4 +1,4 @@
-if (which peco > /dev/null); then
+if (which peco &> /dev/null); then
   # src with ghq
   peco-src() {
     local selected

@@ -1,4 +1,4 @@
-if (which plenv > /dev/null); then
+if (which plenv &> /dev/null); then
 
   addpath $HOME/.plenv/shims
 

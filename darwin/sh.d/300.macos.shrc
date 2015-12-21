@@ -2,7 +2,7 @@
 export LC_ALL=
 
 # Java
-if (which java >/dev/null 2>&1); then
+if (which java &> /dev/null); then
   export JAVA_HOME=$(/usr/libexec/java_home)
   export JAVA_OPTS="-Dfile.encoding=UTF-8"
 fi
