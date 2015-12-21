@@ -44,26 +44,26 @@ class Xake:
         Run application
         """
 
-        # sack
-        sack = self.__sack(args)
-        sack.logger = self.__logger(sack)
+        # context
+        context = self.__context(args)
+        context.logger = self.__logger(context)
 
         # completion
-        if sack.action == Xake.ACTION_COMPLETION:
-            self.completion(sack)
+        if context.action == Xake.ACTION_COMPLETION:
+            self.completion(context)
             xsys.exit(0)
 
         # action
-        for command in self.__commands(sack):
+        for command in self.__commands(context):
             command.run()
 
         xsys.exit(0)
 
-    def completion(self, sack):
+    def completion(self, context):
         """
         Show messages for completion
 
-        :param sack: Sack
+        :param context: Context
         """
 
         from mako.template import Template
@@ -114,17 +114,10 @@ class Xake:
 
         parser = argparse.ArgumentParser(formatter_class=lambda prog: argparse.HelpFormatter(prog, width=240))
 
-        parser.add_argument("-n", "--dry-run", dest="dry_run", action="store_true",
-                            help="Do not execute commands actually")
-
-        parser.add_argument("-v", "--verbose", dest="verbose", action="store_true",
-                            help="Show verbose messages")
-
-        parser.add_argument("action", type=str,
-                            help="Action to perform: (%s)" % "|".join(cls.actions()))
-
-        parser.add_argument("target", type=str, nargs="*", default=["dotfile"],
-                            help="Target for action: (%s)" % "|".join(cls.targets()))
+        parser.add_argument("-n", "--dry-run", dest="dry_run", action="store_true", help="Do not execute commands actually")
+        parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="Show verbose messages")
+        parser.add_argument("action", type=str, help="Action to perform: (%s)" % "|".join(cls.actions()))
+        parser.add_argument("target", type=str, nargs="*", help="Target for action: (%s)" % "|".join(cls.targets()))
 
         return parser
 
@@ -132,57 +125,54 @@ class Xake:
     def __parser_26(cls):
         import optparse
 
-        parser = optparse.OptionParser()
+        parser = optparse.OptionParser(usage="Usage: %prog [options] <command> [<target> ...]")
 
-        parser.add_option("-n", "--dry-run", dest="dry_run", action="store_true",
-                          help="Do not execute commands actually")
-
-        parser.add_option("-v", "--verbose", dest="verbose", action="store_true",
-                          help="Show verbose messages")
+        parser.add_option("-n", "--dry-run", dest="dry_run", action="store_true", help="Do not execute commands actually")
+        parser.add_option("-v", "--verbose", dest="verbose", action="store_true", help="Show verbose messages")
 
         return parser
 
-    def __sack(self, args):
+    def __context(self, args):
         """
-        Package sack
+        Package context
 
         :param args: Arguments
-        :return: Knapsack
+        :return: Context
         """
         if xsys.version_info >= (2, 7, 0):
-            sack = self.__sack_27(args)
+            context = self.__context_27(args)
         else:
-            sack = self.__sack_26(args)
+            context = self.__context_26(args)
 
-        return sack
+        return context
 
-    def __sack_27(self, args):
+    def __context_27(self, args):
 
         namespace = self.parser.parse_args(args)
 
-        sack = Sack()
-        sack.action = namespace.action
-        sack.targets = namespace.target
-        sack.dry_run = namespace.dry_run
-        sack.verbose = namespace.verbose
+        context = Context()
+        context.action = namespace.action
+        context.targets = namespace.target or ["dotfile"]
+        context.dry_run = namespace.dry_run
+        context.verbose = namespace.verbose
 
-        return sack
+        return context
 
-    def __sack_26(self, args):
+    def __context_26(self, args):
 
         (opts, argv) = self.parser.parse_args(args)
 
-        sack = Sack()
-        sack.action = argv[0]
-        sack.targets = argv[1:]
-        sack.dry_run = opts.dry_run
-        sack.verbose = opts.verbose
+        context = Context()
+        context.action = argv[0]
+        context.targets = argv[1:] or ["dotfile"]
+        context.dry_run = opts.dry_run
+        context.verbose = opts.verbose
 
-        return sack
+        return context
 
     @classmethod
-    def __logger(cls, sack):
-        if sack.verbose:
+    def __logger(cls, context):
+        if context.verbose:
             logging_level = xlogging.DEBUG
         else:
             logging_level = xlogging.EXEC
@@ -200,48 +190,48 @@ class Xake:
         return logger
 
     @classmethod
-    def __commands(cls, sack):
-        if sack.action == Xake.ACTION_INSTALL:
-            return cls.__commands_install(sack)
+    def __commands(cls, context):
+        if context.action == Xake.ACTION_INSTALL:
+            return cls.__commands_install(context)
 
-        if sack.action == Xake.ACTION_UNINSTALL:
-            return cls.__commands_uninstall(sack)
+        if context.action == Xake.ACTION_UNINSTALL:
+            return cls.__commands_uninstall(context)
 
-        if sack.action == Xake.ACTION_STATUS:
-            return cls.__commands_status(sack)
+        if context.action == Xake.ACTION_STATUS:
+            return cls.__commands_status(context)
 
         return []
 
     @classmethod
-    def __commands_install(cls, sack):
+    def __commands_install(cls, context):
 
         modules = filter(lambda module: module is not None and module.Install is not None,
-                         map(lambda target: cls.__module(target), sack.targets))
+                         map(lambda target: cls.__module(target), context.targets))
 
         commands = filter(lambda action: action is not None,
-                          map(lambda module: module.Install(noop=sack.dry_run, logger=sack.logger), modules))
+                          map(lambda module: module.Install(noop=context.dry_run, logger=context.logger), modules))
 
         return commands
 
     @classmethod
-    def __commands_uninstall(cls, sack):
+    def __commands_uninstall(cls, context):
 
         modules = filter(lambda module: module is not None and module.Uninstall is not None,
-                         map(lambda target: cls.__module(target), sack.targets))
+                         map(lambda target: cls.__module(target), context.targets))
 
         commands = filter(lambda action: action is not None,
-                          map(lambda module: module.Uninstall(noop=sack.dry_run, logger=sack.logger), modules))
+                          map(lambda module: module.Uninstall(noop=context.dry_run, logger=context.logger), modules))
 
         return commands
 
     @classmethod
-    def __commands_status(cls, sack):
+    def __commands_status(cls, contex):
 
         modules = filter(lambda module: module is not None and module.Status is not None,
-                         map(lambda target: cls.__module(target), sack.targets))
+                         map(lambda target: cls.__module(target), contex.targets))
 
         commands = filter(lambda action: action is not None,
-                          map(lambda module: module.Status(noop=sack.dry_run, logger=sack.logger), modules))
+                          map(lambda module: module.Status(noop=contex.dry_run, logger=contex.logger), modules))
 
         return commands
 
@@ -265,14 +255,14 @@ class Xake:
         return None
 
 
-class Sack:
+class Context:
     """
     Attributes store for application
     """
 
     def __init__(self):
         """
-        Initialize sack
+        Initialize context
         """
         self.action = None
         self.targets = []
