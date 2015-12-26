@@ -401,17 +401,18 @@ NeoBundle 'nono/vim-handlebars'
 NeoBundle 'vim-scripts/yaml.vim'
 " }}}
 
-" Swift {{{3
+" Swift {{{2
 NeoBundle 'toyamarinyon/vim-swift'
 NeoBundle 'keith/swift.vim'
 " }}}
 
-" Crystal {{{3
+" Crystal {{{2
 NeoBundle 'rhysd/vim-crystal'
 " }}}
 
-" Elixir {{{3
+" Elixir {{{2
 NeoBundle 'elixir-lang/vim-elixir'
+NeoBundle 'mattreduce/vim-mix'
 " }}}
 
 call neobundle#end()
