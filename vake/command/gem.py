@@ -84,8 +84,16 @@ class Gem:
 
         gems = []
 
-        for line in filter(lambda l: re.match("^gem", l), open(path).read().splitlines()):
-            n, v = map(lambda s: s.strip(), re.sub("^gem", "", line).strip().split(","))
-            gems.append(Gem(name=n, version=v))
+        # filter lines like following:
+        #   gem 'awesome_gem1', '~> 1.2.3'
+        #   gem "awesome_gem2", "~> 1.2.3"
+        #   gem "awesome_gem3"
+
+        for line in open(path).read().splitlines():
+
+            match = re.compile("^\s*gem\s+[\"'](?P<name>\w+)[\"']\s*(,\s*[\"'](?P<version>.+)[\"'])?").search(line)
+
+            if match:
+                gems.append(Gem(name=match.group("name"), version=match.group("version")))
 
         return gems
