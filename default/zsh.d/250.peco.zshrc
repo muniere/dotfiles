@@ -45,6 +45,25 @@ if (which peco &> /dev/null); then
   bindkey '^]' peco-src
 
   #
+  # <C-[>: git log
+  #
+  function peco-gitlog () {
+    if [[ ! "$BUFFER" =~ "\s*git" ]]; then
+      return
+    fi
+
+    local selected
+    selected=$(git log --oneline | peco | awk '{ print $1 }')
+    if [ -n "$selected" ]; then
+      BUFFER="${BUFFER}${selected}"
+      CURSOR=$#BUFFER
+    fi
+    zle reset-prompt
+  }
+  zle -N peco-gitlog
+  bindkey '^[' peco-gitlog
+
+  #
   # <C-@>: branch
   #
   function peco-branch () {
