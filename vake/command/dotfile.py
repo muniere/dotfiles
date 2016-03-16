@@ -34,6 +34,7 @@ class DotfileAction(base.Action):
 
             Dotfile(src="zsh.d", dst="~/.zsh.d"),
             Dotfile(src="zsh-completions", dst="~/.zsh-completions"),
+            Dotfile(src="/usr/local/library/Contributions/brew_zsh_completion.zsh", dst="~/.zsh-completions/_brew"),
 
             Dotfile(src="tmux.conf", dst="~/.tmux.conf"),
             Dotfile(src="gitconfig", dst="~/.gitconfig"),
@@ -75,8 +76,11 @@ class DotfileAction(base.Action):
 class Install(DotfileAction):
     def run(self):
         for dot in self.dotfiles():
-            self.__run(dot, sysname=xos.sysname())
-            self.__run(dot, sysname="default")
+            if dot.src.startswith('/'):
+                self.__run(dot)
+            else:
+                self.__run(dot, sysname=xos.sysname())
+                self.__run(dot, sysname="default")
 
             if dot.install:
                 dot.install()
@@ -88,8 +92,15 @@ class Install(DotfileAction):
 
     def __run(self, dotfile, sysname="default"):
 
-        src = xpath.abspath(xpath.join(sysname, dotfile.src))
-        dst = xpath.expanduser(dotfile.dst)
+        if dotfile.src.startswith('/'):
+            src = dotfile.src 
+        else:
+            src = xpath.abspath(xpath.join(sysname, dotfile.src))
+
+        if dotfile.dst.startswith('/'):
+            dst = dotfile.dst 
+        else:
+            dst = xpath.expanduser(dotfile.dst)
 
         #
         # guard

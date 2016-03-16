@@ -1,8 +1,3 @@
-# homebrew
-if [ -d /usr/local/Library/Contributions ]; then
-  fpath=(/usr/local/Library/Contributions $fpath)
-fi
-
 # zsh-completions
 if [ -d /usr/local/share/zsh-completions ]; then
   fpath=(/usr/local/share/zsh-completions $fpath)
