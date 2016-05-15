@@ -5,7 +5,8 @@ from ..xos import xpath
 # 3rd
 import base
 
-CASK = "brew-cask"
+BREW = "brew"
+CASK = "cask"
 CASKFILE = "Caskfile"
 
 
@@ -24,8 +25,8 @@ class CaskAction(base.Action):
 
 class Install(CaskAction):
     def run(self):
-        if not self.shell.available(CASK):
-            self.logger.warn("Command is not available: %s" % CASK)
+        if not self.shell.available(BREW):
+            self.logger.warn("Command is not available: %s" % BREW)
             return
 
         casks = self.casks()
@@ -35,15 +36,15 @@ class Install(CaskAction):
             return
 
         for cask in casks:
-            self.shell.execute([CASK, "install", cask])
+            self.shell.execute([BREW, CASK, "install", cask])
 
         return
 
 
 class Uninstall(CaskAction):
     def run(self):
-        if not self.shell.available(CASK):
-            self.logger.warn("Command is not available: %s" % CASK)
+        if not self.shell.available(BREW):
+            self.logger.warn("Command is not available: %s" % BREW)
             return
 
         casks = self.casks()
@@ -53,16 +54,16 @@ class Uninstall(CaskAction):
             return
 
         for cask in casks:
-            self.shell.execute([CASK, "uninstall", cask])
+            self.shell.execute([BREW, CASK, "uninstall", cask])
 
         return
 
 
 class Status(CaskAction):
     def run(self):
-        if not self.shell.available(CASK):
-            self.logger.warn("Command is not available: %s" % CASK)
+        if not self.shell.available(BREW):
+            self.logger.warn("Command is not available: %s" % BREW)
             return
 
-        self.shell.execute([CASK, "list"])
+        self.shell.execute([BREW, CASK, "list"])
         return
