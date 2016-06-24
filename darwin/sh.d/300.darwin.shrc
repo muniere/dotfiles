@@ -38,6 +38,11 @@ if [ -d /usr/local/opt/pkg-config ]; then
   export PKG_CONFIG_PATH="/opt/X11/lib/pkgconfig"
 fi
 
+# git
+if [ -d /usr/local/share/git-core/contrib/diff-highlight/ ]; then
+  addpath /usr/local/share/git-core/contrib/diff-highlight
+fi
+
 # ls
 alias ls="ls -Gv"
 alias ll="ls -lhF"
