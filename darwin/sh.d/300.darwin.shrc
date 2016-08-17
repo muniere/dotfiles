@@ -52,4 +52,42 @@ alias l="ls -lAhF"
 alias grep="grep --color=always"
 alias egrep="egrep --color=always"
 
+# app
+function _activate() {
+  if [ -e "$1" ]; then
+    open -a "$1"
+  else
+    echo "open: No such file or directory: ${1}" >&2
+    exit 1
+  fi
+}
+
+function xcode() {
+  _activate "/Applications/Xcode.app/"
+}
+
+function gvim() {
+  _activate "/Applications/MacVim.app/"
+}
+
+function safari() {
+  _activate "/Applications/Safari.app/"
+}
+
+function chrome() {
+  _activate "/Applications/Google Chrome.app/"
+}
+
+function canary() {
+  _activate "/Applications/Google Chrome Canary.app/"
+}
+
+function slack() {
+  _activate "/Applications/Slack.app/"
+}
+
+function messenger() {
+  _activate "/Applications/Messenger.app/"
+}
+
 # vim: ft=sh sw=2 ts=2 sts=2
