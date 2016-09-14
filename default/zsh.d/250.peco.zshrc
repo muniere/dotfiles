@@ -1,25 +1,10 @@
 if (which peco &> /dev/null); then
   #
-  # <C-x><C-d>: find directory
-  #
-  function peco-dir () {
-    local selected
-    selected=$(find . -type d -maxdepth 10 | grep -v '/\.' | tail -n +2 | peco)
-    if [ -n "$selected" ]; then
-      BUFFER="${BUFFER}${selected}"
-      CURSOR=$#BUFFER
-    fi
-    zle reset-prompt
-  }
-  zle -N peco-dir
-  bindkey '^x^d' peco-dir
-
-  #
   # <C-x><C-f>: find file
   #
   function peco-file () {
     local selected
-    selected=$(find . -type f -maxdepth 10 | grep -v '/\.' | tail -n +2 | peco)
+    selected=$(find . -type f -o -type d -maxdepth 10 | grep -v '/\.' | tail -n +2 | peco)
     if [ -n "$selected" ]; then
       BUFFER="${BUFFER}${selected}"
       CURSOR=$#BUFFER
