@@ -404,6 +404,7 @@ NeoBundle 'vim-scripts/yaml.vim'
 " Swift {{{2
 NeoBundle 'toyamarinyon/vim-swift'
 NeoBundle 'keith/swift.vim'
+NeoBundle 'cfdrake/vim-carthage'
 " }}}
 
 " Crystal {{{2
