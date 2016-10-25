@@ -9,8 +9,8 @@ from logging import *
 # Constants
 #
 DEBUG = 10
+EXEC = 15
 INFO = 20
-EXEC = 25
 WARN = 30
 ERROR = 40
 
@@ -18,8 +18,8 @@ ERROR = 40
 # Refine levels
 #
 addLevelName(DEBUG, "DEBUG")
-addLevelName(INFO, "INFO")
 addLevelName(EXEC, "EXEC")
+addLevelName(INFO, "INFO")
 addLevelName(WARN, "WARN")
 addLevelName(ERROR, "ERROR")
 
@@ -58,8 +58,8 @@ class LabelFormatter(Formatter):
 
         color_dict = {
             DEBUG: "\033[32m", # green
-            INFO: "\033[36m",  # cyan
             EXEC: "\033[35m",  # magenta
+            INFO: "\033[36m",  # cyan
             WARN: "\033[33m",  # yellow
             ERROR: "\033[33m", # red
         }

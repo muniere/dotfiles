@@ -1,5 +1,6 @@
 # 1st
 import glob
+import re
 
 # 2nd
 from .. import xos
@@ -91,6 +92,10 @@ class Install(DotfileAction):
         return
 
     def __run(self, dotfile, sysname="default"):
+        if not self.__istarget(dotfile):
+            if self.logger:
+                self.logger.info("File is not target: %s" % xpath.relpath(dotfile.src, xos.getcwd()))
+            return
 
         if dotfile.src.startswith('/'):
             src = dotfile.src 
@@ -123,7 +128,7 @@ class Install(DotfileAction):
             # another file already exists
             if xpath.isfile(dst):
                 if self.logger:
-                    self.logger.warn("File already exists: %s" % xpath.reduceuser(dst))
+                    self.logger.info("File already exists: %s" % xpath.reduceuser(dst))
                 return False
 
             # ensure parent directory
@@ -194,6 +199,17 @@ class Install(DotfileAction):
 
         return
 
+    def __istarget(self, dotfile):
+        patterns = [
+            '\.swp$'
+        ]
+
+        for pattern in patterns:
+            if re.search(pattern, dotfile.src):
+                return False
+
+        return True
+
 
 class Uninstall(DotfileAction):
     def run(self):
@@ -210,6 +226,10 @@ class Uninstall(DotfileAction):
         return
 
     def __run(self, dotfile, sysname="default"):
+        if not self.__istarget(dotfile):
+            if self.logger:
+                self.logger.info("File is not target: %s" % xpath.relpath(dotfile.src, xos.getcwd()))
+            return
 
         src = xpath.abspath(xpath.join(sysname, dotfile.src))
         dst = xpath.expanduser(dotfile.dst)
@@ -239,7 +259,7 @@ class Uninstall(DotfileAction):
         #
         if xpath.isfile(dst):
             if self.logger:
-                self.logger.warn("File is not symlink: %s" % dst)
+                self.logger.info("File is not symlink: %s" % dst)
             return False
 
         #
@@ -298,6 +318,16 @@ class Uninstall(DotfileAction):
 
         return
 
+    def __istarget(self, dotfile):
+        patterns = [
+            '\.swp$'
+        ]
+
+        for pattern in patterns:
+            if re.search(pattern, dotfile.src):
+                return False
+
+        return True
 
 class Status(DotfileAction):
     def run(self):
