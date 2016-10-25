@@ -9,6 +9,7 @@ curl
 docker
 emacs
 ffmpeg
+fzf
 ghq
 gibo
 git
@@ -42,9 +43,6 @@ watch
 wget
 zsh
 zsh-completions
-caskroom/cask/brew-cask
 homebrew/dupes/apple-gcc42
 homebrew/completions/docker-completion
 homebrew/completions/tmuxinator-completion
-waynezhang/mergepbx/mergepbx
-peco/peco/peco
