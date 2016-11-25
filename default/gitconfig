@@ -19,6 +19,7 @@
 [alias]
     br = branch -vv
     ba = branch -avv
+    review = !origin="$(git rev-parse --show-toplevel)" && org="$(basename ${origin%/*})" && repo="${origin##*/}" && branch="$(git symbolic-ref --short HEAD)" && hub browse "${org}/${repo}/pull/${branch}"
     cutoff = !git branch -vv | grep gone | cut -b 3- | awk '{print $1}' | xargs git branch -d
 [ghq]
     root = ~/Projects/src
