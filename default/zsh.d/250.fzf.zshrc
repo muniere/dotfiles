@@ -30,7 +30,7 @@ if (which fzf &> /dev/null); then
   bindkey '^]' fzf-src
 
   #
-  # <C-[>: git log
+  # <C-@>: git log
   #
   function fzf-gitlog () {
     if [[ ! "$BUFFER" =~ "\s*git" ]]; then
@@ -46,10 +46,10 @@ if (which fzf &> /dev/null); then
     zle reset-prompt
   }
   zle -N fzf-gitlog
-  bindkey '^[' fzf-gitlog
+  bindkey '^@' fzf-gitlog
 
   #
-  # <C-@>: branch
+  # <C-[>: branch
   #
   function fzf-branch () {
     if [[ ! "$BUFFER" =~ "\s*git" ]]; then
@@ -65,7 +65,7 @@ if (which fzf &> /dev/null); then
     zle reset-prompt
   }
   zle -N fzf-branch
-  bindkey '^@' fzf-branch
+  bindkey '^[' fzf-branch
 
   #
   # <C-r>: history
