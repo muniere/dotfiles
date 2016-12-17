@@ -1,7 +1,12 @@
-addpath $HOME/.anyenv/bin
+if [ -d $HOME/.anyenv/bin ]; then
 
-if [ -n "$ZSH_VERSION" ]; then
+  addpath $HOME/.anyenv/bin
+
+  if [ -n "$ZSH_VERSION" ]; then
     eval "$(anyenv init - zsh)"
-elif [ -n "$BASH_VERSION" ]; then
+  elif [ -n "$BASH_VERSION" ]; then
     eval "$(anyenv init -)"
+  fi
 fi
+
+# vim: ft=sh sw=2 ts=2 sts=2
