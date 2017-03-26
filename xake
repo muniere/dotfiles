@@ -21,6 +21,7 @@ class Xake:
     ACTION_COMPLETION   = "completion"
 
     TARGET_DOTFILE      = "dotfile"
+    TARGET_BINFILE      = "binfile"
     TARGET_BREW         = "brew"
     TARGET_CASK         = "cask"
     TARGET_GEM          = "gem"
@@ -95,6 +96,7 @@ class Xake:
     def targets(cls):
         return [
             Xake.TARGET_DOTFILE,
+            Xake.TARGET_BINFILE,
             Xake.TARGET_BREW,
             Xake.TARGET_CASK,
             Xake.TARGET_GEM,
@@ -251,6 +253,9 @@ class Xake:
 
         if target == Xake.TARGET_NPM:
             return vake.command.npm
+
+        if target == Xake.TARGET_BINFILE:
+            return vake.command.binfile
 
         return None
 

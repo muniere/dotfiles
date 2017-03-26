@@ -1,0 +1,56 @@
+#!/usr/bin/env ruby
+
+require 'open3'
+
+class String
+  def red;     "\033[31m#{self}\033[0m"; end
+  def green;   "\033[32m#{self}\033[0m"; end
+  def yellow;  "\033[33m#{self}\033[0m"; end
+  def blue;    "\033[34m#{self}\033[0m"; end
+  def magenta; "\033[35m#{self}\033[0m"; end
+  def cyan;    "\033[36m#{self}\033[0m"; end
+  def gray;    "\033[37m#{self}\033[0m"; end
+end
+
+class Integer
+  def decorate
+    if STDOUT.tty?
+      case
+      when self > 0 then "+#{self.abs}".green
+      when self < 0 then "-#{self.abs}".red
+      else "0"
+      end
+    else
+      case
+      when self > 0 then "+#{self.abs}"
+      when self < 0 then "-#{self.abs}"
+      else "0"
+      end
+    end
+  end
+end
+
+def main(args)
+  command = ['git', 'diff', '--numstat'].concat(args).join(' ')
+
+  output, _, status = Open3.capture3(command)
+
+  unless status.success?
+    Kernel.exit(status.to_i)
+  end
+
+  output.lines.each do |line|
+    inc_s, dec_s, path = line.split
+
+    STDOUT.puts "%{inc}\t%{dec}\t(%{delta})\t%{path}" % {
+      :inc   => (inc_s.to_i * +1).decorate,
+      :dec   => (dec_s.to_i * -1).decorate,
+      :delta => (inc_s.to_i - dec_s.to_i).decorate,
+      :path  => path,
+    }
+  end
+end
+
+if __FILE__ == $0
+  main(ARGV)
+end

@@ -17,7 +17,7 @@ function _xake() {
 
     targets)
       local -a targets
-      targets=(dotfile brew cask gem npm)
+      targets=(dotfile brew cask gem npm bin)
       _describe 'targets' targets && ret=0
       ;;
 
@@ -26,4 +26,4 @@ function _xake() {
   return ret
 }
 
-# vim: ft=zsh ts=2 sts=2 sw=2
+# vim: ft=sh ts=2 sts=2 sw=2
