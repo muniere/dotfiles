@@ -2,7 +2,15 @@ bind generic g move-first-line
 bind generic G move-last-line
 bind generic <Ctrl-B> move-page-up
 bind generic <Ctrl-F> move-page-down
-bind diff V :toggle vertical-split = vertical
-bind diff H :toggle vertical-split = horizontal
+
+bind diff V :set vertical-split = vertical
+bind diff H :set vertical-split = horizontal
+
+bind stage V :set vertical-split = vertical
+bind stage H :set vertical-split = horizontal
+
+bind main r !git rebase -i %(commit)^
+bind diff r !git rebase -i %(commit)^
+
 set diff-options = -m --first-parent
 set main-view = id date author commit-title:graph=yes,refs=yes
