@@ -1,7 +1,7 @@
-<scheme name="Monokai" version="141" parent_scheme="Default">
+<scheme name="Monokai" version="142" parent_scheme="Default">
   <option name="LINE_SPACING" value="1.0" />
-  <option name="EDITOR_FONT_SIZE" value="13" />
-  <option name="EDITOR_FONT_NAME" value="Osaka" />
+  <option name="EDITOR_FONT_SIZE" value="14" />
+  <option name="EDITOR_FONT_NAME" value="Ricty" />
   <colors>
     <option name="ADDED_LINES_COLOR" value="295622" />
     <option name="CARET_COLOR" value="bbbbbb" />
@@ -493,6 +493,10 @@
       <value>
         <option name="FOREGROUND" value="9876aa" />
       </value>
+    </option>
+    <option name="KOTLIN_ANNOTATION" baseAttributes="ANNOTATION_NAME_ATTRIBUTES" />
+    <option name="KOTLIN_SMART_CAST_VALUE">
+      <value />
     </option>
     <option name="LOG_ERROR_OUTPUT">
       <value>

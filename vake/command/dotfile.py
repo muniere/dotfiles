@@ -60,6 +60,14 @@ class DotfileAction(base.Action):
                 map(lambda dst: Dotfile(src="AndroidStudio", dst=dst),
                     glob.glob(xpath.expanduser("~/Library/Preferences/AndroidStudio*"))))
 
+            dots.extend(
+                map(lambda dst: Dotfile(src="AppCode", dst=dst),
+                    glob.glob(xpath.expanduser("~/Library/Preferences/AppCode*"))))
+
+            dots.extend(
+                map(lambda dst: Dotfile(src="RubyMine", dst=dst),
+                    glob.glob(xpath.expanduser("~/Library/Preferences/RubyMine*"))))
+
         return dots
 
     def templates(self):
