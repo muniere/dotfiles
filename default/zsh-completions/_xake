@@ -17,7 +17,7 @@ function _xake() {
 
     targets)
       local -a targets
-      targets=(dotfile brew cask gem npm bin)
+      targets=(dotfile binfile brew cask gem npm)
       _describe 'targets' targets && ret=0
       ;;
 
