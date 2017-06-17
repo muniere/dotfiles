@@ -1,0 +1,13 @@
+#compdef thor
+
+if [ -f $(pwd)/Thorfile ]; then
+  if [ -f $(pwd)/Gemfile ] && grep -q -E "gem\s+[\"']thor[\"']" $(pwd)/Gemfile; then
+    compadd $(bundle exec thor list | grep "thor" | cut -d " " -f 2)
+  else
+    compadd $(thor list | grep "thor" | cut -d " " -f 2)
+  fi
+else
+  compadd $(thor help | grep "thor" | awk '{print $2}')
+fi
+
+# vim: ft=zsh sw=2 ts=2 sts=2
