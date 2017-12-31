@@ -304,6 +304,10 @@ NeoBundle 'gtags.vim'
 NeoBundle 'scrooloose/syntastic'
 
 let g:syntastic_mode_map = { 'mode': 'active', 'active_filetypes': [], 'passive_filetypes': ['java'] }
+let g:syntastic_html_tidy_ignore_errors=[
+      \'proprietary attribute "ng-',
+      \'proprietary attribute "v-'
+      \]
 " }}}
 
 " LightLine {{{2
