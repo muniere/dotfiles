@@ -367,6 +367,7 @@ NeoBundle 'kchmck/vim-coffee-script'
 let g:SimpleJsIndenter_BriefMode=1
 
 NeoBundle 'myhere/vim-nodejs-complete'
+NeoBundle 'posva/vim-vue'
 " }}}
 
 " AppleScript {{{2
