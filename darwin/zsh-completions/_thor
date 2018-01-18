@@ -1,0 +1,7 @@
+#compdef thor
+
+if [[ "$BUFFER" =~ "^\s*thor" ]]; then
+    compadd `thor list 2> /dev/null | grep thor | cut -d " " -f 2`
+elif [[ "$BUFFER" =~ "^\s*bundle exec" ]]; then 
+    compadd `bundle exec thor list 2> /dev/null | grep thor | cut -d " " -f 2`
+fi
