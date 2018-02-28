@@ -1,9 +1,13 @@
 #compdef thor
 
-if [[ "$BUFFER" =~ "^\sthor" ]]; then 
-  compadd $(thor list 2> /dev/null | grep "thor" | cut -d " " -f 2)
-elif [[ "$BUFFER" =~ "^\s*bundle exec thor" ]]; then 
-  compadd $(bundle exec thor list 2> /dev/null | grep thor | cut -d " " -f 2)
+if [ -f $(pwd)/Thorfile ]; then
+  if [[ "$BUFFER" =~ "^\sthor" ]]; then 
+    compadd $(thor list 2> /dev/null | grep "thor" | cut -d " " -f 2)
+  elif [[ "$BUFFER" =~ "^\s*bundle exec thor" ]]; then 
+    compadd $(bundle exec thor list 2> /dev/null | grep thor | cut -d " " -f 2)
+  fi
+else
+  compadd $(thor help | grep "thor" | awk '{print $2}')
 fi
 
 # vim: ft=zsh sw=2 ts=2 sts=2
