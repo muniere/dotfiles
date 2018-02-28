@@ -43,6 +43,12 @@ if [ -d /usr/local/share/git-core/contrib/diff-highlight/ ]; then
   addpath /usr/local/share/git-core/contrib/diff-highlight
 fi
 
+# Android
+if [ -d ${HOME}/Library/Android/sdk/platform-tools ]; then
+  addpath ${HOME}/Library/Android/sdk/platform-tools
+fi
+
+
 # ls
 alias ls="ls -Gv"
 alias ll="ls -lhF"
