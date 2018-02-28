@@ -44,6 +44,8 @@ class DotfileAction(base.Action):
 
             Dotfile(src="vimrc", dst="~/.vimrc"),
             Dotfile(src="vim", dst="~/.vim", install=self.__vim_install, uninstall=self.__vim_uninstall),
+
+            Dotfile(src="gradle", dst="~/.gradle"),
         ])
 
         # linux
