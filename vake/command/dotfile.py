@@ -55,6 +55,10 @@ class DotfileAction(base.Action):
         # darwin
         if xos.isdarwin():
             dots.extend(
+                map(lambda dst: Dotfile(src="Xcode", dst=dst),
+                    glob.glob(xpath.expanduser("~/Library/Developer/Xcode"))))
+
+            dots.extend(
                 map(lambda dst: Dotfile(src="IntelliJIdea", dst=dst),
                     glob.glob(xpath.expanduser("~/Library/Preferences/IntelliJIdea*"))))
 
