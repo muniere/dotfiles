@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# TODO: build base URL from the result of `git config --get remote.origin.url`
+
+origin="$(git rev-parse --show-toplevel)" 
+org="$(basename ${origin%/*})" 
+repo="${origin##*/}" 
+branch="$(git symbolic-ref --short HEAD)" 
+
+hub browse "${org}/${repo}/pull/${branch}"

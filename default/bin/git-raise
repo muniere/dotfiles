@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# TODO: build base URL from the result of `git config --get remote.origin.url`
+
+origin="$(git rev-parse --show-toplevel)" 
+org="$(basename ${origin%/*})" 
+repo="${origin##*/}" 
+
+if [ $# -eq 0 ]; then 
+    open "https://github.com/${org}/${repo}/issues/new" 
+else
+    open "https://github.com/${org}/${repo}/issues/new?template=$1.md" 
+fi

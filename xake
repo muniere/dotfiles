@@ -154,7 +154,7 @@ class Xake:
 
         context = Context()
         context.action = namespace.action
-        context.targets = namespace.target or ["dotfile"]
+        context.targets = namespace.target or ["dotfile", "binfile"]
         context.dry_run = namespace.dry_run
         context.verbose = namespace.verbose
 
@@ -166,7 +166,7 @@ class Xake:
 
         context = Context()
         context.action = argv[0]
-        context.targets = argv[1:] or ["dotfile"]
+        context.targets = argv[1:] or ["dotfile", "binfile"]
         context.dry_run = opts.dry_run
         context.verbose = opts.verbose
 
