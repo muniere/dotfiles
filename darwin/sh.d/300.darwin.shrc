@@ -20,11 +20,6 @@ if [ -d /usr/local/opt/maven/libexec ]; then
   export MAVEN_HOME="/usr/local/opt/maven/libexec"
 fi
 
-# Docker
-if [ -d /usr/local/opt/docker ]; then
-  export DOCKER_HOST="tcp://localhost:4243"
-fi
-
 # Go
 if [ -d /usr/local/opt/go ]; then
   export GOROOT=/usr/local/opt/go/libexec
