@@ -280,12 +280,21 @@ nnoremap <C-e><C-f> :NERDTreeTabsOpen<CR><C-w>p:NERDTreeTabsFind<CR>
 inoremap <C-e><C-f> <ESC>:NERDTreeTabsOpen<CR><C-w>p:NERDTreeTabsFind<CR>
 " }}}
 
+" ag.vim {{{2
+NeoBundle 'rking/ag.vim'
+" }}}
+
 " ctlrp.vim {{{2
 NeoBundle 'kien/ctrlp.vim'
 nnoremap <C-x><C-f> :CtrlP .<CR>
 inoremap <C-x><C-f> <ESC>:CtrlP .<CR>
 nnoremap <C-x><C-b> :CtrlPBuffer<CR>
 inoremap <C-x><C-b> <ESC>:CtrlPBuffer<CR>
+
+if executable('ag')
+  let g:ctrlp_use_caching=0
+  let g:ctrlp_user_command='ag %s -i --nocolor --nogroup -g ""'
+endif
 " }}}
 
 " Sudo.vim {{{2
