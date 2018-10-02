@@ -4,7 +4,7 @@ if (which fzf &> /dev/null); then
   #
   function fzf-file () {
     local selected
-    selected=$(find . -maxdepth 10 | grep -v '/\.' | tail -n +2 | fzf)
+    selected=$(find . -maxdepth 20 | grep -v '/\.' | tail -n +2 | fzf)
     if [ -n "$selected" ]; then
       BUFFER="${BUFFER}${selected}"
       CURSOR=$#BUFFER
@@ -89,7 +89,7 @@ if (which fzf &> /dev/null); then
   zle -N fzf-history
   bindkey '^r' fzf-history
 
-  export FZF_DEFAULT_OPTS='--reverse --bind ctrl-k:kill-line --bind ctrl-j:execute::'
+  export FZF_DEFAULT_OPTS='--height 50% --border --reverse --bind ctrl-k:kill-line --bind ctrl-j:execute::'
 fi
 # vim: ft=sh sw=2 ts=2 sts=2
 
