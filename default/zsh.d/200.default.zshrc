@@ -24,7 +24,7 @@ function update_title() {
 #
 function update_vcs() {
   psvar=()
-  LANG=en_US.UTF-8 vcs_info
+  LANG=C vcs_info
   psvar[1]="$vcs_info_msg_0_"
 }
 
