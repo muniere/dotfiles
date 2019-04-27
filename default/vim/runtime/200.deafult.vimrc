@@ -357,6 +357,10 @@ NeoBundle 'vim-scripts/Wombat'
 
 " == Languages
 
+" JSONC {{{2
+NeoBundle 'neoclide/jsonc.vim'
+" }}}
+
 " Shell Script {{{2
 NeoBundle 'vim-scripts/sh.vim'
 " }}}
