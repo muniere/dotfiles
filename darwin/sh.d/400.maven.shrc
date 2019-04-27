@@ -1,0 +1,6 @@
+# Maven
+if [ -d /usr/local/opt/maven/libexec ]; then
+  export MAVEN_HOME="/usr/local/opt/maven/libexec"
+fi
+
+# vim: ft=sh sw=2 ts=2 sts=2

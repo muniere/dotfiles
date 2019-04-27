@@ -1,0 +1,9 @@
+# Go
+if [ -d /usr/local/opt/go ]; then
+  export GOROOT=/usr/local/opt/go/libexec
+  export GOPATH=$HOME/Projects
+
+  addpath $GOPATH/bin $GOROOT/bin
+fi
+
+# vim: ft=sh sw=2 ts=2 sts=2

@@ -17,10 +17,7 @@ function addpath() {
     fi
   done
 
-  lpath="${adds}:${lpath}"
-  lpath="$(echo $lpath | sed 's/::*/:/g')"
-
-  export PATH=$lpath
+  export PATH="$(echo $adds:$lpath | sed 's/::*/:/g' | sed 's/:*$//g')"
 }
 
 # Default LANG

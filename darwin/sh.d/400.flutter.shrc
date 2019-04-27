@@ -1,0 +1,6 @@
+# Flutter
+if [ -d /usr/local/opt/flutter ]; then
+  addpath "/usr/local/opt/flutter/bin"
+fi
+
+# vim: ft=sh sw=2 ts=2 sts=2

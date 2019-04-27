@@ -1,0 +1,6 @@
+# Android
+if [ -d ${HOME}/Library/Android/sdk/platform-tools ]; then
+  addpath "${HOME}/Library/Android/sdk/platform-tools"
+fi
+
+# vim: ft=sh sw=2 ts=2 sts=2

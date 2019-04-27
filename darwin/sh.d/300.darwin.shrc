@@ -7,43 +7,6 @@ if (which java &> /dev/null); then
   export JAVA_OPTS="-Dfile.encoding=UTF-8"
 fi
 
-# Homebrew Cask
-export HOMEBREW_CASK_OPTS="--appdir=/Applications"
-
-# Tomcat
-if [ -d /usr/local/opt/tomcat/libexec ]; then
-  export CATALINA_HOME="/usr/local/opt/tomcat/libexec"
-fi
-
-# Maven
-if [ -d /usr/local/opt/maven/libexec ]; then
-  export MAVEN_HOME="/usr/local/opt/maven/libexec"
-fi
-
-# Go
-if [ -d /usr/local/opt/go ]; then
-  export GOROOT=/usr/local/opt/go/libexec
-  export GOPATH=$HOME/Projects
-
-  addpath $GOPATH/bin $GOROOT/bin
-fi
-
-# pkgconfig
-if [ -d /usr/local/opt/pkg-config ]; then
-  export PKG_CONFIG_PATH="/opt/X11/lib/pkgconfig"
-fi
-
-# git
-if [ -d /usr/local/share/git-core/contrib/diff-highlight/ ]; then
-  addpath /usr/local/share/git-core/contrib/diff-highlight
-fi
-
-# Android
-if [ -d ${HOME}/Library/Android/sdk/platform-tools ]; then
-  addpath ${HOME}/Library/Android/sdk/platform-tools
-fi
-
-
 # ls
 alias ls="ls -Gv"
 alias ll="ls -lhF"

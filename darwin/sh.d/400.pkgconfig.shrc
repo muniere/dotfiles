@@ -1,0 +1,6 @@
+# pkgconfig
+if [ -d /usr/local/opt/pkg-config ]; then
+  export PKG_CONFIG_PATH="/opt/X11/lib/pkgconfig"
+fi
+
+# vim: ft=sh sw=2 ts=2 sts=2

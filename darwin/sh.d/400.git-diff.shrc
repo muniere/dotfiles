@@ -1,0 +1,6 @@
+# git-diff
+if [ -d /usr/local/share/git-core/contrib/diff-highlight/ ]; then
+  addpath "/usr/local/share/git-core/contrib/diff-highlight"
+fi
+
+# vim: ft=sh sw=2 ts=2 sts=2

@@ -1,0 +1,6 @@
+# MySQL
+if ! (which mysql &> /dev/null) && [ -d /usr/local/opt/mysql-client ]; then
+  addpath "/usr/local/opt/mysql-client/bin"
+fi
+
+# vim: ft=sh sw=2 ts=2 sts=2
