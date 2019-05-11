@@ -11,174 +11,117 @@ from vake import xos
 from vake import xlogging
 
 
-class Xake:
+class Action:
+
+    INSTALL = "install"
+    UNINSTALL = "uninstall"
+    STATUS = "status"
+    COMPLETION = "completion"
+
+    @classmethod
+    def values(cls):
+        return [
+            cls.INSTALL,
+            cls.UNINSTALL,
+            cls.STATUS,
+            cls.COMPLETION,
+        ]
+
+
+class Target:
+
+    DOTFILE = "dotfile"
+    BINFILE = "binfile"
+    BREW = "brew"
+    CASK = "cask"
+    GEM = "gem"
+    NPM = "npm"
+
+    @classmethod
+    def values(cls):
+        return [
+            cls.DOTFILE,
+            cls.BINFILE,
+            cls.BREW,
+            cls.CASK,
+            cls.GEM,
+            cls.NPM,
+        ]
+
+
+class Commander:
+
+    @classmethod
+    def find(cls, target):
+        if target == Target.DOTFILE:
+            return vake.command.dotfile
+
+        if target == Target.BREW:
+            return vake.command.brew
+
+        if target == Target.CASK:
+            return vake.command.cask
+
+        if target == Target.GEM:
+            return vake.command.gem
+
+        if target == Target.NPM:
+            return vake.command.npm
+
+        if target == Target.BINFILE:
+            return vake.command.binfile
+
+        return None
+
+
+class Completion:
+    SOURCE = "vake/template/_xake"
+    DESTINATION = "default/zsh-completions/_xake"
+
+
+class Context:
     """
-    CLI launcher
+    Attributes store for application
     """
-
-    #
-    # Constants
-    #
-    ACTION_INSTALL      = "install"
-    ACTION_UNINSTALL    = "uninstall"
-    ACTION_STATUS       = "status"
-    ACTION_COMPLETION   = "completion"
-
-    TARGET_DOTFILE      = "dotfile"
-    TARGET_BINFILE      = "binfile"
-    TARGET_BREW         = "brew"
-    TARGET_CASK         = "cask"
-    TARGET_GEM          = "gem"
-    TARGET_NPM          = "npm"
-
-    COMPLETION_FILE_SRC = "vake/template/_xake"
-    COMPLETION_FILE_DST = "default/zsh-completions/_xake"
-
-    #
-    # Methods
-    #
     def __init__(self):
         """
-        Initialize application
+        Initialize context
         """
-        self.parser = self.__parser()
+        self.action = None
+        self.targets = []
+        self.dry_run = False
+        self.verbose = False
         return
 
-    def run(self, args):
-        """
-        Run application
-        """
+    def commands(self):
+        if self.action == Action.INSTALL:
+            logger = self.__make_logger()
+            modules = [m for m in [Commander.find(t) for t in self.targets]]
+            modules = [m for m in modules if m is not None and m.Install is not None]
+            commands = [m.Install(noop=self.dry_run, logger=logger) for m in modules]
+            commands = [c for c in commands if c is not None]
+            return commands
 
-        # context
-        context = self.__context(args)
-        context.logger = self.__logger(context)
+        if self.action == Action.UNINSTALL:
+            logger = self.__make_logger()
+            modules = [m for m in [Commander.find(t) for t in self.targets]]
+            modules = [m for m in modules if m is not None and m.Uninstall is not None]
+            commands = [m.Uninstall(noop=self.dry_run, logger=logger) for m in modules]
+            commands = [c for c in commands if c is not None]
+            return commands
 
-        # completion
-        if context.action == Xake.ACTION_COMPLETION:
-            self.completion(context)
-            sys.exit(0)
+        if self.action == Action.STATUS:
+            logger = self.__make_logger()
+            modules = [m for m in [Commander.find(t) for t in self.targets]]
+            modules = [m for m in modules if m is not None and m.Status is not None]
+            commands = [m.Status(noop=self.dry_run, logger=logger) for m in modules]
+            commands = [c for c in commands if c is not None]
+            return commands
 
-        # action
-        for command in self.__commands(context):
-            command.run()
+        return []
 
-        sys.exit(0)
-
-    def completion(self, context):
-        """
-        Show messages for completion
-
-        :param context: Context
-        """
-
-        from mako.template import Template
-
-        template = Template(filename=Xake.COMPLETION_FILE_SRC, input_encoding="utf-8", output_encoding="utf-8")
-
-        rendered = template.render(
-            options=self.parser._optionals._group_actions,
-            actions=self.actions(),
-            targets=self.targets(),
-        )
-
-        with open(Xake.COMPLETION_FILE_DST, 'w') as dst:
-            dst.write(rendered)
-
-        sys.stdout.write(rendered)
-        return
-
-    @classmethod
-    def actions(cls):
-        return [
-            Xake.ACTION_INSTALL,
-            Xake.ACTION_UNINSTALL,
-            Xake.ACTION_STATUS,
-            Xake.ACTION_COMPLETION,
-        ]
-
-    @classmethod
-    def targets(cls):
-        return [
-            Xake.TARGET_DOTFILE,
-            Xake.TARGET_BINFILE,
-            Xake.TARGET_BREW,
-            Xake.TARGET_CASK,
-            Xake.TARGET_GEM,
-            Xake.TARGET_NPM,
-        ]
-
-    @classmethod
-    def __parser(cls):
-        if sys.version_info >= (2, 7, 0):
-            return cls.__parser_27()
-        else:
-            return cls.__parser_26()
-
-    @classmethod
-    def __parser_27(cls):
-        import argparse
-
-        parser = argparse.ArgumentParser(formatter_class=lambda prog: argparse.HelpFormatter(prog, width=240))
-
-        parser.add_argument("-n", "--dry-run", dest="dry_run", action="store_true", help="Do not execute commands actually")
-        parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="Show verbose messages")
-        parser.add_argument("action", type=str, help="Action to perform: (%s)" % "|".join(cls.actions()))
-        parser.add_argument("target", type=str, nargs="*", help="Target for action: (%s)" % "|".join(cls.targets()))
-
-        return parser
-
-    @classmethod
-    def __parser_26(cls):
-        import optparse
-
-        parser = optparse.OptionParser(usage="Usage: %prog [options] <command> [<target> ...]")
-
-        parser.add_option("-n", "--dry-run", dest="dry_run", action="store_true", help="Do not execute commands actually")
-        parser.add_option("-v", "--verbose", dest="verbose", action="store_true", help="Show verbose messages")
-
-        return parser
-
-    def __context(self, args):
-        """
-        Package context
-
-        :param args: Arguments
-        :return: Context
-        """
-        if sys.version_info >= (2, 7, 0):
-            context = self.__context_27(args)
-        else:
-            context = self.__context_26(args)
-
-        return context
-
-    def __context_27(self, args):
-
-        namespace = self.parser.parse_args(args)
-
-        context = Context()
-        context.action = namespace.action
-        context.targets = namespace.target or ["dotfile", "binfile"]
-        context.dry_run = namespace.dry_run
-        context.verbose = namespace.verbose
-
-        return context
-
-    def __context_26(self, args):
-
-        (opts, argv) = self.parser.parse_args(args)
-
-        context = Context()
-        context.action = argv[0]
-        context.targets = argv[1:] or ["dotfile", "binfile"]
-        context.dry_run = opts.dry_run
-        context.verbose = opts.verbose
-
-        return context
-
-    @classmethod
-    def __logger(cls, context):
-        if context.verbose:
+    def __make_logger(self):
+        if self.verbose:
             logging_level = xlogging.DEBUG
         else:
             logging_level = xlogging.EXEC
@@ -195,89 +138,138 @@ class Xake:
 
         return logger
 
-    @classmethod
-    def __commands(cls, context):
-        if context.action == Xake.ACTION_INSTALL:
-            return cls.__commands_install(context)
 
-        if context.action == Xake.ACTION_UNINSTALL:
-            return cls.__commands_uninstall(context)
-
-        if context.action == Xake.ACTION_STATUS:
-            return cls.__commands_status(context)
-
-        return []
+class Parser:
 
     @classmethod
-    def __commands_install(cls, context):
+    def parse(cls, args):
+        """
+        Compose context for arguments
 
-        modules = filter(lambda module: module is not None and module.Install is not None,
-                         map(lambda target: cls.__module(target), context.targets))
-
-        commands = filter(lambda action: action is not None,
-                          map(lambda module: module.Install(noop=context.dry_run, logger=context.logger), modules))
-
-        return commands
-
-    @classmethod
-    def __commands_uninstall(cls, context):
-
-        modules = filter(lambda module: module is not None and module.Uninstall is not None,
-                         map(lambda target: cls.__module(target), context.targets))
-
-        commands = filter(lambda action: action is not None,
-                          map(lambda module: module.Uninstall(noop=context.dry_run, logger=context.logger), modules))
-
-        return commands
+        :param args: Arguments
+        :return: Context
+        """
+        if sys.version_info >= (2, 7, 0):
+            return cls.__parse_argparse(args)
+        else:
+            return cls.__parse_optparse(args)
 
     @classmethod
-    def __commands_status(cls, contex):
-
-        modules = filter(lambda module: module is not None and module.Status is not None,
-                         map(lambda target: cls.__module(target), contex.targets))
-
-        commands = filter(lambda action: action is not None,
-                          map(lambda module: module.Status(noop=contex.dry_run, logger=contex.logger), modules))
-
-        return commands
+    def options(cls):
+        """
+        Get possible options
+        """
+        if sys.version_info >= (2, 7, 0):
+            return cls.__make_argparser()._optionals._group_actions
+        else:
+            return list()
 
     @classmethod
-    def __module(cls, target):
-        if target == Xake.TARGET_DOTFILE:
-            return vake.command.dotfile
+    def __parse_argparse(cls, args):
+        parser = cls.__make_argparser()
 
-        if target == Xake.TARGET_BREW:
-            return vake.command.brew
+        namespace = parser.parse_args(args)
 
-        if target == Xake.TARGET_CASK:
-            return vake.command.cask
+        context = Context()
+        context.action = namespace.action
+        context.targets = namespace.target or ["dotfile", "binfile"]
+        context.dry_run = namespace.dry_run
+        context.verbose = namespace.verbose
 
-        if target == Xake.TARGET_GEM:
-            return vake.command.gem
+        return context
 
-        if target == Xake.TARGET_NPM:
-            return vake.command.npm
+    @classmethod
+    def __parse_optparse(cls, args):
+        parser = cls.__make_optparser()
 
-        if target == Xake.TARGET_BINFILE:
-            return vake.command.binfile
+        (opts, argv) = parser.parse_args(args)
 
-        return None
+        context = Context()
+        context.action = argv[0]
+        context.targets = argv[1:] or ["dotfile", "binfile"]
+        context.dry_run = opts.dry_run
+        context.verbose = opts.verbose
+
+        return context
+
+    @classmethod
+    def __make_argparser(cls):
+        import argparse
+
+        parser = argparse.ArgumentParser(formatter_class=lambda prog: argparse.HelpFormatter(prog, width=240))
+        parser.add_argument("-n", "--dry-run", dest="dry_run", action="store_true", help="Do not execute commands actually")
+        parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="Show verbose messages")
+        parser.add_argument("action", type=str, help="Action to perform: (%s)" % "|".join(Action.values()))
+        parser.add_argument("target", type=str, nargs="*", help="Target for action: (%s)" % "|".join(Target.values()))
+
+        return parser
+
+    @classmethod
+    def __make_optparser(cls):
+        import optparse
+
+        parser = optparse.OptionParser(usage="Usage: %prog [options] <command> [<target> ...]")
+        parser.add_option("-n", "--dry-run", dest="dry_run", action="store_true", help="Do not execute commands actually")
+        parser.add_option("-v", "--verbose", dest="verbose", action="store_true", help="Show verbose messages")
+
+        return parser
 
 
-class Context:
+class CLI:
     """
-    Attributes store for application
+    CLI launcher
     """
 
     def __init__(self):
         """
-        Initialize context
+        Initialize application
         """
-        self.action = None
-        self.targets = []
-        self.dry_run = False
-        self.verbose = False
-        self.logger = None
+        pass
+
+    def run(self, args):
+        """
+        Run application
+        """
+
+        # context
+        context = Parser.parse(args)
+
+        # completion
+        if context.action == Action.COMPLETION:
+            self.completion(context)
+            sys.exit(0)
+
+        # action
+        for command in context.commands():
+            command.run()
+
+        sys.exit(0)
+
+    def completion(self, context):
+        """
+        Show messages for completion
+
+        :param context: Context
+        """
+
+        from mako.template import Template
+
+        template = Template(
+            filename=Completion.SOURCE,
+            input_encoding="utf-8",
+            output_encoding="utf-8"
+        )
+
+        rendered = template.render(
+            options=Parser.options(),
+            actions=Action.values(),
+            targets=Target.values(),
+        )
+
+        with open(Completion.DESTINATION, 'w') as dst:
+            dst.write(rendered)
+
+        sys.stdout.write(rendered)
         return
 
 #
@@ -288,4 +280,4 @@ if __name__ == "__main__":
     os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
     # run application
-    Xake().run(sys.argv[1:])
+    CLI().run(sys.argv[1:])
