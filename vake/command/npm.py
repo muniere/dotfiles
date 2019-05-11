@@ -1,12 +1,10 @@
 # 1st
+import os
 import json
 
 # 2nd
 from .. import xos
-from ..xos import xpath
-
-# 3rd
-import base
+from . import base
 
 NPM = "npm"
 PACKAGE_JSON = "package.json"
@@ -15,12 +13,12 @@ DEPENDENCIES = "dependencies"
 
 class NpmAction(base.Action):
     def packages(self):
-        path = xpath.join(xos.getcwd(), xos.sysname(), PACKAGE_JSON)
+        path = os.path.join(os.getcwd(), xos.sysname(), PACKAGE_JSON)
 
         if self.logger:
             self.logger.debug("Read packages from file: %s" % path)
 
-        if xpath.exists(path):
+        if os.path.exists(path):
             return Package.load(path)
         else:
             return []
@@ -80,7 +78,7 @@ class Package:
 
     @staticmethod
     def load(path):
-        if not xpath.exists(path):
+        if not os.path.exists(path):
             return []
 
         dictionary = json.load(open(path))

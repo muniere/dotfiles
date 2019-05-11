@@ -2,12 +2,12 @@
 Extend package of standard os package
 """
 
-# 0th
-from os import *
-
 # 1st
-import __builtin__ as builtin
+import os
 import subprocess
+
+# 2nd
+from . import xpath
 
 #
 # Constants
@@ -35,8 +35,8 @@ def sysname():
 
     :return: Detected name
     """
-    if xpath.isfile("/etc/issue"):
-        rawname = builtin.open("/etc/issue").read().lower()
+    if os.path.isfile("/etc/issue"):
+        rawname = open("/etc/issue").read().lower()
     else:
         rawname = subprocess.check_output(["uname", "-a"]).strip().lower()
 
@@ -68,7 +68,7 @@ def listdir(pathname, recursive=False):
     """
 
     def isentry(dirpath, entname):
-        return path.exists(path.join(dirpath, entname))
+        return os.path.exists(os.path.join(dirpath, entname))
 
     return __list(pathname, cond=isentry, recursive=recursive)
 
@@ -83,7 +83,7 @@ def listdir_f(pathname, recursive=False):
     """
 
     def isfile(dirpath, entname):
-        return path.isfile(path.join(dirpath, entname))
+        return os.path.isfile(os.path.join(dirpath, entname))
 
     return __list(pathname, cond=isfile, recursive=recursive)
 
@@ -98,13 +98,13 @@ def listdir_d(pathname, recursive=False):
     """
 
     def isdir(dirpath, entname):
-        return path.isdir(path.join(dirpath, entname))
+        return os.path.isdir(os.path.join(dirpath, entname))
 
     return __list(pathname, cond=isdir, recursive=recursive)
 
 
 def __list(pathname, cond, recursive=False):
-    if not path.isdir(pathname):
+    if not os.path.isdir(pathname):
         return [pathname]
 
     if not recursive:
@@ -112,12 +112,9 @@ def __list(pathname, cond, recursive=False):
 
     entries = []
 
-    for dirpath, dirnames, filenames in walk(pathname):
+    for dirpath, dirnames, filenames in os.walk(pathname):
         entries.extend(
-            map(lambda entname: path.join(dirpath, entname),
+            map(lambda entname: os.path.join(dirpath, entname),
                 filter(lambda entname: cond(dirpath, entname), dirnames + filenames)))
 
     return entries
-
-# children
-import xpath

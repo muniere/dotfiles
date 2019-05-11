@@ -1,9 +1,5 @@
 # 2nd
-import xsys
-import xos
-import xlogging
-from xos import xpath
-
-# 3rd
-import command
-import shell
+from . import xos
+from . import xlogging
+from . import command
+from . import shell

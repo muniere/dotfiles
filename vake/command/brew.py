@@ -1,9 +1,9 @@
+# 1st
+import os
+
 # 2nd
 from .. import xos
-from ..xos import xpath
-
-# 3rd
-import base
+from . import base
 
 BREW = "brew"
 BREWFILE = "Brewfile"
@@ -11,12 +11,12 @@ BREWFILE = "Brewfile"
 
 class BrewAction(base.Action):
     def kegs(self):
-        path = xpath.join(xos.getcwd(), xos.sysname(), BREWFILE)
+        path = os.path.join(os.getcwd(), xos.sysname(), BREWFILE)
 
         if self.logger:
             self.logger.debug("Read kegs from file: %s" % path)
 
-        if xpath.exists(path):
+        if os.path.exists(path):
             return open(path).read().splitlines()
         else:
             return []

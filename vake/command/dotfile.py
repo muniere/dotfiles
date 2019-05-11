@@ -1,13 +1,11 @@
 # 1st
+import os
 import glob
 import re
 
 # 2nd
 from .. import xos
-from ..xos import xpath
-
-# 3rd
-import base
+from . import base
 
 TEMPLATE_DIR = "./vake/template"
 
@@ -16,7 +14,7 @@ class DotfileAction(base.Action):
     def __vim_install(self):
         self.shell.git_clone(
             src="https://github.com/Shougo/neobundle.vim",
-            dst=xpath.expanduser("~/.vim/bundle/neobundle.vim")
+            dst=os.path.expanduser("~/.vim/bundle/neobundle.vim")
         )
         return None
 
@@ -56,23 +54,23 @@ class DotfileAction(base.Action):
         if xos.isdarwin():
             dots.extend(
                 map(lambda dst: Dotfile(src="Xcode", dst=dst),
-                    glob.glob(xpath.expanduser("~/Library/Developer/Xcode"))))
+                    glob.glob(os.path.expanduser("~/Library/Developer/Xcode"))))
 
             dots.extend(
                 map(lambda dst: Dotfile(src="IntelliJIdea", dst=dst),
-                    glob.glob(xpath.expanduser("~/Library/Preferences/IntelliJIdea*"))))
+                    glob.glob(os.path.expanduser("~/Library/Preferences/IntelliJIdea*"))))
 
             dots.extend(
                 map(lambda dst: Dotfile(src="AndroidStudio", dst=dst),
-                    glob.glob(xpath.expanduser("~/Library/Preferences/AndroidStudio*"))))
+                    glob.glob(os.path.expanduser("~/Library/Preferences/AndroidStudio*"))))
 
             dots.extend(
                 map(lambda dst: Dotfile(src="AppCode", dst=dst),
-                    glob.glob(xpath.expanduser("~/Library/Preferences/AppCode*"))))
+                    glob.glob(os.path.expanduser("~/Library/Preferences/AppCode*"))))
 
             dots.extend(
                 map(lambda dst: Dotfile(src="RubyMine", dst=dst),
-                    glob.glob(xpath.expanduser("~/Library/Preferences/RubyMine*"))))
+                    glob.glob(os.path.expanduser("~/Library/Preferences/RubyMine*"))))
 
         return dots
 
@@ -108,46 +106,46 @@ class Install(DotfileAction):
     def __run(self, dotfile, sysname="default"):
         if not self.__istarget(dotfile):
             if self.logger:
-                self.logger.info("File is not target: %s" % xpath.relpath(dotfile.src, xos.getcwd()))
+                self.logger.info("File is not target: %s" % os.path.relpath(dotfile.src, os.getcwd()))
             return
 
         if dotfile.src.startswith('/'):
             src = dotfile.src 
         else:
-            src = xpath.abspath(xpath.join(sysname, dotfile.src))
+            src = os.path.abspath(os.path.join(sysname, dotfile.src))
 
         if dotfile.dst.startswith('/'):
             dst = dotfile.dst 
         else:
-            dst = xpath.expanduser(dotfile.dst)
+            dst = os.path.expanduser(dotfile.dst)
 
         #
         # guard
         #
 
         # src not found
-        if not xpath.exists(src):
+        if not os.path.exists(src):
             return False
 
         # dst link already exists
-        if xpath.islink(dst):
+        if os.path.islink(dst):
             if self.logger:
-                self.logger.info("Symlink already exists: %s" % xpath.reduceuser(dst))
+                self.logger.info("Symlink already exists: %s" % xos.xpath.reduceuser(dst))
             return False
 
         #
         # file
         #
-        if xpath.isfile(src):
+        if os.path.isfile(src):
             # another file already exists
-            if xpath.isfile(dst):
+            if os.path.isfile(dst):
                 if self.logger:
-                    self.logger.info("File already exists: %s" % xpath.reduceuser(dst))
+                    self.logger.info("File already exists: %s" % xos.xpath.reduceuser(dst))
                 return False
 
             # ensure parent directory
-            dst_dir = xpath.dirname(dst)
-            if not xpath.isdir(dst_dir):
+            dst_dir = os.path.dirname(dst)
+            if not os.path.isdir(dst_dir):
                 self.shell.mkdir(dst_dir, recursive=True)
 
             # create symbolic link
@@ -156,10 +154,10 @@ class Install(DotfileAction):
         #
         # directory
         #
-        if xpath.isdir(src):
+        if os.path.isdir(src):
             for new_src in xos.listdir_f(src, recursive=True):
-                rel_dst = xpath.relpath(new_src, src)
-                new_dst = xpath.join(dotfile.dst, rel_dst)
+                rel_dst = os.path.relpath(new_src, src)
+                new_dst = os.path.join(dotfile.dst, rel_dst)
                 new_dot = Dotfile(src=new_src, dst=new_dst)
                 self.__run(new_dot, sysname=sysname)
 
@@ -170,9 +168,9 @@ class Install(DotfileAction):
         #
         # source
         #
-        src_path = xpath.join(TEMPLATE_DIR, template.src)
+        src_path = os.path.join(TEMPLATE_DIR, template.src)
 
-        if not xpath.exists(src_path):
+        if not os.path.exists(src_path):
             return
 
         src_str = ""
@@ -182,13 +180,13 @@ class Install(DotfileAction):
         #
         # destination
         #
-        dst_path = xpath.expanduser(template.dst)
+        dst_path = os.path.expanduser(template.dst)
 
         # new file
-        if not xpath.exists(dst_path):
+        if not os.path.exists(dst_path):
             with open(dst_path, "w") as dst_file:
                 if self.logger:
-                    self.logger.execute("Enable %s" % xpath.reduceuser(src_path))
+                    self.logger.execute("Enable %s" % xos.xpath.reduceuser(src_path))
                 if not self.noop:
                     dst_file.write(src_str + "\n")
             return
@@ -200,12 +198,12 @@ class Install(DotfileAction):
         # skip: already enabled
         if src_str in dst_str:
             if self.logger:
-                self.logger.info("Already enabled: %s" % xpath.reduceuser(dst_path))
+                self.logger.info("Already enabled: %s" % xos.xpath.reduceuser(dst_path))
             return
 
         # enable
         if self.logger:
-            self.logger.execute("Enable %s" % xpath.reduceuser(src_path))
+            self.logger.execute("Enable %s" % xos.xpath.reduceuser(src_path))
 
         if not self.noop:
             with open(dst_path, "w") as dst_file:
@@ -242,22 +240,22 @@ class Uninstall(DotfileAction):
     def __run(self, dotfile, sysname="default"):
         if not self.__istarget(dotfile):
             if self.logger:
-                self.logger.info("File is not target: %s" % xpath.relpath(dotfile.src, xos.getcwd()))
+                self.logger.info("File is not target: %s" % os.path.relpath(dotfile.src, os.getcwd()))
             return
 
-        src = xpath.abspath(xpath.join(sysname, dotfile.src))
-        dst = xpath.expanduser(dotfile.dst)
+        src = os.path.abspath(os.path.join(sysname, dotfile.src))
+        dst = os.path.expanduser(dotfile.dst)
 
         #
         # guard
         #
 
         # src not found
-        if not xpath.exists(src):
+        if not os.path.exists(src):
             return True
 
         # dst not found
-        if not xpath.exists(dst) and not xpath.islink(dst):
+        if not os.path.exists(dst) and not os.path.islink(dst):
             if self.logger:
                 self.logger.info("File already removed: %s" % dst)
             return True
@@ -265,13 +263,13 @@ class Uninstall(DotfileAction):
         #
         # symlink
         #
-        if xpath.islink(dst):
+        if os.path.islink(dst):
             return self.shell.remove(dst)
 
         #
         # file
         #
-        if xpath.isfile(dst):
+        if os.path.isfile(dst):
             if self.logger:
                 self.logger.info("File is not symlink: %s" % dst)
             return False
@@ -279,10 +277,10 @@ class Uninstall(DotfileAction):
         #
         # directory
         #
-        if xpath.isdir(src):
+        if os.path.isdir(src):
             for new_src in xos.listdir_f(src, recursive=True):
-                rel_dst = xpath.relpath(new_src, src)
-                new_dst = xpath.join(dotfile.dst, rel_dst)
+                rel_dst = os.path.relpath(new_src, src)
+                new_dst = os.path.join(dotfile.dst, rel_dst)
                 new_dot = Dotfile(src=new_src, dst=new_dst)
                 self.__run(new_dot, sysname=sysname)
 
@@ -293,9 +291,9 @@ class Uninstall(DotfileAction):
         #
         # source
         #
-        src_path = xpath.join(TEMPLATE_DIR, template.src)
+        src_path = os.path.join(TEMPLATE_DIR, template.src)
 
-        if not xpath.exists(src_path):
+        if not os.path.exists(src_path):
             return
 
         src_str = ""
@@ -305,11 +303,11 @@ class Uninstall(DotfileAction):
         #
         # destination
         #
-        dst_path = xpath.expanduser(template.dst)
+        dst_path = os.path.expanduser(template.dst)
 
         # not found
-        if not xpath.exists(dst_path):
-            self.logger.info("File NOT FOUND: %s" % xpath.reduceuser(dst_path))
+        if not os.path.exists(dst_path):
+            self.logger.info("File NOT FOUND: %s" % xos.xpath.reduceuser(dst_path))
             return
 
         dst_str = ""
@@ -319,12 +317,12 @@ class Uninstall(DotfileAction):
         # skip: already disabled
         if not src_str in dst_str:
             if self.logger:
-                self.logger.info("Already disabled: %s" % xpath.reduceuser(dst_path))
+                self.logger.info("Already disabled: %s" % xos.xpath.reduceuser(dst_path))
             return
 
         # disable
         if self.logger:
-            self.logger.execute("Disable %s" % xpath.reduceuser(src_path))
+            self.logger.execute("Disable %s" % xos.xpath.reduceuser(src_path))
 
         if not self.noop:
             with open(dst_path, "w") as dst_file:
@@ -349,9 +347,9 @@ class Status(DotfileAction):
 
         for dot in dotfiles:
 
-            target = xpath.expanduser(dot.dst)
+            target = os.path.expanduser(dot.dst)
 
-            if not xpath.exists(target):
+            if not os.path.exists(target):
                 continue
 
             if xos.isdarwin():

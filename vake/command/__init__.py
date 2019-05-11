@@ -2,9 +2,9 @@
 Package of commands to install each target
 """
 
-import dotfile
-import binfile
-import brew
-import cask
-import gem
-import npm
+from . import dotfile
+from . import binfile
+from . import brew
+from . import cask
+from . import gem
+from . import npm

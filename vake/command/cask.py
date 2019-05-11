@@ -1,9 +1,9 @@
+# 1st
+import os
+
 # 2nd
 from .. import xos
-from ..xos import xpath
-
-# 3rd
-import base
+from . import base
 
 BREW = "brew"
 CASK = "cask"
@@ -12,12 +12,12 @@ CASKFILE = "Caskfile"
 
 class CaskAction(base.Action):
     def casks(self):
-        path = xpath.join(xos.getcwd(), xos.sysname(), CASKFILE)
+        path = os.path.join(os.getcwd(), xos.sysname(), CASKFILE)
 
         if self.logger:
             self.logger.debug("Read casks from file: %s" % path)
 
-        if xpath.exists(path):
+        if os.path.exists(path):
             return open(path).read().splitlines()
         else:
             return []

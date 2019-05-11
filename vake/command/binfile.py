@@ -1,13 +1,11 @@
 # 1st
+import os
 import glob
 import re
 
 # 2nd
 from .. import xos
-from ..xos import xpath
-
-# 3rd
-import base
+from . import base
 
 class BinfileAction(base.Action):
     def binfiles(self):
@@ -27,39 +25,39 @@ class Install(BinfileAction):
     def __run(self, binfile, sysname="default"):
         if not self.__istarget(binfile):
             if self.logger:
-                self.logger.info("File is not target: %s" % xpath.relpath(binfile.src, xos.getcwd()))
+                self.logger.info("File is not target: %s" % os.path.relpath(binfile.src, os.getcwd()))
             return
 
-        src = xpath.abspath(xpath.join(sysname, binfile.src))
-        dst = xpath.expanduser(binfile.dst)
+        src = os.path.abspath(os.path.join(sysname, binfile.src))
+        dst = os.path.expanduser(binfile.dst)
 
         #
         # guard
         #
 
         # src not found
-        if not xpath.exists(src):
+        if not os.path.exists(src):
             return False
 
         # dst link already exists
-        if xpath.islink(dst):
+        if os.path.islink(dst):
             if self.logger:
-                self.logger.info("Symlink already exists: %s" % xpath.reduceuser(dst))
+                self.logger.info("Symlink already exists: %s" % xos.xpath.reduceuser(dst))
             return False
 
         #
         # file
         #
-        if xpath.isfile(src):
+        if os.path.isfile(src):
             # another file already exists
-            if xpath.isfile(dst):
+            if os.path.isfile(dst):
                 if self.logger:
-                    self.logger.info("File already exists: %s" % xpath.reduceuser(dst))
+                    self.logger.info("File already exists: %s" % xos.xpath.reduceuser(dst))
                 return False
 
             # ensure parent directory
-            dst_dir = xpath.dirname(dst)
-            if not xpath.isdir(dst_dir):
+            dst_dir = os.path.dirname(dst)
+            if not os.path.isdir(dst_dir):
                 self.shell.mkdir(dst_dir, recursive=True)
 
             # create symbolic link
@@ -68,10 +66,10 @@ class Install(BinfileAction):
         #
         # directory
         #
-        if xpath.isdir(src):
+        if os.path.isdir(src):
             for new_src in xos.listdir_f(src, recursive=True):
-                rel_dst = xpath.relpath(new_src, src)
-                new_dst = xpath.join(binfile.dst, rel_dst)
+                rel_dst = os.path.relpath(new_src, src)
+                new_dst = os.path.join(binfile.dst, rel_dst)
                 new_bin = Binfile(src=new_src, dst=new_dst)
                 self.__run(new_bin, sysname=sysname)
 
@@ -100,22 +98,22 @@ class Uninstall(BinfileAction):
     def __run(self, binfile, sysname="default"):
         if not self.__istarget(binfile):
             if self.logger:
-                self.logger.info("File is not target: %s" % xpath.relpath(binfile.src, xos.getcwd()))
+                self.logger.info("File is not target: %s" % os.path.relpath(binfile.src, os.getcwd()))
             return
 
-        src = xpath.abspath(xpath.join(sysname, binfile.src))
-        dst = xpath.expanduser(binfile.dst)
+        src = os.path.abspath(os.path.join(sysname, binfile.src))
+        dst = os.path.expanduser(binfile.dst)
 
         #
         # guard
         #
 
         # src not found
-        if not xpath.exists(src):
+        if not os.path.exists(src):
             return True
 
         # dst not found
-        if not xpath.exists(dst) and not xpath.islink(dst):
+        if not os.path.exists(dst) and not os.path.islink(dst):
             if self.logger:
                 self.logger.info("File already removed: %s" % dst)
             return True
@@ -123,13 +121,13 @@ class Uninstall(BinfileAction):
         #
         # symlink
         #
-        if xpath.islink(dst):
+        if os.path.islink(dst):
             return self.shell.remove(dst)
 
         #
         # file
         #
-        if xpath.isfile(dst):
+        if os.path.isfile(dst):
             if self.logger:
                 self.logger.info("File is not symlink: %s" % dst)
             return False
@@ -137,10 +135,10 @@ class Uninstall(BinfileAction):
         #
         # directory
         #
-        if xpath.isdir(src):
+        if os.path.isdir(src):
             for new_src in xos.listdir_f(src, recursive=True):
-                rel_dst = xpath.relpath(new_src, src)
-                new_dst = xpath.join(binfile.dst, rel_dst)
+                rel_dst = os.path.relpath(new_src, src)
+                new_dst = os.path.join(binfile.dst, rel_dst)
                 new_bin = Binfile(src=new_src, dst=new_dst)
                 self.__run(new_bin, sysname=sysname)
 
@@ -163,9 +161,9 @@ class Status(BinfileAction):
 
         for binfile in binfiles:
 
-            target = xpath.expanduser(binfile.dst)
+            target = os.path.expanduser(binfile.dst)
 
-            if not xpath.exists(target):
+            if not os.path.exists(target):
                 continue
 
             if xos.isdarwin():

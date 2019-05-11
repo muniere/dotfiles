@@ -2,8 +2,8 @@
 Extend package of standard logging package
 """
 
-# 0th
-from logging import *
+# 1st
+import logging
 
 #
 # Constants
@@ -17,11 +17,11 @@ ERROR = 40
 #
 # Refine levels
 #
-addLevelName(DEBUG, "DEBUG")
-addLevelName(EXEC, "EXEC")
-addLevelName(INFO, "INFO")
-addLevelName(WARN, "WARN")
-addLevelName(ERROR, "ERROR")
+logging.addLevelName(DEBUG, "DEBUG")
+logging.addLevelName(EXEC, "EXEC")
+logging.addLevelName(INFO, "INFO")
+logging.addLevelName(WARN, "WARN")
+logging.addLevelName(ERROR, "ERROR")
 
 #
 # Functions
@@ -40,12 +40,12 @@ def __execute(self, cmd, *args, **kwargs):
     return
 
 
-Logger.execute = __execute
+logging.Logger.execute = __execute
 
 #
 # Classes
 #
-class LabelFormatter(Formatter):
+class LabelFormatter(logging.Formatter):
     LEVEL_NAME_WIDTH = 5
 
     def format(self, record):
@@ -53,7 +53,7 @@ class LabelFormatter(Formatter):
         return self.colorize(message, levelno=record.levelno)
 
     @staticmethod
-    def colorize(message, levelno=NOTSET):
+    def colorize(message, levelno=logging.NOTSET):
         reset_str = "\033[0m"
 
         color_dict = {

@@ -1,12 +1,10 @@
 # 1st
+import os
 import re
 
 # 2nd
 from .. import xos
-from ..xos import xpath
-
-# 3rd
-import base
+from . import base
 
 GEM = "gem"
 GEMFILE = "Gemfile"
@@ -14,12 +12,12 @@ GEMFILE = "Gemfile"
 
 class GemAction(base.Action):
     def gems(self):
-        path = xpath.join(xos.getcwd(), xos.sysname(), GEMFILE)
+        path = os.path.join(os.getcwd(), xos.sysname(), GEMFILE)
 
         if self.logger:
             self.logger.debug("Read gems from file: %s" % path)
 
-        if xpath.exists(path):
+        if os.path.exists(path):
             return Gem.load(path)
         else:
             return []
@@ -79,7 +77,7 @@ class Gem:
 
     @staticmethod
     def load(path):
-        if not xpath.exists(path):
+        if not os.path.exists(path):
             return []
 
         gems = []
