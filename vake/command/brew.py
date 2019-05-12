@@ -2,7 +2,7 @@
 import os
 
 # 2nd
-from .. import xos
+from .. import osx
 from . import base
 
 BREW = "brew"
@@ -11,7 +11,7 @@ BREWFILE = "Brewfile"
 
 class BrewAction(base.Action):
     def kegs(self):
-        path = os.path.join(os.getcwd(), xos.sysname(), BREWFILE)
+        path = os.path.join(os.getcwd(), osx.sysname(), BREWFILE)
 
         if self.logger:
             self.logger.debug("Read kegs from file: %s" % path)

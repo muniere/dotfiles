@@ -3,12 +3,10 @@
 # 1st
 import os
 import sys
-import logging
 
 # 2nd
-import vake
-from vake import xos
-from vake import xlogging
+from vake import command
+from vake import logx
 
 
 class Action:
@@ -54,22 +52,22 @@ class Commander:
     @classmethod
     def find(cls, target):
         if target == Target.DOTFILE:
-            return vake.command.dotfile
+            return command.dotfile
 
         if target == Target.BREW:
-            return vake.command.brew
+            return command.brew
 
         if target == Target.CASK:
-            return vake.command.cask
+            return command.cask
 
         if target == Target.GEM:
-            return vake.command.gem
+            return command.gem
 
         if target == Target.NPM:
-            return vake.command.npm
+            return command.npm
 
         if target == Target.BINFILE:
-            return vake.command.binfile
+            return command.binfile
 
         return None
 
@@ -122,18 +120,18 @@ class Context:
 
     def __make_logger(self):
         if self.verbose:
-            logging_level = xlogging.DEBUG
+            level = logx.DEBUG
         else:
-            logging_level = xlogging.EXEC
+            level = logx.EXEC
 
-        formatter = xlogging.LabelFormatter()
+        formatter = logx.LabelFormatter()
 
-        handler = logging.StreamHandler()
-        handler.setLevel(logging_level)
+        handler = logx.StreamHandler()
+        handler.setLevel(level)
         handler.setFormatter(formatter)
 
-        logger = logging.getLogger(__name__)
-        logger.setLevel(logging_level)
+        logger = logx.getLogger(__name__)
+        logger.setLevel(level)
         logger.addHandler(handler)
 
         return logger

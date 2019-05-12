@@ -1,5 +1,5 @@
 # 2nd
-from . import xos
-from . import xlogging
+from . import osx
+from . import logx
 from . import command
 from . import shell

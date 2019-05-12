@@ -4,7 +4,8 @@ import glob
 import re
 
 # 2nd
-from .. import xos
+from .. import fs
+from .. import osx
 from . import base
 
 TEMPLATE_DIR = "./vake/template"
@@ -47,11 +48,11 @@ class DotfileAction(base.Action):
         ])
 
         # linux
-        if xos.islinux():
+        if osx.islinux():
             dots.extend([])
 
         # darwin
-        if xos.isdarwin():
+        if osx.isdarwin():
             dots.extend(
                 map(lambda dst: Dotfile(src="Xcode", dst=dst),
                     glob.glob(os.path.expanduser("~/Library/Developer/Xcode"))))
@@ -92,7 +93,7 @@ class Install(DotfileAction):
             if dot.src.startswith('/'):
                 self.__run(dot)
             else:
-                self.__run(dot, sysname=xos.sysname())
+                self.__run(dot, sysname=osx.sysname())
                 self.__run(dot, sysname="default")
 
             if dot.install:
@@ -130,7 +131,7 @@ class Install(DotfileAction):
         # dst link already exists
         if os.path.islink(dst):
             if self.logger:
-                self.logger.info("Symlink already exists: %s" % xos.xpath.reduceuser(dst))
+                self.logger.info("Symlink already exists: %s" % osx.pathx.reduceuser(dst))
             return False
 
         #
@@ -140,7 +141,7 @@ class Install(DotfileAction):
             # another file already exists
             if os.path.isfile(dst):
                 if self.logger:
-                    self.logger.info("File already exists: %s" % xos.xpath.reduceuser(dst))
+                    self.logger.info("File already exists: %s" % osx.pathx.reduceuser(dst))
                 return False
 
             # ensure parent directory
@@ -155,7 +156,7 @@ class Install(DotfileAction):
         # directory
         #
         if os.path.isdir(src):
-            for new_src in xos.listdir_f(src, recursive=True):
+            for new_src in fs.children(src, target='file', recursive=True):
                 rel_dst = os.path.relpath(new_src, src)
                 new_dst = os.path.join(dotfile.dst, rel_dst)
                 new_dot = Dotfile(src=new_src, dst=new_dst)
@@ -186,7 +187,7 @@ class Install(DotfileAction):
         if not os.path.exists(dst_path):
             with open(dst_path, "w") as dst_file:
                 if self.logger:
-                    self.logger.execute("Enable %s" % xos.xpath.reduceuser(src_path))
+                    self.logger.execute("Enable %s" % osx.pathx.reduceuser(src_path))
                 if not self.noop:
                     dst_file.write(src_str + "\n")
             return
@@ -198,12 +199,12 @@ class Install(DotfileAction):
         # skip: already enabled
         if src_str in dst_str:
             if self.logger:
-                self.logger.info("Already enabled: %s" % xos.xpath.reduceuser(dst_path))
+                self.logger.info("Already enabled: %s" % osx.pathx.reduceuser(dst_path))
             return
 
         # enable
         if self.logger:
-            self.logger.execute("Enable %s" % xos.xpath.reduceuser(src_path))
+            self.logger.execute("Enable %s" % osx.pathx.reduceuser(src_path))
 
         if not self.noop:
             with open(dst_path, "w") as dst_file:
@@ -226,7 +227,7 @@ class Install(DotfileAction):
 class Uninstall(DotfileAction):
     def run(self):
         for dot in self.dotfiles():
-            self.__run(dot, sysname=xos.sysname())
+            self.__run(dot, sysname=osx.sysname())
             self.__run(dot, sysname="default")
 
             if dot.uninstall:
@@ -278,7 +279,7 @@ class Uninstall(DotfileAction):
         # directory
         #
         if os.path.isdir(src):
-            for new_src in xos.listdir_f(src, recursive=True):
+            for new_src in fs.children(src, target='file', recursive=True):
                 rel_dst = os.path.relpath(new_src, src)
                 new_dst = os.path.join(dotfile.dst, rel_dst)
                 new_dot = Dotfile(src=new_src, dst=new_dst)
@@ -307,7 +308,7 @@ class Uninstall(DotfileAction):
 
         # not found
         if not os.path.exists(dst_path):
-            self.logger.info("File NOT FOUND: %s" % xos.xpath.reduceuser(dst_path))
+            self.logger.info("File NOT FOUND: %s" % osx.pathx.reduceuser(dst_path))
             return
 
         dst_str = ""
@@ -317,12 +318,12 @@ class Uninstall(DotfileAction):
         # skip: already disabled
         if not src_str in dst_str:
             if self.logger:
-                self.logger.info("Already disabled: %s" % xos.xpath.reduceuser(dst_path))
+                self.logger.info("Already disabled: %s" % osx.pathx.reduceuser(dst_path))
             return
 
         # disable
         if self.logger:
-            self.logger.execute("Disable %s" % xos.xpath.reduceuser(src_path))
+            self.logger.execute("Disable %s" % osx.pathx.reduceuser(src_path))
 
         if not self.noop:
             with open(dst_path, "w") as dst_file:
@@ -352,7 +353,7 @@ class Status(DotfileAction):
             if not os.path.exists(target):
                 continue
 
-            if xos.isdarwin():
+            if osx.isdarwin():
                 self.shell.execute("ls -lFG %s" % target)
             else:
                 self.shell.execute("ls -lFo %s" % target)

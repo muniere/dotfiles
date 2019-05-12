@@ -4,7 +4,8 @@ import glob
 import re
 
 # 2nd
-from .. import xos
+from .. import fs
+from .. import osx
 from . import base
 
 class BinfileAction(base.Action):
@@ -17,7 +18,7 @@ class BinfileAction(base.Action):
 class Install(BinfileAction):
     def run(self):
         for binfile in self.binfiles():
-            self.__run(binfile, sysname=xos.sysname())
+            self.__run(binfile, sysname=osx.sysname())
             self.__run(binfile, sysname="default")
 
         return
@@ -42,7 +43,7 @@ class Install(BinfileAction):
         # dst link already exists
         if os.path.islink(dst):
             if self.logger:
-                self.logger.info("Symlink already exists: %s" % xos.xpath.reduceuser(dst))
+                self.logger.info("Symlink already exists: %s" % osx.pathx.reduceuser(dst))
             return False
 
         #
@@ -52,7 +53,7 @@ class Install(BinfileAction):
             # another file already exists
             if os.path.isfile(dst):
                 if self.logger:
-                    self.logger.info("File already exists: %s" % xos.xpath.reduceuser(dst))
+                    self.logger.info("File already exists: %s" % osx.pathx.reduceuser(dst))
                 return False
 
             # ensure parent directory
@@ -67,7 +68,7 @@ class Install(BinfileAction):
         # directory
         #
         if os.path.isdir(src):
-            for new_src in xos.listdir_f(src, recursive=True):
+            for new_src in fs.children(src, target='file', recursive=True):
                 rel_dst = os.path.relpath(new_src, src)
                 new_dst = os.path.join(binfile.dst, rel_dst)
                 new_bin = Binfile(src=new_src, dst=new_dst)
@@ -90,7 +91,7 @@ class Install(BinfileAction):
 class Uninstall(BinfileAction):
     def run(self):
         for binfile in self.binfiles():
-            self.__run(binfile, sysname=xos.sysname())
+            self.__run(binfile, sysname=osx.sysname())
             self.__run(binfile, sysname="default")
 
         return
@@ -136,7 +137,7 @@ class Uninstall(BinfileAction):
         # directory
         #
         if os.path.isdir(src):
-            for new_src in xos.listdir_f(src, recursive=True):
+            for new_src in fs.children(src, target='file', recursive=True):
                 rel_dst = os.path.relpath(new_src, src)
                 new_dst = os.path.join(binfile.dst, rel_dst)
                 new_bin = Binfile(src=new_src, dst=new_dst)
@@ -166,7 +167,7 @@ class Status(BinfileAction):
             if not os.path.exists(target):
                 continue
 
-            if xos.isdarwin():
+            if osx.isdarwin():
                 self.shell.execute("ls -lFG %s" % target)
             else:
                 self.shell.execute("ls -lFo %s" % target)

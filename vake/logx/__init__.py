@@ -24,6 +24,15 @@ logging.addLevelName(WARN, "WARN")
 logging.addLevelName(ERROR, "ERROR")
 
 #
+# Export
+#
+def getLogger(name=None):
+    return logging.getLogger(name)
+
+class StreamHandler(logging.StreamHandler):
+    pass
+
+#
 # Functions
 #
 def __execute(self, cmd, *args, **kwargs):

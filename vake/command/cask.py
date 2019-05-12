@@ -2,7 +2,7 @@
 import os
 
 # 2nd
-from .. import xos
+from .. import osx
 from . import base
 
 BREW = "brew"
@@ -12,7 +12,7 @@ CASKFILE = "Caskfile"
 
 class CaskAction(base.Action):
     def casks(self):
-        path = os.path.join(os.getcwd(), xos.sysname(), CASKFILE)
+        path = os.path.join(os.getcwd(), osx.sysname(), CASKFILE)
 
         if self.logger:
             self.logger.debug("Read casks from file: %s" % path)

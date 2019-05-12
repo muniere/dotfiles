@@ -3,7 +3,7 @@ import os
 import re
 
 # 2nd
-from .. import xos
+from .. import osx
 from . import base
 
 GEM = "gem"
@@ -12,7 +12,7 @@ GEMFILE = "Gemfile"
 
 class GemAction(base.Action):
     def gems(self):
-        path = os.path.join(os.getcwd(), xos.sysname(), GEMFILE)
+        path = os.path.join(os.getcwd(), osx.sysname(), GEMFILE)
 
         if self.logger:
             self.logger.debug("Read gems from file: %s" % path)

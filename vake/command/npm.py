@@ -3,7 +3,7 @@ import os
 import json
 
 # 2nd
-from .. import xos
+from .. import osx
 from . import base
 
 NPM = "npm"
@@ -13,7 +13,7 @@ DEPENDENCIES = "dependencies"
 
 class NpmAction(base.Action):
     def packages(self):
-        path = os.path.join(os.getcwd(), xos.sysname(), PACKAGE_JSON)
+        path = os.path.join(os.getcwd(), osx.sysname(), PACKAGE_JSON)
 
         if self.logger:
             self.logger.debug("Read packages from file: %s" % path)
