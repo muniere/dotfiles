@@ -1,5 +1,25 @@
+# 1st
 import os
 
+# 2nd
+from . import __pilot__
+
+def pilot(pathname):
+    """
+    Create a new Pilot for pathname.
+    Returns pathname as it is when it is Pilot.
+
+    :type pathname: str or Pilot
+    :rtype: Pilot
+    """
+    if isinstance(pathname, __pilot__.Pilot):
+        return pathname
+    else:
+        return __pilot__.Pilot(pathname)
+
+#
+# deprecated functions
+#
 def walk(top, topdown=True, onerror=None, followlinks=False):
   return os.walk(top, topdown, onerror, followlinks)
 

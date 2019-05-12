@@ -7,6 +7,9 @@ import os
 import re
 
 
+#
+# deprecated functions
+#
 def reduceuser(path):
     """
     Reduce user directory with '~'
