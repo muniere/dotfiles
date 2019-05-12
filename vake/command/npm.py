@@ -3,6 +3,7 @@ import os
 import json
 
 # 2nd
+from .. import fs
 from .. import osx
 from . import base
 
@@ -13,13 +14,13 @@ DEPENDENCIES = "dependencies"
 
 class NpmAction(base.Action):
     def packages(self):
-        path = os.path.join(os.getcwd(), osx.sysname(), PACKAGE_JSON)
+        src = fs.pilot(os.getcwd()).append(osx.sysname()).append(PACKAGE_JSON)
 
         if self.logger:
-            self.logger.debug("Read packages from file: %s" % path)
+            self.logger.debug("Read packages from file: %s" % src)
 
-        if os.path.exists(path):
-            return Package.load(path)
+        if src.exists():
+            return Package.load(src)
         else:
             return []
 
@@ -79,17 +80,20 @@ class Package:
 
     @staticmethod
     def load(path):
-        if not os.path.exists(path):
+        target = fs.pilot(path)
+
+        if not target.exists():
             return []
 
-        dictionary = json.load(open(path))
+        content = target.read()
+        jsonobj = json.loads(content)
 
-        if not DEPENDENCIES in dictionary:
+        if not DEPENDENCIES in jsonobj:
             return []
 
         packages = []
 
-        for n, v in dictionary[DEPENDENCIES].items():
-            packages.append(Package(name=n, version=v))
+        for name, version in jsonobj[DEPENDENCIES].items():
+            packages.append(Package(name, version))
 
         return packages

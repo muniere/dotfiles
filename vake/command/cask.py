@@ -2,6 +2,7 @@
 import os
 
 # 2nd
+from .. import fs
 from .. import osx
 from . import base
 
@@ -12,13 +13,13 @@ CASKFILE = "Caskfile"
 
 class CaskAction(base.Action):
     def casks(self):
-        path = os.path.join(os.getcwd(), osx.sysname(), CASKFILE)
+        src = fs.pilot(os.getcwd()).append(osx.sysname()).append(CASKFILE)
 
         if self.logger:
-            self.logger.debug("Read casks from file: %s" % path)
+            self.logger.debug("Read casks from file: %s" % src)
 
-        if os.path.exists(path):
-            return open(path).read().splitlines()
+        if src.exists():
+            return Cask.load(src)
         else:
             return []
 
@@ -36,7 +37,7 @@ class Install(CaskAction):
             return
 
         for cask in casks:
-            self.shell.execute([BREW, CASK, "install", cask])
+            self.shell.execute([BREW, CASK, "install", cask.name])
 
         return
 
@@ -54,7 +55,7 @@ class Uninstall(CaskAction):
             return
 
         for cask in casks:
-            self.shell.execute([BREW, CASK, "uninstall", cask])
+            self.shell.execute([BREW, CASK, "uninstall", cask.name])
 
         return
 
@@ -67,3 +68,24 @@ class Status(CaskAction):
 
         self.shell.execute([BREW, CASK, "list"])
         return
+
+
+
+class Cask:
+    def __init__(self, name):
+        self.name = name
+        return
+
+    @staticmethod
+    def load(path):
+        target = fs.pilot(path)
+
+        if not target.exists():
+            return []
+
+        casks = []
+
+        for name in target.readlines():
+            casks.append(Cask(name))
+
+        return casks

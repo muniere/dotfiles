@@ -7,6 +7,7 @@ import sys
 # 2nd
 from vake import command
 from vake import logx
+from vake import fs
 
 
 class Action:
@@ -275,7 +276,9 @@ class CLI:
 #
 if __name__ == "__main__":
     # change to script's directory
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
+    root_dir = fs.pilot(__file__).abspath().parent()
+
+    os.chdir(root_dir.pathname())
 
     # run application
     CLI().run(sys.argv[1:])

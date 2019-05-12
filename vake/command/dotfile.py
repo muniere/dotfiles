@@ -102,25 +102,26 @@ class DotfileAction(base.Action):
 
         # darwin
         if osx.isdarwin():
-            dots.extend(
-                map(lambda dst: Dotfile(src="Xcode", dst=dst),
-                    glob.glob(os.path.expanduser("~/Library/Developer/Xcode"))))
-
-            dots.extend(
-                map(lambda dst: Dotfile(src="IntelliJIdea", dst=dst),
-                    glob.glob(os.path.expanduser("~/Library/Preferences/IntelliJIdea*"))))
-
-            dots.extend(
-                map(lambda dst: Dotfile(src="AndroidStudio", dst=dst),
-                    glob.glob(os.path.expanduser("~/Library/Preferences/AndroidStudio*"))))
-
-            dots.extend(
-                map(lambda dst: Dotfile(src="AppCode", dst=dst),
-                    glob.glob(os.path.expanduser("~/Library/Preferences/AppCode*"))))
-
-            dots.extend(
-                map(lambda dst: Dotfile(src="RubyMine", dst=dst),
-                    glob.glob(os.path.expanduser("~/Library/Preferences/RubyMine*"))))
+            dots.extend([
+                Dotfile(src="Xcode", dst=dst) for dst in
+                fs.pilot("~/Library/Developer/Xcode").expanduser().glob()
+            ])
+            dots.extend([
+                Dotfile(src="IntelliJIdea", dst=dst) for dst in
+                fs.pilot("~/Library/Preferences/IntelliJIdea*").expanduser().glob()
+            ])
+            dots.extend([
+                Dotfile(src="AndroidStudio", dst=dst) for dst in
+                fs.pilot("~/Library/Preferences/AndroidStudio*").expanduser().glob()
+            ])
+            dots.extend([
+                Dotfile(src="AppCode", dst=dst) for dst in
+                fs.pilot("~/Library/Preferences/AppCode*").expanduser().glob()
+            ])
+            dots.extend([
+                Dotfile(src="RubyMine", dst=dst) for dst in
+                fs.pilot("~/Library/Preferences/RubyMine*").expanduser().glob()
+            ])
 
         return dots
 

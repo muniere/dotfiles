@@ -6,6 +6,9 @@ Package of shell commands
 import os
 import subprocess
 
+# 2nd
+from .. import fs
+
 
 class Client:
     def __init__(self, noop=False, logger=None):
@@ -55,7 +58,7 @@ class Client:
         return self.execute(words)
 
     def git_clone(self, src, dst):
-        if os.path.isdir(dst):
+        if fs.pilot(dst).isdir():
             if self.logger:
                 self.logger.info("Worktree already exists: %s" % dst)
             return True

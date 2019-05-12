@@ -6,6 +6,9 @@ Extend package of standard os package
 import os
 import subprocess
 
+# 2nd
+from .. import fs
+
 #
 # Constants
 #
@@ -32,8 +35,10 @@ def sysname():
 
     :return: Detected name
     """
-    if os.path.isfile("/etc/issue"):
-        rawname = open("/etc/issue").read().lower()
+    issue = fs.pilot("/etc/issue")
+
+    if issue.isfile():
+        rawname = issue.read().lower()
     else:
         rawname = subprocess.check_output(["uname", "-a"]).strip().lower()
 

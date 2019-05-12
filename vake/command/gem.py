@@ -3,6 +3,7 @@ import os
 import re
 
 # 2nd
+from .. import fs
 from .. import osx
 from . import base
 
@@ -12,13 +13,13 @@ GEMFILE = "Gemfile"
 
 class GemAction(base.Action):
     def gems(self):
-        path = os.path.join(os.getcwd(), osx.sysname(), GEMFILE)
+        src = fs.pilot(os.getcwd()).append(osx.sysname()).append(GEMFILE)
 
         if self.logger:
-            self.logger.debug("Read gems from file: %s" % path)
+            self.logger.debug("Read gems from file: %s" % src)
 
-        if os.path.exists(path):
-            return Gem.load(path)
+        if src.exists():
+            return Gem.load(src)
         else:
             return []
 
@@ -79,26 +80,25 @@ class Gem:
 
     @staticmethod
     def load(path):
-        if not os.path.exists(path):
+        target = fs.pilot(path)
+
+        if not target.exists():
             return []
-
-        gems = []
-
-        # filter lines like following:
-        #   gem 'awesome_gem1', '~> 1.2.3'
-        #   gem "awesome_gem2", "~> 1.2.3"
-        #   gem "awesome_gem3"
 
         pattern = re.compile(
             r"^\s*gem\s+[\"'](?P<name>\w+)[\"']\s*(,\s*[\"'](?P<version>.+)[\"'])?"
         )
 
-        for line in open(path).read().splitlines():
+        gems = []
+
+        for line in target.readlines():
             match = pattern.search(line)
 
-            if match:
-                n = match.group("name")
-                v = match.group("version")
-                gems.append(Gem(n, v))
+            if not match:
+                continue
+
+            name = match.group("name")
+            version = match.group("version")
+            gems.append(Gem(name, version))
 
         return gems
