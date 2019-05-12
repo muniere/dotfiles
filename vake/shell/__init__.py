@@ -15,7 +15,10 @@ class Client:
 
     @classmethod
     def available(cls, command):
-        return subprocess.call(["which", command]) == 0
+        code = subprocess.call(["which", command],
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+        return code == 0
 
     def mkdir(self, path, recursive=False):
         words = ["mkdir"]
