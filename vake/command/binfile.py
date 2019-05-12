@@ -27,65 +27,60 @@ class Install(BinfileAction):
     def __run(self, binfile, sysname="default"):
         if not self.__istarget(binfile):
             if self.logger:
-                relpath = os.path.relpath(binfile.src, os.getcwd())
+                relpath = fs.pilot(binfile.src).relpath(os.getcwd())
                 self.logger.info("File is not target: %s" % relpath)
             return
 
-        src = os.path.abspath(os.path.join(sysname, binfile.src))
-        dst = os.path.expanduser(binfile.dst)
+        src = fs.pilot(binfile.src).prepend(sysname).abspath()
+        dst = fs.pilot(binfile.dst).expanduser()
 
         #
         # guard
         #
 
         # src not found
-        if not os.path.exists(src):
+        if not src.exists():
             return False
 
         # dst link already exists
-        if os.path.islink(dst):
+        if dst.islink():
             if self.logger:
-                relpath = osx.pathx.reduceuser(dst)
-                self.logger.info("Symlink already exists: %s" % relpath)
+                self.logger.info("Symlink already exists: %s" % dst.reduceuser())
             return False
 
         #
         # file
         #
-        if os.path.isfile(src):
+        if src.isfile():
             # another file already exists
-            if os.path.isfile(dst):
+            if dst.isfile():
                 if self.logger:
-                    relpath = osx.pathx.reduceuser(dst)
-                    self.logger.info("File already exists: %s" % relpath)
+                    self.logger.info("File already exists: %s" % dst.reduceuser())
                 return False
 
             # ensure parent directory
-            dst_dir = os.path.dirname(dst)
-            if not os.path.isdir(dst_dir):
-                self.shell.mkdir(dst_dir, recursive=True)
+            dst_dir = dst.parent()
+            if not dst_dir.isdir():
+                self.shell.mkdir(dst_dir.pathname(), recursive=True)
 
             # create symbolic link
-            return self.shell.symlink(src, dst, force=True)
+            return self.shell.symlink(src.pathname(), dst.pathname(), force=True)
 
         #
         # directory
         #
-        if os.path.isdir(src):
-            for new_src in fs.children(src, target='file', recursive=True):
-                rel_dst = os.path.relpath(new_src, src)
-                new_dst = os.path.join(binfile.dst, rel_dst)
-                new_bin = Binfile(src=new_src, dst=new_dst)
+        if src.isdir():
+            for new_src in src.children(target='f', recursive=True):
+                new_dst = fs.pilot(binfile.dst).append(new_src.relpath(src))
+                new_bin = Binfile(src=new_src.pathname(), dst=new_dst.pathname())
                 self.__run(new_bin, sysname=sysname)
 
         return True
 
     def __istarget(self, binfile):
-        patterns = [
-            r'\.swp$'
-        ]
+        blacklist = [r'\.swp$']
 
-        for pattern in patterns:
+        for pattern in blacklist:
             if re.search(pattern, binfile.src):
                 return False
 
@@ -103,23 +98,23 @@ class Uninstall(BinfileAction):
     def __run(self, binfile, sysname="default"):
         if not self.__istarget(binfile):
             if self.logger:
-                relpath = os.path.relpath(binfile.src, os.getcwd())
+                relpath = fs.pilot(binfile.src).relpath(os.getcwd())
                 self.logger.info("File is not target: %s" % relpath)
             return
 
-        src = os.path.abspath(os.path.join(sysname, binfile.src))
-        dst = os.path.expanduser(binfile.dst)
+        src = fs.pilot(binfile.src).prepend(sysname).abspath()
+        dst = fs.pilot(binfile.dst).expanduser()
 
         #
         # guard
         #
 
         # src not found
-        if not os.path.exists(src):
+        if not src.exists():
             return True
 
         # dst not found
-        if not os.path.exists(dst) and not os.path.islink(dst):
+        if not dst.exists() and not dst.islink():
             if self.logger:
                 self.logger.info("File already removed: %s" % dst)
             return True
@@ -127,13 +122,13 @@ class Uninstall(BinfileAction):
         #
         # symlink
         #
-        if os.path.islink(dst):
-            return self.shell.remove(dst)
+        if dst.islink():
+            return self.shell.remove(dst.pathname())
 
         #
         # file
         #
-        if os.path.isfile(dst):
+        if dst.isfile():
             if self.logger:
                 self.logger.info("File is not symlink: %s" % dst)
             return False
@@ -141,21 +136,18 @@ class Uninstall(BinfileAction):
         #
         # directory
         #
-        if os.path.isdir(src):
-            for new_src in fs.children(src, target='file', recursive=True):
-                rel_dst = os.path.relpath(new_src, src)
-                new_dst = os.path.join(binfile.dst, rel_dst)
-                new_bin = Binfile(src=new_src, dst=new_dst)
+        if src.isdir():
+            for new_src in src.children(target='f', recursive=True):
+                new_dst = fs.pilot(binfile.dst).append(new_src.relpath(src))
+                new_bin = Binfile(src=new_src.pathname(), dst=new_dst.pathname())
                 self.__run(new_bin, sysname=sysname)
 
         return True
 
     def __istarget(self, binfile):
-        patterns = [
-            r'\.swp$'
-        ]
+        blacklist = [r'\.swp$']
 
-        for pattern in patterns:
+        for pattern in blacklist:
             if re.search(pattern, binfile.src):
                 return False
 
@@ -167,10 +159,9 @@ class Status(BinfileAction):
         binfiles = sorted(self.binfiles(), key=lambda x: x.dst)
 
         for binfile in binfiles:
+            target = fs.pilot(binfile.dst).expanduser()
 
-            target = os.path.expanduser(binfile.dst)
-
-            if not os.path.exists(target):
+            if not target.exists():
                 continue
 
             if osx.isdarwin():

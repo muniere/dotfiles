@@ -6,9 +6,6 @@ Extend package of standard os package
 import os
 import subprocess
 
-# 2nd
-from . import pathx
-
 #
 # Constants
 #

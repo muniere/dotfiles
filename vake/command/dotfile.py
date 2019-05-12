@@ -15,7 +15,7 @@ class DotfileAction(base.Action):
     def __vim_install(self):
         self.shell.git_clone(
             src="https://github.com/Shougo/neobundle.vim",
-            dst=os.path.expanduser("~/.vim/bundle/neobundle.vim")
+            dst=fs.pilot("~/.vim/bundle/neobundle.vim").expanduser().pathname()
         )
         return None
 
@@ -174,62 +174,59 @@ class Install(DotfileAction):
     def __run(self, dotfile, sysname="default"):
         if not self.__istarget(dotfile):
             if self.logger:
-                relpath = os.path.relpath(dotfile.src, os.getcwd())
+                relpath = fs.pilot(dotfile.src).relpath(os.getcwd())
                 self.logger.info("File is not target: %s" % relpath)
             return
 
         if dotfile.src.startswith('/'):
-            src = dotfile.src
+            src = fs.pilot(dotfile.src)
         else:
-            src = os.path.abspath(os.path.join(sysname, dotfile.src))
+            src = fs.pilot(dotfile.src).prepend(sysname).abspath()
 
         if dotfile.dst.startswith('/'):
-            dst = dotfile.dst
+            dst = fs.pilot(dotfile.dst)
         else:
-            dst = os.path.expanduser(dotfile.dst)
+            dst = fs.pilot(dotfile.dst).expanduser()
 
         #
         # guard
         #
 
         # src not found
-        if not os.path.exists(src):
+        if not src.exists():
             return False
 
         # dst link already exists
-        if os.path.islink(dst):
+        if dst.islink():
             if self.logger:
-                relpath = osx.pathx.reduceuser(dst)
-                self.logger.info("Symlink already exists: %s" % relpath)
+                self.logger.info("Symlink already exists: %s" % dst.reduceuser())
             return False
 
         #
         # file
         #
-        if os.path.isfile(src):
+        if src.isfile():
             # another file already exists
-            if os.path.isfile(dst):
+            if dst.isfile():
                 if self.logger:
-                    relpath = osx.pathx.reduceuser(dst)
-                    self.logger.info("File already exists: %s" % relpath)
+                    self.logger.info("File already exists: %s" % dst.reduceuser())
                 return False
 
             # ensure parent directory
-            dst_dir = os.path.dirname(dst)
-            if not os.path.isdir(dst_dir):
-                self.shell.mkdir(dst_dir, recursive=True)
+            dst_dir = dst.parent()
+            if not dst_dir.isdir():
+                self.shell.mkdir(dst_dir.pathname(), recursive=True)
 
             # create symbolic link
-            return self.shell.symlink(src, dst, force=True)
+            return self.shell.symlink(src.pathname(), dst.pathname(), force=True)
 
         #
         # directory
         #
-        if os.path.isdir(src):
-            for new_src in fs.children(src, target='file', recursive=True):
-                rel_dst = os.path.relpath(new_src, src)
-                new_dst = os.path.join(dotfile.dst, rel_dst)
-                new_dot = Dotfile(src=new_src, dst=new_dst)
+        if src.isdir():
+            for new_src in src.children(target='f', recursive=True):
+                new_dst = fs.pilot(dotfile.dst).append(new_src.relpath(src))
+                new_dot = Dotfile(src=new_src.pathname(), dst=new_dst.pathname())
                 self.__run(new_dot, sysname=sysname)
 
         return True
@@ -239,58 +236,49 @@ class Install(DotfileAction):
         #
         # source
         #
-        src_path = os.path.join(TEMPLATE_DIR, template.src)
+        src = fs.pilot(template.src).prepend(TEMPLATE_DIR)
 
-        if not os.path.exists(src_path):
+        if not src.exists():
             return
 
-        src_str = ""
-        with open(src_path, "r") as src_file:
-            src_str = src_file.read().strip()
+        src_str = src.read().strip()
 
         #
         # destination
         #
-        dst_path = os.path.expanduser(template.dst)
+        dst = fs.pilot(template.dst).expanduser()
 
         # new file
-        if not os.path.exists(dst_path):
-            with open(dst_path, "w") as dst_file:
-                if self.logger:
-                    relpath = osx.pathx.reduceuser(src_path)
-                    self.logger.execute("Enable %s" % relpath)
-                if not self.noop:
-                    dst_file.write(src_str + "\n")
+        if not dst.exists():
+            if self.logger:
+                self.logger.execute("Enable %s" % src.reduceuser())
+
+            if not self.noop:
+                dst.write(src_str + "\n")
+
             return
 
-        dst_str = ""
-        with open(dst_path, "r") as dst_file:
-            dst_str = dst_file.read()
+        dst_str = dst.read()
 
         # skip: already enabled
         if src_str in dst_str:
             if self.logger:
-                relpath = osx.pathx.reduceuser(dst_path)
-                self.logger.info("Already enabled: %s" % relpath)
+                self.logger.info("Already enabled: %s" % dst.reduceuser())
             return
 
         # enable
         if self.logger:
-            relpath = osx.pathx.reduceuser(src_path)
-            self.logger.execute("Enable %s" % relpath)
+            self.logger.execute("Enable %s" % src.reduceuser())
 
         if not self.noop:
-            with open(dst_path, "w") as dst_file:
-                dst_file.write(dst_str + src_str + "\n")
+            dst.write(dst_str + src_str + "\n")
 
         return
 
     def __istarget(self, dotfile):
-        patterns = [
-            r'\.swp$'
-        ]
+        blacklist = [r'\.swp$']
 
-        for pattern in patterns:
+        for pattern in blacklist:
             if re.search(pattern, dotfile.src):
                 return False
 
@@ -314,23 +302,23 @@ class Uninstall(DotfileAction):
     def __run(self, dotfile, sysname="default"):
         if not self.__istarget(dotfile):
             if self.logger:
-                relpath = os.path.relpath(dotfile.src, os.getcwd())
+                relpath = fs.pilot(dotfile.src).relpath(os.getcwd())
                 self.logger.info("File is not target: %s" % relpath)
             return
 
-        src = os.path.abspath(os.path.join(sysname, dotfile.src))
-        dst = os.path.expanduser(dotfile.dst)
+        src = fs.pilot(dotfile.src).prepend(sysname).abspath()
+        dst = fs.pilot(dotfile.dst).expanduser()
 
         #
         # guard
         #
 
         # src not found
-        if not os.path.exists(src):
+        if not src.exists():
             return True
 
         # dst not found
-        if not os.path.exists(dst) and not os.path.islink(dst):
+        if not dst.exists() and not dst.islink():
             if self.logger:
                 self.logger.info("File already removed: %s" % dst)
             return True
@@ -338,13 +326,13 @@ class Uninstall(DotfileAction):
         #
         # symlink
         #
-        if os.path.islink(dst):
-            return self.shell.remove(dst)
+        if dst.islink():
+            return self.shell.remove(dst.pathname())
 
         #
         # file
         #
-        if os.path.isfile(dst):
+        if dst.isfile():
             if self.logger:
                 self.logger.info("File is not symlink: %s" % dst)
             return False
@@ -352,11 +340,10 @@ class Uninstall(DotfileAction):
         #
         # directory
         #
-        if os.path.isdir(src):
-            for new_src in fs.children(src, target='file', recursive=True):
-                rel_dst = os.path.relpath(new_src, src)
-                new_dst = os.path.join(dotfile.dst, rel_dst)
-                new_dot = Dotfile(src=new_src, dst=new_dst)
+        if src.isdir():
+            for new_src in src.children(target='f', recursive=True):
+                new_dst = fs.pilot(dotfile.dst).append(new_src.relpath(src))
+                new_dot = Dotfile(src=new_src.pathname(), dst=new_dst.pathname())
                 self.__run(new_dot, sysname=sysname)
 
         return True
@@ -366,54 +353,44 @@ class Uninstall(DotfileAction):
         #
         # source
         #
-        src_path = os.path.join(TEMPLATE_DIR, template.src)
+        src = fs.pilot(template.src).prepend(TEMPLATE_DIR)
 
-        if not os.path.exists(src_path):
+        if not src.exists():
             return
 
-        src_str = ""
-        with open(src_path, "r") as src_file:
-            src_str = src_file.read().strip()
+        src_str = src.read().strip()
 
         #
         # destination
         #
-        dst_path = os.path.expanduser(template.dst)
+        dst = fs.pilot(template.dst).expanduser()
 
         # not found
-        if not os.path.exists(dst_path):
-            relpath = osx.pathx.reduceuser(dst_path)
-            self.logger.info("File NOT FOUND: %s" % relpath)
+        if not dst.exists():
+            self.logger.info("File NOT FOUND: %s" % dst.reduceuser())
             return
 
-        dst_str = ""
-        with open(dst_path, "r") as dst_file:
-            dst_str = dst_file.read()
+        dst_str = dst.read()
 
         # skip: already disabled
         if not src_str in dst_str:
             if self.logger:
-                relpath = osx.pathx.reduceuser(dst_path)
-                self.logger.info("Already disabled: %s" % relpath)
+                self.logger.info("Already disabled: %s" % dst.reduceuser())
             return
 
         # disable
         if self.logger:
-            relpath = osx.pathx.reduceuser(src_path)
-            self.logger.execute("Disable %s" % relpath)
+            self.logger.execute("Disable %s" % src.reduceuser())
 
         if not self.noop:
-            with open(dst_path, "w") as dst_file:
-                dst_file.write(dst_str.replace(src_str, ""))
+            dst.write(dst_str.replace(src_str, ""))
 
         return
 
     def __istarget(self, dotfile):
-        patterns = [
-            r'\.swp$'
-        ]
+        blacklist = [r'\.swp$']
 
-        for pattern in patterns:
+        for pattern in blacklist:
             if re.search(pattern, dotfile.src):
                 return False
 
@@ -425,10 +402,9 @@ class Status(DotfileAction):
         dotfiles = sorted(self.dotfiles(), key=lambda x: x.dst)
 
         for dot in dotfiles:
+            target = fs.pilot(dot.dst).expanduser()
 
-            target = os.path.expanduser(dot.dst)
-
-            if not os.path.exists(target):
+            if not target.exists():
                 continue
 
             if osx.isdarwin():
