@@ -287,7 +287,7 @@ class Install(DotfileAction):
 
     def __istarget(self, dotfile):
         patterns = [
-            '\.swp$'
+            r'\.swp$'
         ]
 
         for pattern in patterns:
@@ -410,7 +410,7 @@ class Uninstall(DotfileAction):
 
     def __istarget(self, dotfile):
         patterns = [
-            '\.swp$'
+            r'\.swp$'
         ]
 
         for pattern in patterns:

@@ -82,7 +82,7 @@ class Install(BinfileAction):
 
     def __istarget(self, binfile):
         patterns = [
-            '\.swp$'
+            r'\.swp$'
         ]
 
         for pattern in patterns:
@@ -152,7 +152,7 @@ class Uninstall(BinfileAction):
 
     def __istarget(self, binfile):
         patterns = [
-            '\.swp$'
+            r'\.swp$'
         ]
 
         for pattern in patterns:

@@ -90,7 +90,7 @@ class Gem:
         #   gem "awesome_gem3"
 
         pattern = re.compile(
-            "^\s*gem\s+[\"'](?P<name>\w+)[\"']\s*(,\s*[\"'](?P<version>.+)[\"'])?"
+            r"^\s*gem\s+[\"'](?P<name>\w+)[\"']\s*(,\s*[\"'](?P<version>.+)[\"'])?"
         )
 
         for line in open(path).read().splitlines():
