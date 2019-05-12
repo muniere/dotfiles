@@ -9,20 +9,27 @@ import subprocess
 # 2nd
 from .. import fs
 
-#
-# Constants
-#
 UBUNTU = "ubuntu"
 DEBIAN = "debian"
 CENTOS = "centos"
 AMAZON = "amazon"
 DARWIN = "darwin"
 
-#
-# Functions
-#
+
 def islinux():
     return sysname() in [UBUNTU, DEBIAN, CENTOS, AMAZON]
+
+
+def isbsd():
+    return sysname() in [DARWIN]
+
+
+def isdebian():
+    return sysname() in [UBUNTU, DEBIAN]
+
+
+def isredhat():
+    return sysname() in [CENTOS, AMAZON]
 
 
 def isdarwin():
@@ -58,4 +65,3 @@ def sysname():
         return DARWIN
 
     return None
-
