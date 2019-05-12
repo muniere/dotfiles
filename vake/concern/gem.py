@@ -3,17 +3,17 @@ import os
 import re
 
 # 2nd
-from .. import fs
-from .. import osx
-from . import base
+from .. import filetree
+from .. import kernel
+from . import __base__
 
 GEM = "gem"
 GEMFILE = "Gemfile"
 
 
-class GemAction(base.Action):
+class GemAction(__base__.Action):
     def gems(self):
-        src = fs.pilot(os.getcwd()).append(osx.sysname()).append(GEMFILE)
+        src = filetree.pilot(os.getcwd()).append(kernel.sysname()).append(GEMFILE)
 
         if self.logger:
             self.logger.debug("Read gems from file: %s" % src)
@@ -80,7 +80,7 @@ class Gem:
 
     @staticmethod
     def load(path):
-        target = fs.pilot(path)
+        target = filetree.pilot(path)
 
         if not target.exists():
             return []

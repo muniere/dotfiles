@@ -3,18 +3,18 @@ import os
 import json
 
 # 2nd
-from .. import fs
-from .. import osx
-from . import base
+from .. import filetree
+from .. import kernel
+from . import __base__
 
 NPM = "npm"
 PACKAGE_JSON = "package.json"
 DEPENDENCIES = "dependencies"
 
 
-class NpmAction(base.Action):
+class NpmAction(__base__.Action):
     def packages(self):
-        src = fs.pilot(os.getcwd()).append(osx.sysname()).append(PACKAGE_JSON)
+        src = filetree.pilot(os.getcwd()).append(kernel.sysname()).append(PACKAGE_JSON)
 
         if self.logger:
             self.logger.debug("Read packages from file: %s" % src)
@@ -80,7 +80,7 @@ class Package:
 
     @staticmethod
     def load(path):
-        target = fs.pilot(path)
+        target = filetree.pilot(path)
 
         if not target.exists():
             return []

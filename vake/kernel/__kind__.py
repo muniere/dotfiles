@@ -7,7 +7,7 @@ import os
 import subprocess
 
 # 2nd
-from .. import fs
+from .. import filetree
 
 UBUNTU = "ubuntu"
 DEBIAN = "debian"
@@ -42,12 +42,13 @@ def sysname():
 
     :return: Detected name
     """
-    issue = fs.pilot("/etc/issue")
+    issue = filetree.pilot("/etc/issue")
 
     if issue.isfile():
         rawname = issue.read().lower()
     else:
-        rawname = subprocess.check_output(["uname", "-a"]).strip().lower()
+        output = subprocess.check_output(["uname", "-a"])
+        rawname = output.decode('utf-8').strip().lower()
 
     if "ubuntu" in rawname:
         return UBUNTU

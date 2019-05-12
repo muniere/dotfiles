@@ -1,21 +1,20 @@
 # 1st
 import os
-import glob
 import re
 
 # 2nd
-from .. import fs
-from .. import osx
-from . import base
+from .. import filetree
+from .. import kernel
+from . import __base__
 
 TEMPLATE_DIR = "./vake/template"
 
 
-class DotfileAction(base.Action):
+class DotfileAction(__base__.Action):
     def __vim_install(self):
         self.shell.git_clone(
             src="https://github.com/Shougo/neobundle.vim",
-            dst=fs.pilot("~/.vim/bundle/neobundle.vim").expanduser().pathname()
+            dst=filetree.pilot("~/.vim/bundle/neobundle.vim").expanduser().pathname()
         )
         return None
 
@@ -97,30 +96,30 @@ class DotfileAction(base.Action):
         ])
 
         # linux
-        if osx.islinux():
+        if kernel.islinux():
             dots.extend([])
 
         # darwin
-        if osx.isdarwin():
+        if kernel.isdarwin():
             dots.extend([
                 Dotfile(src="Xcode", dst=dst) for dst in
-                fs.pilot("~/Library/Developer/Xcode").expanduser().glob()
+                filetree.pilot("~/Library/Developer/Xcode").expanduser().glob()
             ])
             dots.extend([
                 Dotfile(src="IntelliJIdea", dst=dst) for dst in
-                fs.pilot("~/Library/Preferences/IntelliJIdea*").expanduser().glob()
+                filetree.pilot("~/Library/Preferences/IntelliJIdea*").expanduser().glob()
             ])
             dots.extend([
                 Dotfile(src="AndroidStudio", dst=dst) for dst in
-                fs.pilot("~/Library/Preferences/AndroidStudio*").expanduser().glob()
+                filetree.pilot("~/Library/Preferences/AndroidStudio*").expanduser().glob()
             ])
             dots.extend([
                 Dotfile(src="AppCode", dst=dst) for dst in
-                fs.pilot("~/Library/Preferences/AppCode*").expanduser().glob()
+                filetree.pilot("~/Library/Preferences/AppCode*").expanduser().glob()
             ])
             dots.extend([
                 Dotfile(src="RubyMine", dst=dst) for dst in
-                fs.pilot("~/Library/Preferences/RubyMine*").expanduser().glob()
+                filetree.pilot("~/Library/Preferences/RubyMine*").expanduser().glob()
             ])
 
         return dots
@@ -161,7 +160,7 @@ class Install(DotfileAction):
             if dot.src.startswith('/'):
                 self.__run(dot)
             else:
-                self.__run(dot, sysname=osx.sysname())
+                self.__run(dot, sysname=kernel.sysname())
                 self.__run(dot, sysname="default")
 
             if dot.install:
@@ -175,19 +174,19 @@ class Install(DotfileAction):
     def __run(self, dotfile, sysname="default"):
         if not self.__istarget(dotfile):
             if self.logger:
-                relpath = fs.pilot(dotfile.src).relpath(os.getcwd())
+                relpath = filetree.pilot(dotfile.src).relpath(os.getcwd())
                 self.logger.info("File is not target: %s" % relpath)
             return
 
         if dotfile.src.startswith('/'):
-            src = fs.pilot(dotfile.src)
+            src = filetree.pilot(dotfile.src)
         else:
-            src = fs.pilot(dotfile.src).prepend(sysname).abspath()
+            src = filetree.pilot(dotfile.src).prepend(sysname).abspath()
 
         if dotfile.dst.startswith('/'):
-            dst = fs.pilot(dotfile.dst)
+            dst = filetree.pilot(dotfile.dst)
         else:
-            dst = fs.pilot(dotfile.dst).expanduser()
+            dst = filetree.pilot(dotfile.dst).expanduser()
 
         #
         # guard
@@ -226,7 +225,7 @@ class Install(DotfileAction):
         #
         if src.isdir():
             for new_src in src.children(target='f', recursive=True):
-                new_dst = fs.pilot(dotfile.dst).append(new_src.relpath(src))
+                new_dst = filetree.pilot(dotfile.dst).append(new_src.relpath(src))
                 new_dot = Dotfile(src=new_src.pathname(), dst=new_dst.pathname())
                 self.__run(new_dot, sysname=sysname)
 
@@ -237,7 +236,7 @@ class Install(DotfileAction):
         #
         # source
         #
-        src = fs.pilot(template.src).prepend(TEMPLATE_DIR)
+        src = filetree.pilot(template.src).prepend(TEMPLATE_DIR)
 
         if not src.exists():
             return
@@ -247,7 +246,7 @@ class Install(DotfileAction):
         #
         # destination
         #
-        dst = fs.pilot(template.dst).expanduser()
+        dst = filetree.pilot(template.dst).expanduser()
 
         # new file
         if not dst.exists():
@@ -289,7 +288,7 @@ class Install(DotfileAction):
 class Uninstall(DotfileAction):
     def run(self):
         for dot in self.dotfiles():
-            self.__run(dot, sysname=osx.sysname())
+            self.__run(dot, sysname=kernel.sysname())
             self.__run(dot, sysname="default")
 
             if dot.uninstall:
@@ -303,12 +302,12 @@ class Uninstall(DotfileAction):
     def __run(self, dotfile, sysname="default"):
         if not self.__istarget(dotfile):
             if self.logger:
-                relpath = fs.pilot(dotfile.src).relpath(os.getcwd())
+                relpath = filetree.pilot(dotfile.src).relpath(os.getcwd())
                 self.logger.info("File is not target: %s" % relpath)
             return
 
-        src = fs.pilot(dotfile.src).prepend(sysname).abspath()
-        dst = fs.pilot(dotfile.dst).expanduser()
+        src = filetree.pilot(dotfile.src).prepend(sysname).abspath()
+        dst = filetree.pilot(dotfile.dst).expanduser()
 
         #
         # guard
@@ -343,7 +342,7 @@ class Uninstall(DotfileAction):
         #
         if src.isdir():
             for new_src in src.children(target='f', recursive=True):
-                new_dst = fs.pilot(dotfile.dst).append(new_src.relpath(src))
+                new_dst = filetree.pilot(dotfile.dst).append(new_src.relpath(src))
                 new_dot = Dotfile(src=new_src.pathname(), dst=new_dst.pathname())
                 self.__run(new_dot, sysname=sysname)
 
@@ -354,7 +353,7 @@ class Uninstall(DotfileAction):
         #
         # source
         #
-        src = fs.pilot(template.src).prepend(TEMPLATE_DIR)
+        src = filetree.pilot(template.src).prepend(TEMPLATE_DIR)
 
         if not src.exists():
             return
@@ -364,7 +363,7 @@ class Uninstall(DotfileAction):
         #
         # destination
         #
-        dst = fs.pilot(template.dst).expanduser()
+        dst = filetree.pilot(template.dst).expanduser()
 
         # not found
         if not dst.exists():
@@ -403,12 +402,12 @@ class Status(DotfileAction):
         dotfiles = sorted(self.dotfiles(), key=lambda x: x.dst)
 
         for dot in dotfiles:
-            target = fs.pilot(dot.dst).expanduser()
+            target = filetree.pilot(dot.dst).expanduser()
 
             if not target.exists():
                 continue
 
-            if osx.isdarwin():
+            if kernel.isdarwin():
                 self.shell.execute("ls -lFG %s" % target)
             else:
                 self.shell.execute("ls -lFo %s" % target)

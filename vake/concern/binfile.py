@@ -1,15 +1,14 @@
 # 1st
 import os
-import glob
 import re
 
 # 2nd
-from .. import fs
-from .. import osx
-from . import base
+from .. import filetree
+from .. import kernel
+from . import __base__
 
 
-class BinfileAction(base.Action):
+class BinfileAction(__base__.Action):
     def binfiles(self):
         return [
             Binfile(src="bin", dst="~/.bin")
@@ -19,7 +18,7 @@ class BinfileAction(base.Action):
 class Install(BinfileAction):
     def run(self):
         for binfile in self.binfiles():
-            self.__run(binfile, sysname=osx.sysname())
+            self.__run(binfile, sysname=kernel.sysname())
             self.__run(binfile, sysname="default")
 
         return
@@ -27,12 +26,12 @@ class Install(BinfileAction):
     def __run(self, binfile, sysname="default"):
         if not self.__istarget(binfile):
             if self.logger:
-                relpath = fs.pilot(binfile.src).relpath(os.getcwd())
+                relpath = filetree.pilot(binfile.src).relpath(os.getcwd())
                 self.logger.info("File is not target: %s" % relpath)
             return
 
-        src = fs.pilot(binfile.src).prepend(sysname).abspath()
-        dst = fs.pilot(binfile.dst).expanduser()
+        src = filetree.pilot(binfile.src).prepend(sysname).abspath()
+        dst = filetree.pilot(binfile.dst).expanduser()
 
         #
         # guard
@@ -71,7 +70,7 @@ class Install(BinfileAction):
         #
         if src.isdir():
             for new_src in src.children(target='f', recursive=True):
-                new_dst = fs.pilot(binfile.dst).append(new_src.relpath(src))
+                new_dst = filetree.pilot(binfile.dst).append(new_src.relpath(src))
                 new_bin = Binfile(src=new_src.pathname(), dst=new_dst.pathname())
                 self.__run(new_bin, sysname=sysname)
 
@@ -90,7 +89,7 @@ class Install(BinfileAction):
 class Uninstall(BinfileAction):
     def run(self):
         for binfile in self.binfiles():
-            self.__run(binfile, sysname=osx.sysname())
+            self.__run(binfile, sysname=kernel.sysname())
             self.__run(binfile, sysname="default")
 
         return
@@ -98,12 +97,12 @@ class Uninstall(BinfileAction):
     def __run(self, binfile, sysname="default"):
         if not self.__istarget(binfile):
             if self.logger:
-                relpath = fs.pilot(binfile.src).relpath(os.getcwd())
+                relpath = filetree.pilot(binfile.src).relpath(os.getcwd())
                 self.logger.info("File is not target: %s" % relpath)
             return
 
-        src = fs.pilot(binfile.src).prepend(sysname).abspath()
-        dst = fs.pilot(binfile.dst).expanduser()
+        src = filetree.pilot(binfile.src).prepend(sysname).abspath()
+        dst = filetree.pilot(binfile.dst).expanduser()
 
         #
         # guard
@@ -138,7 +137,7 @@ class Uninstall(BinfileAction):
         #
         if src.isdir():
             for new_src in src.children(target='f', recursive=True):
-                new_dst = fs.pilot(binfile.dst).append(new_src.relpath(src))
+                new_dst = filetree.pilot(binfile.dst).append(new_src.relpath(src))
                 new_bin = Binfile(src=new_src.pathname(), dst=new_dst.pathname())
                 self.__run(new_bin, sysname=sysname)
 
@@ -159,12 +158,12 @@ class Status(BinfileAction):
         binfiles = sorted(self.binfiles(), key=lambda x: x.dst)
 
         for binfile in binfiles:
-            target = fs.pilot(binfile.dst).expanduser()
+            target = filetree.pilot(binfile.dst).expanduser()
 
             if not target.exists():
                 continue
 
-            if osx.isdarwin():
+            if kernel.isdarwin():
                 self.shell.execute("ls -lFG %s" % target)
             else:
                 self.shell.execute("ls -lFo %s" % target)

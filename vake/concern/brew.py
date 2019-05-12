@@ -2,17 +2,17 @@
 import os
 
 # 2nd
-from .. import fs
-from .. import osx
-from . import base
+from .. import filetree
+from .. import kernel
+from . import __base__
 
 BREW = "brew"
 BREWFILE = "Brewfile"
 
 
-class BrewAction(base.Action):
+class BrewAction(__base__.Action):
     def kegs(self):
-        src = fs.pilot(os.getcwd()).append(osx.sysname()).append(BREWFILE)
+        src = filetree.pilot(os.getcwd()).append(kernel.sysname()).append(BREWFILE)
 
         if self.logger:
             self.logger.debug("Read kegs from file: %s" % src)
@@ -77,7 +77,7 @@ class Keg:
 
     @staticmethod
     def load(path):
-        target = fs.pilot(path)
+        target = filetree.pilot(path)
 
         if not target.exists():
             return []

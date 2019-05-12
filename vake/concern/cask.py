@@ -2,18 +2,18 @@
 import os
 
 # 2nd
-from .. import fs
-from .. import osx
-from . import base
+from .. import filetree
+from .. import kernel
+from . import __base__
 
 BREW = "brew"
 CASK = "cask"
 CASKFILE = "Caskfile"
 
 
-class CaskAction(base.Action):
+class CaskAction(__base__.Action):
     def casks(self):
-        src = fs.pilot(os.getcwd()).append(osx.sysname()).append(CASKFILE)
+        src = filetree.pilot(os.getcwd()).append(kernel.sysname()).append(CASKFILE)
 
         if self.logger:
             self.logger.debug("Read casks from file: %s" % src)
@@ -78,7 +78,7 @@ class Cask:
 
     @staticmethod
     def load(path):
-        target = fs.pilot(path)
+        target = filetree.pilot(path)
 
         if not target.exists():
             return []

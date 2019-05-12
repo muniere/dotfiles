@@ -3,6 +3,20 @@ import re
 import glob
 
 
+def pilot(path):
+    """
+    Create a new Pilot for pathname.
+    Returns pathname as it is when it is Pilot.
+
+    :type pathname: str or Pilot
+    :rtype: Pilot
+    """
+    if isinstance(path, Pilot):
+        return path
+    else:
+        return Pilot(path)
+
+
 class Pilot:
 
     def __init__(self, value):

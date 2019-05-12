@@ -47,4 +47,7 @@ function tstatus() {
   echo "\"`hostname`($addr)\" [$load] `date +'%Y/%m/%d %H:%M:%S'`"
 }
 
+# Python
+export PYTHONDONTWRITEBYTECODE=1
+
 # vim: ft=sh sw=2 ts=2 sts=2

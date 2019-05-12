@@ -7,10 +7,14 @@ import os
 import subprocess
 
 # 2nd
-from .. import fs
+from .. import filetree
 
 
-class Client:
+def shell(noop=False, logger=None):
+    return Shell(noop, logger)
+
+
+class Shell:
     def __init__(self, noop=False, logger=None):
         self.noop = noop
         self.logger = logger
@@ -58,7 +62,7 @@ class Client:
         return self.execute(words)
 
     def git_clone(self, src, dst):
-        if fs.pilot(dst).isdir():
+        if filetree.pilot(dst).isdir():
             if self.logger:
                 self.logger.info("Worktree already exists: %s" % dst)
             return True
