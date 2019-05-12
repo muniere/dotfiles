@@ -37,7 +37,8 @@ class Install(NpmAction):
             return
 
         for package in packages:
-            self.shell.execute([NPM, "install", "--global", "%s@%s" % (package.name, package.version)])
+            spec = "%s@%s" % (package.name, package.version)
+            self.shell.execute([NPM, "install", "--global", spec])
 
         return
 

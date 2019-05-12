@@ -27,24 +27,73 @@ class DotfileAction(base.Action):
 
         # shared
         dots.extend([
-            Dotfile(src="sh.d", dst="~/.sh.d"),
+            # sh
+            Dotfile(
+                src="sh.d",
+                dst="~/.sh.d"
+            ),
 
-            Dotfile(src="bash.d", dst="~/.bash.d"),
-            Dotfile(src="bash_completion.d", dst="~/.bash_completion.d"),
+            # bash
+            Dotfile(
+                src="bash.d",
+                dst="~/.bash.d"
+            ),
+            Dotfile(
+                src="bash_completion.d",
+                dst="~/.bash_completion.d"
+            ),
 
-            Dotfile(src="zsh.d", dst="~/.zsh.d"),
-            Dotfile(src="zsh-completions", dst="~/.zsh-completions"),
-            Dotfile(src="/usr/local/library/Contributions/brew_zsh_completion.zsh", dst="~/.zsh-completions/_brew"),
+            # zsh
+            Dotfile(
+                src="zsh.d",
+                dst="~/.zsh.d"
+            ),
+            Dotfile(
+                src="zsh-completions",
+                dst="~/.zsh-completions"
+            ),
+            Dotfile(
+                src="/usr/local/library/Contributions/brew_zsh_completion.zsh",
+                dst="~/.zsh-completions/_brew"
+            ),
 
-            Dotfile(src="tmux.conf", dst="~/.tmux.conf"),
-            Dotfile(src="gitconfig", dst="~/.gitconfig"),
-            Dotfile(src="tigrc", dst="~/.tigrc"),
-            Dotfile(src="peco", dst="~/.peco"),
+            # git
+            Dotfile(
+                src="gitconfig",
+                dst="~/.gitconfig"
+            ),
+            Dotfile(
+                src="tigrc",
+                dst="~/.tigrc"
+            ),
 
-            Dotfile(src="vimrc", dst="~/.vimrc"),
-            Dotfile(src="vim", dst="~/.vim", install=self.__vim_install, uninstall=self.__vim_uninstall),
+            # vim
+            Dotfile(
+                src="vimrc",
+                dst="~/.vimrc"
+            ),
+            Dotfile(
+                src="vim",
+                dst="~/.vim",
+                install=self.__vim_install,
+                uninstall=self.__vim_uninstall
+            ),
 
-            Dotfile(src="gradle", dst="~/.gradle"),
+            # ext
+            Dotfile(
+                src="tmux.conf",
+                dst="~/.tmux.conf"
+            ),
+            Dotfile(
+                src="peco",
+                dst="~/.peco"
+            ),
+
+            # gradle
+            Dotfile(
+                src="gradle",
+                dst="~/.gradle"
+            ),
         ])
 
         # linux
@@ -77,13 +126,31 @@ class DotfileAction(base.Action):
 
     def templates(self):
         return [
-            Template(src="shrc", dst="~/.shrc"),
+            # sh
+            Template(
+                src="shrc",
+                dst="~/.shrc"
+            ),
 
-            Template(src="bashrc", dst="~/.bashrc"),
-            Template(src="bash_profile", dst="~/.bash_profile"),
+            # bash
+            Template(
+                src="bashrc",
+                dst="~/.bashrc"
+            ),
+            Template(
+                src="bash_profile",
+                dst="~/.bash_profile"
+            ),
 
-            Template(src="zshrc", dst="~/.zshrc"),
-            Template(src="zshprofile", dst="~/.zshprofile"),
+            # zsh
+            Template(
+                src="zshrc",
+                dst="~/.zshrc"
+            ),
+            Template(
+                src="zshprofile",
+                dst="~/.zshprofile"
+            ),
         ]
 
 
@@ -107,16 +174,17 @@ class Install(DotfileAction):
     def __run(self, dotfile, sysname="default"):
         if not self.__istarget(dotfile):
             if self.logger:
-                self.logger.info("File is not target: %s" % os.path.relpath(dotfile.src, os.getcwd()))
+                relpath = os.path.relpath(dotfile.src, os.getcwd())
+                self.logger.info("File is not target: %s" % relpath)
             return
 
         if dotfile.src.startswith('/'):
-            src = dotfile.src 
+            src = dotfile.src
         else:
             src = os.path.abspath(os.path.join(sysname, dotfile.src))
 
         if dotfile.dst.startswith('/'):
-            dst = dotfile.dst 
+            dst = dotfile.dst
         else:
             dst = os.path.expanduser(dotfile.dst)
 
@@ -131,7 +199,8 @@ class Install(DotfileAction):
         # dst link already exists
         if os.path.islink(dst):
             if self.logger:
-                self.logger.info("Symlink already exists: %s" % osx.pathx.reduceuser(dst))
+                relpath = osx.pathx.reduceuser(dst)
+                self.logger.info("Symlink already exists: %s" % relpath)
             return False
 
         #
@@ -141,7 +210,8 @@ class Install(DotfileAction):
             # another file already exists
             if os.path.isfile(dst):
                 if self.logger:
-                    self.logger.info("File already exists: %s" % osx.pathx.reduceuser(dst))
+                    relpath = osx.pathx.reduceuser(dst)
+                    self.logger.info("File already exists: %s" % relpath)
                 return False
 
             # ensure parent directory
@@ -187,7 +257,8 @@ class Install(DotfileAction):
         if not os.path.exists(dst_path):
             with open(dst_path, "w") as dst_file:
                 if self.logger:
-                    self.logger.execute("Enable %s" % osx.pathx.reduceuser(src_path))
+                    relpath = osx.pathx.reduceuser(src_path)
+                    self.logger.execute("Enable %s" % relpath)
                 if not self.noop:
                     dst_file.write(src_str + "\n")
             return
@@ -199,12 +270,14 @@ class Install(DotfileAction):
         # skip: already enabled
         if src_str in dst_str:
             if self.logger:
-                self.logger.info("Already enabled: %s" % osx.pathx.reduceuser(dst_path))
+                relpath = osx.pathx.reduceuser(dst_path)
+                self.logger.info("Already enabled: %s" % relpath)
             return
 
         # enable
         if self.logger:
-            self.logger.execute("Enable %s" % osx.pathx.reduceuser(src_path))
+            relpath = osx.pathx.reduceuser(src_path)
+            self.logger.execute("Enable %s" % relpath)
 
         if not self.noop:
             with open(dst_path, "w") as dst_file:
@@ -241,7 +314,8 @@ class Uninstall(DotfileAction):
     def __run(self, dotfile, sysname="default"):
         if not self.__istarget(dotfile):
             if self.logger:
-                self.logger.info("File is not target: %s" % os.path.relpath(dotfile.src, os.getcwd()))
+                relpath = os.path.relpath(dotfile.src, os.getcwd())
+                self.logger.info("File is not target: %s" % relpath)
             return
 
         src = os.path.abspath(os.path.join(sysname, dotfile.src))
@@ -308,7 +382,8 @@ class Uninstall(DotfileAction):
 
         # not found
         if not os.path.exists(dst_path):
-            self.logger.info("File NOT FOUND: %s" % osx.pathx.reduceuser(dst_path))
+            relpath = osx.pathx.reduceuser(dst_path)
+            self.logger.info("File NOT FOUND: %s" % relpath)
             return
 
         dst_str = ""
@@ -318,12 +393,14 @@ class Uninstall(DotfileAction):
         # skip: already disabled
         if not src_str in dst_str:
             if self.logger:
-                self.logger.info("Already disabled: %s" % osx.pathx.reduceuser(dst_path))
+                relpath = osx.pathx.reduceuser(dst_path)
+                self.logger.info("Already disabled: %s" % relpath)
             return
 
         # disable
         if self.logger:
-            self.logger.execute("Disable %s" % osx.pathx.reduceuser(src_path))
+            relpath = osx.pathx.reduceuser(src_path)
+            self.logger.execute("Disable %s" % relpath)
 
         if not self.noop:
             with open(dst_path, "w") as dst_file:
@@ -341,6 +418,7 @@ class Uninstall(DotfileAction):
                 return False
 
         return True
+
 
 class Status(DotfileAction):
     def run(self):

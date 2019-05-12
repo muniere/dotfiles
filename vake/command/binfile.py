@@ -8,6 +8,7 @@ from .. import fs
 from .. import osx
 from . import base
 
+
 class BinfileAction(base.Action):
     def binfiles(self):
         return [
@@ -26,7 +27,8 @@ class Install(BinfileAction):
     def __run(self, binfile, sysname="default"):
         if not self.__istarget(binfile):
             if self.logger:
-                self.logger.info("File is not target: %s" % os.path.relpath(binfile.src, os.getcwd()))
+                relpath = os.path.relpath(binfile.src, os.getcwd())
+                self.logger.info("File is not target: %s" % relpath)
             return
 
         src = os.path.abspath(os.path.join(sysname, binfile.src))
@@ -43,7 +45,8 @@ class Install(BinfileAction):
         # dst link already exists
         if os.path.islink(dst):
             if self.logger:
-                self.logger.info("Symlink already exists: %s" % osx.pathx.reduceuser(dst))
+                relpath = osx.pathx.reduceuser(dst)
+                self.logger.info("Symlink already exists: %s" % relpath)
             return False
 
         #
@@ -53,7 +56,8 @@ class Install(BinfileAction):
             # another file already exists
             if os.path.isfile(dst):
                 if self.logger:
-                    self.logger.info("File already exists: %s" % osx.pathx.reduceuser(dst))
+                    relpath = osx.pathx.reduceuser(dst)
+                    self.logger.info("File already exists: %s" % relpath)
                 return False
 
             # ensure parent directory
@@ -99,7 +103,8 @@ class Uninstall(BinfileAction):
     def __run(self, binfile, sysname="default"):
         if not self.__istarget(binfile):
             if self.logger:
-                self.logger.info("File is not target: %s" % os.path.relpath(binfile.src, os.getcwd()))
+                relpath = os.path.relpath(binfile.src, os.getcwd())
+                self.logger.info("File is not target: %s" % relpath)
             return
 
         src = os.path.abspath(os.path.join(sysname, binfile.src))
@@ -155,6 +160,7 @@ class Uninstall(BinfileAction):
                 return False
 
         return True
+
 
 class Status(BinfileAction):
     def run(self):

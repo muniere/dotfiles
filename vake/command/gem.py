@@ -36,7 +36,9 @@ class Install(GemAction):
             return
 
         for gem in gems:
-            self.shell.execute([GEM, "install", gem.name, "--version", gem.version])
+            self.shell.execute([
+                GEM, "install", gem.name, "--version", gem.version
+            ])
 
         return
 
@@ -87,11 +89,16 @@ class Gem:
         #   gem "awesome_gem2", "~> 1.2.3"
         #   gem "awesome_gem3"
 
-        for line in open(path).read().splitlines():
+        pattern = re.compile(
+            "^\s*gem\s+[\"'](?P<name>\w+)[\"']\s*(,\s*[\"'](?P<version>.+)[\"'])?"
+        )
 
-            match = re.compile("^\s*gem\s+[\"'](?P<name>\w+)[\"']\s*(,\s*[\"'](?P<version>.+)[\"'])?").search(line)
+        for line in open(path).read().splitlines():
+            match = pattern.search(line)
 
             if match:
-                gems.append(Gem(name=match.group("name"), version=match.group("version")))
+                n = match.group("name")
+                v = match.group("version")
+                gems.append(Gem(n, v))
 
         return gems

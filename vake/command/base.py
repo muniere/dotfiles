@@ -1,7 +1,7 @@
 # 2nd
 from .. import shell
 
-# interface
+
 class Action:
     def __init__(self, noop=False, logger=None):
 
