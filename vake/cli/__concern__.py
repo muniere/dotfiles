@@ -24,3 +24,15 @@ class Concern:
             return concern.binfile
 
         return None
+
+    @classmethod
+    def installable(cls, x):
+        return x is not None and x.Install is not None
+
+    @classmethod
+    def uninstallable(cls, x):
+        return x is not None and x.Uninstall is not None
+
+    @classmethod
+    def statusable(cls, x):
+        return x is not None and x.Status is not None

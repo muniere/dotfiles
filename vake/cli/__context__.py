@@ -18,28 +18,31 @@ class Context:
 
     def commands(self):
         if self.action == Action.INSTALL:
+            noop = self.dry_run
             logger = self.__make_logger()
-            concerns = [m for m in [Concern.hunt(t) for t in self.targets]]
-            concerns = [m for m in concerns if m is not None and m.Install is not None]
-            commands = [m.Install(noop=self.dry_run, logger=logger) for m in concerns]
-            commands = [c for c in commands if c is not None]
-            return commands
+
+            concerns = [Concern.hunt(t) for t in self.targets]
+            concerns = [x for x in concerns if Concern.installable(x)]
+
+            return [x.Install(noop=noop, logger=logger) for x in concerns]
 
         if self.action == Action.UNINSTALL:
+            noop = self.dry_run
             logger = self.__make_logger()
-            concerns = [m for m in [Concern.hunt(t) for t in self.targets]]
-            concerns = [m for m in concerns if m is not None and m.Uninstall is not None]
-            commands = [m.Uninstall(noop=self.dry_run, logger=logger) for m in concerns]
-            commands = [c for c in commands if c is not None]
-            return commands
+
+            concerns = [Concern.hunt(t) for t in self.targets]
+            concerns = [x for x in concerns if Concern.uninstallable(x)]
+
+            return [x.Uninstall(noop=noop, logger=logger) for x in concerns]
 
         if self.action == Action.STATUS:
+            noop = self.dry_run
             logger = self.__make_logger()
-            concerns = [m for m in [Concern.hunt(t) for t in self.targets]]
-            concerns = [m for m in concerns if m is not None and m.Status is not None]
-            commands = [m.Status(noop=self.dry_run, logger=logger) for m in concerns]
-            commands = [c for c in commands if c is not None]
-            return commands
+
+            concerns = [Concern.hunt(t) for t in self.targets]
+            concerns = [x for x in concerns if Concern.statusable(x)]
+
+            return [x.Status(noop=noop, logger=logger) for x in concerns]
 
         return []
 
