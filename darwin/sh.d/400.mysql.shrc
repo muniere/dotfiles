@@ -1,4 +1,12 @@
 # MySQL
+if ! (which mysql &> /dev/null) && [ -d /usr/local/opt/mysql ]; then
+  addpath "/usr/local/opt/mysql/bin"
+fi
+
+if ! (which mysql &> /dev/null) && [ -d /usr/local/opt/mysql@5.7 ]; then
+  addpath "/usr/local/opt/mysql@5.7/bin"
+fi
+
 if ! (which mysql &> /dev/null) && [ -d /usr/local/opt/mysql-client ]; then
   addpath "/usr/local/opt/mysql-client/bin"
 fi
