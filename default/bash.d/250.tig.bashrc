@@ -1,5 +1,7 @@
 #compdef tig
 
+# ref: https://github.com/jonas/tig/blob/tig-2.4.1/contrib/tig-completion.bash
+
 ##
 # bash completion support for tig
 #
@@ -271,7 +273,7 @@ complete -o default -o nospace -F _tig tig
 # when the user has tab-completed the executable name and consequently
 # included the '.exe' suffix.
 if [ Cygwin = "$(uname -o 2>/dev/null)" ]; then
-complete -o default -o nospace -F _tig tig.exe
+  complete -o default -o nospace -F _tig tig.exe
 fi
 
 # vim: ft=zsh sw=2 ts=2 sts=2
