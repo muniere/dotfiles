@@ -1,5 +1,7 @@
 if [ -d $HOME/.anyenv/bin ]; then
   addpath $HOME/.anyenv/bin
+fi
+if (which anyenv &> /dev/null); then
   eval "$(anyenv init -)"
 fi
 
