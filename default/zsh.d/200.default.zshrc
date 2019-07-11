@@ -1,6 +1,6 @@
 bindkey -e
 
-## Funcitons 
+## Hook Funcitons 
 
 function zshaddhistory() { 
   local line=${1%%$'\n'}
@@ -9,37 +9,23 @@ function zshaddhistory() {
   [[ ${cmd} != (l|l[sal]) && ${cmd} != (cd) && ${cmd} != (rm) ]]
 } 
 
-#
-# update terminal title
-#
-function update_title() { 
+function precmd() {
+  # update terminal title
   if (echo $TERM | grep -i "xterm" 2>&1 >/dev/null); then
     title="${PWD/$HOME/~}"
     echo -ne "\033]0;${title}\007"
   fi
-}
 
-#
-# update vcs info
-#
-function update_vcs() {
+  # update vcs info
   psvar=()
   LANG=C vcs_info
   psvar[1]="$vcs_info_msg_0_"
 }
 
-#
-# define precmd
-#
-function precmd() {
-  update_title
-  update_vcs
-}
+## Overriding Functions
 
 #
 # override sudo for sudo.vim
-#
-# `sudo vim path1 path2 ...` => `vim sudo:path1 sudo:path2 ...`
 #
 function sudo() { 
   local args
@@ -58,6 +44,18 @@ function sudo() {
       command sudo $@;;
   esac
 } 
+
+## Prompt Functions
+function prefix() {
+  # print nothing
+}
+
+function suffix() {
+  # show virtual env
+  if [[ -n "$VIRTUAL_ENV" && -n "$DIRENV_DIR" ]]; then
+    echo " ($(basename $VIRTUAL_ENV))"
+  fi
+}
 
 ### Completion 
 
@@ -94,7 +92,7 @@ setopt prompt_subst
 setopt transient_rprompt
 zstyle ':vcs_info:*' formats '[%b]'
 zstyle ':vcs_info:*' actionformats '[%b|%a]'
-PROMPT='%(?.%F{cyan}.%F{red})%n%f@%(?.%F{cyan}.%F{red})%m%f: %F{yellow}%~%f
+PROMPT='$(prefix)%(?.%F{cyan}.%F{red})%n%f@%(?.%F{cyan}.%F{red})%m%f$(suffix): %F{yellow}%~%f
 %(!.#.%%) '
 RPROMPT='%1(v|%F{magenta}%1v%f|)'
 
