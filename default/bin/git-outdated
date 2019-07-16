@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+tab='%09'
+hash='%(color:magenta)%(objectname:short)%(color:reset)'
+date='%(color:blue)%(authordate:iso)%(color: reset)'
+author='%(color:green)%(align:15)%(authorname)%(end)%(color:reset)'
+refname='%(color:yellow)%(refname)%(color:reset)'
+
+git for-each-ref --merged develop --format="${hash} ${date} ${tab} ${author} ${tab} ${refname}"
