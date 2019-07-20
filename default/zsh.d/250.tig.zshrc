@@ -16,7 +16,7 @@
 
 _tig () {
   local e
-  e=$(dirname ${funcsourcetrace[1]%:*})/tig-completion.bash
+  e="${HOME}/.bash.d/250.tig.bashrc"
   if [ -f $e ]; then
     . $e
   fi
