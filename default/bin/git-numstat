@@ -53,7 +53,7 @@ def main(args)
   }.call
 
   output.lines.each do |line|
-    inc_s, dec_s, path = line.split
+    inc_s, dec_s, path = line.split($;, 3)
 
     STDOUT.puts "%{inc}\t%{dec}\t(%{delta})\t%{path}" % {
       :inc   => (inc_s.to_i * +1).decorate(colored: colored),
