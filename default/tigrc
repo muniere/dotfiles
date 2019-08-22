@@ -9,8 +9,8 @@ bind diff H :set vertical-split = horizontal
 bind stage V :set vertical-split = vertical
 bind stage H :set vertical-split = horizontal
 
-bind main r !git rebase -i %(commit)^
-bind diff r !git rebase -i %(commit)^
+bind main <Ctrl-R> !git rebase -i %(commit)^
+bind diff <Ctrl-R> !git rebase -i %(commit)^
 
 set diff-options = -m --first-parent
 set main-view = id date author commit-title:graph=yes,refs=yes
