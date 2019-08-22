@@ -425,6 +425,10 @@ NeoBundle 'keith/swift.vim'
 NeoBundle 'cfdrake/vim-carthage'
 " }}}
 
+" Kotlin {{{2
+NeoBundle 'udalov/kotlin-vim'
+" }}}
+
 " Crystal {{{2
 NeoBundle 'rhysd/vim-crystal'
 " }}}
