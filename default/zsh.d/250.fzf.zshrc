@@ -33,7 +33,7 @@ if (which fzf &> /dev/null); then
   # <C-@>: git log
   #
   function fzf-gitlog () {
-    if [[ ! "$BUFFER" =~ "\s*git" ]]; then
+    if [[ ! "$BUFFER" =~ "\s*(git|tig)" ]]; then
       return
     fi
 
@@ -52,7 +52,7 @@ if (which fzf &> /dev/null); then
   # <C-[>: branch
   #
   function fzf-branch () {
-    if [[ ! "$BUFFER" =~ "\s*git" ]]; then
+    if [[ ! "$BUFFER" =~ "\s*(git|tig)" ]]; then
       return
     fi
 
