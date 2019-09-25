@@ -46,7 +46,7 @@ if (which fzf &> /dev/null); then
     zle reset-prompt
   }
   zle -N fzf-gitlog
-  bindkey '^@' fzf-gitlog
+  bindkey '^x^l' fzf-gitlog
 
   #
   # <C-[>: branch
@@ -65,7 +65,7 @@ if (which fzf &> /dev/null); then
     zle reset-prompt
   }
   zle -N fzf-branch
-  bindkey '^[' fzf-branch
+  bindkey '^x^b' fzf-branch
 
   #
   # <C-r>: history
