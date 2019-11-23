@@ -438,6 +438,10 @@ NeoBundle 'elixir-lang/vim-elixir'
 NeoBundle 'mattreduce/vim-mix'
 " }}}
 
+" Plist {{{2
+NeoBundle 'darfink/vim-plist'
+" }}}
+
 call neobundle#end()
 
 filetype indent plugin on
