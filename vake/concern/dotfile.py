@@ -121,6 +121,10 @@ class DotfileAction(__base__.Action):
                 Dotfile(src="RubyMine", dst=dst) for dst in
                 filetree.pilot("~/Library/Preferences/RubyMine*").expanduser().glob()
             ])
+            dots.extend([
+                Dotfile(src="GoLand", dst=dst) for dst in
+                filetree.pilot("~/Library/Preferences/GoLand*").expanduser().glob()
+            ])
 
         return dots
 
