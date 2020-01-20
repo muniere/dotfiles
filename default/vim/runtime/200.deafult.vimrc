@@ -332,6 +332,10 @@ let g:lightline = {
 NeoBundle 'Align'
 " }}}
 
+" EditorConfig {{{2
+NeoBundle 'editorconfig/editorconfig-vim'
+" }}}
+
 " YankRing {{{2
 NeoBundle 'YankRing.vim'
 let g:yankring_history_file = '.yankring_history'
