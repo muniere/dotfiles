@@ -1,0 +1,4 @@
+# Python
+if [ -e /usr/local/opt/python@3.8/ ]; then
+  addpath "/usr/local/opt/python@3.8/bin"
+fi
