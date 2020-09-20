@@ -1,6 +1,9 @@
 # LC
 export LC_ALL=
 
+# PATH
+addpath $HOME/.local/bin
+
 # Java
 if (which java &> /dev/null); then
   export JAVA_HOME=$(/usr/libexec/java_home)
