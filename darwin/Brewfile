@@ -31,7 +31,6 @@ rename
 ripgrep
 ruby
 terminal-notifier
-the_silver_searcher
 tig
 tmux
 tree
@@ -40,5 +39,3 @@ watch
 wget
 zsh
 zsh-completions
-homebrew/dupes/apple-gcc42
-homebrew/completions/tmuxinator-completion
