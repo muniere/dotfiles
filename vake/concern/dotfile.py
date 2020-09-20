@@ -125,6 +125,14 @@ class DotfileAction(__base__.Action):
                 Dotfile(src="GoLand", dst=dst) for dst in
                 filetree.pilot("~/Library/Preferences/GoLand*").expanduser().glob()
             ])
+            dots.extend([
+                Dotfile(src="CLion", dst=dst) for dst in
+                filetree.pilot("~/Library/Preferences/CLion*").expanduser().glob()
+            ])
+            dots.extend([
+                Dotfile(src="Rider", dst=dst) for dst in
+                filetree.pilot("~/Library/ApplicationSupport/JetBrains/Rider*").expanduser().glob()
+            ])
 
         return dots
 
@@ -280,7 +288,7 @@ class Install(DotfileAction):
         return
 
     def __istarget(self, dotfile):
-        blacklist = [r'\.swp$']
+        blacklist = [r'\.swp$', r'\.DS_Store$']
 
         for pattern in blacklist:
             if re.search(pattern, dotfile.src):
@@ -392,7 +400,7 @@ class Uninstall(DotfileAction):
         return
 
     def __istarget(self, dotfile):
-        blacklist = [r'\.swp$']
+        blacklist = [r'\.swp$', r'\.DS_Store$']
 
         for pattern in blacklist:
             if re.search(pattern, dotfile.src):
