@@ -110,24 +110,52 @@ class DotfileAction(__base__.Action):
                 filetree.pilot("~/Library/Preferences/IntelliJIdea*").expanduser().glob()
             ])
             dots.extend([
+                Dotfile(src="IntelliJIdea", dst=dst) for dst in
+                filetree.pilot("~/Library/ApplicationSupport/JetBrains/IntelliJIdea*").expanduser().glob()
+            ])
+            dots.extend([
                 Dotfile(src="AndroidStudio", dst=dst) for dst in
                 filetree.pilot("~/Library/Preferences/AndroidStudio*").expanduser().glob()
+            ])
+            dots.extend([
+                Dotfile(src="AndroidStudio", dst=dst) for dst in
+                filetree.pilot("~/Library/ApplicationSupport/Google/AndroidStudio*").expanduser().glob()
             ])
             dots.extend([
                 Dotfile(src="AppCode", dst=dst) for dst in
                 filetree.pilot("~/Library/Preferences/AppCode*").expanduser().glob()
             ])
             dots.extend([
+                Dotfile(src="AppCode", dst=dst) for dst in
+                filetree.pilot("~/Library/ApplicationSupport/JetBrains/AppCode*").expanduser().glob()
+            ])
+            dots.extend([
                 Dotfile(src="RubyMine", dst=dst) for dst in
                 filetree.pilot("~/Library/Preferences/RubyMine*").expanduser().glob()
+            ])
+            dots.extend([
+                Dotfile(src="RubyMine", dst=dst) for dst in
+                filetree.pilot("~/Library/ApplicationSupport/JetBrains/RubyMine*").expanduser().glob()
             ])
             dots.extend([
                 Dotfile(src="GoLand", dst=dst) for dst in
                 filetree.pilot("~/Library/Preferences/GoLand*").expanduser().glob()
             ])
             dots.extend([
+                Dotfile(src="GoLand", dst=dst) for dst in
+                filetree.pilot("~/Library/ApplicationSupport/JetBrains/GoLand*").expanduser().glob()
+            ])
+            dots.extend([
                 Dotfile(src="CLion", dst=dst) for dst in
                 filetree.pilot("~/Library/Preferences/CLion*").expanduser().glob()
+            ])
+            dots.extend([
+                Dotfile(src="CLion", dst=dst) for dst in
+                filetree.pilot("~/Library/ApplicationSupport/JetBrains/CLion*").expanduser().glob()
+            ])
+            dots.extend([
+                Dotfile(src="Rider", dst=dst) for dst in
+                filetree.pilot("~/Library/Preferences/Rider*").expanduser().glob()
             ])
             dots.extend([
                 Dotfile(src="Rider", dst=dst) for dst in
