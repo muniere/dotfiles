@@ -1,5 +1,4 @@
 aacgain
-atomicparsley
 bash
 bash-completion
 carthage
@@ -8,7 +7,6 @@ colordiff
 coreutils
 curl
 direnv
-emacs
 ffmpeg
 fish
 fzf
@@ -19,10 +17,7 @@ go
 grep
 hub
 imagemagick
-javarepl
-jenkins
 jq
-maven
 nkf
 node
 osxutils
