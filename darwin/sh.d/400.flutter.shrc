@@ -1,6 +1,12 @@
 # Flutter
-if [ -d /usr/local/opt/flutter ]; then
-  addpath "/usr/local/opt/flutter/bin"
+if [ -d /usr/local/opt/flutter/bin/cache/dart-sdk/bin/ ]; then
+  addpath /usr/local/opt/flutter/bin /usr/local/opt/flutter/bin/cache/dart-sdk/bin
+elif [ -d /usr/local/opt/flutter ]; then
+  addpath /usr/local/opt/flutter/bin
+fi
+
+if [ -d $HOME/.pub-cache/bin ]; then
+  addpath $HOME/.pub-cache/bin
 fi
 
 # vim: ft=sh sw=2 ts=2 sts=2
