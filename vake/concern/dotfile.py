@@ -83,10 +83,6 @@ class DotfileAction(__base__.Action):
                 src="tmux.conf",
                 dst="~/.tmux.conf"
             ),
-            Dotfile(
-                src="peco",
-                dst="~/.peco"
-            ),
 
             # gradle
             Dotfile(
