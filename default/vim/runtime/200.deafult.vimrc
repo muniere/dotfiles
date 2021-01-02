@@ -132,18 +132,10 @@ nnoremap tm :tabmove
 " Plugins
 """
 
-filetype off
-
-if has('vim_starting')
-  set runtimepath+=~/.vim/bundle/neobundle.vim
-endif
-
-call neobundle#begin(expand('~/.vim/bundle/'))
-
-NeoBundleFetch 'Shougo/neobundle.vim'
+call plug#begin()
 
 " == Appearance
-NeoBundle 'itchyny/lightline.vim'
+Plug 'itchyny/lightline.vim'
 
 let g:lightline = { 
   \ 'active'  : { 'left': [['mode'], ['relativepath'], ['modified']] },
@@ -151,24 +143,23 @@ let g:lightline = {
   \ }
 
 " == Text Editing
-NeoBundle 'Align'
+Plug 'vim-scripts/Align'
 
-NeoBundle 'surround.vim'
+Plug 'vim-scripts/surround.vim'
 
-NeoBundle 'scrooloose/nerdcommenter'
+Plug 'scrooloose/nerdcommenter'
 
-NeoBundle 'editorconfig/editorconfig-vim'
+Plug 'editorconfig/editorconfig-vim'
 
 " == Completion
-NeoBundle 'neocomplcache'
-let g:neocomplcache_enable_at_startup = 1
-let g:neocomplcache_lock_buffer_name_pattern = "files"
-let g:neocomplcache_force_overwrite_completefunc = 1
+Plug 'Shougo/neocomplete.vim'
+
+let g:neocomplete#enable_at_startup = 1
 
 " == File System
-NeoBundle 'scrooloose/nerdtree'
+Plug 'scrooloose/nerdtree'
 
-NeoBundle 'jistr/vim-nerdtree-tabs'
+Plug 'jistr/vim-nerdtree-tabs'
 let g:nerdtree_tabs_open_on_gui_startup = 0
 let g:nerdtree_tabs_open_on_console_startup = 0
 nnoremap <C-e><C-e> :NERDTreeTabsToggle<CR>
@@ -176,7 +167,7 @@ inoremap <C-e><C-e> <ESC>:NERDTreeTabsToggle<CR>
 nnoremap <C-e><C-f> :NERDTreeTabsOpen<CR><C-w>p:NERDTreeTabsFind<CR>
 inoremap <C-e><C-f> <ESC>:NERDTreeTabsOpen<CR><C-w>p:NERDTreeTabsFind<CR>
 
-NeoBundle 'kien/ctrlp.vim'
+Plug 'kien/ctrlp.vim'
 nnoremap <C-x><C-f> :CtrlP .<CR>
 inoremap <C-x><C-f> <ESC>:CtrlP .<CR>
 nnoremap <C-x><C-b> :CtrlPBuffer<CR>
@@ -187,10 +178,10 @@ if executable('ag')
   let g:ctrlp_user_command='ag %s -i --nocolor --nogroup -g ""'
 endif
 
-NeoBundle 'sudo.vim'
+Plug 'vim-scripts/sudo.vim'
 
 " == Syntax Highlight
-NeoBundle 'scrooloose/syntastic'
+Plug 'scrooloose/syntastic'
 
 let g:syntastic_mode_map = { 
       \ 'mode': 'active',
@@ -203,82 +194,74 @@ let g:syntastic_html_tidy_ignore_errors = [
       \]
 
 " == Languages / JSONC
-NeoBundle 'neoclide/jsonc.vim'
+Plug 'neoclide/jsonc.vim'
 
 " == Languages / Shell Script
-NeoBundle 'vim-scripts/sh.vim'
+Plug 'vim-scripts/sh.vim'
 
 " == Languages / Ruby
-NeoBundle 'ruby.vim'
+Plug 'vim-scripts/ruby.vim'
 
 " == Languages / Python
-NeoBundle 'hynek/vim-python-pep8-indent'
+Plug 'hynek/vim-python-pep8-indent'
 
 " == Languages / Javascript
-NeoBundle 'jelera/vim-javascript-syntax'
-NeoBundle 'jiangmiao/simple-javascript-indenter'
-NeoBundle 'kchmck/vim-coffee-script'
+Plug 'jelera/vim-javascript-syntax'
+Plug 'jiangmiao/simple-javascript-indenter'
+Plug 'kchmck/vim-coffee-script'
 let g:SimpleJsIndenter_BriefMode=1
 
-NeoBundle 'myhere/vim-nodejs-complete'
-NeoBundle 'posva/vim-vue'
+Plug 'myhere/vim-nodejs-complete'
+Plug 'posva/vim-vue'
 
 " == Languages / AppleScript
-NeoBundle 'applescript.vim'
+Plug 'vim-scripts/applescript.vim'
 
 " == Languages / Scala
-NeoBundle 'scala.vim'
+Plug 'vim-scripts/scala.vim'
 
 " == Languages / Go
 set runtimepath+=$GOROOT/misc/vim
 exe "set runtimepath+=".globpath($GOPATH, "src/github.com/nsf/gocode/vim")
 exe "set runtimepath+=".globpath($GOPATH, "src/github.com/golang/lint/misc/vim")
-NeoBundle 'Blackrush/vim-gocode'
+Plug 'Blackrush/vim-gocode'
 
 " == Languages / HTML
-NeoBundle 'mattn/emmet-vim'
-NeoBundle 'othree/html5.vim'
+Plug 'mattn/emmet-vim'
+Plug 'othree/html5.vim'
 
 " == Languages / Jade
-NeoBundle 'digitaltoad/vim-jade'
+Plug 'digitaltoad/vim-jade'
 
 " == Languages / Handlebars
-NeoBundle 'nono/vim-handlebars'
+Plug 'nono/vim-handlebars'
 
 " == Languages / YAML
-NeoBundle 'vim-scripts/yaml.vim'
+Plug 'vim-scripts/yaml.vim'
 
 " == Languages / Swift
-NeoBundle 'toyamarinyon/vim-swift'
-NeoBundle 'keith/swift.vim'
-NeoBundle 'cfdrake/vim-carthage'
+Plug 'toyamarinyon/vim-swift'
+Plug 'keith/swift.vim'
+Plug 'cfdrake/vim-carthage'
 
 " == Languages / Kotlin
-NeoBundle 'udalov/kotlin-vim'
+Plug 'udalov/kotlin-vim'
 
 " == Languages / Crystal
-NeoBundle 'rhysd/vim-crystal'
+Plug 'rhysd/vim-crystal'
 
 " == Languages / Elixir
-NeoBundle 'elixir-lang/vim-elixir'
-NeoBundle 'mattreduce/vim-mix'
+Plug 'elixir-lang/vim-elixir'
+Plug 'mattreduce/vim-mix'
 
 " == Languages / Plist
-NeoBundle 'darfink/vim-plist'
+Plug 'darfink/vim-plist'
 
-call neobundle#end()
+call plug#end()
 
-NeoBundleCheck
-
-"""
-" Features - Post Plugin
-""'
-
-" Enable filetyp plugin detecting filetype
-filetype indent plugin on
-
-" Enable syntax highlight
-syntax on
+autocmd VimEnter * if len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
+  \| PlugInstall --sync | source $MYVIMRC
+\| endif
 
 """
 " Colors

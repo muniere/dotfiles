@@ -12,10 +12,20 @@ TEMPLATE_DIR = "./vake/template"
 
 class DotfileAction(__base__.Action):
     def __vim_install(self):
-        self.shell.git_clone(
-            src="https://github.com/Shougo/neobundle.vim",
-            dst=filetree.pilot("~/.vim/bundle/neobundle.vim").expanduser().pathname()
-        )
+        dst = filetree.pilot("~/.vim/autoload/plug.vim").expanduser()
+
+        if dst.isfile():
+            self.logger.info("Vim-Plug is already downloaded: %s" % dst.reduceuser())
+            return None
+
+        self.shell.execute([
+            "curl",
+            "--fail",
+            "--location",
+            "--create-dirs",
+            "--output", str(dst),
+            "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
+        ])
         return None
 
     def __vim_uninstall(self):
