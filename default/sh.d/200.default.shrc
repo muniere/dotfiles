@@ -49,5 +49,6 @@ function tstatus() {
 
 # Python
 export PYTHONDONTWRITEBYTECODE=1
+export PIPENV_VENV_IN_PROJECT=true
 
 # vim: ft=sh sw=2 ts=2 sts=2
