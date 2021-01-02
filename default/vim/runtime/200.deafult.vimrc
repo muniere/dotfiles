@@ -1,16 +1,12 @@
 " Vim configurations for all environments
 " Reference: http://vim.wikia.com/wiki/Example_vimc
 
-" Features {{{1
+"""
+" Features
+""
 
 " Enable vim extended features
 set nocompatible
-
-" Enable filetyp plugin detecting filetype
-filetype indent plugin on
-
-" Enable syntax highlight
-syntax on
 
 " Default charset is utf-8
 set encoding=utf8
@@ -90,9 +86,18 @@ set foldmethod=marker
 set modeline
 set modelines=5
 
+" Use 4 spaces in place of tab
+set shiftwidth=4
+set softtabstop=4
+set tabstop=4
+set expandtab
+
 " Set new window directions
 set splitbelow
 set splitright
+
+" Shell script with bash mode
+let g:is_bash=1
 
 " Move to last edit position
 autocmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal g`\"" | endif
@@ -101,9 +106,183 @@ autocmd BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "norm
 autocmd Filetype * set formatoptions-=r
 autocmd Filetype * set formatoptions-=o
 
-" /Features }}}
+"""
+" Keymaps
+"""
 
-" Colors {{{1
+" Deactivate highlight
+nnoremap <C-l> :nohl<CR><C-l>
+
+" Move in visual line
+nnoremap k gk
+nnoremap j gj
+nnoremap <Up> gk
+nnoremap <Down> gj
+
+" Tab utilization
+nnoremap tt :tabnew<CR>
+nnoremap td :tabclose<CR>
+nnoremap tl :tabnext<CR>
+nnoremap tn :tabnext<CR>
+nnoremap th :tabprevious<CR>
+nnoremap tp :tabprevious<CR>
+nnoremap tm :tabmove
+
+"""
+" Plugins
+"""
+
+filetype off
+
+if has('vim_starting')
+  set runtimepath+=~/.vim/bundle/neobundle.vim
+endif
+
+call neobundle#begin(expand('~/.vim/bundle/'))
+
+NeoBundleFetch 'Shougo/neobundle.vim'
+
+" == Appearance
+NeoBundle 'itchyny/lightline.vim'
+
+let g:lightline = { 
+  \ 'active'  : { 'left': [['mode'], ['relativepath'], ['modified']] },
+  \ 'inactive': { 'left': [['mode'], ['relativepath'], ['modified']] }
+  \ }
+
+" == Text Editing
+NeoBundle 'Align'
+
+NeoBundle 'surround.vim'
+
+NeoBundle 'scrooloose/nerdcommenter'
+
+NeoBundle 'editorconfig/editorconfig-vim'
+
+" == Completion
+NeoBundle 'neocomplcache'
+let g:neocomplcache_enable_at_startup = 1
+let g:neocomplcache_lock_buffer_name_pattern = "files"
+let g:neocomplcache_force_overwrite_completefunc = 1
+
+" == File System
+NeoBundle 'scrooloose/nerdtree'
+
+NeoBundle 'jistr/vim-nerdtree-tabs'
+let g:nerdtree_tabs_open_on_gui_startup = 0
+let g:nerdtree_tabs_open_on_console_startup = 0
+nnoremap <C-e><C-e> :NERDTreeTabsToggle<CR>
+inoremap <C-e><C-e> <ESC>:NERDTreeTabsToggle<CR>
+nnoremap <C-e><C-f> :NERDTreeTabsOpen<CR><C-w>p:NERDTreeTabsFind<CR>
+inoremap <C-e><C-f> <ESC>:NERDTreeTabsOpen<CR><C-w>p:NERDTreeTabsFind<CR>
+
+NeoBundle 'kien/ctrlp.vim'
+nnoremap <C-x><C-f> :CtrlP .<CR>
+inoremap <C-x><C-f> <ESC>:CtrlP .<CR>
+nnoremap <C-x><C-b> :CtrlPBuffer<CR>
+inoremap <C-x><C-b> <ESC>:CtrlPBuffer<CR>
+
+if executable('ag')
+  let g:ctrlp_use_caching=0
+  let g:ctrlp_user_command='ag %s -i --nocolor --nogroup -g ""'
+endif
+
+NeoBundle 'sudo.vim'
+
+" == Syntax Highlight
+NeoBundle 'scrooloose/syntastic'
+
+let g:syntastic_mode_map = { 
+      \ 'mode': 'active',
+      \ 'active_filetypes': [],
+      \ 'passive_filetypes': ['java'] 
+      \ }
+let g:syntastic_html_tidy_ignore_errors = [
+      \'proprietary attribute "ng-',
+      \'proprietary attribute "v-'
+      \]
+
+" == Languages / JSONC
+NeoBundle 'neoclide/jsonc.vim'
+
+" == Languages / Shell Script
+NeoBundle 'vim-scripts/sh.vim'
+
+" == Languages / Ruby
+NeoBundle 'ruby.vim'
+
+" == Languages / Python
+NeoBundle 'hynek/vim-python-pep8-indent'
+
+" == Languages / Javascript
+NeoBundle 'jelera/vim-javascript-syntax'
+NeoBundle 'jiangmiao/simple-javascript-indenter'
+NeoBundle 'kchmck/vim-coffee-script'
+let g:SimpleJsIndenter_BriefMode=1
+
+NeoBundle 'myhere/vim-nodejs-complete'
+NeoBundle 'posva/vim-vue'
+
+" == Languages / AppleScript
+NeoBundle 'applescript.vim'
+
+" == Languages / Scala
+NeoBundle 'scala.vim'
+
+" == Languages / Go
+set runtimepath+=$GOROOT/misc/vim
+exe "set runtimepath+=".globpath($GOPATH, "src/github.com/nsf/gocode/vim")
+exe "set runtimepath+=".globpath($GOPATH, "src/github.com/golang/lint/misc/vim")
+NeoBundle 'Blackrush/vim-gocode'
+
+" == Languages / HTML
+NeoBundle 'mattn/emmet-vim'
+NeoBundle 'othree/html5.vim'
+
+" == Languages / Jade
+NeoBundle 'digitaltoad/vim-jade'
+
+" == Languages / Handlebars
+NeoBundle 'nono/vim-handlebars'
+
+" == Languages / YAML
+NeoBundle 'vim-scripts/yaml.vim'
+
+" == Languages / Swift
+NeoBundle 'toyamarinyon/vim-swift'
+NeoBundle 'keith/swift.vim'
+NeoBundle 'cfdrake/vim-carthage'
+
+" == Languages / Kotlin
+NeoBundle 'udalov/kotlin-vim'
+
+" == Languages / Crystal
+NeoBundle 'rhysd/vim-crystal'
+
+" == Languages / Elixir
+NeoBundle 'elixir-lang/vim-elixir'
+NeoBundle 'mattreduce/vim-mix'
+
+" == Languages / Plist
+NeoBundle 'darfink/vim-plist'
+
+call neobundle#end()
+
+NeoBundleCheck
+
+"""
+" Features - Post Plugin
+""'
+
+" Enable filetyp plugin detecting filetype
+filetype indent plugin on
+
+" Enable syntax highlight
+syntax on
+
+"""
+" Colors
+"""
 highlight SpecialKey    ctermfg=4               term=bold
 highlight NonText       ctermfg=12              term=bold
 highlight Directory     ctermfg=4               term=bold
@@ -180,277 +359,5 @@ highlight link SpecialChar    Special
 highlight link Delimiter      Special
 highlight link SpecialComment Special
 highlight link Debug          Special
-" /Colors }}}
-
-" Indentation {{{1
-
-" Use 4 spaces in place of tab
-set shiftwidth=4
-set softtabstop=4
-set tabstop=4
-set expandtab
-" /Indentation }}}
-
-" Keymaps {{{1
-
-" Deactivate highlight
-nnoremap <C-l> :nohl<CR><C-l>
-
-" Move in visual line
-nnoremap k gk
-nnoremap j gj
-nnoremap <Up> gk
-nnoremap <Down> gj
-
-" Tab utilization
-nnoremap tt :tabnew<CR>
-nnoremap td :tabclose<CR>
-nnoremap tl :tabnext<CR>
-nnoremap tn :tabnext<CR>
-nnoremap th :tabprevious<CR>
-nnoremap tp :tabprevious<CR>
-nnoremap tm :tabmove
-" /Keymaps }}}
-
-" Utilization {{{1
-
-" JsonFormat {{{2
-command! -nargs=0 JsonFormat :execute '%!python -m json.tool' 
-" }}}
-
-" CdCurrent {{{2
-command! -nargs=0 CdCurrent cd %:p:h
-" }}}
-
-let g:is_bash=1
-
-" }}}
-
-" Plugins {{{1
-
-filetype off
-
-if has('vim_starting')
-  set runtimepath+=~/.vim/bundle/neobundle.vim
-endif
-
-call neobundle#begin(expand('~/.vim/bundle/'))
-
-NeoBundleFetch 'Shougo/neobundle.vim'
-
-" == General
-
-" NeoCompleCache {{{2
-NeoBundle 'neocomplcache'
-
-" Enable at startup
-let g:neocomplcache_enable_at_startup = 1
-let g:neocomplcache_lock_buffer_name_pattern = "files"
-let g:neocomplcache_force_overwrite_completefunc = 1
-" }}}
-
-" NeoSnippet {{{2
-NeoBundle 'Shougo/neosnippet'
-NeoBundle 'Shougo/neosnippet-snippets'
-let g:neosnippet#snippets_directory = '~/.vim/snippets'
-
-imap <expr><TAB> neosnippet#expandable() <Bar><Bar> neosnippet#jumpable() ?  "\<Plug>(neosnippet_expand_or_jump)" : pumvisible() ? "\<C-n>" : "\<TAB>"
-smap <expr><TAB> neosnippet#expandable() <Bar><Bar> neosnippet#jumpable() ?  "\<Plug>(neosnippet_expand_or_jump)" : "\<TAB>"
-" }}}
-
-" surround.vim {{{2
-NeoBundle 'surround.vim'
-"}}}
-
-" NERD Commenter {{{2
-NeoBundle 'scrooloose/nerdcommenter'
-" }}}
-
-" NERD Tree {{{2
-NeoBundle 'scrooloose/nerdtree'
-" }}}
-
-" NERD Tree Tabs {{{2
-NeoBundle 'jistr/vim-nerdtree-tabs'
-let g:nerdtree_tabs_open_on_gui_startup = 0
-let g:nerdtree_tabs_open_on_console_startup = 0
-nnoremap <C-e><C-e> :NERDTreeTabsToggle<CR>
-inoremap <C-e><C-e> <ESC>:NERDTreeTabsToggle<CR>
-nnoremap <C-e><C-f> :NERDTreeTabsOpen<CR><C-w>p:NERDTreeTabsFind<CR>
-inoremap <C-e><C-f> <ESC>:NERDTreeTabsOpen<CR><C-w>p:NERDTreeTabsFind<CR>
-" }}}
-
-" ag.vim {{{2
-NeoBundle 'rking/ag.vim'
-" }}}
-
-" ctlrp.vim {{{2
-NeoBundle 'kien/ctrlp.vim'
-nnoremap <C-x><C-f> :CtrlP .<CR>
-inoremap <C-x><C-f> <ESC>:CtrlP .<CR>
-nnoremap <C-x><C-b> :CtrlPBuffer<CR>
-inoremap <C-x><C-b> <ESC>:CtrlPBuffer<CR>
-
-if executable('ag')
-  let g:ctrlp_use_caching=0
-  let g:ctrlp_user_command='ag %s -i --nocolor --nogroup -g ""'
-endif
-" }}}
-
-" Sudo.vim {{{2
-NeoBundle 'sudo.vim'
-" }}}
-
-" BlockDiff {{{2
-NeoBundle 'adie/BlockDiff'
-" }}}
-
-" gtags {{{2
-NeoBundle 'gtags.vim'
-" }}}
-
-" Syntastic {{{2
-NeoBundle 'scrooloose/syntastic'
-
-let g:syntastic_mode_map = { 'mode': 'active', 'active_filetypes': [], 'passive_filetypes': ['java'] }
-let g:syntastic_html_tidy_ignore_errors=[
-      \'proprietary attribute "ng-',
-      \'proprietary attribute "v-'
-      \]
-" }}}
-
-" LightLine {{{2
-NeoBundle 'itchyny/lightline.vim'
-
-let g:lightline = { 
-            \ 'active'  : { 'left': [['mode'], ['relativepath'], ['modified']] },
-            \ 'inactive': { 'left': [['mode'], ['relativepath'], ['modified']] }
-            \ }
-" }}}
-
-" Align {{{2
-NeoBundle 'Align'
-" }}}
-
-" EditorConfig {{{2
-NeoBundle 'editorconfig/editorconfig-vim'
-" }}}
-
-" YankRing {{{2
-NeoBundle 'YankRing.vim'
-let g:yankring_history_file = '.yankring_history'
-" }}}
-
-" fugitive {{{2
-NeoBundle 'fugitive.vim'
-" }}}
-
-" == Colors
-
-" Solarized {{{2
-NeoBundle 'altercation/vim-colors-solarized'
-" }}}
-
-" Molokai {{{2
-NeoBundle 'tomasr/molokai'
-" }}}
-
-" Wombat {{{2
-NeoBundle 'vim-scripts/Wombat'
-" }}}
-
-" == Languages
-
-" JSONC {{{2
-NeoBundle 'neoclide/jsonc.vim'
-" }}}
-
-" Shell Script {{{2
-NeoBundle 'vim-scripts/sh.vim'
-" }}}
-
-" Ruby {{{2
-NeoBundle 'ruby.vim'
-" }}}
-
-" Python {{{2
-NeoBundle 'hynek/vim-python-pep8-indent'
-" }}}
-
-" Javascript {{{2
-NeoBundle 'jelera/vim-javascript-syntax'
-NeoBundle 'jiangmiao/simple-javascript-indenter'
-NeoBundle 'kchmck/vim-coffee-script'
-let g:SimpleJsIndenter_BriefMode=1
-
-NeoBundle 'myhere/vim-nodejs-complete'
-NeoBundle 'posva/vim-vue'
-" }}}
-
-" AppleScript {{{2
-NeoBundle 'applescript.vim'
-" }}}
-
-" Scala {{{2
-NeoBundle 'scala.vim'
-" }}}
-
-" Go {{{2
-set runtimepath+=$GOROOT/misc/vim
-exe "set runtimepath+=".globpath($GOPATH, "src/github.com/nsf/gocode/vim")
-exe "set runtimepath+=".globpath($GOPATH, "src/github.com/golang/lint/misc/vim")
-NeoBundle 'Blackrush/vim-gocode'
-" }}}
-
-" CQL {{{2
-NeoBundle 'elubow/cql-vim'
-" }}}
-
-" HTML {{{2
-NeoBundle 'mattn/emmet-vim'
-NeoBundle 'othree/html5.vim'
-"}}}
-
-" Jade {{{2
-NeoBundle 'digitaltoad/vim-jade'
-" }}}
-
-" Handlebars {{{2
-NeoBundle 'nono/vim-handlebars'
-" }}}
-
-" YAML {{{2
-NeoBundle 'vim-scripts/yaml.vim'
-" }}}
-
-" Swift {{{2
-NeoBundle 'toyamarinyon/vim-swift'
-NeoBundle 'keith/swift.vim'
-NeoBundle 'cfdrake/vim-carthage'
-" }}}
-
-" Kotlin {{{2
-NeoBundle 'udalov/kotlin-vim'
-" }}}
-
-" Crystal {{{2
-NeoBundle 'rhysd/vim-crystal'
-" }}}
-
-" Elixir {{{2
-NeoBundle 'elixir-lang/vim-elixir'
-NeoBundle 'mattreduce/vim-mix'
-" }}}
-
-" Plist {{{2
-NeoBundle 'darfink/vim-plist'
-" }}}
-
-call neobundle#end()
-
-filetype indent plugin on
-
-NeoBundleCheck
-" }}}
 
 " vim: ft=vim sw=2 ts=2 sts=2
