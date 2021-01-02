@@ -90,6 +90,10 @@ class DotfileAction(__base__.Action):
 
             # ext
             Dotfile(
+                src="asdfrc",
+                dst="~/.asdfrc"
+            ),
+            Dotfile(
                 src="tmux.conf",
                 dst="~/.tmux.conf"
             ),
@@ -322,7 +326,7 @@ class Install(DotfileAction):
         return
 
     def __istarget(self, dotfile):
-        blacklist = [r'\.swp$', r'\.DS_Store$']
+        blacklist = [r'\.swp$', r'\.bak$', r'\.DS_Store$']
 
         for pattern in blacklist:
             if re.search(pattern, dotfile.src):
