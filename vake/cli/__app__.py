@@ -33,8 +33,6 @@ class Target:
     BINFILE = "binfile"
     BREW = "brew"
     CASK = "cask"
-    GEM = "gem"
-    NPM = "npm"
 
     @classmethod
     def values(cls):
@@ -43,8 +41,6 @@ class Target:
             cls.BINFILE,
             cls.BREW,
             cls.CASK,
-            cls.GEM,
-            cls.NPM,
         ]
 
 
@@ -60,12 +56,6 @@ class Concern:
 
         if target == Target.CASK:
             return concern.cask
-
-        if target == Target.GEM:
-            return concern.gem
-
-        if target == Target.NPM:
-            return concern.npm
 
         if target == Target.BINFILE:
             return concern.binfile

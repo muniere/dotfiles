@@ -3,6 +3,4 @@ from . import (
     binfile,
     brew,
     cask,
-    gem,
-    npm,
 )
