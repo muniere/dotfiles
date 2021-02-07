@@ -1,3 +1,17 @@
 #!/usr/bin/env bash
 
-git branch -vv | grep gone | cut -b 3- | awk '{print $1}' | xargs git branch -d
+force=false
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -f|--force) force=true; shift ;;
+        *) echo "Unknown parameter passed: $1"; exit 1 ;;
+    esac
+    shift
+done
+
+if $force; then
+    git branch -vv | grep gone | cut -b 3- | awk '{print $1}' | xargs git branch -D
+else
+    git branch -vv | grep gone | cut -b 3- | awk '{print $1}' | xargs git branch -d
+fi
