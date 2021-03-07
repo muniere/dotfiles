@@ -8,6 +8,9 @@ name = "pypi"
 [dev-packages]
 mako = "*"
 pynvim = "*"
+pylint = "*"
+autopep8 = "*"
+rope = "*"
 
 [requires]
 python_version = "3.9"

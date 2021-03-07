@@ -204,7 +204,7 @@ class DotfileAction(__base__.Action):
         ]
 
 
-class Install(DotfileAction):
+class InstallAction(DotfileAction):
     def run(self):
         for dot in self.dotfiles():
             if dot.src.startswith('/'):
@@ -335,7 +335,7 @@ class Install(DotfileAction):
         return True
 
 
-class Uninstall(DotfileAction):
+class UninstallAction(DotfileAction):
     def run(self):
         for dot in self.dotfiles():
             self.__run(dot, sysname=kernel.sysname())
@@ -447,7 +447,7 @@ class Uninstall(DotfileAction):
         return True
 
 
-class Status(DotfileAction):
+class StatusAction(DotfileAction):
     def run(self):
         dotfiles = sorted(self.dotfiles(), key=lambda x: x.dst)
 

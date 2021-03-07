@@ -15,7 +15,7 @@ class BinfileAction(__base__.Action):
         ]
 
 
-class Install(BinfileAction):
+class InstallAction(BinfileAction):
     def run(self):
         for binfile in self.binfiles():
             self.__run(binfile, sysname=kernel.sysname())
@@ -86,7 +86,7 @@ class Install(BinfileAction):
         return True
 
 
-class Uninstall(BinfileAction):
+class UninstallAction(BinfileAction):
     def run(self):
         for binfile in self.binfiles():
             self.__run(binfile, sysname=kernel.sysname())
@@ -153,7 +153,7 @@ class Uninstall(BinfileAction):
         return True
 
 
-class Status(BinfileAction):
+class StatusAction(BinfileAction):
     def run(self):
         binfiles = sorted(self.binfiles(), key=lambda x: x.dst)
 

@@ -24,7 +24,7 @@ class CaskAction(__base__.Action):
             return []
 
 
-class Install(CaskAction):
+class InstallAction(CaskAction):
     def run(self):
         if not self.shell.available(BREW):
             self.logger.warn("Command is not available: %s" % BREW)
@@ -42,7 +42,7 @@ class Install(CaskAction):
         return
 
 
-class Uninstall(CaskAction):
+class UninstallAction(CaskAction):
     def run(self):
         if not self.shell.available(BREW):
             self.logger.warn("Command is not available: %s" % BREW)
@@ -60,7 +60,7 @@ class Uninstall(CaskAction):
         return
 
 
-class Status(CaskAction):
+class StatusAction(CaskAction):
     def run(self):
         if not self.shell.available(BREW):
             self.logger.warn("Command is not available: %s" % BREW)

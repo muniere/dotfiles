@@ -44,35 +44,55 @@ class Target:
         ]
 
 
-class Concern:
+class Commander:
 
     @classmethod
-    def hunt(cls, target):
+    def install(cls, target, noop=False, logger=None):
         if target == Target.DOTFILE:
-            return concern.dotfile
+            return concern.DotfileInstallAction(noop=noop, logger=logger)
 
         if target == Target.BREW:
-            return concern.brew
+            return concern.BrewInstallAction(noop=noop, logger=logger)
 
         if target == Target.CASK:
-            return concern.cask
+            return concern.CaskInstallAction(noop=noop, logger=logger)
 
         if target == Target.BINFILE:
-            return concern.binfile
+            return concern.BinfileInstallAction(noop=noop, logger=logger)
 
         return None
 
     @classmethod
-    def installable(cls, x):
-        return x is not None and x.Install is not None
+    def uninstall(cls, target, noop=False, logger=None):
+        if target == Target.DOTFILE:
+            return concern.DotfileUninstallAction(noop=noop, logger=logger)
+
+        if target == Target.BREW:
+            return concern.BrewUninstallAction(noop=noop, logger=logger)
+
+        if target == Target.CASK:
+            return concern.CaskUninstallAction(noop=noop, logger=logger)
+
+        if target == Target.BINFILE:
+            return concern.BinfileUninstallAction(noop=noop, logger=logger)
+
+        return None
 
     @classmethod
-    def uninstallable(cls, x):
-        return x is not None and x.Uninstall is not None
+    def status(cls, target, noop=False, logger=None):
+        if target == Target.DOTFILE:
+            return concern.DotfileStatusAction(noop=noop, logger=logger)
 
-    @classmethod
-    def statusable(cls, x):
-        return x is not None and x.Status is not None
+        if target == Target.BREW:
+            return concern.BrewStatusAction(noop=noop, logger=logger)
+
+        if target == Target.CASK:
+            return concern.CaskStatusAction(noop=noop, logger=logger)
+
+        if target == Target.BINFILE:
+            return concern.BinfileStatusAction(noop=noop, logger=logger)
+
+        return None
 
 
 class Completion:
@@ -227,9 +247,9 @@ class CLI:
         noop = context.dry_run
         logger = context.logger()
 
-        concerns = [Concern.hunt(t) for t in context.targets]
-        concerns = [x for x in concerns if Concern.installable(x)]
-        commands = [x.Install(noop=noop, logger=logger) for x in concerns]
+        commands = [Commander.install(
+            target, noop=noop, logger=logger) for target in context.targets]
+        commands = [c for c in commands if c is not None]
 
         for command in commands:
             command.run()
@@ -246,9 +266,9 @@ class CLI:
         noop = context.dry_run
         logger = context.logger()
 
-        concerns = [Concern.hunt(t) for t in context.targets]
-        concerns = [x for x in concerns if Concern.uninstallable(x)]
-        commands = [x.Uninstall(noop=noop, logger=logger) for x in concerns]
+        commands = [Commander.uninstall(
+            target, noop=noop, logger=logger) for target in context.targets]
+        commands = [c for c in commands if c is not None]
 
         for command in commands:
             command.run()
@@ -265,9 +285,9 @@ class CLI:
         noop = context.dry_run
         logger = context.logger()
 
-        concerns = [Concern.hunt(t) for t in context.targets]
-        concerns = [x for x in concerns if Concern.statusable(x)]
-        commands = [x.Status(noop=noop, logger=logger) for x in concerns]
+        commands = [Commander.status(target, noop=noop, logger=logger)
+                    for target in context.targets]
+        commands = [c for c in commands if c is not None]
 
         for command in commands:
             command.run()

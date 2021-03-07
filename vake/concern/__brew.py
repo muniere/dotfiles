@@ -23,7 +23,7 @@ class BrewAction(__base__.Action):
             return []
 
 
-class Install(BrewAction):
+class InstallAction(BrewAction):
     def run(self):
         if not self.shell.available(BREW):
             self.logger.warn("Command is not available: %s" % BREW)
@@ -41,7 +41,7 @@ class Install(BrewAction):
         return
 
 
-class Uninstall(BrewAction):
+class UninstallAction(BrewAction):
     def run(self):
         if not self.shell.available(BREW):
             self.logger.warn("Command is not available: %s" % BREW)
@@ -59,7 +59,7 @@ class Uninstall(BrewAction):
         return
 
 
-class Status(BrewAction):
+class StatusAction(BrewAction):
     def run(self):
         if not self.shell.available(BREW):
             self.logger.warn("Command is not available: %s" % BREW)
