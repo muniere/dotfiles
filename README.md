@@ -6,7 +6,10 @@
 # clone
 $ git clone https://github.com/muniere/dotfiles.git
 
-# install 
+# link dotfiles 
+$ ./xake link
+
+# install binaries
 $ ./xake install
 ```
 
@@ -17,14 +20,14 @@ Each task has following options:
 - `-n`: dry-run
 - `-v`: verbose 
 
-### Dotfile
+### Dotfile & Binfile
 
 ```bash
-# install 
-./xake install
+# link 
+./xake link
 
-# uninstall
-./xake uninstall
+# unlink
+./xake unlink
 
 # status
 ./xake status
@@ -34,50 +37,11 @@ Each task has following options:
 
 ```bash
 # install
-./xake install brew
+./xake install
 
 # uninstall
-./xake uninstall brew
+./xake uninstall
 
 # status
-./xake status bew
-```
-
-### Homebrew Cask
-
-```bash
-# install
-./xake install cask
-
-# uninstall
-./xake uninstall cask
-
-# status
-./xake status cask
-```
-
-### Rubygems
-
-```bash
-# install
-./xake install gem
-
-# uninstall
-./xake uninstall gem
-
-# status
-./xake status gem
-```
-
-### npm
-
-```bash
-# install
-./xake install npm
-
-# uninstall
-./xake uninstall npm
-
-# status
-./xake status npm
+./xake status
 ```

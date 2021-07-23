@@ -5,20 +5,13 @@ function _xake() {
     '(-h --help)'{-h,--help}'[show this help message and exit]' \
     '(-n --dry-run)'{-n,--dry-run}'[Do not execute commands actually]' \
     '(-v --verbose)'{-v,--verbose}'[Show verbose messages]' \
-    '1: :->actions' \
-    '*: :->targets' && ret=0
+    '1: :->actions' && ret=0
 
   case "$state" in
     actions)
       local -a actions
-      actions=(install uninstall status completion)
+      actions=(link unlink install uninstall status completion)
       _describe 'actions' actions && ret=0
-      ;;
-
-    targets)
-      local -a targets
-      targets=(dotfile binfile brew)
-      _describe 'targets' targets && ret=0
       ;;
 
   esac

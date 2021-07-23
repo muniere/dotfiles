@@ -8,6 +8,7 @@ from typing import List
 
 # 2nd
 from .. import concern
+from .. import kernel
 from .. import winston
 
 
@@ -16,58 +17,12 @@ def cli():
 
 
 class Action(Enum):
+    LINK = "link"
+    UNLINK = "unlink"
     INSTALL = "install"
     UNINSTALL = "uninstall"
     STATUS = "status"
     COMPLETION = "completion"
-
-
-class Target(Enum):
-    DOTFILE = "dotfile"
-    BINFILE = "binfile"
-    BREW = "brew"
-
-
-class Commander:
-
-    @classmethod
-    def install(cls, target, noop=False, logger=None):
-        if target == Target.DOTFILE:
-            return concern.DotfileInstallAction(noop=noop, logger=logger)
-
-        if target == Target.BREW:
-            return concern.BrewInstallAction(noop=noop, logger=logger)
-
-        if target == Target.BINFILE:
-            return concern.BinfileInstallAction(noop=noop, logger=logger)
-
-        return None
-
-    @classmethod
-    def uninstall(cls, target, noop=False, logger=None):
-        if target == Target.DOTFILE:
-            return concern.DotfileUninstallAction(noop=noop, logger=logger)
-
-        if target == Target.BREW:
-            return concern.BrewUninstallAction(noop=noop, logger=logger)
-
-        if target == Target.BINFILE:
-            return concern.BinfileUninstallAction(noop=noop, logger=logger)
-
-        return None
-
-    @classmethod
-    def status(cls, target, noop=False, logger=None):
-        if target == Target.DOTFILE:
-            return concern.DotfileStatusAction(noop=noop, logger=logger)
-
-        if target == Target.BREW:
-            return concern.BrewStatusAction(noop=noop, logger=logger)
-
-        if target == Target.BINFILE:
-            return concern.BinfileStatusAction(noop=noop, logger=logger)
-
-        return None
 
 
 class Completion:
@@ -92,17 +47,7 @@ class Context:
         namespace = parser.parse_args(args)
 
         context = Context()
-
-        if namespace.action:
-            context.action = Action(namespace.action)
-        else:
-            raise RuntimeError('action must not be null')
-
-        if namespace.target:
-            context.targets = [Target(x) for x in namespace.target]
-        else:
-            context.targets = [Target.DOTFILE, Target.BINFILE]
-
+        context.action = Action(namespace.action)
         context.dry_run = namespace.dry_run
         context.verbose = namespace.verbose
 
@@ -137,10 +82,6 @@ class Context:
         parser.add_argument("action",
                             type=str,
                             help="Action to perform: (%s)" % "|".join([x.value for x in Action]))
-        parser.add_argument("target",
-                            type=str,
-                            nargs="*",
-                            help="Target for action: (%s)" % "|".join([x.value for x in Target]))
         return parser
 
     def __init__(self):
@@ -148,7 +89,6 @@ class Context:
         Initialize context
         """
         self.action = None
-        self.targets = []
         self.dry_run = False
         self.verbose = False
         return
@@ -202,6 +142,14 @@ class CLI:
         context = Context.parse(args)
 
         # actions
+        if context.action == Action.LINK:
+            self.__link(context)
+            sys.exit(0)
+
+        if context.action == Action.UNLINK:
+            self.__unlink(context)
+            sys.exit(0)
+
         if context.action == Action.INSTALL:
             self.__install(context)
             sys.exit(0)
@@ -221,6 +169,47 @@ class CLI:
         sys.exit(1)
 
     @staticmethod
+    def __link(context: Context) -> None:
+        """
+        Perform link action.
+
+        :param context: Context
+        """
+
+        noop = context.dry_run
+        logger = context.logger()
+
+        commands = [
+            concern.DotfileInstallAction(noop=noop, logger=logger),
+            concern.BinfileInstallAction(noop=noop, logger=logger),
+        ]
+
+        for command in commands:
+            command.run()
+
+        return
+
+    @staticmethod
+    def __unlink(context: Context) -> None:
+        """
+        Perform unlink action.
+
+        :param context: Context
+        """
+        noop = context.dry_run
+        logger = context.logger()
+
+        commands = [
+            concern.DotfileUninstallAction(noop=noop, logger=logger),
+            concern.BinfileUninstallAction(noop=noop, logger=logger),
+        ]
+
+        for command in commands:
+            command.run()
+
+        return
+
+    @staticmethod
     def __install(context: Context) -> None:
         """
         Perform install action.
@@ -231,9 +220,15 @@ class CLI:
         noop = context.dry_run
         logger = context.logger()
 
-        commands = [Commander.install(target, noop=noop, logger=logger)
-                    for target in context.targets]
-        commands = [c for c in commands if c is not None]
+        commands = []
+
+        if kernel.islinux():
+            commands.extend([])
+
+        if kernel.isdarwin():
+            commands.extend([
+                concern.BrewInstallAction(noop=noop, logger=logger),
+            ])
 
         for command in commands:
             command.run()
@@ -250,9 +245,9 @@ class CLI:
         noop = context.dry_run
         logger = context.logger()
 
-        commands = [Commander.uninstall(target, noop=noop, logger=logger)
-                    for target in context.targets]
-        commands = [c for c in commands if c is not None]
+        commands = [
+            concern.BrewUninstallAction(noop=noop, logger=logger),
+        ]
 
         for command in commands:
             command.run()
@@ -269,9 +264,11 @@ class CLI:
         noop = context.dry_run
         logger = context.logger()
 
-        commands = [Commander.status(target, noop=noop, logger=logger)
-                    for target in context.targets]
-        commands = [c for c in commands if c is not None]
+        commands = [
+            concern.DotfileStatusAction(noop=noop, logger=logger),
+            concern.BinfileStatusAction(noop=noop, logger=logger),
+            concern.BrewStatusAction(noop=noop, logger=logger),
+        ]
 
         for command in commands:
             command.run()
@@ -298,7 +295,6 @@ class CLI:
         rendered = template.render(
             options=Context.options(),
             actions=[x.value for x in Action],
-            targets=[x.value for x in Target],
         )
 
         with open(Completion.DESTINATION, 'w') as dst:
