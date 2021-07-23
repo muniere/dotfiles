@@ -1,6 +1,9 @@
 # 1st
 import os
 
+from dataclasses import dataclass
+from typing import List
+
 # 2nd
 from .. import filetree
 from .. import kernel
@@ -10,21 +13,30 @@ BREW = "brew"
 BREWFILE = "Brewfile"
 
 
+@dataclass(eq=True, frozen=True)
+class Keg:
+    name: str
+
+
 class BrewAction(__base__.Action):
-    def load_kegs(self):
-        src = filetree.pilot(os.getcwd()).append(kernel.sysname()).append(BREWFILE)
+    def load_kegs(self) -> List[Keg]:
+        src = filetree.pilot(os.getcwd())\
+            .append(kernel.sysname())\
+            .append(BREWFILE)
 
         if self.logger:
             self.logger.debug("Read kegs from file: %s" % src)
 
-        if src.exists():
-            return Keg.load(src)
-        else:
+        if not src.exists():
             return []
 
-    def list_kegs(self):
+        lines = src.readlines()
+        return [Keg(name) for name in lines]
+
+    def list_kegs(self) -> List[Keg]:
         stdout = self.shell.capture([BREW, "list"]).stdout
-        return [Keg(name) for name in stdout.decode('utf8').strip().splitlines()]
+        lines = stdout.decode('utf8').strip().splitlines()
+        return [Keg(name) for name in lines]
 
 
 class InstallAction(BrewAction):
@@ -82,29 +94,3 @@ class StatusAction(BrewAction):
         self.shell.execute([BREW, "tap"])
         self.shell.execute([BREW, "list"])
         return
-
-
-class Keg:
-    def __init__(self, name):
-        self.name = name
-        return
-
-    def __eq__(self, o: object) -> bool:
-        return isinstance(o, self.__class__) and self.name == o.name
-
-    def __hash__(self) -> int:
-        return hash(self.name)
-
-    @staticmethod
-    def load(path):
-        target = filetree.pilot(path)
-
-        if not target.exists():
-            return []
-
-        kegs = []
-
-        for name in target.readlines():
-            kegs.append(Keg(name))
-
-        return kegs
