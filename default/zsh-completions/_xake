@@ -17,7 +17,7 @@ function _xake() {
 
     targets)
       local -a targets
-      targets=(dotfile binfile brew cask)
+      targets=(dotfile binfile brew)
       _describe 'targets' targets && ret=0
       ;;
 

@@ -33,7 +33,6 @@ class Target:
     DOTFILE = "dotfile"
     BINFILE = "binfile"
     BREW = "brew"
-    CASK = "cask"
 
     @classmethod
     def values(cls):
@@ -41,7 +40,6 @@ class Target:
             cls.DOTFILE,
             cls.BINFILE,
             cls.BREW,
-            cls.CASK,
         ]
 
 
@@ -54,9 +52,6 @@ class Commander:
 
         if target == Target.BREW:
             return concern.BrewInstallAction(noop=noop, logger=logger)
-
-        if target == Target.CASK:
-            return concern.CaskInstallAction(noop=noop, logger=logger)
 
         if target == Target.BINFILE:
             return concern.BinfileInstallAction(noop=noop, logger=logger)
@@ -71,9 +66,6 @@ class Commander:
         if target == Target.BREW:
             return concern.BrewUninstallAction(noop=noop, logger=logger)
 
-        if target == Target.CASK:
-            return concern.CaskUninstallAction(noop=noop, logger=logger)
-
         if target == Target.BINFILE:
             return concern.BinfileUninstallAction(noop=noop, logger=logger)
 
@@ -86,9 +78,6 @@ class Commander:
 
         if target == Target.BREW:
             return concern.BrewStatusAction(noop=noop, logger=logger)
-
-        if target == Target.CASK:
-            return concern.CaskStatusAction(noop=noop, logger=logger)
 
         if target == Target.BINFILE:
             return concern.BinfileStatusAction(noop=noop, logger=logger)

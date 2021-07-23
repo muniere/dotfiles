@@ -15,9 +15,3 @@ from .__brew import (
     UninstallAction as BrewUninstallAction,
     StatusAction as BrewStatusAction,
 )
-
-from .__cask import (
-    InstallAction as CaskInstallAction,
-    UninstallAction as CaskUninstallAction,
-    StatusAction as CaskStatusAction,
-)
