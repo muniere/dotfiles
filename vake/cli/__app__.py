@@ -2,6 +2,8 @@
 import sys
 import argparse
 import logging
+
+from enum import Enum
 from typing import List
 
 # 2nd
@@ -13,34 +15,17 @@ def cli():
     return CLI()
 
 
-class Action:
+class Action(Enum):
     INSTALL = "install"
     UNINSTALL = "uninstall"
     STATUS = "status"
     COMPLETION = "completion"
 
-    @classmethod
-    def values(cls):
-        return [
-            cls.INSTALL,
-            cls.UNINSTALL,
-            cls.STATUS,
-            cls.COMPLETION,
-        ]
 
-
-class Target:
+class Target(Enum):
     DOTFILE = "dotfile"
     BINFILE = "binfile"
     BREW = "brew"
-
-    @classmethod
-    def values(cls):
-        return [
-            cls.DOTFILE,
-            cls.BINFILE,
-            cls.BREW,
-        ]
 
 
 class Commander:
@@ -107,8 +92,17 @@ class Context:
         namespace = parser.parse_args(args)
 
         context = Context()
-        context.action = namespace.action
-        context.targets = namespace.target or ["dotfile", "binfile"]
+
+        if namespace.action:
+            context.action = Action(namespace.action)
+        else:
+            raise RuntimeError('action must not be null')
+
+        if namespace.target:
+            context.targets = [Target(x) for x in namespace.target]
+        else:
+            context.targets = [Target.DOTFILE, Target.BINFILE]
+
         context.dry_run = namespace.dry_run
         context.verbose = namespace.verbose
 
@@ -142,11 +136,11 @@ class Context:
                             help="Show verbose messages")
         parser.add_argument("action",
                             type=str,
-                            help="Action to perform: (%s)" % "|".join(Action.values()))
+                            help="Action to perform: (%s)" % "|".join([x.value for x in Action]))
         parser.add_argument("target",
                             type=str,
                             nargs="*",
-                            help="Target for action: (%s)" % "|".join(Target.values()))
+                            help="Target for action: (%s)" % "|".join([x.value for x in Target]))
         return parser
 
     def __init__(self):
@@ -237,8 +231,8 @@ class CLI:
         noop = context.dry_run
         logger = context.logger()
 
-        commands = [Commander.install(
-            target, noop=noop, logger=logger) for target in context.targets]
+        commands = [Commander.install(target, noop=noop, logger=logger)
+                    for target in context.targets]
         commands = [c for c in commands if c is not None]
 
         for command in commands:
@@ -256,8 +250,8 @@ class CLI:
         noop = context.dry_run
         logger = context.logger()
 
-        commands = [Commander.uninstall(
-            target, noop=noop, logger=logger) for target in context.targets]
+        commands = [Commander.uninstall(target, noop=noop, logger=logger)
+                    for target in context.targets]
         commands = [c for c in commands if c is not None]
 
         for command in commands:
@@ -303,8 +297,8 @@ class CLI:
 
         rendered = template.render(
             options=Context.options(),
-            actions=Action.values(),
-            targets=Target.values(),
+            actions=[x.value for x in Action],
+            targets=[x.value for x in Target],
         )
 
         with open(Completion.DESTINATION, 'w') as dst:
