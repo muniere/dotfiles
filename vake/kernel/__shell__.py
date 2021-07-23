@@ -87,3 +87,19 @@ class Shell:
             return True
 
         return subprocess.call(words) == 0
+
+    def capture(self, command):
+        if isinstance(command, list):
+            words = command
+        elif isinstance(command, str):
+            words = command.split()
+        else:
+            words = []
+
+        if not words:
+            return
+
+        if self.noop:
+            return None
+
+        return subprocess.run(words, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

@@ -11,7 +11,7 @@ BREWFILE = "Brewfile"
 
 
 class BrewAction(__base__.Action):
-    def kegs(self):
+    def load_kegs(self):
         src = filetree.pilot(os.getcwd()).append(kernel.sysname()).append(BREWFILE)
 
         if self.logger:
@@ -22,6 +22,10 @@ class BrewAction(__base__.Action):
         else:
             return []
 
+    def list_kegs(self):
+        stdout = self.shell.capture([BREW, "list"]).stdout
+        return [Keg(name) for name in stdout.decode('utf8').strip().splitlines()]
+
 
 class InstallAction(BrewAction):
     def run(self):
@@ -29,14 +33,19 @@ class InstallAction(BrewAction):
             self.logger.warn("Command is not available: %s" % BREW)
             return
 
-        kegs = self.kegs()
+        kegs = self.load_kegs()
 
         if not kegs:
             self.logger.info("No available kegs were found")
             return
 
+        found = set(self.list_kegs())
+
         for keg in kegs:
-            self.shell.execute([BREW, "install", keg.name])
+            if keg in found:
+                self.logger.info("%s is already installed" % keg.name)
+            else:
+                self.shell.execute([BREW, "install", keg.name])
 
         return
 
@@ -47,14 +56,19 @@ class UninstallAction(BrewAction):
             self.logger.warn("Command is not available: %s" % BREW)
             return
 
-        kegs = self.kegs()
+        kegs = self.load_kegs()
 
         if not kegs:
             self.logger.info("No available kegs were found")
             return
 
-        for keg in kegs:
-            self.shell.execute([BREW, "uninstall", keg.name])
+        found = set(self.list_kegs())
+
+        for keg in found:
+            if keg in found:
+                self.shell.execute([BREW, "uninstall", keg.name])
+            else:
+                self.logger.info("%s is not installed" % keg.name)
 
         return
 
@@ -74,6 +88,12 @@ class Keg:
     def __init__(self, name):
         self.name = name
         return
+
+    def __eq__(self, o: object) -> bool:
+        return isinstance(o, self.__class__) and self.name == o.name
+
+    def __hash__(self) -> int:
+        return hash(self.name)
 
     @staticmethod
     def load(path):
