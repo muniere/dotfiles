@@ -2,6 +2,7 @@
 import sys
 import argparse
 import logging
+from typing import List
 
 # 2nd
 from .. import concern
@@ -106,7 +107,7 @@ class Context:
     """
 
     @classmethod
-    def parse(cls, args: list[str]) -> 'Context':
+    def parse(cls, args: List[str]) -> 'Context':
         """
         Compose context for arguments
 
@@ -204,7 +205,7 @@ class CLI:
         """
         pass
 
-    def run(self, args: list[str]) -> None:
+    def run(self, args: List[str]) -> None:
         """
         Run application with given arguments.
 
