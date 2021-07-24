@@ -11,7 +11,7 @@ from .. import kernel
 from . import __base__
 
 STATIC_DIR = "./static"
-SHARD_DIR = "./shard"
+SNIPPET_DIR = "./snippet"
 
 
 @dataclass
@@ -181,7 +181,7 @@ class LayoutAction(__base__.Action):
 
         return dots
 
-    def shards(self) -> List[Recipe]:
+    def snippets(self) -> List[Recipe]:
         return [
             # sh
             Recipe(
@@ -231,8 +231,8 @@ class InstallAction(LayoutAction):
             if dot.activate:
                 dot.activate.run()
 
-        for shard in self.shards():
-            self.__enable(shard)
+        for snippet in self.snippets():
+            self.__enable(snippet)
 
         for bin in self.binfiles():
             self.__run(bin, sysname=kernel.sysname())
@@ -313,12 +313,12 @@ class InstallAction(LayoutAction):
 
         return True
 
-    def __enable(self, shard):
+    def __enable(self, snippet):
 
         #
         # source
         #
-        src = filetree.pilot(shard.src).prepend(SHARD_DIR)
+        src = filetree.pilot(snippet.src).prepend(SNIPPET_DIR)
 
         if not src.exists():
             return
@@ -328,12 +328,12 @@ class InstallAction(LayoutAction):
         #
         # destination
         #
-        dst = filetree.pilot(shard.dst).expanduser()
+        dst = filetree.pilot(snippet.dst).expanduser()
 
         # new file
         if not dst.exists():
             if self.logger:
-                self.logger.execute("Enable shard %s" % src.reduceuser())
+                self.logger.execute("Enable snippet %s" % src.reduceuser())
 
             if not self.noop:
                 dst.write(src_str + "\n")
@@ -346,7 +346,7 @@ class InstallAction(LayoutAction):
         if src_str in dst_str:
             if self.logger:
                 self.logger.info(
-                    "Shard already enabled: %s" % dst.reduceuser()
+                    "Snippet already enabled: %s" % dst.reduceuser()
                 )
             return
 
@@ -378,8 +378,8 @@ class UninstallAction(LayoutAction):
             if dot.deactivate:
                 dot.deactivate.run()
 
-        for shard in self.shards():
-            self.__disable(shard)
+        for snippet in self.snippets():
+            self.__disable(snippet)
 
         for bin in self.binfiles():
             self.__run(bin, sysname=kernel.sysname())
@@ -453,12 +453,12 @@ class UninstallAction(LayoutAction):
 
         return True
 
-    def __disable(self, shard):
+    def __disable(self, snippet):
 
         #
         # source
         #
-        src = filetree.pilot(shard.src).prepend(SHARD_DIR)
+        src = filetree.pilot(snippet.src).prepend(SNIPPET_DIR)
 
         if not src.exists():
             return
@@ -468,7 +468,7 @@ class UninstallAction(LayoutAction):
         #
         # destination
         #
-        dst = filetree.pilot(shard.dst).expanduser()
+        dst = filetree.pilot(snippet.dst).expanduser()
 
         # not found
         if not dst.exists():
@@ -481,13 +481,13 @@ class UninstallAction(LayoutAction):
         if not src_str in dst_str:
             if self.logger:
                 self.logger.info(
-                    "Shard already disabled: %s" % dst.reduceuser()
+                    "Snippet already disabled: %s" % dst.reduceuser()
                 )
             return
 
         # disable
         if self.logger:
-            self.logger.execute("Disable shard %s" % src.reduceuser())
+            self.logger.execute("Disable snippet %s" % src.reduceuser())
 
         if not self.noop:
             dst.write(dst_str.replace(src_str, ""))
