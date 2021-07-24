@@ -23,11 +23,17 @@ class Recipe:
 
 
 class LayoutAction(__base__.Action):
-    def dotfiles(self) -> List[Recipe]:
+    def linkers(self) -> List[Recipe]:
         dots = []
 
         # shared
         dots.extend([
+            # bin
+            Recipe(
+                src="bin",
+                dst="~/.bin"
+            ),
+
             # sh
             Recipe(
                 src="sh.d",
@@ -210,33 +216,21 @@ class LayoutAction(__base__.Action):
             ),
         ]
 
-    def binfiles(self) -> List[Recipe]:
-        return [
-            Recipe(
-                src="bin",
-                dst="~/.bin"
-            )
-        ]
-
 
 class InstallAction(LayoutAction):
     def run(self):
-        for dot in self.dotfiles():
-            if dot.src.startswith('/'):
-                self.__run(dot)
+        for linker in self.linkers():
+            if linker.src.startswith('/'):
+                self.__run(linker)
             else:
-                self.__run(dot, sysname=kernel.sysname())
-                self.__run(dot, sysname="default")
+                self.__run(linker, sysname=kernel.sysname())
+                self.__run(linker, sysname="default")
 
-            if dot.activate:
-                dot.activate.run()
+            if linker.activate:
+                linker.activate.run()
 
         for snippet in self.snippets():
             self.__enable(snippet)
-
-        for bin in self.binfiles():
-            self.__run(bin, sysname=kernel.sysname())
-            self.__run(bin, sysname="default")
 
         return
 
@@ -371,19 +365,15 @@ class InstallAction(LayoutAction):
 
 class UninstallAction(LayoutAction):
     def run(self):
-        for dot in self.dotfiles():
-            self.__run(dot, sysname=kernel.sysname())
-            self.__run(dot, sysname="default")
+        for linker in self.linkers():
+            self.__run(linker, sysname=kernel.sysname())
+            self.__run(linker, sysname="default")
 
-            if dot.deactivate:
-                dot.deactivate.run()
+            if linker.deactivate:
+                linker.deactivate.run()
 
         for snippet in self.snippets():
             self.__disable(snippet)
-
-        for bin in self.binfiles():
-            self.__run(bin, sysname=kernel.sysname())
-            self.__run(bin, sysname="default")
 
         return
 
@@ -408,7 +398,6 @@ class UninstallAction(LayoutAction):
             dst = filetree.pilot(recipe.dst)
         else:
             dst = filetree.pilot(recipe.dst).expanduser()
-
 
         #
         # guard
@@ -506,9 +495,9 @@ class UninstallAction(LayoutAction):
 
 class StatusAction(LayoutAction):
     def run(self):
-        dotfiles = sorted(self.dotfiles(), key=lambda x: x.dst)
+        linkers = sorted(self.linkers(), key=lambda x: x.dst)
 
-        for dot in dotfiles:
+        for dot in linkers:
             target = filetree.pilot(dot.dst).expanduser()
 
             if not target.exists():
