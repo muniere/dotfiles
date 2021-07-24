@@ -10,7 +10,7 @@ function _xake() {
   case "$state" in
     actions)
       local -a actions
-      actions=(layout unlayout install uninstall status completion)
+      actions=(deploy undeploy install uninstall status completion)
       _describe 'actions' actions && ret=0
       ;;
 

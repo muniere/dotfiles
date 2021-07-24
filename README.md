@@ -6,10 +6,10 @@
 # clone
 $ git clone https://github.com/muniere/dotfiles.git
 
-# link dotfiles 
-$ ./xake link
+# deploy dotfiles and binfiles
+$ ./xake deploy
 
-# install binaries
+# install packages
 $ ./xake install
 ```
 
@@ -23,17 +23,17 @@ Each task has following options:
 ### Dotfile & Binfile
 
 ```bash
-# link 
-./xake link
+# deploy 
+./xake deploy
 
-# unlink
-./xake unlink
+# undeploy
+./xake undeploy
 
 # status
 ./xake status
 ```
 
-### Homebrew
+### Packages
 
 ```bash
 # install

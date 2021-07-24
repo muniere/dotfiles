@@ -22,7 +22,7 @@ class Recipe:
     deactivate: __base__.Action = None
 
 
-class LayoutAction(__base__.Action):
+class PrefAction(__base__.Action):
     def linkers(self) -> List[Recipe]:
         dots = []
 
@@ -217,7 +217,7 @@ class LayoutAction(__base__.Action):
         ]
 
 
-class InstallAction(LayoutAction):
+class InstallAction(PrefAction):
     def run(self):
         for linker in self.linkers():
             if linker.src.startswith('/'):
@@ -363,7 +363,7 @@ class InstallAction(LayoutAction):
         return True
 
 
-class UninstallAction(LayoutAction):
+class UninstallAction(PrefAction):
     def run(self):
         for linker in self.linkers():
             self.__run(linker, sysname=kernel.sysname())
@@ -493,7 +493,7 @@ class UninstallAction(LayoutAction):
         return True
 
 
-class StatusAction(LayoutAction):
+class StatusAction(PrefAction):
     def run(self):
         linkers = sorted(self.linkers(), key=lambda x: x.dst)
 

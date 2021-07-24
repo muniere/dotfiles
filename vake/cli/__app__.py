@@ -17,8 +17,8 @@ def cli():
 
 
 class Action(Enum):
-    LAYOUT = "layout"
-    UNLAYOUT = "unlayout"
+    DEPLOY = "deploy"
+    UNDEPLOY = "undeploy"
     INSTALL = "install"
     UNINSTALL = "uninstall"
     STATUS = "status"
@@ -27,7 +27,7 @@ class Action(Enum):
 
 class Completion:
     SOURCE = "template/_xake"
-    DESTINATION = "default/zsh-completions/_xake"
+    DESTINATION = "static/default/zsh-completions/_xake"
 
 
 class Context:
@@ -142,12 +142,12 @@ class CLI:
         context = Context.parse(args)
 
         # actions
-        if context.action == Action.LAYOUT:
-            self.__layout(context)
+        if context.action == Action.DEPLOY:
+            self.__deploy(context)
             sys.exit(0)
 
-        if context.action == Action.UNLAYOUT:
-            self.__unlayout(context)
+        if context.action == Action.UNDEPLOY:
+            self.__undeploy(context)
             sys.exit(0)
 
         if context.action == Action.INSTALL:
@@ -169,9 +169,9 @@ class CLI:
         sys.exit(1)
 
     @staticmethod
-    def __layout(context: Context) -> None:
+    def __deploy(context: Context) -> None:
         """
-        Perform layout action.
+        Perform tune action.
 
         :param context: Context
         """
@@ -180,7 +180,7 @@ class CLI:
         logger = context.logger()
 
         commands = [
-            concern.LayoutInstallAction(noop=noop, logger=logger),
+            concern.PrefInstallAction(noop=noop, logger=logger),
         ]
 
         for command in commands:
@@ -189,9 +189,9 @@ class CLI:
         return
 
     @staticmethod
-    def __unlayout(context: Context) -> None:
+    def __undeploy(context: Context) -> None:
         """
-        Perform unlayout action.
+        Perform untine action.
 
         :param context: Context
         """
@@ -199,7 +199,7 @@ class CLI:
         logger = context.logger()
 
         commands = [
-            concern.LayoutUninstallAction(noop=noop, logger=logger),
+            concern.PrefUninstallAction(noop=noop, logger=logger),
         ]
 
         for command in commands:
@@ -263,7 +263,7 @@ class CLI:
         logger = context.logger()
 
         commands = [
-            concern.LayoutStatusAction(noop=noop, logger=logger),
+            concern.PrefStatusAction(noop=noop, logger=logger),
             concern.BrewStatusAction(noop=noop, logger=logger),
         ]
 

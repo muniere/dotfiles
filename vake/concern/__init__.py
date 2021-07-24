@@ -1,7 +1,7 @@
-from .__layout__ import (
-    InstallAction as LayoutInstallAction,
-    UninstallAction as LayoutUninstallAction,
-    StatusAction as LayoutStatusAction,
+from .__pref__ import (
+    InstallAction as PrefInstallAction,
+    UninstallAction as PrefUninstallAction,
+    StatusAction as PrefStatusAction,
 )
 
 from .__brew__ import (
