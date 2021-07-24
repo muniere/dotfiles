@@ -234,7 +234,7 @@ class InstallAction(PrefAction):
 
         return
 
-    def __run(self, recipe, sysname="default"):
+    def __run(self, recipe: Recipe, sysname="default"):
         if not self.__istarget(recipe):
             if self.logger:
                 relpath = filetree.pilot(recipe.src)\
@@ -307,7 +307,7 @@ class InstallAction(PrefAction):
 
         return True
 
-    def __enable(self, snippet):
+    def __enable(self, snippet: Recipe):
 
         #
         # source
@@ -353,11 +353,11 @@ class InstallAction(PrefAction):
 
         return
 
-    def __istarget(self, dotfile):
+    def __istarget(self, recipe: Recipe):
         blacklist = [r'\.swp$', r'\.bak$', r'\.DS_Store$']
 
         for pattern in blacklist:
-            if re.search(pattern, dotfile.src):
+            if re.search(pattern, recipe.src):
                 return False
 
         return True
@@ -377,7 +377,7 @@ class UninstallAction(PrefAction):
 
         return
 
-    def __run(self, recipe, sysname="default"):
+    def __run(self, recipe: Recipe, sysname: str = "default"):
         if not self.__istarget(recipe):
             if self.logger:
                 relpath = filetree.pilot(recipe.src)\
@@ -442,7 +442,7 @@ class UninstallAction(PrefAction):
 
         return True
 
-    def __disable(self, snippet):
+    def __disable(self, snippet: Recipe):
 
         #
         # source
@@ -483,11 +483,11 @@ class UninstallAction(PrefAction):
 
         return
 
-    def __istarget(self, dotfile):
+    def __istarget(self, recipe: Recipe):
         blacklist = [r'\.swp$', r'\.DS_Store$']
 
         for pattern in blacklist:
-            if re.search(pattern, dotfile.src):
+            if re.search(pattern, recipe.src):
                 return False
 
         return True

@@ -2,8 +2,11 @@ import os
 import re
 import glob
 
+from io import TextIOWrapper
+from typing import List, Union
 
-def pilot(path):
+
+def pilot(path) -> 'Pilot':
     """
     Create a new Pilot for pathname.
     Returns pathname as it is when it is Pilot.
@@ -19,7 +22,7 @@ def pilot(path):
 
 class Pilot:
 
-    def __init__(self, value):
+    def __init__(self, value: Union[str, 'Pilot']):
         if isinstance(value, Pilot):
             self.__pathname = value.pathname()
         else:
@@ -28,7 +31,7 @@ class Pilot:
     def __str__(self):
         return self.__pathname
 
-    def pathname(self):
+    def pathname(self) -> str:
         """
         Retruns current value
 
@@ -37,7 +40,7 @@ class Pilot:
         """
         return self.__pathname
 
-    def expanduser(self):
+    def expanduser(self) -> 'Pilot':
         """
         Retruns a new pathname with expanding '~' to absolute path to user directory
 
@@ -46,7 +49,7 @@ class Pilot:
         """
         return Pilot(os.path.expanduser(self.__pathname))
 
-    def reduceuser(self):
+    def reduceuser(self) -> 'Pilot':
         """
         Returns a new pathname with reducing user directory with '~'
 
@@ -62,7 +65,7 @@ class Pilot:
         else:
             return self
 
-    def abspath(self):
+    def abspath(self) -> 'Pilot':
         """
         Returns a new pathname with absolute path
 
@@ -71,7 +74,7 @@ class Pilot:
         """
         return Pilot(os.path.abspath(self.__pathname))
 
-    def relpath(self, start='.'):
+    def relpath(self, start: Union[str, 'Pilot'] = '.') -> 'Pilot':
         """
         Returns a new pathname with relative path from start
 
@@ -85,7 +88,7 @@ class Pilot:
 
         return Pilot(os.path.relpath(self.__pathname, s))
 
-    def prepend(self, component):
+    def prepend(self, component: Union[str, 'Pilot']) -> 'Pilot':
         """
         Returns a new pathname with prepending path component
 
@@ -99,7 +102,7 @@ class Pilot:
 
         return Pilot(os.path.join(p, self.__pathname))
 
-    def append(self, component):
+    def append(self, component: Union[str, 'Pilot']) -> 'Pilot':
         """
         Returns a new pathname with appending path component
 
@@ -113,7 +116,7 @@ class Pilot:
 
         return Pilot(os.path.join(self.__pathname, p))
 
-    def parent(self):
+    def parent(self) -> 'Pilot':
         """
         Returns a new pathname of parent path
 
@@ -122,7 +125,7 @@ class Pilot:
         """
         return Pilot(os.path.dirname(self.__pathname))
 
-    def exists(self):
+    def exists(self) -> 'Pilot':
         """
         Returns if entry exists at path.
 
@@ -131,7 +134,7 @@ class Pilot:
         """
         return os.path.exists(self.__pathname)
 
-    def isfile(self):
+    def isfile(self) -> bool:
         """
         Returns if file exists at path.
 
@@ -140,7 +143,7 @@ class Pilot:
         """
         return os.path.isfile(self.__pathname)
 
-    def isdir(self):
+    def isdir(self) -> bool:
         """
         Returns if directory exists at path.
 
@@ -149,7 +152,7 @@ class Pilot:
         """
         return os.path.isdir(self.__pathname)
 
-    def islink(self):
+    def islink(self) -> bool:
         """
         Returns if link exists at path.
 
@@ -158,7 +161,7 @@ class Pilot:
         """
         return os.path.islink(self.__pathname)
 
-    def open(self, mode='r', buffering=-1):
+    def open(self, mode='r', buffering=-1) -> TextIOWrapper:
         """
         Open a the file at path.
 
@@ -167,7 +170,7 @@ class Pilot:
         """
         return open(self.__pathname, mode, buffering)
 
-    def read(self):
+    def read(self) -> str:
         """
         Read the content of file at path.
 
@@ -176,7 +179,7 @@ class Pilot:
         """
         return self.open('r').read()
 
-    def readlines(self):
+    def readlines(self) -> List[str]:
         """
         Read the lines of file at path.
 
@@ -185,16 +188,16 @@ class Pilot:
         """
         return self.read().splitlines()
 
-    def write(self, string):
+    def write(self, string) -> int:
         """
         Write the content to the file at path.
 
         :rtype: str
-        :return: The content of file
+        :return: The bytes written
         """
         return self.open('w').write(string)
 
-    def glob(self):
+    def glob(self) -> List[str]:
         """
         Return a list of paths matching a pathname pattern.
 
@@ -203,7 +206,7 @@ class Pilot:
         """
         return glob.glob(self.__pathname)
 
-    def children(self, target=None, recursive=False):
+    def children(self, target=None, recursive=False) -> List['Pilot']:
         """
         List entries in path
 

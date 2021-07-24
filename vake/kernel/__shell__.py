@@ -3,7 +3,6 @@ Package of shell commands
 """
 
 # 1st
-import os
 import subprocess
 
 # 2nd
@@ -21,13 +20,13 @@ class Shell:
         return
 
     @classmethod
-    def available(cls, command):
+    def available(cls, command) -> bool:
         code = subprocess.call(["which", command],
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
         return code == 0
 
-    def mkdir(self, path, recursive=False):
+    def mkdir(self, path, recursive=False) -> bool:
         words = ["mkdir"]
 
         if recursive:
@@ -37,7 +36,7 @@ class Shell:
 
         return self.execute(words)
 
-    def remove(self, path, recursive=False, force=False):
+    def remove(self, path, recursive=False, force=False) -> bool:
         words = ["rm"]
 
         if recursive:
@@ -50,7 +49,7 @@ class Shell:
 
         return self.execute(words)
 
-    def symlink(self, src, dst, force=False):
+    def symlink(self, src, dst, force=False) -> bool:
         words = ["ln", "-s"]
 
         if force:
@@ -61,7 +60,7 @@ class Shell:
 
         return self.execute(words)
 
-    def git_clone(self, src, dst):
+    def git_clone(self, src, dst) -> bool:
         if filetree.pilot(dst).isdir():
             if self.logger:
                 self.logger.info("Worktree already exists: %s" % dst)
@@ -69,7 +68,7 @@ class Shell:
 
         return self.execute(["git", "clone", "--recursive", src, dst])
 
-    def execute(self, command):
+    def execute(self, command) -> bool:
         if isinstance(command, list):
             words = command
         elif isinstance(command, str):
@@ -88,7 +87,7 @@ class Shell:
 
         return subprocess.call(words) == 0
 
-    def capture(self, command):
+    def capture(self, command) -> subprocess.CompletedProcess:
         if isinstance(command, list):
             words = command
         elif isinstance(command, str):

@@ -3,7 +3,6 @@ Extend package of standard os package
 """
 
 # 1st
-import os
 import subprocess
 
 # 2nd
@@ -16,27 +15,27 @@ AMAZON = "amazon"
 DARWIN = "darwin"
 
 
-def islinux():
+def islinux() -> bool:
     return sysname() in [UBUNTU, DEBIAN, CENTOS, AMAZON]
 
 
-def isbsd():
+def isbsd() -> bool:
     return sysname() in [DARWIN]
 
 
-def isdebian():
+def isdebian() -> bool:
     return sysname() in [UBUNTU, DEBIAN]
 
 
-def isredhat():
+def isredhat() -> bool:
     return sysname() in [CENTOS, AMAZON]
 
 
-def isdarwin():
+def isdarwin() -> bool:
     return sysname() in [DARWIN]
 
 
-def sysname():
+def sysname() -> str:
     """
     Detect system name
 
