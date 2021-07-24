@@ -17,8 +17,8 @@ def cli():
 
 
 class Action(Enum):
-    LINK = "link"
-    UNLINK = "unlink"
+    LAYOUT = "layout"
+    UNLAYOUT = "unlayout"
     INSTALL = "install"
     UNINSTALL = "uninstall"
     STATUS = "status"
@@ -142,12 +142,12 @@ class CLI:
         context = Context.parse(args)
 
         # actions
-        if context.action == Action.LINK:
-            self.__link(context)
+        if context.action == Action.LAYOUT:
+            self.__layout(context)
             sys.exit(0)
 
-        if context.action == Action.UNLINK:
-            self.__unlink(context)
+        if context.action == Action.UNLAYOUT:
+            self.__unlayout(context)
             sys.exit(0)
 
         if context.action == Action.INSTALL:
@@ -169,9 +169,9 @@ class CLI:
         sys.exit(1)
 
     @staticmethod
-    def __link(context: Context) -> None:
+    def __layout(context: Context) -> None:
         """
-        Perform link action.
+        Perform layout action.
 
         :param context: Context
         """
@@ -180,7 +180,7 @@ class CLI:
         logger = context.logger()
 
         commands = [
-            concern.LinkInstallAction(noop=noop, logger=logger),
+            concern.LayoutInstallAction(noop=noop, logger=logger),
         ]
 
         for command in commands:
@@ -189,9 +189,9 @@ class CLI:
         return
 
     @staticmethod
-    def __unlink(context: Context) -> None:
+    def __unlayout(context: Context) -> None:
         """
-        Perform unlink action.
+        Perform unlayout action.
 
         :param context: Context
         """
@@ -199,7 +199,7 @@ class CLI:
         logger = context.logger()
 
         commands = [
-            concern.LinkUninstallAction(noop=noop, logger=logger),
+            concern.LayoutUninstallAction(noop=noop, logger=logger),
         ]
 
         for command in commands:
@@ -263,7 +263,7 @@ class CLI:
         logger = context.logger()
 
         commands = [
-            concern.LinkStatusAction(noop=noop, logger=logger),
+            concern.LayoutStatusAction(noop=noop, logger=logger),
             concern.BrewStatusAction(noop=noop, logger=logger),
         ]
 

@@ -1,7 +1,7 @@
-from .__link__ import (
-    InstallAction as LinkInstallAction,
-    UninstallAction as LinkUninstallAction,
-    StatusAction as LinkStatusAction,
+from .__layout__ import (
+    InstallAction as LayoutInstallAction,
+    UninstallAction as LayoutUninstallAction,
+    StatusAction as LayoutStatusAction,
 )
 
 from .__brew__ import (

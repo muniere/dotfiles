@@ -21,29 +21,7 @@ class Recipe:
     deactivate: __base__.Action = None
 
 
-class VimActivateAction(__base__.Action):
-
-    def run(self):
-        dst = filetree.pilot("~/.vim/autoload/plug.vim").expanduser()
-
-        if dst.isfile():
-            self.logger.info(
-                "Vim-Plug is already downloaded: %s" % dst.reduceuser()
-            )
-            return None
-
-        self.shell.execute([
-            "curl",
-            "--fail",
-            "--location",
-            "--create-dirs",
-            "--output", str(dst),
-            "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
-        ])
-        return None
-
-
-class LinkAction(__base__.Action):
+class LayoutAction(__base__.Action):
     def dotfiles(self) -> List[Recipe]:
         dots = []
 
@@ -240,7 +218,7 @@ class LinkAction(__base__.Action):
         ]
 
 
-class InstallAction(LinkAction):
+class InstallAction(LayoutAction):
     def run(self):
         for dot in self.dotfiles():
             if dot.src.startswith('/'):
@@ -383,7 +361,7 @@ class InstallAction(LinkAction):
         return True
 
 
-class UninstallAction(LinkAction):
+class UninstallAction(LayoutAction):
     def run(self):
         for dot in self.dotfiles():
             self.__run(dot, sysname=kernel.sysname())
@@ -503,7 +481,7 @@ class UninstallAction(LinkAction):
         return True
 
 
-class StatusAction(LinkAction):
+class StatusAction(LayoutAction):
     def run(self):
         dotfiles = sorted(self.dotfiles(), key=lambda x: x.dst)
 
@@ -519,3 +497,25 @@ class StatusAction(LinkAction):
                 self.shell.execute("ls -lFo %s" % target)
 
         return True
+
+
+class VimActivateAction(__base__.Action):
+
+    def run(self):
+        dst = filetree.pilot("~/.vim/autoload/plug.vim").expanduser()
+
+        if dst.isfile():
+            self.logger.info(
+                "Vim-Plug is already downloaded: %s" % dst.reduceuser()
+            )
+            return None
+
+        self.shell.execute([
+            "curl",
+            "--fail",
+            "--location",
+            "--create-dirs",
+            "--output", str(dst),
+            "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
+        ])
+        return None
