@@ -26,7 +26,7 @@ class Action(Enum):
 
 
 class Completion:
-    SOURCE = "vake/template/_xake"
+    SOURCE = "template/_xake"
     DESTINATION = "default/zsh-completions/_xake"
 
 

@@ -10,7 +10,7 @@ from .. import filetree
 from .. import kernel
 from . import __base__
 
-TEMPLATE_DIR = "./vake/template"
+SHARD_DIR = "./shard"
 
 
 @dataclass
@@ -180,7 +180,7 @@ class LayoutAction(__base__.Action):
 
         return dots
 
-    def templates(self) -> List[Recipe]:
+    def shards(self) -> List[Recipe]:
         return [
             # sh
             Recipe(
@@ -230,8 +230,8 @@ class InstallAction(LayoutAction):
             if dot.activate:
                 dot.activate.run()
 
-        for template in self.templates():
-            self.__enable(template)
+        for shard in self.shards():
+            self.__enable(shard)
 
         for bin in self.binfiles():
             self.__run(bin, sysname=kernel.sysname())
@@ -307,12 +307,12 @@ class InstallAction(LayoutAction):
 
         return True
 
-    def __enable(self, template):
+    def __enable(self, shard):
 
         #
         # source
         #
-        src = filetree.pilot(template.src).prepend(TEMPLATE_DIR)
+        src = filetree.pilot(shard.src).prepend(SHARD_DIR)
 
         if not src.exists():
             return
@@ -322,12 +322,12 @@ class InstallAction(LayoutAction):
         #
         # destination
         #
-        dst = filetree.pilot(template.dst).expanduser()
+        dst = filetree.pilot(shard.dst).expanduser()
 
         # new file
         if not dst.exists():
             if self.logger:
-                self.logger.execute("Enable %s" % src.reduceuser())
+                self.logger.execute("Enable shard %s" % src.reduceuser())
 
             if not self.noop:
                 dst.write(src_str + "\n")
@@ -339,7 +339,9 @@ class InstallAction(LayoutAction):
         # skip: already enabled
         if src_str in dst_str:
             if self.logger:
-                self.logger.info("Already enabled: %s" % dst.reduceuser())
+                self.logger.info(
+                    "Shard already enabled: %s" % dst.reduceuser()
+                )
             return
 
         # enable
@@ -370,8 +372,8 @@ class UninstallAction(LayoutAction):
             if dot.deactivate:
                 dot.deactivate.run()
 
-        for template in self.templates():
-            self.__disable(template)
+        for shard in self.shards():
+            self.__disable(shard)
 
         for bin in self.binfiles():
             self.__run(bin, sysname=kernel.sysname())
@@ -432,12 +434,12 @@ class UninstallAction(LayoutAction):
 
         return True
 
-    def __disable(self, template):
+    def __disable(self, shard):
 
         #
         # source
         #
-        src = filetree.pilot(template.src).prepend(TEMPLATE_DIR)
+        src = filetree.pilot(shard.src).prepend(SHARD_DIR)
 
         if not src.exists():
             return
@@ -447,7 +449,7 @@ class UninstallAction(LayoutAction):
         #
         # destination
         #
-        dst = filetree.pilot(template.dst).expanduser()
+        dst = filetree.pilot(shard.dst).expanduser()
 
         # not found
         if not dst.exists():
@@ -459,12 +461,14 @@ class UninstallAction(LayoutAction):
         # skip: already disabled
         if not src_str in dst_str:
             if self.logger:
-                self.logger.info("Already disabled: %s" % dst.reduceuser())
+                self.logger.info(
+                    "Shard already disabled: %s" % dst.reduceuser()
+                )
             return
 
         # disable
         if self.logger:
-            self.logger.execute("Disable %s" % src.reduceuser())
+            self.logger.execute("Disable shard %s" % src.reduceuser())
 
         if not self.noop:
             dst.write(dst_str.replace(src_str, ""))
