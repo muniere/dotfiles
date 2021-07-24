@@ -180,8 +180,7 @@ class CLI:
         logger = context.logger()
 
         commands = [
-            concern.DotfileInstallAction(noop=noop, logger=logger),
-            concern.BinfileInstallAction(noop=noop, logger=logger),
+            concern.LinkInstallAction(noop=noop, logger=logger),
         ]
 
         for command in commands:
@@ -200,8 +199,7 @@ class CLI:
         logger = context.logger()
 
         commands = [
-            concern.DotfileUninstallAction(noop=noop, logger=logger),
-            concern.BinfileUninstallAction(noop=noop, logger=logger),
+            concern.LinkUninstallAction(noop=noop, logger=logger),
         ]
 
         for command in commands:
@@ -265,8 +263,7 @@ class CLI:
         logger = context.logger()
 
         commands = [
-            concern.DotfileStatusAction(noop=noop, logger=logger),
-            concern.BinfileStatusAction(noop=noop, logger=logger),
+            concern.LinkStatusAction(noop=noop, logger=logger),
             concern.BrewStatusAction(noop=noop, logger=logger),
         ]
 

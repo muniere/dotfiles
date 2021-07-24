@@ -2,6 +2,9 @@
 import os
 import re
 
+from dataclasses import dataclass
+from typing import List
+
 # 2nd
 from .. import filetree
 from .. import kernel
@@ -10,12 +13,23 @@ from . import __base__
 TEMPLATE_DIR = "./vake/template"
 
 
-class DotfileAction(__base__.Action):
-    def __vim_install(self):
+@dataclass
+class Recipe:
+    src: str
+    dst: str
+    activate: __base__.Action = None
+    deactivate: __base__.Action = None
+
+
+class VimActivateAction(__base__.Action):
+
+    def run(self):
         dst = filetree.pilot("~/.vim/autoload/plug.vim").expanduser()
 
         if dst.isfile():
-            self.logger.info("Vim-Plug is already downloaded: %s" % dst.reduceuser())
+            self.logger.info(
+                "Vim-Plug is already downloaded: %s" % dst.reduceuser()
+            )
             return None
 
         self.shell.execute([
@@ -28,78 +42,77 @@ class DotfileAction(__base__.Action):
         ])
         return None
 
-    def __vim_uninstall(self):
-        return None
 
-    def dotfiles(self):
+class LinkAction(__base__.Action):
+    def dotfiles(self) -> List[Recipe]:
         dots = []
 
         # shared
         dots.extend([
             # sh
-            Dotfile(
+            Recipe(
                 src="sh.d",
                 dst="~/.sh.d"
             ),
 
             # bash
-            Dotfile(
+            Recipe(
                 src="bash.d",
                 dst="~/.bash.d"
             ),
-            Dotfile(
+            Recipe(
                 src="bash_completion.d",
                 dst="~/.bash_completion.d"
             ),
 
             # zsh
-            Dotfile(
+            Recipe(
                 src="zsh.d",
                 dst="~/.zsh.d"
             ),
-            Dotfile(
+            Recipe(
                 src="zsh-completions",
                 dst="~/.zsh-completions"
             ),
-            Dotfile(
+            Recipe(
                 src="/usr/local/library/Contributions/brew_zsh_completion.zsh",
                 dst="~/.zsh-completions/_brew"
             ),
 
             # git
-            Dotfile(
+            Recipe(
                 src="gitconfig",
                 dst="~/.gitconfig"
             ),
-            Dotfile(
+            Recipe(
                 src="tigrc",
                 dst="~/.tigrc"
             ),
 
             # vim
-            Dotfile(
+            Recipe(
                 src="vimrc",
                 dst="~/.vimrc"
             ),
-            Dotfile(
+            Recipe(
                 src="vim",
                 dst="~/.vim",
-                install=self.__vim_install,
-                uninstall=self.__vim_uninstall
+                activate=VimActivateAction(noop=self.noop, logger=self.logger),
+                deactivate=None
             ),
 
             # ext
-            Dotfile(
+            Recipe(
                 src="asdfrc",
                 dst="~/.asdfrc"
             ),
-            Dotfile(
+            Recipe(
                 src="tmux.conf",
                 dst="~/.tmux.conf"
             ),
 
             # gradle
-            Dotfile(
+            Recipe(
                 src="gradle",
                 dst="~/.gradle"
             ),
@@ -112,99 +125,122 @@ class DotfileAction(__base__.Action):
         # darwin
         if kernel.isdarwin():
             dots.extend([
-                Dotfile(src="Xcode", dst=dst) for dst in
-                filetree.pilot("~/Library/Developer/Xcode").expanduser().glob()
+                Recipe(src="Xcode", dst=dst) for dst in
+                filetree.pilot(
+                    "~/Library/Developer/Xcode").expanduser().glob()
             ])
             dots.extend([
-                Dotfile(src="IntelliJIdea", dst=dst) for dst in
-                filetree.pilot("~/Library/Preferences/IntelliJIdea*").expanduser().glob()
+                Recipe(src="IntelliJIdea", dst=dst) for dst in
+                filetree.pilot(
+                    "~/Library/Preferences/IntelliJIdea*").expanduser().glob()
             ])
             dots.extend([
-                Dotfile(src="IntelliJIdea", dst=dst) for dst in
-                filetree.pilot("~/Library/ApplicationSupport/JetBrains/IntelliJIdea*").expanduser().glob()
+                Recipe(src="IntelliJIdea", dst=dst) for dst in
+                filetree.pilot(
+                    "~/Library/ApplicationSupport/JetBrains/IntelliJIdea*").expanduser().glob()
             ])
             dots.extend([
-                Dotfile(src="AndroidStudio", dst=dst) for dst in
-                filetree.pilot("~/Library/Preferences/AndroidStudio*").expanduser().glob()
+                Recipe(src="AndroidStudio", dst=dst) for dst in
+                filetree.pilot(
+                    "~/Library/Preferences/AndroidStudio*").expanduser().glob()
             ])
             dots.extend([
-                Dotfile(src="AndroidStudio", dst=dst) for dst in
-                filetree.pilot("~/Library/ApplicationSupport/Google/AndroidStudio*").expanduser().glob()
+                Recipe(src="AndroidStudio", dst=dst) for dst in
+                filetree.pilot(
+                    "~/Library/ApplicationSupport/Google/AndroidStudio*").expanduser().glob()
             ])
             dots.extend([
-                Dotfile(src="AppCode", dst=dst) for dst in
-                filetree.pilot("~/Library/Preferences/AppCode*").expanduser().glob()
+                Recipe(src="AppCode", dst=dst) for dst in
+                filetree.pilot(
+                    "~/Library/Preferences/AppCode*").expanduser().glob()
             ])
             dots.extend([
-                Dotfile(src="AppCode", dst=dst) for dst in
-                filetree.pilot("~/Library/ApplicationSupport/JetBrains/AppCode*").expanduser().glob()
+                Recipe(src="AppCode", dst=dst) for dst in
+                filetree.pilot(
+                    "~/Library/ApplicationSupport/JetBrains/AppCode*").expanduser().glob()
             ])
             dots.extend([
-                Dotfile(src="RubyMine", dst=dst) for dst in
-                filetree.pilot("~/Library/Preferences/RubyMine*").expanduser().glob()
+                Recipe(src="RubyMine", dst=dst) for dst in
+                filetree.pilot(
+                    "~/Library/Preferences/RubyMine*").expanduser().glob()
             ])
             dots.extend([
-                Dotfile(src="RubyMine", dst=dst) for dst in
-                filetree.pilot("~/Library/ApplicationSupport/JetBrains/RubyMine*").expanduser().glob()
+                Recipe(src="RubyMine", dst=dst) for dst in
+                filetree.pilot(
+                    "~/Library/ApplicationSupport/JetBrains/RubyMine*").expanduser().glob()
             ])
             dots.extend([
-                Dotfile(src="GoLand", dst=dst) for dst in
-                filetree.pilot("~/Library/Preferences/GoLand*").expanduser().glob()
+                Recipe(src="GoLand", dst=dst) for dst in
+                filetree.pilot(
+                    "~/Library/Preferences/GoLand*").expanduser().glob()
             ])
             dots.extend([
-                Dotfile(src="GoLand", dst=dst) for dst in
-                filetree.pilot("~/Library/ApplicationSupport/JetBrains/GoLand*").expanduser().glob()
+                Recipe(src="GoLand", dst=dst) for dst in
+                filetree.pilot(
+                    "~/Library/ApplicationSupport/JetBrains/GoLand*").expanduser().glob()
             ])
             dots.extend([
-                Dotfile(src="CLion", dst=dst) for dst in
-                filetree.pilot("~/Library/Preferences/CLion*").expanduser().glob()
+                Recipe(src="CLion", dst=dst) for dst in
+                filetree.pilot(
+                    "~/Library/Preferences/CLion*").expanduser().glob()
             ])
             dots.extend([
-                Dotfile(src="CLion", dst=dst) for dst in
-                filetree.pilot("~/Library/ApplicationSupport/JetBrains/CLion*").expanduser().glob()
+                Recipe(src="CLion", dst=dst) for dst in
+                filetree.pilot(
+                    "~/Library/ApplicationSupport/JetBrains/CLion*").expanduser().glob()
             ])
             dots.extend([
-                Dotfile(src="Rider", dst=dst) for dst in
-                filetree.pilot("~/Library/Preferences/Rider*").expanduser().glob()
+                Recipe(src="Rider", dst=dst) for dst in
+                filetree.pilot(
+                    "~/Library/Preferences/Rider*").expanduser().glob()
             ])
             dots.extend([
-                Dotfile(src="Rider", dst=dst) for dst in
-                filetree.pilot("~/Library/ApplicationSupport/JetBrains/Rider*").expanduser().glob()
+                Recipe(src="Rider", dst=dst) for dst in
+                filetree.pilot(
+                    "~/Library/ApplicationSupport/JetBrains/Rider*").expanduser().glob()
             ])
 
         return dots
 
-    def templates(self):
+    def templates(self) -> List[Recipe]:
         return [
             # sh
-            Template(
+            Recipe(
                 src="shrc",
                 dst="~/.shrc"
             ),
 
             # bash
-            Template(
+            Recipe(
                 src="bashrc",
                 dst="~/.bashrc"
             ),
-            Template(
+            Recipe(
                 src="bash_profile",
                 dst="~/.bash_profile"
             ),
 
             # zsh
-            Template(
+            Recipe(
                 src="zshrc",
                 dst="~/.zshrc"
             ),
-            Template(
+            Recipe(
                 src="zshprofile",
                 dst="~/.zshprofile"
             ),
         ]
 
+    def binfiles(self) -> List[Recipe]:
+        return [
+            Recipe(
+                src="bin",
+                dst="~/.bin"
+            )
+        ]
 
-class InstallAction(DotfileAction):
+
+class InstallAction(LinkAction):
     def run(self):
         for dot in self.dotfiles():
             if dot.src.startswith('/'):
@@ -213,30 +249,34 @@ class InstallAction(DotfileAction):
                 self.__run(dot, sysname=kernel.sysname())
                 self.__run(dot, sysname="default")
 
-            if dot.install:
-                dot.install()
+            if dot.activate:
+                dot.activate.run()
 
         for template in self.templates():
             self.__enable(template)
 
+        for bin in self.binfiles():
+            self.__run(bin, sysname=kernel.sysname())
+            self.__run(bin, sysname="default")
+
         return
 
-    def __run(self, dotfile, sysname="default"):
-        if not self.__istarget(dotfile):
+    def __run(self, recipe, sysname="default"):
+        if not self.__istarget(recipe):
             if self.logger:
-                relpath = filetree.pilot(dotfile.src).relpath(os.getcwd())
+                relpath = filetree.pilot(recipe.src).relpath(os.getcwd())
                 self.logger.info("File is not target: %s" % relpath)
             return
 
-        if dotfile.src.startswith('/'):
-            src = filetree.pilot(dotfile.src)
+        if recipe.src.startswith('/'):
+            src = filetree.pilot(recipe.src)
         else:
-            src = filetree.pilot(dotfile.src).prepend(sysname).abspath()
+            src = filetree.pilot(recipe.src).prepend(sysname).abspath()
 
-        if dotfile.dst.startswith('/'):
-            dst = filetree.pilot(dotfile.dst)
+        if recipe.dst.startswith('/'):
+            dst = filetree.pilot(recipe.dst)
         else:
-            dst = filetree.pilot(dotfile.dst).expanduser()
+            dst = filetree.pilot(recipe.dst).expanduser()
 
         #
         # guard
@@ -249,7 +289,9 @@ class InstallAction(DotfileAction):
         # dst link already exists
         if dst.islink():
             if self.logger:
-                self.logger.info("Symlink already exists: %s" % dst.reduceuser())
+                self.logger.info(
+                    "Symlink already exists: %s" % dst.reduceuser()
+                )
             return False
 
         #
@@ -259,7 +301,9 @@ class InstallAction(DotfileAction):
             # another file already exists
             if dst.isfile():
                 if self.logger:
-                    self.logger.info("File already exists: %s" % dst.reduceuser())
+                    self.logger.info(
+                        "File already exists: %s" % dst.reduceuser()
+                    )
                 return False
 
             # ensure parent directory
@@ -275,9 +319,13 @@ class InstallAction(DotfileAction):
         #
         if src.isdir():
             for new_src in src.children(target='f', recursive=True):
-                new_dst = filetree.pilot(dotfile.dst).append(new_src.relpath(src))
-                new_dot = Dotfile(src=new_src.pathname(), dst=new_dst.pathname())
-                self.__run(new_dot, sysname=sysname)
+                new_dst = filetree.pilot(recipe.dst)\
+                    .append(new_src.relpath(src))
+                new_recipe = Recipe(
+                    src=new_src.pathname(),
+                    dst=new_dst.pathname()
+                )
+                self.__run(new_recipe, sysname=sysname)
 
         return True
 
@@ -335,29 +383,33 @@ class InstallAction(DotfileAction):
         return True
 
 
-class UninstallAction(DotfileAction):
+class UninstallAction(LinkAction):
     def run(self):
         for dot in self.dotfiles():
             self.__run(dot, sysname=kernel.sysname())
             self.__run(dot, sysname="default")
 
-            if dot.uninstall:
-                dot.uninstall()
+            if dot.deactivate:
+                dot.deactivate.run()
 
         for template in self.templates():
             self.__disable(template)
 
+        for bin in self.binfiles():
+            self.__run(bin, sysname=kernel.sysname())
+            self.__run(bin, sysname="default")
+
         return
 
-    def __run(self, dotfile, sysname="default"):
-        if not self.__istarget(dotfile):
+    def __run(self, recipe, sysname="default"):
+        if not self.__istarget(recipe):
             if self.logger:
-                relpath = filetree.pilot(dotfile.src).relpath(os.getcwd())
+                relpath = filetree.pilot(recipe.src).relpath(os.getcwd())
                 self.logger.info("File is not target: %s" % relpath)
             return
 
-        src = filetree.pilot(dotfile.src).prepend(sysname).abspath()
-        dst = filetree.pilot(dotfile.dst).expanduser()
+        src = filetree.pilot(recipe.src).prepend(sysname).abspath()
+        dst = filetree.pilot(recipe.dst).expanduser()
 
         #
         # guard
@@ -392,9 +444,13 @@ class UninstallAction(DotfileAction):
         #
         if src.isdir():
             for new_src in src.children(target='f', recursive=True):
-                new_dst = filetree.pilot(dotfile.dst).append(new_src.relpath(src))
-                new_dot = Dotfile(src=new_src.pathname(), dst=new_dst.pathname())
-                self.__run(new_dot, sysname=sysname)
+                new_dst = filetree.pilot(recipe.dst)\
+                    .append(new_src.relpath(src))
+                new_recipe = Recipe(
+                    src=new_src.pathname(),
+                    dst=new_dst.pathname()
+                )
+                self.__run(new_recipe, sysname=sysname)
 
         return True
 
@@ -447,7 +503,7 @@ class UninstallAction(DotfileAction):
         return True
 
 
-class StatusAction(DotfileAction):
+class StatusAction(LinkAction):
     def run(self):
         dotfiles = sorted(self.dotfiles(), key=lambda x: x.dst)
 
@@ -463,18 +519,3 @@ class StatusAction(DotfileAction):
                 self.shell.execute("ls -lFo %s" % target)
 
         return True
-
-
-class Dotfile:
-    def __init__(self, src, dst, install=None, uninstall=None):
-        self.src = src
-        self.dst = dst
-        self.install = install
-        self.uninstall = uninstall
-        return
-
-
-class Template:
-    def __init__(self, src, dst):
-        self.src = src
-        self.dst = dst
