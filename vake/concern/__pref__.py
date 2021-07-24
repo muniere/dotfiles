@@ -1,6 +1,7 @@
 # 1st
 import os
 import re
+import glob
 
 from dataclasses import dataclass
 from typing import List
@@ -21,13 +22,20 @@ class Recipe:
     activate: __base__.Action = None
     deactivate: __base__.Action = None
 
+    @staticmethod
+    def glob(src: str, dst: str) -> List['Recipe']:
+        return [
+            Recipe(src=src, dst=dst) for dst in
+            glob.glob(os.path.expanduser(dst))
+        ]
+
 
 class PrefAction(__base__.Action):
     def linkers(self) -> List[Recipe]:
         dots = []
 
         # shared
-        dots.extend([
+        dots += [
             # bin
             Recipe(
                 src="bin",
@@ -101,7 +109,7 @@ class PrefAction(__base__.Action):
                 src="gradle",
                 dst="~/.gradle"
             ),
-        ])
+        ]
 
         # linux
         if kernel.islinux():
@@ -109,81 +117,66 @@ class PrefAction(__base__.Action):
 
         # darwin
         if kernel.isdarwin():
-            dots.extend([
-                Recipe(src="Xcode", dst=dst) for dst in
-                filetree.pilot(
-                    "~/Library/Developer/Xcode").expanduser().glob()
-            ])
-            dots.extend([
-                Recipe(src="IntelliJIdea", dst=dst) for dst in
-                filetree.pilot(
-                    "~/Library/Preferences/IntelliJIdea*").expanduser().glob()
-            ])
-            dots.extend([
-                Recipe(src="IntelliJIdea", dst=dst) for dst in
-                filetree.pilot(
-                    "~/Library/ApplicationSupport/JetBrains/IntelliJIdea*").expanduser().glob()
-            ])
-            dots.extend([
-                Recipe(src="AndroidStudio", dst=dst) for dst in
-                filetree.pilot(
-                    "~/Library/Preferences/AndroidStudio*").expanduser().glob()
-            ])
-            dots.extend([
-                Recipe(src="AndroidStudio", dst=dst) for dst in
-                filetree.pilot(
-                    "~/Library/ApplicationSupport/Google/AndroidStudio*").expanduser().glob()
-            ])
-            dots.extend([
-                Recipe(src="AppCode", dst=dst) for dst in
-                filetree.pilot(
-                    "~/Library/Preferences/AppCode*").expanduser().glob()
-            ])
-            dots.extend([
-                Recipe(src="AppCode", dst=dst) for dst in
-                filetree.pilot(
-                    "~/Library/ApplicationSupport/JetBrains/AppCode*").expanduser().glob()
-            ])
-            dots.extend([
-                Recipe(src="RubyMine", dst=dst) for dst in
-                filetree.pilot(
-                    "~/Library/Preferences/RubyMine*").expanduser().glob()
-            ])
-            dots.extend([
-                Recipe(src="RubyMine", dst=dst) for dst in
-                filetree.pilot(
-                    "~/Library/ApplicationSupport/JetBrains/RubyMine*").expanduser().glob()
-            ])
-            dots.extend([
-                Recipe(src="GoLand", dst=dst) for dst in
-                filetree.pilot(
-                    "~/Library/Preferences/GoLand*").expanduser().glob()
-            ])
-            dots.extend([
-                Recipe(src="GoLand", dst=dst) for dst in
-                filetree.pilot(
-                    "~/Library/ApplicationSupport/JetBrains/GoLand*").expanduser().glob()
-            ])
-            dots.extend([
-                Recipe(src="CLion", dst=dst) for dst in
-                filetree.pilot(
-                    "~/Library/Preferences/CLion*").expanduser().glob()
-            ])
-            dots.extend([
-                Recipe(src="CLion", dst=dst) for dst in
-                filetree.pilot(
-                    "~/Library/ApplicationSupport/JetBrains/CLion*").expanduser().glob()
-            ])
-            dots.extend([
-                Recipe(src="Rider", dst=dst) for dst in
-                filetree.pilot(
-                    "~/Library/Preferences/Rider*").expanduser().glob()
-            ])
-            dots.extend([
-                Recipe(src="Rider", dst=dst) for dst in
-                filetree.pilot(
-                    "~/Library/ApplicationSupport/JetBrains/Rider*").expanduser().glob()
-            ])
+            dots += Recipe.glob(
+                src="Xcode",
+                dst="~/Library/Developer/Xcode"
+            )
+            dots += Recipe.glob(
+                src="IntelliJIdea",
+                dst="~/Library/Preferences/IntelliJIdea*"
+            )
+            dots += Recipe.glob(
+                src="IntelliJIdea",
+                dst="~/Library/ApplicationSupport/JetBrains/IntelliJIdea*"
+            )
+            dots += Recipe.glob(
+                src="AndroidStudio",
+                dst="~/Library/Preferences/AndroidStudio*"
+            )
+            dots += Recipe.glob(
+                src="AndroidStudio",
+                dst="~/Library/ApplicationSupport/Google/AndroidStudio*"
+            )
+            dots += Recipe.glob(
+                src="AppCode",
+                dst="~/Library/Preferences/AppCode*"
+            )
+            dots += Recipe.glob(
+                src="AppCode",
+                dst="~/Library/ApplicationSupport/JetBrains/AppCode*"
+            )
+            dots += Recipe.glob(
+                src="RubyMine",
+                dst="~/Library/Preferences/RubyMine*"
+            )
+            dots += Recipe.glob(
+                src="RubyMine",
+                dst="~/Library/ApplicationSupport/JetBrains/RubyMine*"
+            )
+            dots += Recipe.glob(
+                src="GoLand",
+                dst="~/Library/Preferences/GoLand*"
+            )
+            dots += Recipe.glob(
+                src="GoLand",
+                dst="~/Library/ApplicationSupport/JetBrains/GoLand*"
+            )
+            dots += Recipe.glob(
+                src="CLion",
+                dst="~/Library/Preferences/CLion*"
+            )
+            dots += Recipe.glob(
+                src="CLion",
+                dst="~/Library/ApplicationSupport/JetBrains/CLion*"
+            )
+            dots += Recipe.glob(
+                src="Rider",
+                dst="~/Library/Preferences/Rider*"
+            )
+            dots += Recipe.glob(
+                src="Rider",
+                dst="~/Library/ApplicationSupport/JetBrains/Rider*"
+            )
 
         return dots
 
