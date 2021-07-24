@@ -10,6 +10,7 @@ from .. import filetree
 from .. import kernel
 from . import __base__
 
+STATIC_DIR = "./static"
 SHARD_DIR = "./shard"
 
 
@@ -242,14 +243,19 @@ class InstallAction(LayoutAction):
     def __run(self, recipe, sysname="default"):
         if not self.__istarget(recipe):
             if self.logger:
-                relpath = filetree.pilot(recipe.src).relpath(os.getcwd())
+                relpath = filetree.pilot(recipe.src)\
+                    .prepend(sysname)\
+                    .prepend(STATIC_DIR)\
+                    .relpath(os.getcwd())
                 self.logger.info("File is not target: %s" % relpath)
             return
 
         if recipe.src.startswith('/'):
             src = filetree.pilot(recipe.src)
         else:
-            src = filetree.pilot(recipe.src).prepend(sysname).abspath()
+            src = filetree.pilot(recipe.src)\
+                .prepend(sysname)\
+                .prepend(STATIC_DIR).abspath()
 
         if recipe.dst.startswith('/'):
             dst = filetree.pilot(recipe.dst)
@@ -384,12 +390,25 @@ class UninstallAction(LayoutAction):
     def __run(self, recipe, sysname="default"):
         if not self.__istarget(recipe):
             if self.logger:
-                relpath = filetree.pilot(recipe.src).relpath(os.getcwd())
+                relpath = filetree.pilot(recipe.src)\
+                    .prepend(sysname)\
+                    .prepend(STATIC_DIR)\
+                    .relpath(os.getcwd())
                 self.logger.info("File is not target: %s" % relpath)
             return
 
-        src = filetree.pilot(recipe.src).prepend(sysname).abspath()
-        dst = filetree.pilot(recipe.dst).expanduser()
+        if recipe.src.startswith('/'):
+            src = filetree.pilot(recipe.src)
+        else:
+            src = filetree.pilot(recipe.src)\
+                .prepend(sysname)\
+                .prepend(STATIC_DIR).abspath()
+
+        if recipe.dst.startswith('/'):
+            dst = filetree.pilot(recipe.dst)
+        else:
+            dst = filetree.pilot(recipe.dst).expanduser()
+
 
         #
         # guard
