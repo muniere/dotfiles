@@ -2,7 +2,7 @@ import logging
 
 from . import __level__ as level
 
-def __execute(self, cmd, *args, **kwargs):
+def __execute(self: logging.Logger, cmd, *args, **kwargs):
     """
     Log 'msg % args' with severity 'EXEC'.
 
@@ -11,6 +11,7 @@ def __execute(self, cmd, *args, **kwargs):
 
     logger.execute("Houston, we have a %s", "interesting problem", exc_info=1)
     """
+    # pylint: disable=protected-access
     if self.isEnabledFor(level.EXEC):
         self._log(level.EXEC, cmd, args, **kwargs)
     return

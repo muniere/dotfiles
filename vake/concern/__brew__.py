@@ -1,6 +1,7 @@
 # 1st
 import os
 
+from abc import ABCMeta
 from dataclasses import dataclass
 from typing import List
 
@@ -18,7 +19,7 @@ class Keg:
     name: str
 
 
-class BrewAction(__base__.Action):
+class BrewAction(__base__.Action, metaclass=ABCMeta):
     def load_kegs(self) -> List[Keg]:
         src = filetree.pilot(os.getcwd())\
             .append(kernel.sysname())\

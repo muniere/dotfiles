@@ -2,8 +2,7 @@ import os
 import re
 import glob
 
-from io import TextIOWrapper
-from typing import List, Union
+from typing import Callable, List, Union
 
 
 def pilot(path) -> 'Pilot':
@@ -82,11 +81,11 @@ class Pilot:
         :return: New Pilot
         """
         if isinstance(start, Pilot):
-            s = start.pathname()
+            base = start.pathname()
         else:
-            s = start
+            base = start
 
-        return Pilot(os.path.relpath(self.__pathname, s))
+        return Pilot(os.path.relpath(self.__pathname, base))
 
     def prepend(self, component: Union[str, 'Pilot']) -> 'Pilot':
         """
@@ -96,11 +95,11 @@ class Pilot:
         :return: New Pilot
         """
         if isinstance(component, Pilot):
-            p = component.pathname()
+            base = component.pathname()
         else:
-            p = component
+            base = component
 
-        return Pilot(os.path.join(p, self.__pathname))
+        return Pilot(os.path.join(base, self.__pathname))
 
     def append(self, component: Union[str, 'Pilot']) -> 'Pilot':
         """
@@ -110,11 +109,11 @@ class Pilot:
         :return: New Pilot
         """
         if isinstance(component, Pilot):
-            p = component.pathname()
+            base = component.pathname()
         else:
-            p = component
+            base = component
 
-        return Pilot(os.path.join(self.__pathname, p))
+        return Pilot(os.path.join(self.__pathname, base))
 
     def parent(self) -> 'Pilot':
         """
@@ -161,15 +160,6 @@ class Pilot:
         """
         return os.path.islink(self.__pathname)
 
-    def open(self, mode='r', buffering=-1) -> TextIOWrapper:
-        """
-        Open a the file at path.
-
-        :rtype: file object
-        :return: Opened file object
-        """
-        return open(self.__pathname, mode, buffering)
-
     def read(self) -> str:
         """
         Read the content of file at path.
@@ -177,7 +167,8 @@ class Pilot:
         :rtype: str
         :return: The content of file
         """
-        return self.open('r').read()
+        with open(self.__pathname, 'r') as file:
+            return file.read()
 
     def readlines(self) -> List[str]:
         """
@@ -188,14 +179,15 @@ class Pilot:
         """
         return self.read().splitlines()
 
-    def write(self, string) -> int:
+    def write(self, string: str) -> int:
         """
         Write the content to the file at path.
 
         :rtype: str
         :return: The bytes written
         """
-        return self.open('w').write(string)
+        with open(self.__pathname, 'w') as file:
+            return file.write(string)
 
     def glob(self) -> List[str]:
         """
@@ -206,33 +198,24 @@ class Pilot:
         """
         return glob.glob(self.__pathname)
 
-    def children(self, target=None, recursive=False) -> List['Pilot']:
+    def children(self, target: str = None, recursive: bool = False) -> List['Pilot']:
         """
         List entries in path
 
         :param pathname: Path
+        :param target: Target type string
         :param recursive: Recursive or not
         :return: Entries in path
         """
+        if target in ['f', 'file']:
+            return self.__children(lambda p: p.isfile(), recursive=recursive)
 
-        def isentry(pilot):
-            return pilot.exists()
+        if target in ['d', 'directory']:
+            return self.__children(lambda p: p.isdir(), recursive=recursive)
 
-        def isfile(pilot):
-            return pilot.isfile()
+        return self.__children(lambda p: p.exists(), recursive=recursive)
 
-        def isdir(pilot):
-            return pilot.isdir()
-
-        if target == 'f' or target == 'file':
-            return self.__children(isfile, recursive=recursive)
-
-        if target == 'd' or target == 'directory':
-            return self.__children(isdir, recursive=recursive)
-
-        return self.__children(isentry, recursive=recursive)
-
-    def __children(self, cond, recursive=False):
+    def __children(self, cond: Callable[['Pilot'], bool], recursive: bool = False):
         if not os.path.isdir(self.__pathname):
             return [self]
 

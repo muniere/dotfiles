@@ -3,7 +3,6 @@ from .__kind__ import (
     isbsd,
     isdarwin,
     isredhat,
-    isdarwin,
     sysname,
 )
 

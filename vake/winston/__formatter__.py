@@ -22,9 +22,6 @@ class LabelFormatter(logging.Formatter):
             level.ERROR: "\033[33m",  # red
         }
 
-        if levelno in color_dict:
-            color_str = color_dict[levelno]
-        else:
-            color_str = reset_str
+        color_str = color_dict.get(levelno, reset_str)
 
         return "%s%s%s" % (color_str, message, reset_str)

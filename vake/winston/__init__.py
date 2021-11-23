@@ -15,7 +15,7 @@ from .__formatter__ import (
     LabelFormatter
 )
 
-def bootstrap():
-    from . import __bootstrap__
+from . import __bootstrap__
 
+def bootstrap():
     __bootstrap__.run()

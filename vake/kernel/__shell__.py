@@ -77,7 +77,7 @@ class Shell:
             words = []
 
         if not words:
-            return
+            return False
 
         if self.logger:
             self.logger.execute("%s" % " ".join(words))
@@ -96,9 +96,14 @@ class Shell:
             words = []
 
         if not words:
-            return
+            return None
 
         if self.noop:
             return None
 
-        return subprocess.run(words, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        return subprocess.run(
+            words,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=True
+        )

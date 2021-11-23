@@ -3,6 +3,7 @@ import os
 import re
 import glob
 
+from abc import ABCMeta
 from dataclasses import dataclass
 from typing import List
 
@@ -30,8 +31,8 @@ class Recipe:
         ]
 
 
-class PrefAction(__base__.Action):
-    def linkers(self) -> List[Recipe]:
+class PrefAction(__base__.Action, metaclass=ABCMeta):
+    def recipes(self) -> List[Recipe]:
         dots = []
 
         # shared
@@ -212,22 +213,22 @@ class PrefAction(__base__.Action):
 
 class InstallAction(PrefAction):
     def run(self):
-        for linker in self.linkers():
-            if linker.src.startswith('/'):
-                self.__run(linker)
+        for recipe in self.recipes():
+            if recipe.src.startswith('/'):
+                self.__run(recipe)
             else:
-                self.__run(linker, sysname=kernel.sysname())
-                self.__run(linker, sysname="default")
+                self.__run(recipe, sysname=kernel.sysname())
+                self.__run(recipe, sysname="default")
 
-            if linker.activate:
-                linker.activate.run()
+            if recipe.activate:
+                recipe.activate.run()
 
         for snippet in self.snippets():
             self.__enable(snippet)
 
         return
 
-    def __run(self, recipe: Recipe, sysname="default"):
+    def __run(self, recipe: Recipe, sysname="default") -> bool:
         if not self.__istarget(recipe):
             if self.logger:
                 relpath = filetree.pilot(recipe.src)\
@@ -235,7 +236,7 @@ class InstallAction(PrefAction):
                     .prepend(STATIC_DIR)\
                     .relpath(os.getcwd())
                 self.logger.info("File is not target: %s" % relpath)
-            return
+            return False
 
         if recipe.src.startswith('/'):
             src = filetree.pilot(recipe.src)
@@ -358,7 +359,7 @@ class InstallAction(PrefAction):
 
 class UninstallAction(PrefAction):
     def run(self):
-        for linker in self.linkers():
+        for linker in self.recipes():
             self.__run(linker, sysname=kernel.sysname())
             self.__run(linker, sysname="default")
 
@@ -370,7 +371,7 @@ class UninstallAction(PrefAction):
 
         return
 
-    def __run(self, recipe: Recipe, sysname: str = "default"):
+    def __run(self, recipe: Recipe, sysname: str = "default") -> bool:
         if not self.__istarget(recipe):
             if self.logger:
                 relpath = filetree.pilot(recipe.src)\
@@ -378,7 +379,7 @@ class UninstallAction(PrefAction):
                     .prepend(STATIC_DIR)\
                     .relpath(os.getcwd())
                 self.logger.info("File is not target: %s" % relpath)
-            return
+            return False
 
         if recipe.src.startswith('/'):
             src = filetree.pilot(recipe.src)
@@ -488,7 +489,7 @@ class UninstallAction(PrefAction):
 
 class StatusAction(PrefAction):
     def run(self):
-        linkers = sorted(self.linkers(), key=lambda x: x.dst)
+        linkers = sorted(self.recipes(), key=lambda x: x.dst)
 
         for dot in linkers:
             target = filetree.pilot(dot.dst).expanduser()

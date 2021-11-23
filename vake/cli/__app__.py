@@ -43,7 +43,7 @@ class Context:
         :param args: Arguments
         :return: Context
         """
-        parser = cls.__make_argparser()
+        parser = Context.__make_argparser()
         namespace = parser.parse_args(args)
 
         context = Context()
@@ -60,7 +60,9 @@ class Context:
 
         :return: List of available options
         """
-        parser = cls.__make_argparser()
+        parser = Context.__make_argparser()
+
+        # pylint: disable=protected-access
         return parser._optionals._group_actions
 
     @classmethod
@@ -163,7 +165,7 @@ class CLI:
             sys.exit(0)
 
         if context.action == Action.COMPLETION:
-            self.__completion(context)
+            self.__completion()
             sys.exit(0)
 
         sys.exit(1)
@@ -273,13 +275,14 @@ class CLI:
         return
 
     @staticmethod
-    def __completion(context: Context) -> None:
+    def __completion() -> None:
         """
         Perform completion action.
 
         :param context: Context
         """
 
+        # pylint: disable=import-outside-toplevel
         from mako.template import Template
 
         template = Template(
