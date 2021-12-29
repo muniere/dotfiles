@@ -3,7 +3,7 @@ import sys
 from enum import Enum
 from typing import List
 
-from . import concern
+from . import intent
 from . import kernel
 from . import winston
 
@@ -182,7 +182,7 @@ class CLI:
         logger = context.logger()
 
         commands = [
-            concern.PrefInstallAction(noop=noop, logger=logger),
+            intent.PrefInstallAction(noop=noop, logger=logger),
         ]
 
         for command in commands:
@@ -201,7 +201,7 @@ class CLI:
         logger = context.logger()
 
         commands = [
-            concern.PrefUninstallAction(noop=noop, logger=logger),
+            intent.PrefUninstallAction(noop=noop, logger=logger),
         ]
 
         for command in commands:
@@ -227,7 +227,7 @@ class CLI:
 
         if kernel.isdarwin():
             commands.extend([
-                concern.BrewInstallAction(noop=noop, logger=logger),
+                intent.BrewInstallAction(noop=noop, logger=logger),
             ])
 
         for command in commands:
@@ -246,7 +246,7 @@ class CLI:
         logger = context.logger()
 
         commands = [
-            concern.BrewUninstallAction(noop=noop, logger=logger),
+            intent.BrewUninstallAction(noop=noop, logger=logger),
         ]
 
         for command in commands:
@@ -265,8 +265,8 @@ class CLI:
         logger = context.logger()
 
         commands = [
-            concern.PrefStatusAction(noop=noop, logger=logger),
-            concern.BrewStatusAction(noop=noop, logger=logger),
+            intent.PrefStatusAction(noop=noop, logger=logger),
+            intent.BrewStatusAction(noop=noop, logger=logger),
         ]
 
         for command in commands:
