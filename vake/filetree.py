@@ -1,16 +1,19 @@
+# TODO: use pathlib instead.
 import os
 import re
 import glob
 
 from typing import Callable, List, Union
 
+__all__ = ['pilot', 'Pilot']
 
-def pilot(path) -> 'Pilot':
+
+def pilot(path: Union[str, 'Pilot']) -> 'Pilot':
     """
     Create a new Pilot for pathname.
     Returns pathname as it is when it is Pilot.
 
-    :type pathname: str or Pilot
+    :type path: str or Pilot
     :rtype: Pilot
     """
     if isinstance(path, Pilot):
@@ -124,7 +127,7 @@ class Pilot:
         """
         return Pilot(os.path.dirname(self.__pathname))
 
-    def exists(self) -> 'Pilot':
+    def exists(self) -> bool:
         """
         Returns if entry exists at path.
 
@@ -202,7 +205,6 @@ class Pilot:
         """
         List entries in path
 
-        :param pathname: Path
         :param target: Target type string
         :param recursive: Recursive or not
         :return: Entries in path
