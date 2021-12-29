@@ -1,4 +1,5 @@
 import glob
+import itertools
 import os
 import re
 from abc import ABCMeta, abstractmethod
@@ -13,6 +14,7 @@ __all__ = [
     'PrefInstallAction', 'PrefUninstallAction', 'PrefStatusAction',
     'BrewInstallAction', 'BrewUninstallAction', 'BrewStatusAction',
 ]
+
 
 # ==
 # Base
@@ -55,25 +57,31 @@ class Recipe:
         ]
 
 
-class PrefAction(Action, metaclass=ABCMeta):
-    def recipes(self) -> List[Recipe]:
-        dots = []
+@dataclass
+class Cookbook:
+    recipes: List[Recipe]
 
-        # shared
-        dots += [
-            # bin
+    @staticmethod
+    def bin() -> 'Cookbook':
+        return Cookbook([
             Recipe(
                 src="bin",
                 dst="~/.bin"
             ),
+        ])
 
-            # sh
+    @staticmethod
+    def sh() -> 'Cookbook':
+        return Cookbook([
             Recipe(
                 src="sh.d",
                 dst="~/.sh.d"
             ),
+        ])
 
-            # bash
+    @staticmethod
+    def bash() -> 'Cookbook':
+        return Cookbook([
             Recipe(
                 src="bash.d",
                 dst="~/.bash.d"
@@ -82,8 +90,11 @@ class PrefAction(Action, metaclass=ABCMeta):
                 src="bash_completion.d",
                 dst="~/.bash_completion.d"
             ),
+        ])
 
-            # zsh
+    @staticmethod
+    def zsh() -> 'Cookbook':
+        return Cookbook([
             Recipe(
                 src="zsh.d",
                 dst="~/.zsh.d"
@@ -96,8 +107,11 @@ class PrefAction(Action, metaclass=ABCMeta):
                 src="/usr/local/library/Contributions/brew_zsh_completion.zsh",
                 dst="~/.zsh-completions/_brew"
             ),
+        ])
 
-            # git
+    @staticmethod
+    def git() -> 'Cookbook':
+        return Cookbook([
             Recipe(
                 src="gitconfig",
                 dst="~/.gitconfig"
@@ -106,8 +120,11 @@ class PrefAction(Action, metaclass=ABCMeta):
                 src="tigrc",
                 dst="~/.tigrc"
             ),
+        ])
 
-            # vim
+    @staticmethod
+    def vim(noop: bool = False, logger: Optional[winston.LoggerWrapper] = None) -> 'Cookbook':
+        return Cookbook([
             Recipe(
                 src="vimrc",
                 dst="~/.vimrc"
@@ -115,95 +132,173 @@ class PrefAction(Action, metaclass=ABCMeta):
             Recipe(
                 src="vim",
                 dst="~/.vim",
-                activate=VimActivateAction(noop=self.noop, logger=self.logger),
-                deactivate=VimDeactivateAction(noop=self.noop, logger=self.logger)
+                activate=VimActivateAction(noop=noop, logger=logger),
+                deactivate=VimDeactivateAction(noop=noop, logger=logger)
             ),
+        ])
 
-            # ext
+    @staticmethod
+    def asdf() -> 'Cookbook':
+        return Cookbook([
             Recipe(
                 src="asdfrc",
                 dst="~/.asdfrc"
             ),
+        ])
+
+    @staticmethod
+    def tmux() -> 'Cookbook':
+        return Cookbook([
             Recipe(
                 src="tmux.conf",
                 dst="~/.tmux.conf"
             ),
+        ])
 
-            # gradle
+    @staticmethod
+    def gradle() -> 'Cookbook':
+        return Cookbook([
             Recipe(
                 src="gradle",
                 dst="~/.gradle"
             ),
+        ])
+
+    @staticmethod
+    def xcode() -> 'Cookbook':
+        return Cookbook([
+            *Recipe.glob(
+                src="Xcode",
+                dst="~/Library/Developer/Xcode"
+            )
+        ])
+
+    @staticmethod
+    def intellij_idea() -> 'Cookbook':
+        return Cookbook([
+            *Recipe.glob(
+                src="IntelliJIdea",
+                dst="~/Library/Preferences/IntelliJIdea*"
+            ),
+            *Recipe.glob(
+                src="IntelliJIdea",
+                dst="~/Library/ApplicationSupport/JetBrains/IntelliJIdea*"
+            ),
+        ])
+
+    @staticmethod
+    def android_studio() -> 'Cookbook':
+        return Cookbook([
+            *Recipe.glob(
+                src="AndroidStudio",
+                dst="~/Library/Preferences/AndroidStudio*"
+            ),
+            *Recipe.glob(
+                src="AndroidStudio",
+                dst="~/Library/ApplicationSupport/Google/AndroidStudio*"
+            ),
+        ])
+
+    @staticmethod
+    def app_code() -> 'Cookbook':
+        return Cookbook([
+            *Recipe.glob(
+                src="AppCode",
+                dst="~/Library/Preferences/AppCode*"
+            ),
+            *Recipe.glob(
+                src="AppCode",
+                dst="~/Library/ApplicationSupport/JetBrains/AppCode*"
+            ),
+        ])
+
+    @staticmethod
+    def ruby_mine() -> 'Cookbook':
+        return Cookbook([
+            *Recipe.glob(
+                src="RubyMine",
+                dst="~/Library/Preferences/RubyMine*"
+            ),
+            *Recipe.glob(
+                src="RubyMine",
+                dst="~/Library/ApplicationSupport/JetBrains/RubyMine*"
+            ),
+        ])
+
+    @staticmethod
+    def go_land() -> 'Cookbook':
+        return Cookbook([
+            *Recipe.glob(
+                src="GoLand",
+                dst="~/Library/Preferences/GoLand*"
+            ),
+            *Recipe.glob(
+                src="GoLand",
+                dst="~/Library/ApplicationSupport/JetBrains/GoLand*"
+            ),
+        ])
+
+    @staticmethod
+    def c_lion() -> 'Cookbook':
+        return Cookbook([
+            *Recipe.glob(
+                src="CLion",
+                dst="~/Library/Preferences/CLion*"
+            ),
+            *Recipe.glob(
+                src="CLion",
+                dst="~/Library/ApplicationSupport/JetBrains/CLion*"
+            ),
+        ])
+
+    @staticmethod
+    def rider() -> 'Cookbook':
+        return Cookbook([
+            *Recipe.glob(
+                src="Rider",
+                dst="~/Library/Preferences/Rider*"
+            ),
+            *Recipe.glob(
+                src="Rider",
+                dst="~/Library/ApplicationSupport/JetBrains/Rider*"
+            ),
+        ])
+
+
+class PrefAction(Action, metaclass=ABCMeta):
+    def recipes(self) -> List[Recipe]:
+        books: List[Cookbook] = []
+
+        # shared
+        books += [
+            Cookbook.bin(),
+            Cookbook.sh(),
+            Cookbook.bash(),
+            Cookbook.zsh(),
+            Cookbook.git(),
+            Cookbook.vim(noop=self.noop, logger=self.logger),
+            Cookbook.tmux(),
+            Cookbook.gradle(),
         ]
 
         # linux
         if kernel.islinux():
-            dots.extend([])
+            books += []
 
         # darwin
         if kernel.isdarwin():
-            dots += Recipe.glob(
-                src="Xcode",
-                dst="~/Library/Developer/Xcode"
-            )
-            dots += Recipe.glob(
-                src="IntelliJIdea",
-                dst="~/Library/Preferences/IntelliJIdea*"
-            )
-            dots += Recipe.glob(
-                src="IntelliJIdea",
-                dst="~/Library/ApplicationSupport/JetBrains/IntelliJIdea*"
-            )
-            dots += Recipe.glob(
-                src="AndroidStudio",
-                dst="~/Library/Preferences/AndroidStudio*"
-            )
-            dots += Recipe.glob(
-                src="AndroidStudio",
-                dst="~/Library/ApplicationSupport/Google/AndroidStudio*"
-            )
-            dots += Recipe.glob(
-                src="AppCode",
-                dst="~/Library/Preferences/AppCode*"
-            )
-            dots += Recipe.glob(
-                src="AppCode",
-                dst="~/Library/ApplicationSupport/JetBrains/AppCode*"
-            )
-            dots += Recipe.glob(
-                src="RubyMine",
-                dst="~/Library/Preferences/RubyMine*"
-            )
-            dots += Recipe.glob(
-                src="RubyMine",
-                dst="~/Library/ApplicationSupport/JetBrains/RubyMine*"
-            )
-            dots += Recipe.glob(
-                src="GoLand",
-                dst="~/Library/Preferences/GoLand*"
-            )
-            dots += Recipe.glob(
-                src="GoLand",
-                dst="~/Library/ApplicationSupport/JetBrains/GoLand*"
-            )
-            dots += Recipe.glob(
-                src="CLion",
-                dst="~/Library/Preferences/CLion*"
-            )
-            dots += Recipe.glob(
-                src="CLion",
-                dst="~/Library/ApplicationSupport/JetBrains/CLion*"
-            )
-            dots += Recipe.glob(
-                src="Rider",
-                dst="~/Library/Preferences/Rider*"
-            )
-            dots += Recipe.glob(
-                src="Rider",
-                dst="~/Library/ApplicationSupport/JetBrains/Rider*"
-            )
+            books += [
+                Cookbook.xcode(),
+                Cookbook.intellij_idea(),
+                Cookbook.android_studio(),
+                Cookbook.app_code(),
+                Cookbook.ruby_mine(),
+                Cookbook.go_land(),
+                Cookbook.c_lion(),
+                Cookbook.rider(),
+            ]
 
-        return dots
+        return list(itertools.chain.from_iterable([book.recipes for book in books]))
 
     @staticmethod
     def snippets() -> List[Recipe]:
