@@ -1,7 +1,6 @@
 # 1st
 import sys
 import argparse
-import logging
 
 from enum import Enum
 from typing import List
@@ -95,7 +94,7 @@ class Context:
         self.verbose = False
         return
 
-    def logger(self) -> logging.Logger:
+    def logger(self) -> winston.LoggerWrapper:
         """
         Create a new logger.
 
@@ -106,15 +105,15 @@ class Context:
         else:
             level = winston.EXEC
 
-        formatter = winston.LabelFormatter()
+        formatter = winston.ColoredFormatter()
 
         handler = winston.StreamHandler()
         handler.setLevel(level)
         handler.setFormatter(formatter)
 
-        logger = winston.getLogger(__name__)
-        logger.setLevel(level)
-        logger.addHandler(handler)
+        logger = winston.get_logger(__name__)
+        logger.set_level(level)
+        logger.add_handler(handler)
 
         return logger
 
@@ -278,8 +277,6 @@ class CLI:
     def __completion() -> None:
         """
         Perform completion action.
-
-        :param context: Context
         """
 
         # pylint: disable=import-outside-toplevel
