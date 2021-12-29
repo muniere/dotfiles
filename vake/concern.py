@@ -1,17 +1,41 @@
-# 1st
+import glob
 import os
 import re
-import glob
-
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
-from typing import List
+from typing import Optional, List
 
-# 2nd
-from .. import filetree
-from .. import kernel
-from . import __base__
+from . import filetree
+from . import kernel
+from . import winston
 
+__all__ = [
+    'PrefInstallAction', 'PrefUninstallAction', 'PrefStatusAction',
+    'BrewInstallAction', 'BrewUninstallAction', 'BrewStatusAction',
+]
+
+# ==
+# Base
+# ==
+class Action(metaclass=ABCMeta):
+    noop: bool
+    logger: Optional[winston.LoggerWrapper]
+    shell: kernel.Shell
+
+    def __init__(self, noop: bool = False, logger: Optional[winston.LoggerWrapper] = None):
+        self.noop = noop
+        self.logger = logger
+        self.shell = kernel.shell(noop, logger)
+        return
+
+    @abstractmethod
+    def run(self):
+        pass
+
+
+# ==
+# Pref
+# ==
 STATIC_DIR = "./static"
 SNIPPET_DIR = "./snippet"
 
@@ -20,8 +44,8 @@ SNIPPET_DIR = "./snippet"
 class Recipe:
     src: str
     dst: str
-    activate: __base__.Action = None
-    deactivate: __base__.Action = None
+    activate: Optional[Action] = None
+    deactivate: Optional[Action] = None
 
     @staticmethod
     def glob(src: str, dst: str) -> List['Recipe']:
@@ -31,7 +55,7 @@ class Recipe:
         ]
 
 
-class PrefAction(__base__.Action, metaclass=ABCMeta):
+class PrefAction(Action, metaclass=ABCMeta):
     def recipes(self) -> List[Recipe]:
         dots = []
 
@@ -92,7 +116,7 @@ class PrefAction(__base__.Action, metaclass=ABCMeta):
                 src="vim",
                 dst="~/.vim",
                 activate=VimActivateAction(noop=self.noop, logger=self.logger),
-                deactivate=None
+                deactivate=VimDeactivateAction(noop=self.noop, logger=self.logger)
             ),
 
             # ext
@@ -181,7 +205,8 @@ class PrefAction(__base__.Action, metaclass=ABCMeta):
 
         return dots
 
-    def snippets(self) -> List[Recipe]:
+    @staticmethod
+    def snippets() -> List[Recipe]:
         return [
             # sh
             Recipe(
@@ -211,7 +236,7 @@ class PrefAction(__base__.Action, metaclass=ABCMeta):
         ]
 
 
-class InstallAction(PrefAction):
+class PrefInstallAction(PrefAction):
     def run(self):
         for recipe in self.recipes():
             if recipe.src.startswith('/'):
@@ -231,9 +256,9 @@ class InstallAction(PrefAction):
     def __run(self, recipe: Recipe, sysname="default") -> bool:
         if not self.__istarget(recipe):
             if self.logger:
-                relpath = filetree.pilot(recipe.src)\
-                    .prepend(sysname)\
-                    .prepend(STATIC_DIR)\
+                relpath = filetree.pilot(recipe.src) \
+                    .prepend(sysname) \
+                    .prepend(STATIC_DIR) \
                     .relpath(os.getcwd())
                 self.logger.info("File is not target: %s" % relpath)
             return False
@@ -241,8 +266,8 @@ class InstallAction(PrefAction):
         if recipe.src.startswith('/'):
             src = filetree.pilot(recipe.src)
         else:
-            src = filetree.pilot(recipe.src)\
-                .prepend(sysname)\
+            src = filetree.pilot(recipe.src) \
+                .prepend(sysname) \
                 .prepend(STATIC_DIR).abspath()
 
         if recipe.dst.startswith('/'):
@@ -291,7 +316,7 @@ class InstallAction(PrefAction):
         #
         if src.isdir():
             for new_src in src.children(target='f', recursive=True):
-                new_dst = filetree.pilot(recipe.dst)\
+                new_dst = filetree.pilot(recipe.dst) \
                     .append(new_src.relpath(src))
                 new_recipe = Recipe(
                     src=new_src.pathname(),
@@ -347,7 +372,8 @@ class InstallAction(PrefAction):
 
         return
 
-    def __istarget(self, recipe: Recipe):
+    @staticmethod
+    def __istarget(recipe: Recipe):
         blacklist = [r'\.swp$', r'\.bak$', r'\.DS_Store$']
 
         for pattern in blacklist:
@@ -357,7 +383,7 @@ class InstallAction(PrefAction):
         return True
 
 
-class UninstallAction(PrefAction):
+class PrefUninstallAction(PrefAction):
     def run(self):
         for linker in self.recipes():
             self.__run(linker, sysname=kernel.sysname())
@@ -374,9 +400,9 @@ class UninstallAction(PrefAction):
     def __run(self, recipe: Recipe, sysname: str = "default") -> bool:
         if not self.__istarget(recipe):
             if self.logger:
-                relpath = filetree.pilot(recipe.src)\
-                    .prepend(sysname)\
-                    .prepend(STATIC_DIR)\
+                relpath = filetree.pilot(recipe.src) \
+                    .prepend(sysname) \
+                    .prepend(STATIC_DIR) \
                     .relpath(os.getcwd())
                 self.logger.info("File is not target: %s" % relpath)
             return False
@@ -384,8 +410,8 @@ class UninstallAction(PrefAction):
         if recipe.src.startswith('/'):
             src = filetree.pilot(recipe.src)
         else:
-            src = filetree.pilot(recipe.src)\
-                .prepend(sysname)\
+            src = filetree.pilot(recipe.src) \
+                .prepend(sysname) \
                 .prepend(STATIC_DIR).abspath()
 
         if recipe.dst.startswith('/'):
@@ -426,7 +452,7 @@ class UninstallAction(PrefAction):
         #
         if src.isdir():
             for new_src in src.children(target='f', recursive=True):
-                new_dst = filetree.pilot(recipe.dst)\
+                new_dst = filetree.pilot(recipe.dst) \
                     .append(new_src.relpath(src))
                 new_recipe = Recipe(
                     src=new_src.pathname(),
@@ -461,7 +487,7 @@ class UninstallAction(PrefAction):
         dst_str = dst.read()
 
         # skip: already disabled
-        if not src_str in dst_str:
+        if src_str not in dst_str:
             if self.logger:
                 self.logger.info(
                     "Snippet already disabled: %s" % dst.reduceuser()
@@ -477,7 +503,8 @@ class UninstallAction(PrefAction):
 
         return
 
-    def __istarget(self, recipe: Recipe):
+    @staticmethod
+    def __istarget(recipe: Recipe):
         blacklist = [r'\.swp$', r'\.DS_Store$']
 
         for pattern in blacklist:
@@ -487,7 +514,7 @@ class UninstallAction(PrefAction):
         return True
 
 
-class StatusAction(PrefAction):
+class PrefStatusAction(PrefAction):
     def run(self):
         linkers = sorted(self.recipes(), key=lambda x: x.dst)
 
@@ -505,7 +532,7 @@ class StatusAction(PrefAction):
         return True
 
 
-class VimActivateAction(__base__.Action):
+class VimActivateAction(Action):
 
     def run(self):
         dst = filetree.pilot("~/.vim/autoload/plug.vim").expanduser()
@@ -525,3 +552,100 @@ class VimActivateAction(__base__.Action):
             "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
         ])
         return None
+
+
+class VimDeactivateAction(Action):
+
+    def run(self):
+        pass
+
+
+# ==
+# Brew
+# ==
+BREW = "brew"
+BREWFILE = "Brewfile"
+
+
+@dataclass(eq=True, frozen=True)
+class Keg:
+    name: str
+
+
+class BrewAction(Action, metaclass=ABCMeta):
+    def load_kegs(self) -> List[Keg]:
+        src = filetree.pilot(os.getcwd()) \
+            .append(STATIC_DIR) \
+            .append(kernel.sysname()) \
+            .append(BREWFILE)
+
+        if self.logger:
+            self.logger.debug("Read kegs from file: %s" % src)
+
+        if not src.exists():
+            return []
+
+        lines = src.readlines()
+        return [Keg(name) for name in lines]
+
+    def list_kegs(self) -> List[Keg]:
+        stdout = self.shell.capture([BREW, "list"]).stdout
+        lines = stdout.decode('utf8').strip().splitlines()
+        return [Keg(name) for name in lines]
+
+
+class BrewInstallAction(BrewAction):
+    def run(self):
+        if not self.shell.available(BREW):
+            self.logger.warning("Command is not available: %s" % BREW)
+            return
+
+        kegs = self.load_kegs()
+
+        if not kegs:
+            self.logger.info("No available kegs were found")
+            return
+
+        found = set(self.list_kegs())
+
+        for keg in kegs:
+            if keg in found:
+                self.logger.info("%s is already installed" % keg.name)
+            else:
+                self.shell.execute([BREW, "install", keg.name])
+
+        return
+
+
+class BrewUninstallAction(BrewAction):
+    def run(self):
+        if not self.shell.available(BREW):
+            self.logger.warn("Command is not available: %s" % BREW)
+            return
+
+        kegs = self.load_kegs()
+
+        if not kegs:
+            self.logger.info("No available kegs were found")
+            return
+
+        found = set(self.list_kegs())
+
+        for keg in found:
+            if keg in found:
+                self.shell.execute([BREW, "uninstall", keg.name])
+            else:
+                self.logger.info("%s is not installed" % keg.name)
+
+        return
+
+
+class BrewStatusAction(BrewAction):
+    def run(self):
+        if not self.shell.available(BREW):
+            self.logger.warn("Command is not available: %s" % BREW)
+            return
+
+        self.shell.execute([BREW, "tap"])
+        self.shell.execute([BREW, "list"])
+        return
