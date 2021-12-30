@@ -33,6 +33,26 @@ class Action(metaclass=ABCMeta):
         pass
 
 
+class Hook(metaclass=ABCMeta):
+    noop: bool
+    logger: Optional[LoggerWrapper]
+    shell: Shell
+
+    def __init__(self, noop: bool = False, logger: Optional[LoggerWrapper] = None):
+        self.noop = noop
+        self.logger = logger
+        self.shell = Shell(noop, logger)
+        return
+
+    @abstractmethod
+    def activate(self):
+        pass
+
+    @abstractmethod
+    def deactivate(self):
+        pass
+
+
 # ==
 # Pref
 # ==
@@ -44,28 +64,25 @@ SNIPPET_DIR = "./snippet"
 class Recipe:
     src: Path
     dst: Path
-    activate: Optional[Action] = None
-    deactivate: Optional[Action] = None
+    hook: Optional[Hook] = None
 
     @staticmethod
     def create(
         src: str,
         dst: str,
-        activate: Optional[Action] = None,
-        deactivate: Optional[Action] = None,
+        hook: Optional[Hook] = None,
     ) -> 'Recipe':
-        return Recipe(src=Path(src), dst=Path(dst), activate=activate, deactivate=deactivate)
+        return Recipe(src=Path(src), dst=Path(dst), hook=hook)
 
     @staticmethod
     def glob(
         src: str,
         dst: str,
-        activate: Optional[Action] = None,
-        deactivate: Optional[Action] = None,
+        hook: Optional[Hook] = None,
     ) -> List['Recipe']:
         pattern = str(Path(dst).expanduser())
         return [
-            Recipe(src=Path(src), dst=Path(dst), activate=activate, deactivate=deactivate)
+            Recipe(src=Path(src), dst=Path(dst), hook=hook)
             for dst in glob.glob(pattern)
         ]
 
@@ -145,8 +162,7 @@ class Cookbook:
             Recipe.create(
                 src="vim",
                 dst="~/.vim",
-                activate=VimActivateAction(noop=noop, logger=logger),
-                deactivate=VimDeactivateAction(noop=noop, logger=logger)
+                hook=VimHook(noop=noop, logger=logger)
             ),
         ])
 
@@ -356,8 +372,8 @@ class PrefInstallAction(PrefAction):
                 self.__run(recipe, identifier=identity.value)
                 self.__run(recipe, identifier="default")
 
-            if recipe.activate:
-                recipe.activate.run()
+            if recipe.hook:
+                recipe.hook.activate()
 
         for snippet in self.snippets():
             self.__enable(snippet)
@@ -487,8 +503,8 @@ class PrefUninstallAction(PrefAction):
             self.__run(recipe, identifier=identity.value)
             self.__run(recipe, identifier="default")
 
-            if recipe.deactivate:
-                recipe.deactivate.run()
+            if recipe.hook:
+                recipe.hook.deactivate()
 
         for snippet in self.snippets():
             self.__disable(snippet)
@@ -620,14 +636,14 @@ class PrefStatusAction(PrefAction):
         return True
 
 
-class VimActivateAction(Action):
+class VimHook(Hook):
 
-    def run(self):
+    def activate(self):
         dst = Path("~/.vim/autoload/plug.vim").expanduser()
 
         if dst.is_file():
             self.logger.info("Vim-Plug is already downloaded: %s" % dst)
-            return None
+            return
 
         self.shell.execute([
             "curl",
@@ -637,12 +653,8 @@ class VimActivateAction(Action):
             "--output", str(dst),
             "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
         ])
-        return None
 
-
-class VimDeactivateAction(Action):
-
-    def run(self):
+    def deactivate(self):
         pass
 
 
