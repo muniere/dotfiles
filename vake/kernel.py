@@ -1,7 +1,7 @@
 import subprocess
+from pathlib import Path
 from typing import Optional, Union, List
 
-from . import filetree
 from . import winston
 
 __all__ = [
@@ -41,27 +41,27 @@ def sysname() -> str:
 
     :return: Detected name
     """
-    issue = filetree.pilot("/etc/issue")
+    issue = Path("/etc/issue")
 
-    if issue.isfile():
-        rawname = issue.read().lower()
+    if issue.is_file():
+        name = issue.read_text().lower()
     else:
         output = subprocess.check_output(["uname", "-a"])
-        rawname = output.decode('utf-8').strip().lower()
+        name = output.decode('utf-8').strip().lower()
 
-    if "ubuntu" in rawname:
+    if "ubuntu" in name:
         return UBUNTU
 
-    if "debian" in rawname:
+    if "debian" in name:
         return DEBIAN
 
-    if "centos" in rawname:
+    if "centos" in name:
         return CENTOS
 
-    if "amzn" in rawname:
+    if "amzn" in name:
         return AMAZON
 
-    if "darwin" in rawname:
+    if "darwin" in name:
         return DARWIN
 
     return "default"
@@ -89,17 +89,17 @@ class Shell:
         )
         return code == 0
 
-    def mkdir(self, path: str, recursive: bool = False) -> bool:
+    def mkdir(self, path: Union[str, Path], recursive: bool = False) -> bool:
         args = ["mkdir"]
 
         if recursive:
             args.append("-p")
 
-        args.append(path)
+        args.append(str(path))
 
         return self.execute(args)
 
-    def remove(self, path: str, recursive: bool = False, force: bool = False) -> bool:
+    def remove(self, path: Union[str, Path], recursive: bool = False, force: bool = False) -> bool:
         args = ["rm"]
 
         if recursive:
@@ -108,18 +108,18 @@ class Shell:
         if force:
             args.append("-f")
 
-        args.append(path)
+        args.append(str(path))
 
         return self.execute(args)
 
-    def symlink(self, src: str, dst: str, force: bool = False) -> bool:
+    def symlink(self, src: Union[str, Path], dst: Union[str, Path], force: bool = False) -> bool:
         args = ["ln", "-s"]
 
         if force:
             args.append("-f")
 
-        args.append(src)
-        args.append(dst)
+        args.append(str(src))
+        args.append(str(dst))
 
         return self.execute(args)
 
