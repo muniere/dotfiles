@@ -1,12 +1,10 @@
 import glob
 import itertools
-import os
-import re
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Optional, List
 
-from . import filetree
 from . import kernel
 from . import winston
 
@@ -44,16 +42,31 @@ SNIPPET_DIR = "./snippet"
 
 @dataclass
 class Recipe:
-    src: str
-    dst: str
+    src: Path
+    dst: Path
     activate: Optional[Action] = None
     deactivate: Optional[Action] = None
 
     @staticmethod
-    def glob(src: str, dst: str) -> List['Recipe']:
+    def create(
+        src: str,
+        dst: str,
+        activate: Optional[Action] = None,
+        deactivate: Optional[Action] = None,
+    ) -> 'Recipe':
+        return Recipe(src=Path(src), dst=Path(dst), activate=activate, deactivate=deactivate)
+
+    @staticmethod
+    def glob(
+        src: str,
+        dst: str,
+        activate: Optional[Action] = None,
+        deactivate: Optional[Action] = None,
+    ) -> List['Recipe']:
+        pattern = str(Path(dst).expanduser())
         return [
-            Recipe(src=src, dst=dst) for dst in
-            glob.glob(os.path.expanduser(dst))
+            Recipe(src=Path(src), dst=Path(dst), activate=activate, deactivate=deactivate)
+            for dst in glob.glob(pattern)
         ]
 
 
@@ -64,7 +77,7 @@ class Cookbook:
     @staticmethod
     def bin() -> 'Cookbook':
         return Cookbook([
-            Recipe(
+            Recipe.create(
                 src="bin",
                 dst="~/.bin"
             ),
@@ -73,7 +86,7 @@ class Cookbook:
     @staticmethod
     def sh() -> 'Cookbook':
         return Cookbook([
-            Recipe(
+            Recipe.create(
                 src="sh.d",
                 dst="~/.sh.d"
             ),
@@ -82,11 +95,11 @@ class Cookbook:
     @staticmethod
     def bash() -> 'Cookbook':
         return Cookbook([
-            Recipe(
+            Recipe.create(
                 src="bash.d",
                 dst="~/.bash.d"
             ),
-            Recipe(
+            Recipe.create(
                 src="bash_completion.d",
                 dst="~/.bash_completion.d"
             ),
@@ -95,15 +108,15 @@ class Cookbook:
     @staticmethod
     def zsh() -> 'Cookbook':
         return Cookbook([
-            Recipe(
+            Recipe.create(
                 src="zsh.d",
                 dst="~/.zsh.d"
             ),
-            Recipe(
+            Recipe.create(
                 src="zsh-completions",
                 dst="~/.zsh-completions"
             ),
-            Recipe(
+            Recipe.create(
                 src="/usr/local/library/Contributions/brew_zsh_completion.zsh",
                 dst="~/.zsh-completions/_brew"
             ),
@@ -112,11 +125,11 @@ class Cookbook:
     @staticmethod
     def git() -> 'Cookbook':
         return Cookbook([
-            Recipe(
+            Recipe.create(
                 src="gitconfig",
                 dst="~/.gitconfig"
             ),
-            Recipe(
+            Recipe.create(
                 src="tigrc",
                 dst="~/.tigrc"
             ),
@@ -125,11 +138,11 @@ class Cookbook:
     @staticmethod
     def vim(noop: bool = False, logger: Optional[winston.LoggerWrapper] = None) -> 'Cookbook':
         return Cookbook([
-            Recipe(
+            Recipe.create(
                 src="vimrc",
                 dst="~/.vimrc"
             ),
-            Recipe(
+            Recipe.create(
                 src="vim",
                 dst="~/.vim",
                 activate=VimActivateAction(noop=noop, logger=logger),
@@ -140,7 +153,7 @@ class Cookbook:
     @staticmethod
     def asdf() -> 'Cookbook':
         return Cookbook([
-            Recipe(
+            Recipe.create(
                 src="asdfrc",
                 dst="~/.asdfrc"
             ),
@@ -149,7 +162,7 @@ class Cookbook:
     @staticmethod
     def tmux() -> 'Cookbook':
         return Cookbook([
-            Recipe(
+            Recipe.create(
                 src="tmux.conf",
                 dst="~/.tmux.conf"
             ),
@@ -158,7 +171,7 @@ class Cookbook:
     @staticmethod
     def gradle() -> 'Cookbook':
         return Cookbook([
-            Recipe(
+            Recipe.create(
                 src="gradle",
                 dst="~/.gradle"
             ),
@@ -304,27 +317,27 @@ class PrefAction(Action, metaclass=ABCMeta):
     def snippets() -> List[Recipe]:
         return [
             # sh
-            Recipe(
+            Recipe.create(
                 src="shrc",
                 dst="~/.shrc"
             ),
 
             # bash
-            Recipe(
+            Recipe.create(
                 src="bashrc",
                 dst="~/.bashrc"
             ),
-            Recipe(
+            Recipe.create(
                 src="bash_profile",
                 dst="~/.bash_profile"
             ),
 
             # zsh
-            Recipe(
+            Recipe.create(
                 src="zshrc",
                 dst="~/.zshrc"
             ),
-            Recipe(
+            Recipe.create(
                 src="zshprofile",
                 dst="~/.zshprofile"
             ),
@@ -334,7 +347,7 @@ class PrefAction(Action, metaclass=ABCMeta):
 class PrefInstallAction(PrefAction):
     def run(self):
         for recipe in self.recipes():
-            if recipe.src.startswith('/'):
+            if recipe.src.is_absolute():
                 self.__run(recipe)
             else:
                 self.__run(recipe, sysname=kernel.sysname())
@@ -351,24 +364,19 @@ class PrefInstallAction(PrefAction):
     def __run(self, recipe: Recipe, sysname="default") -> bool:
         if not self.__istarget(recipe):
             if self.logger:
-                relpath = filetree.pilot(recipe.src) \
-                    .prepend(sysname) \
-                    .prepend(STATIC_DIR) \
-                    .relpath(os.getcwd())
-                self.logger.info("File is not target: %s" % relpath)
+                rel = Path(STATIC_DIR, sysname, recipe.src).relative_to(Path.cwd())
+                self.logger.info("File is not target: %s" % rel)
             return False
 
-        if recipe.src.startswith('/'):
-            src = filetree.pilot(recipe.src)
+        if recipe.src.is_absolute():
+            src = Path(recipe.src)
         else:
-            src = filetree.pilot(recipe.src) \
-                .prepend(sysname) \
-                .prepend(STATIC_DIR).abspath()
+            src = Path(STATIC_DIR, sysname, recipe.src).resolve()
 
-        if recipe.dst.startswith('/'):
-            dst = filetree.pilot(recipe.dst)
+        if recipe.dst.is_absolute():
+            dst = Path(recipe.dst)
         else:
-            dst = filetree.pilot(recipe.dst).expanduser()
+            dst = Path(recipe.dst).expanduser()
 
         #
         # guard
@@ -379,44 +387,36 @@ class PrefInstallAction(PrefAction):
             return False
 
         # dst link already exists
-        if dst.islink():
+        if dst.is_symlink():
             if self.logger:
-                self.logger.info(
-                    "Symlink already exists: %s" % dst.reduceuser()
-                )
+                self.logger.info("Symlink already exists: %s" % dst)
             return False
 
         #
         # file
         #
-        if src.isfile():
+        if src.is_file():
             # another file already exists
-            if dst.isfile():
+            if dst.is_file():
                 if self.logger:
-                    self.logger.info(
-                        "File already exists: %s" % dst.reduceuser()
-                    )
+                    self.logger.info("File already exists: %s" % dst)
                 return False
 
             # ensure parent directory
-            dst_dir = dst.parent()
-            if not dst_dir.isdir():
-                self.shell.mkdir(dst_dir.pathname(), recursive=True)
+            dst_dir = dst.parent
+            if not dst_dir.is_dir():
+                self.shell.mkdir(dst_dir, recursive=True)
 
             # create symbolic link
-            return self.shell.symlink(src.pathname(), dst.pathname(), force=True)
+            return self.shell.symlink(src, dst, force=True)
 
         #
         # directory
         #
-        if src.isdir():
-            for new_src in src.children(target='f', recursive=True):
-                new_dst = filetree.pilot(recipe.dst) \
-                    .append(new_src.relpath(src))
-                new_recipe = Recipe(
-                    src=new_src.pathname(),
-                    dst=new_dst.pathname()
-                )
+        if src.is_dir():
+            for new_src in [x for x in src.glob("**/*") if x.is_file()]:
+                new_dst = Path(recipe.dst, new_src.relative_to(src))
+                new_recipe = Recipe(src=new_src, dst=new_dst)
                 self.__run(new_recipe, sysname=sysname)
 
         return True
@@ -426,53 +426,51 @@ class PrefInstallAction(PrefAction):
         #
         # source
         #
-        src = filetree.pilot(snippet.src).prepend(SNIPPET_DIR)
+        src = Path(SNIPPET_DIR, snippet.src)
 
         if not src.exists():
             return
 
-        src_str = src.read().strip()
+        src_str = src.read_text().strip()
 
         #
         # destination
         #
-        dst = filetree.pilot(snippet.dst).expanduser()
+        dst = Path(snippet.dst).expanduser()
 
         # new file
         if not dst.exists():
             if self.logger:
-                self.logger.execute("Enable snippet %s" % src.reduceuser())
+                self.logger.execute("Enable snippet %s" % src)
 
             if not self.noop:
-                dst.write(src_str + "\n")
+                dst.write_text(src_str + "\n")
 
             return
 
-        dst_str = dst.read()
+        dst_str = dst.read_text()
 
         # skip: already enabled
         if src_str in dst_str:
             if self.logger:
-                self.logger.info(
-                    "Snippet already enabled: %s" % dst.reduceuser()
-                )
+                self.logger.info("Snippet already enabled: %s" % dst)
             return
 
         # enable
         if self.logger:
-            self.logger.execute("Enable %s" % src.reduceuser())
+            self.logger.execute("Enable %s" % src)
 
         if not self.noop:
-            dst.write(dst_str + src_str + "\n")
+            dst.write_text(dst_str + src_str + "\n")
 
         return
 
     @staticmethod
     def __istarget(recipe: Recipe):
-        blacklist = [r'\.swp$', r'\.bak$', r'\.DS_Store$']
+        blacklist = ['*.swp', '*.bak', '*.DS_Store']
 
         for pattern in blacklist:
-            if re.search(pattern, recipe.src):
+            if recipe.src.match(pattern):
                 return False
 
         return True
@@ -480,12 +478,12 @@ class PrefInstallAction(PrefAction):
 
 class PrefUninstallAction(PrefAction):
     def run(self):
-        for linker in self.recipes():
-            self.__run(linker, sysname=kernel.sysname())
-            self.__run(linker, sysname="default")
+        for recipe in self.recipes():
+            self.__run(recipe, sysname=kernel.sysname())
+            self.__run(recipe, sysname="default")
 
-            if linker.deactivate:
-                linker.deactivate.run()
+            if recipe.deactivate:
+                recipe.deactivate.run()
 
         for snippet in self.snippets():
             self.__disable(snippet)
@@ -495,24 +493,19 @@ class PrefUninstallAction(PrefAction):
     def __run(self, recipe: Recipe, sysname: str = "default") -> bool:
         if not self.__istarget(recipe):
             if self.logger:
-                relpath = filetree.pilot(recipe.src) \
-                    .prepend(sysname) \
-                    .prepend(STATIC_DIR) \
-                    .relpath(os.getcwd())
-                self.logger.info("File is not target: %s" % relpath)
+                rel = Path(STATIC_DIR, sysname, recipe.src).relative_to(Path.cwd())
+                self.logger.info("File is not target: %s" % rel)
             return False
 
-        if recipe.src.startswith('/'):
-            src = filetree.pilot(recipe.src)
+        if recipe.src.is_absolute():
+            src = Path(recipe.src)
         else:
-            src = filetree.pilot(recipe.src) \
-                .prepend(sysname) \
-                .prepend(STATIC_DIR).abspath()
+            src = Path(STATIC_DIR, sysname, recipe.src).resolve()
 
-        if recipe.dst.startswith('/'):
-            dst = filetree.pilot(recipe.dst)
+        if recipe.dst.is_absolute():
+            dst = Path(recipe.dst)
         else:
-            dst = filetree.pilot(recipe.dst).expanduser()
+            dst = Path(recipe.dst).expanduser()
 
         #
         # guard
@@ -523,7 +516,7 @@ class PrefUninstallAction(PrefAction):
             return True
 
         # dst not found
-        if not dst.exists() and not dst.islink():
+        if not dst.exists() and not dst.is_symlink():
             if self.logger:
                 self.logger.info("File already removed: %s" % dst)
             return True
@@ -531,13 +524,13 @@ class PrefUninstallAction(PrefAction):
         #
         # symlink
         #
-        if dst.islink():
-            return self.shell.remove(dst.pathname())
+        if dst.is_symlink():
+            return self.shell.remove(dst)
 
         #
         # file
         #
-        if dst.isfile():
+        if dst.is_file():
             if self.logger:
                 self.logger.info("File is not symlink: %s" % dst)
             return False
@@ -545,14 +538,10 @@ class PrefUninstallAction(PrefAction):
         #
         # directory
         #
-        if src.isdir():
-            for new_src in src.children(target='f', recursive=True):
-                new_dst = filetree.pilot(recipe.dst) \
-                    .append(new_src.relpath(src))
-                new_recipe = Recipe(
-                    src=new_src.pathname(),
-                    dst=new_dst.pathname()
-                )
+        if src.is_dir():
+            for new_src in [x for x in src.glob("**/*") if x.is_file()]:
+                new_dst = Path(recipe.dst, new_src.relative_to(src))
+                new_recipe = Recipe(src=new_src, dst=new_dst)
                 self.__run(new_recipe, sysname=sysname)
 
         return True
@@ -562,48 +551,46 @@ class PrefUninstallAction(PrefAction):
         #
         # source
         #
-        src = filetree.pilot(snippet.src).prepend(SNIPPET_DIR)
+        src = Path(SNIPPET_DIR, snippet.src)
 
         if not src.exists():
             return
 
-        src_str = src.read().strip()
+        src_str = src.read_text().strip()
 
         #
         # destination
         #
-        dst = filetree.pilot(snippet.dst).expanduser()
+        dst = Path(snippet.dst).expanduser()
 
         # not found
         if not dst.exists():
-            self.logger.info("File NOT FOUND: %s" % dst.reduceuser())
+            self.logger.info("File NOT FOUND: %s" % dst)
             return
 
-        dst_str = dst.read()
+        dst_str = dst.read_text()
 
         # skip: already disabled
         if src_str not in dst_str:
             if self.logger:
-                self.logger.info(
-                    "Snippet already disabled: %s" % dst.reduceuser()
-                )
+                self.logger.info("Snippet already disabled: %s" % dst)
             return
 
         # disable
         if self.logger:
-            self.logger.execute("Disable snippet %s" % src.reduceuser())
+            self.logger.execute("Disable snippet %s" % src)
 
         if not self.noop:
-            dst.write(dst_str.replace(src_str, ""))
+            dst.write_text(dst_str.replace(src_str, ""))
 
         return
 
     @staticmethod
     def __istarget(recipe: Recipe):
-        blacklist = [r'\.swp$', r'\.DS_Store$']
+        blacklist = ['*.swp', '*.DS_Store']
 
         for pattern in blacklist:
-            if re.search(pattern, recipe.src):
+            if recipe.src.match(pattern):
                 return False
 
         return True
@@ -611,10 +598,10 @@ class PrefUninstallAction(PrefAction):
 
 class PrefStatusAction(PrefAction):
     def run(self):
-        linkers = sorted(self.recipes(), key=lambda x: x.dst)
+        recipes = sorted(self.recipes(), key=lambda x: x.dst)
 
-        for dot in linkers:
-            target = filetree.pilot(dot.dst).expanduser()
+        for recipe in recipes:
+            target = Path(recipe.dst).expanduser()
 
             if not target.exists():
                 continue
@@ -630,12 +617,10 @@ class PrefStatusAction(PrefAction):
 class VimActivateAction(Action):
 
     def run(self):
-        dst = filetree.pilot("~/.vim/autoload/plug.vim").expanduser()
+        dst = Path("~/.vim/autoload/plug.vim").expanduser()
 
-        if dst.isfile():
-            self.logger.info(
-                "Vim-Plug is already downloaded: %s" % dst.reduceuser()
-            )
+        if dst.is_file():
+            self.logger.info("Vim-Plug is already downloaded: %s" % dst)
             return None
 
         self.shell.execute([
@@ -669,10 +654,7 @@ class Keg:
 
 class BrewAction(Action, metaclass=ABCMeta):
     def load_kegs(self) -> List[Keg]:
-        src = filetree.pilot(os.getcwd()) \
-            .append(STATIC_DIR) \
-            .append(kernel.sysname()) \
-            .append(BREWFILE)
+        src = Path(STATIC_DIR, kernel.sysname(), BREWFILE).resolve()
 
         if self.logger:
             self.logger.debug("Read kegs from file: %s" % src)
@@ -680,7 +662,7 @@ class BrewAction(Action, metaclass=ABCMeta):
         if not src.exists():
             return []
 
-        lines = src.readlines()
+        lines = src.read_text().splitlines()
         return [Keg(name) for name in lines]
 
     def list_kegs(self) -> List[Keg]:
