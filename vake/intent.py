@@ -384,7 +384,7 @@ class PrefInstallAction(PrefAction):
         if not self.__istarget(recipe):
             if self.logger:
                 rel = Path(STATIC_DIR, identifier, recipe.src).relative_to(Path.cwd())
-                self.logger.info("File is not target: %s" % rel)
+                self.logger.info(f"File is not target: {rel}")
             return False
 
         if recipe.src.is_absolute():
@@ -408,7 +408,7 @@ class PrefInstallAction(PrefAction):
         # dst link already exists
         if dst.is_symlink():
             if self.logger:
-                self.logger.info("Symlink already exists: %s" % dst)
+                self.logger.info(f"Symlink already exists: {dst}")
             return False
 
         #
@@ -418,7 +418,7 @@ class PrefInstallAction(PrefAction):
             # another file already exists
             if dst.is_file():
                 if self.logger:
-                    self.logger.info("File already exists: %s" % dst)
+                    self.logger.info(f"File already exists: {dst}")
                 return False
 
             # ensure parent directory
@@ -460,7 +460,7 @@ class PrefInstallAction(PrefAction):
         # new file
         if not dst.exists():
             if self.logger:
-                self.logger.execute("Enable snippet %s" % src)
+                self.logger.execute(f"Enable snippet {src}")
 
             if not self.noop:
                 dst.write_text(src_str + "\n")
@@ -472,12 +472,12 @@ class PrefInstallAction(PrefAction):
         # skip: already enabled
         if src_str in dst_str:
             if self.logger:
-                self.logger.info("Snippet already enabled: %s" % dst)
+                self.logger.info(f"Snippet already enabled: {dst}")
             return
 
         # enable
         if self.logger:
-            self.logger.execute("Enable %s" % src)
+            self.logger.execute(f"Enable {src}")
 
         if not self.noop:
             dst.write_text(dst_str + src_str + "\n")
@@ -515,7 +515,7 @@ class PrefUninstallAction(PrefAction):
         if not self.__istarget(recipe):
             if self.logger:
                 rel = Path(STATIC_DIR, identifier, recipe.src).relative_to(Path.cwd())
-                self.logger.info("File is not target: %s" % rel)
+                self.logger.info(f"File is not target: {rel}")
             return False
 
         if recipe.src.is_absolute():
@@ -539,7 +539,7 @@ class PrefUninstallAction(PrefAction):
         # dst not found
         if not dst.exists() and not dst.is_symlink():
             if self.logger:
-                self.logger.info("File already removed: %s" % dst)
+                self.logger.info(f"File already removed: {dst}")
             return True
 
         #
@@ -553,7 +553,7 @@ class PrefUninstallAction(PrefAction):
         #
         if dst.is_file():
             if self.logger:
-                self.logger.info("File is not symlink: %s" % dst)
+                self.logger.info(f"File is not symlink: {dst}")
             return False
 
         #
@@ -586,7 +586,7 @@ class PrefUninstallAction(PrefAction):
 
         # not found
         if not dst.exists():
-            self.logger.info("File NOT FOUND: %s" % dst)
+            self.logger.info(f"File NOT FOUND: {dst}")
             return
 
         dst_str = dst.read_text()
@@ -594,12 +594,12 @@ class PrefUninstallAction(PrefAction):
         # skip: already disabled
         if src_str not in dst_str:
             if self.logger:
-                self.logger.info("Snippet already disabled: %s" % dst)
+                self.logger.info(f"Snippet already disabled: {dst}")
             return
 
         # disable
         if self.logger:
-            self.logger.execute("Disable snippet %s" % src)
+            self.logger.execute(f"Disable snippet {src}")
 
         if not self.noop:
             dst.write_text(dst_str.replace(src_str, ""))
@@ -629,9 +629,9 @@ class PrefStatusAction(PrefAction):
                 continue
 
             if identity.is_darwin():
-                self.shell.execute("ls -lFG %s" % target)
+                self.shell.execute(f"ls -lFG {target}")
             else:
-                self.shell.execute("ls -lFo %s" % target)
+                self.shell.execute(f"ls -lFo {target}")
 
         return True
 
@@ -642,7 +642,7 @@ class VimHook(Hook):
         dst = Path("~/.vim/autoload/plug.vim").expanduser()
 
         if dst.is_file():
-            self.logger.info("Vim-Plug is already downloaded: %s" % dst)
+            self.logger.info(f"Vim-Plug is already downloaded: {dst}")
             return
 
         self.shell.execute([
@@ -676,7 +676,7 @@ class BrewAction(Action, metaclass=ABCMeta):
         src = Path(STATIC_DIR, identity.value, BREWFILE).resolve()
 
         if self.logger:
-            self.logger.debug("Read kegs from file: %s" % src)
+            self.logger.debug(f"Read kegs from file: {src}")
 
         if not src.exists():
             return []
@@ -693,7 +693,7 @@ class BrewAction(Action, metaclass=ABCMeta):
 class BrewInstallAction(BrewAction):
     def run(self):
         if not self.shell.available(BREW):
-            self.logger.warning("Command is not available: %s" % BREW)
+            self.logger.warning(f"Command is not available: {BREW}")
             return
 
         kegs = self.load_kegs()
@@ -706,7 +706,7 @@ class BrewInstallAction(BrewAction):
 
         for keg in kegs:
             if keg in found:
-                self.logger.info("%s is already installed" % keg.name)
+                self.logger.info(f"{keg.name} is already installed")
             else:
                 self.shell.execute([BREW, "install", keg.name])
 
@@ -716,7 +716,7 @@ class BrewInstallAction(BrewAction):
 class BrewUninstallAction(BrewAction):
     def run(self):
         if not self.shell.available(BREW):
-            self.logger.warn("Command is not available: %s" % BREW)
+            self.logger.warn(f"Command is not available: {BREW}")
             return
 
         kegs = self.load_kegs()
@@ -731,7 +731,7 @@ class BrewUninstallAction(BrewAction):
             if keg in found:
                 self.shell.execute([BREW, "uninstall", keg.name])
             else:
-                self.logger.info("%s is not installed" % keg.name)
+                self.logger.info(f"{keg.name} is not installed")
 
         return
 
@@ -739,7 +739,7 @@ class BrewUninstallAction(BrewAction):
 class BrewStatusAction(BrewAction):
     def run(self):
         if not self.shell.available(BREW):
-            self.logger.warn("Command is not available: %s" % BREW)
+            self.logger.warn(f"Command is not available: {BREW}")
             return
 
         self.shell.execute([BREW, "tap"])

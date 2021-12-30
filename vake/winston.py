@@ -19,11 +19,10 @@ class ColoredFormatter(logging.Formatter):
     LEVEL_NAME_WIDTH = 5
 
     def format(self, record: logging.LogRecord):
-        message = "[%s] %s" % (
-            record.levelname.ljust(self.__class__.LEVEL_NAME_WIDTH),
-            record.getMessage(),
-        )
-        return self.colorize(message, levelno=record.levelno)
+        label = record.levelname.ljust(self.__class__.LEVEL_NAME_WIDTH)
+        message = record.getMessage()
+        levelno = record.levelno
+        return self.colorize(f"[{label}] {message}", levelno=levelno)
 
     @staticmethod
     def colorize(message, levelno=logging.NOTSET):
@@ -39,7 +38,7 @@ class ColoredFormatter(logging.Formatter):
 
         color_str = color_dict.get(levelno, reset_str)
 
-        return "%s%s%s" % (color_str, message, reset_str)
+        return f"{color_str}{message}{reset_str}"
 
 
 class StreamHandler(logging.StreamHandler):

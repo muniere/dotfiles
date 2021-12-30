@@ -120,7 +120,7 @@ class Shell:
             return False
 
         if self.logger:
-            self.logger.execute("%s" % " ".join(args))
+            self.logger.execute(" ".join(args))
 
         if self.noop:
             return True
