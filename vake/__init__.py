@@ -1,3 +1,1 @@
-from .program import (
-    cli
-)
+from .program import CLI

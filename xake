@@ -4,10 +4,10 @@ import os
 import sys
 from pathlib import Path
 
-import vake
+from vake import CLI
 
 # change to script's directory
 os.chdir(Path(__file__).parent)
 
 # run application
-vake.cli().run(sys.argv[1:])
+CLI().run(sys.argv[1:])

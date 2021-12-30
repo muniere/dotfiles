@@ -6,7 +6,8 @@ from pathlib import Path
 from typing import Optional, List
 
 from . import kernel
-from . import winston
+from .kernel import Shell
+from .winston import LoggerWrapper
 
 __all__ = [
     'PrefInstallAction', 'PrefUninstallAction', 'PrefStatusAction',
@@ -19,13 +20,13 @@ __all__ = [
 # ==
 class Action(metaclass=ABCMeta):
     noop: bool
-    logger: Optional[winston.LoggerWrapper]
-    shell: kernel.Shell
+    logger: Optional[LoggerWrapper]
+    shell: Shell
 
-    def __init__(self, noop: bool = False, logger: Optional[winston.LoggerWrapper] = None):
+    def __init__(self, noop: bool = False, logger: Optional[LoggerWrapper] = None):
         self.noop = noop
         self.logger = logger
-        self.shell = kernel.shell(noop, logger)
+        self.shell = Shell(noop, logger)
         return
 
     @abstractmethod
@@ -136,7 +137,7 @@ class Cookbook:
         ])
 
     @staticmethod
-    def vim(noop: bool = False, logger: Optional[winston.LoggerWrapper] = None) -> 'Cookbook':
+    def vim(noop: bool = False, logger: Optional[LoggerWrapper] = None) -> 'Cookbook':
         return Cookbook([
             Recipe.create(
                 src="vimrc",

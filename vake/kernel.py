@@ -1,11 +1,12 @@
 import subprocess
 from pathlib import Path
+from subprocess import CompletedProcess
 from typing import Optional, Union, List
 
-from . import winston
+from .winston import LoggerWrapper
 
 __all__ = [
-    'islinux', 'isbsd', 'isdebian', 'isredhat', 'isdarwin', 'sysname', 'shell'
+    'islinux', 'isbsd', 'isdebian', 'isredhat', 'isdarwin', 'sysname', 'Shell'
 ]
 
 UBUNTU = "ubuntu"
@@ -67,15 +68,11 @@ def sysname() -> str:
     return "default"
 
 
-def shell(noop: bool = False, logger: Optional[winston.LoggerWrapper] = None) -> 'Shell':
-    return Shell(noop, logger)
-
-
 class Shell:
     noop: bool
-    logger: Optional[winston.LoggerWrapper]
+    logger: Optional[LoggerWrapper]
 
-    def __init__(self, noop: bool = False, logger: Optional[winston.LoggerWrapper] = None):
+    def __init__(self, noop: bool = False, logger: Optional[LoggerWrapper] = None):
         self.noop = noop
         self.logger = logger
         return
@@ -142,7 +139,7 @@ class Shell:
 
         return subprocess.call(args) == 0
 
-    def capture(self, command: Union[List[str], str]) -> Optional[subprocess.CompletedProcess]:
+    def capture(self, command: Union[List[str], str]) -> Optional[CompletedProcess]:
         if isinstance(command, list):
             args = command
         elif isinstance(command, str):

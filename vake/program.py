@@ -1,19 +1,17 @@
-import argparse
 import sys
+from argparse import ArgumentParser
 from enum import Enum
 from typing import List
 
-from . import intent
 from . import kernel
 from . import winston
+from .intent import BrewInstallAction, BrewUninstallAction, BrewStatusAction
+from .intent import PrefInstallAction, PrefUninstallAction, PrefStatusAction
+from .winston import ColoredFormatter, StreamHandler, LoggerWrapper
 
 __all__ = [
-    'cli'
+    'CLI'
 ]
-
-
-def cli():
-    return CLI()
 
 
 class Action(Enum):
@@ -66,13 +64,13 @@ class Context:
         return parser._optionals._group_actions
 
     @classmethod
-    def __make_argparser(cls) -> argparse.ArgumentParser:
+    def __make_argparser(cls) -> ArgumentParser:
         """
         Create a new ArgumentParser.
 
         :return: New argument parser
         """
-        parser = argparse.ArgumentParser()
+        parser = ArgumentParser()
         parser.add_argument("-n", "--dry-run",
                             dest="dry_run",
                             action="store_true",
@@ -95,7 +93,7 @@ class Context:
         self.verbose = False
         return
 
-    def logger(self) -> winston.LoggerWrapper:
+    def logger(self) -> LoggerWrapper:
         """
         Create a new logger.
 
@@ -106,9 +104,9 @@ class Context:
         else:
             level = winston.EXEC
 
-        formatter = winston.ColoredFormatter()
+        formatter = ColoredFormatter()
 
-        handler = winston.StreamHandler()
+        handler = StreamHandler()
         handler.setLevel(level)
         handler.setFormatter(formatter)
 
@@ -182,7 +180,7 @@ class CLI:
         logger = context.logger()
 
         commands = [
-            intent.PrefInstallAction(noop=noop, logger=logger),
+            PrefInstallAction(noop=noop, logger=logger),
         ]
 
         for command in commands:
@@ -201,7 +199,7 @@ class CLI:
         logger = context.logger()
 
         commands = [
-            intent.PrefUninstallAction(noop=noop, logger=logger),
+            PrefUninstallAction(noop=noop, logger=logger),
         ]
 
         for command in commands:
@@ -227,7 +225,7 @@ class CLI:
 
         if kernel.isdarwin():
             commands.extend([
-                intent.BrewInstallAction(noop=noop, logger=logger),
+                BrewInstallAction(noop=noop, logger=logger),
             ])
 
         for command in commands:
@@ -246,7 +244,7 @@ class CLI:
         logger = context.logger()
 
         commands = [
-            intent.BrewUninstallAction(noop=noop, logger=logger),
+            BrewUninstallAction(noop=noop, logger=logger),
         ]
 
         for command in commands:
@@ -265,8 +263,8 @@ class CLI:
         logger = context.logger()
 
         commands = [
-            intent.PrefStatusAction(noop=noop, logger=logger),
-            intent.BrewStatusAction(noop=noop, logger=logger),
+            PrefStatusAction(noop=noop, logger=logger),
+            BrewStatusAction(noop=noop, logger=logger),
         ]
 
         for command in commands:
