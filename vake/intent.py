@@ -5,8 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional, List
 
-from . import kernel
-from .kernel import Shell
+from .kernel import Identity, Shell
 from .winston import LoggerWrapper
 
 __all__ = [
@@ -282,6 +281,7 @@ class Cookbook:
 class PrefAction(Action, metaclass=ABCMeta):
     def recipes(self) -> List[Recipe]:
         books: List[Cookbook] = []
+        identity = Identity.detect()
 
         # shared
         books += [
@@ -296,11 +296,11 @@ class PrefAction(Action, metaclass=ABCMeta):
         ]
 
         # linux
-        if kernel.islinux():
+        if identity.is_linux():
             books += []
 
         # darwin
-        if kernel.isdarwin():
+        if identity.is_darwin():
             books += [
                 Cookbook.xcode(),
                 Cookbook.intellij_idea(),
@@ -347,12 +347,14 @@ class PrefAction(Action, metaclass=ABCMeta):
 
 class PrefInstallAction(PrefAction):
     def run(self):
+        identity = Identity.detect()
+
         for recipe in self.recipes():
             if recipe.src.is_absolute():
                 self.__run(recipe)
             else:
-                self.__run(recipe, sysname=kernel.sysname())
-                self.__run(recipe, sysname="default")
+                self.__run(recipe, identifier=identity.value)
+                self.__run(recipe, identifier="default")
 
             if recipe.activate:
                 recipe.activate.run()
@@ -362,17 +364,17 @@ class PrefInstallAction(PrefAction):
 
         return
 
-    def __run(self, recipe: Recipe, sysname="default") -> bool:
+    def __run(self, recipe: Recipe, identifier="default") -> bool:
         if not self.__istarget(recipe):
             if self.logger:
-                rel = Path(STATIC_DIR, sysname, recipe.src).relative_to(Path.cwd())
+                rel = Path(STATIC_DIR, identifier, recipe.src).relative_to(Path.cwd())
                 self.logger.info("File is not target: %s" % rel)
             return False
 
         if recipe.src.is_absolute():
             src = Path(recipe.src)
         else:
-            src = Path(STATIC_DIR, sysname, recipe.src).resolve()
+            src = Path(STATIC_DIR, identifier, recipe.src).resolve()
 
         if recipe.dst.is_absolute():
             dst = Path(recipe.dst)
@@ -418,7 +420,7 @@ class PrefInstallAction(PrefAction):
             for new_src in [x for x in src.glob("**/*") if x.is_file()]:
                 new_dst = Path(recipe.dst, new_src.relative_to(src))
                 new_recipe = Recipe(src=new_src, dst=new_dst)
-                self.__run(new_recipe, sysname=sysname)
+                self.__run(new_recipe, identifier=identifier)
 
         return True
 
@@ -479,9 +481,11 @@ class PrefInstallAction(PrefAction):
 
 class PrefUninstallAction(PrefAction):
     def run(self):
+        identity = Identity.detect()
+
         for recipe in self.recipes():
-            self.__run(recipe, sysname=kernel.sysname())
-            self.__run(recipe, sysname="default")
+            self.__run(recipe, identifier=identity.value)
+            self.__run(recipe, identifier="default")
 
             if recipe.deactivate:
                 recipe.deactivate.run()
@@ -491,17 +495,17 @@ class PrefUninstallAction(PrefAction):
 
         return
 
-    def __run(self, recipe: Recipe, sysname: str = "default") -> bool:
+    def __run(self, recipe: Recipe, identifier: str = "default") -> bool:
         if not self.__istarget(recipe):
             if self.logger:
-                rel = Path(STATIC_DIR, sysname, recipe.src).relative_to(Path.cwd())
+                rel = Path(STATIC_DIR, identifier, recipe.src).relative_to(Path.cwd())
                 self.logger.info("File is not target: %s" % rel)
             return False
 
         if recipe.src.is_absolute():
             src = Path(recipe.src)
         else:
-            src = Path(STATIC_DIR, sysname, recipe.src).resolve()
+            src = Path(STATIC_DIR, identifier, recipe.src).resolve()
 
         if recipe.dst.is_absolute():
             dst = Path(recipe.dst)
@@ -543,7 +547,7 @@ class PrefUninstallAction(PrefAction):
             for new_src in [x for x in src.glob("**/*") if x.is_file()]:
                 new_dst = Path(recipe.dst, new_src.relative_to(src))
                 new_recipe = Recipe(src=new_src, dst=new_dst)
-                self.__run(new_recipe, sysname=sysname)
+                self.__run(new_recipe, identifier=identifier)
 
         return True
 
@@ -599,6 +603,7 @@ class PrefUninstallAction(PrefAction):
 
 class PrefStatusAction(PrefAction):
     def run(self):
+        identity = Identity.detect()
         recipes = sorted(self.recipes(), key=lambda x: x.dst)
 
         for recipe in recipes:
@@ -607,7 +612,7 @@ class PrefStatusAction(PrefAction):
             if not target.exists():
                 continue
 
-            if kernel.isdarwin():
+            if identity.is_darwin():
                 self.shell.execute("ls -lFG %s" % target)
             else:
                 self.shell.execute("ls -lFo %s" % target)
@@ -655,7 +660,8 @@ class Keg:
 
 class BrewAction(Action, metaclass=ABCMeta):
     def load_kegs(self) -> List[Keg]:
-        src = Path(STATIC_DIR, kernel.sysname(), BREWFILE).resolve()
+        identity = Identity.detect()
+        src = Path(STATIC_DIR, identity.value, BREWFILE).resolve()
 
         if self.logger:
             self.logger.debug("Read kegs from file: %s" % src)

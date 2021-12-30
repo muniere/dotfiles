@@ -1,4 +1,5 @@
 import subprocess
+from enum import Enum
 from pathlib import Path
 from subprocess import CompletedProcess
 from typing import Optional, Union, List
@@ -6,66 +7,53 @@ from typing import Optional, Union, List
 from .winston import LoggerWrapper
 
 __all__ = [
-    'islinux', 'isbsd', 'isdebian', 'isredhat', 'isdarwin', 'sysname', 'Shell'
+    'Identity', 'Shell'
 ]
 
-UBUNTU = "ubuntu"
-DEBIAN = "debian"
-CENTOS = "centos"
-AMAZON = "amazon"
-DARWIN = "darwin"
 
+class Identity(Enum):
+    UBUNTU = "ubuntu"
+    DEBIAN = "debian"
+    CENTOS = "centos"
+    AMAZON = "amazon"
+    DARWIN = "darwin"
+    DEFAULT = "default"
 
-def islinux() -> bool:
-    return sysname() in [UBUNTU, DEBIAN, CENTOS, AMAZON]
+    def is_linux(self) -> bool:
+        return self in [Identity.UBUNTU, Identity.DEBIAN, Identity.CENTOS, Identity.AMAZON]
 
+    def is_darwin(self) -> bool:
+        return self in [Identity.DARWIN]
 
-def isbsd() -> bool:
-    return sysname() in [DARWIN]
+    def is_windows(self) -> bool:
+        return self in []
 
+    @classmethod
+    def detect(cls) -> 'Identity':
+        issue = Path("/etc/issue")
 
-def isdebian() -> bool:
-    return sysname() in [UBUNTU, DEBIAN]
+        if issue.is_file():
+            name = issue.read_text().lower()
+        else:
+            output = subprocess.check_output(["uname", "-a"])
+            name = output.decode('utf-8').strip().lower()
 
+        if "ubuntu" in name:
+            return Identity.UBUNTU
 
-def isredhat() -> bool:
-    return sysname() in [CENTOS, AMAZON]
+        if "debian" in name:
+            return Identity.DEBIAN
 
+        if "centos" in name:
+            return Identity.CENTOS
 
-def isdarwin() -> bool:
-    return sysname() in [DARWIN]
+        if "amzn" in name:
+            return Identity.AMAZON
 
+        if "darwin" in name:
+            return Identity.DARWIN
 
-def sysname() -> str:
-    """
-    Detect system name
-
-    :return: Detected name
-    """
-    issue = Path("/etc/issue")
-
-    if issue.is_file():
-        name = issue.read_text().lower()
-    else:
-        output = subprocess.check_output(["uname", "-a"])
-        name = output.decode('utf-8').strip().lower()
-
-    if "ubuntu" in name:
-        return UBUNTU
-
-    if "debian" in name:
-        return DEBIAN
-
-    if "centos" in name:
-        return CENTOS
-
-    if "amzn" in name:
-        return AMAZON
-
-    if "darwin" in name:
-        return DARWIN
-
-    return "default"
+        return Identity.DEFAULT
 
 
 class Shell:

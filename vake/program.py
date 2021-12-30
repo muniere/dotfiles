@@ -3,10 +3,10 @@ from argparse import ArgumentParser
 from enum import Enum
 from typing import List
 
-from . import kernel
 from . import winston
 from .intent import BrewInstallAction, BrewUninstallAction, BrewStatusAction
 from .intent import PrefInstallAction, PrefUninstallAction, PrefStatusAction
+from .kernel import Identity
 from .winston import ColoredFormatter, StreamHandler, LoggerWrapper
 
 __all__ = [
@@ -217,13 +217,14 @@ class CLI:
 
         noop = context.dry_run
         logger = context.logger()
+        identity = Identity.detect()
 
         commands = []
 
-        if kernel.islinux():
+        if identity.is_linux():
             commands.extend([])
 
-        if kernel.isdarwin():
+        if identity.is_darwin():
             commands.extend([
                 BrewInstallAction(noop=noop, logger=logger),
             ])
