@@ -1,1 +1,1 @@
-from .program import CLI
+from .cli import Application as CLI

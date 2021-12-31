@@ -11,7 +11,7 @@ from .kernel import Identity
 from .timber import Level, ColoredFormatter, StreamHandler, Lumber
 
 __all__ = [
-    'CLI'
+    'Application'
 ]
 
 
@@ -104,7 +104,7 @@ class ContextParser:
         return self.delegate._optionals._group_actions
 
 
-class CLI:
+class Application:
     """
     CLI launcher
     """
