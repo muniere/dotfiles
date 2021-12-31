@@ -102,7 +102,7 @@ class PrefInstallAction(PrefAction):
         return
 
     def __run(self, recipe: PrefRecipe, identifier='default') -> bool:
-        if not self.__istarget(recipe):
+        if not self.__test(recipe):
             rel = Path(locate.static(), identifier, recipe.src).relative_to(Path.cwd())
             self.logger.info(f'File is not target: {rel}')
             return False
@@ -197,9 +197,10 @@ class PrefInstallAction(PrefAction):
         if not dst.exists():
             self.logger.execute(f'Enable snippet {src}')
 
-            if not self.noop:
-                dst.write_text(src_str + '\n')
+            if self.noop:
+                return
 
+            dst.write_text(src_str + '\n')
             return
 
         dst_str = dst.read_text()
@@ -212,13 +213,14 @@ class PrefInstallAction(PrefAction):
         # enable
         self.logger.execute(f'Enable {src}')
 
-        if not self.noop:
-            dst.write_text(dst_str + src_str + '\n')
+        if self.noop:
+            return
 
+        dst.write_text(dst_str + src_str + '\n')
         return
 
     @staticmethod
-    def __istarget(recipe: PrefRecipe):
+    def __test(recipe: PrefRecipe):
         blacklist = ['*.swp', '*.bak', '*.DS_Store']
 
         for pattern in blacklist:
@@ -244,7 +246,7 @@ class PrefUninstallAction(PrefAction):
         return
 
     def __run(self, recipe: PrefRecipe, identifier: str = 'default') -> bool:
-        if not self.__istarget(recipe):
+        if not self.__test(recipe):
             rel = Path(locate.static(), identifier, recipe.src).relative_to(Path.cwd())
             self.logger.info(f'File is not target: {rel}')
             return False
@@ -337,13 +339,14 @@ class PrefUninstallAction(PrefAction):
         # disable
         self.logger.execute(f'Disable snippet {src}')
 
-        if not self.noop:
-            dst.write_text(dst_str.replace(src_str, ''))
+        if self.noop:
+            return
 
+        dst.write_text(dst_str.replace(src_str, ''))
         return
 
     @staticmethod
-    def __istarget(recipe: PrefRecipe):
+    def __test(recipe: PrefRecipe):
         blacklist = ['*.swp', '*.DS_Store']
 
         for pattern in blacklist:
@@ -359,15 +362,15 @@ class PrefStatusAction(PrefAction):
         recipes = sorted(self.recipes(), key=lambda x: x.dst)
 
         for recipe in recipes:
-            target = Path(recipe.dst).expanduser()
+            dst = Path(recipe.dst).expanduser()
 
-            if not target.exists():
+            if not dst.exists():
                 continue
 
             if identity.is_darwin():
-                shell.execute(['ls', '-lFG', str(target)], logger=self.logger, noop=False)
+                shell.execute(['ls', '-lFG', str(dst)], logger=self.logger, noop=False)
             else:
-                shell.execute(['ls', '-lFo', str(target)], logger=self.logger, noop=False)
+                shell.execute(['ls', '-lFo', str(dst)], logger=self.logger, noop=False)
 
         return True
 
@@ -389,7 +392,7 @@ class BrewInstallAction(BrewAction):
 
         kegs = brew.load()
 
-        if not kegs:
+        if len(kegs) == 0:
             self.logger.info('No available kegs were found')
             return
 
@@ -414,7 +417,7 @@ class BrewUninstallAction(BrewAction):
 
         kegs = brew.load()
 
-        if not kegs:
+        if len(kegs) == 0:
             self.logger.info('No available kegs were found')
             return
 
