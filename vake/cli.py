@@ -2,6 +2,7 @@ import sys
 from argparse import ArgumentParser
 from dataclasses import dataclass
 from enum import Enum
+from pathlib import Path
 from typing import List
 
 from . import kernel
@@ -24,9 +25,14 @@ class Command(Enum):
     COMPLETION = 'completion'
 
 
-class Completion:
-    SOURCE = 'template/_xake'
-    DESTINATION = 'static/default/zsh-completions/_xake'
+class Locator:
+    @staticmethod
+    def completion_src() -> Path:
+        return Path('template/_xake')
+
+    @staticmethod
+    def completion_dst() -> Path:
+        return Path('static/default/zsh-completions/_xake')
 
 
 @dataclass(frozen=True)
@@ -271,9 +277,11 @@ class Application:
         from mako.template import Template
 
         parser = ContextParser()
+        src = Locator.completion_src()
+        dst = Locator.completion_dst()
 
         template = Template(
-            filename=Completion.SOURCE,
+            filename=str(src),
             input_encoding='utf-8',
             output_encoding='utf-8',
             bytestring_passthrough=True,
@@ -284,8 +292,7 @@ class Application:
             actions=[x.value for x in Command],
         )
 
-        with open(Completion.DESTINATION, 'w') as dst:
-            dst.write(rendered)
+        dst.write_text(rendered)
 
         sys.stdout.write(rendered)
         return

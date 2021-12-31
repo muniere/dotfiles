@@ -36,8 +36,14 @@ class Action(metaclass=ABCMeta):
 # ==
 # Pref
 # ==
-STATIC_DIR = './static'
-SNIPPET_DIR = './snippet'
+class Locator:
+    @staticmethod
+    def static() -> Path:
+        return Path('./static')
+
+    @staticmethod
+    def snippet() -> Path:
+        return Path('./snippet')
 
 
 class PrefAction(Action, metaclass=ABCMeta):
@@ -106,14 +112,14 @@ class PrefInstallAction(PrefAction):
 
     def __run(self, recipe: PrefRecipe, identifier='default') -> bool:
         if not self.__istarget(recipe):
-            rel = Path(STATIC_DIR, identifier, recipe.src).relative_to(Path.cwd())
+            rel = Path(Locator.static(), identifier, recipe.src).relative_to(Path.cwd())
             self.logger.info(f'File is not target: {rel}')
             return False
 
         if recipe.src.is_absolute():
             src = Path(recipe.src)
         else:
-            src = Path(STATIC_DIR, identifier, recipe.src).resolve()
+            src = Path(Locator.static(), identifier, recipe.src).resolve()
 
         if recipe.dst.is_absolute():
             dst = Path(recipe.dst)
@@ -184,7 +190,7 @@ class PrefInstallAction(PrefAction):
         #
         # source
         #
-        src = Path(SNIPPET_DIR, snippet.src)
+        src = Path(Locator.snippet(), snippet.src)
 
         if not src.exists():
             return
@@ -248,14 +254,14 @@ class PrefUninstallAction(PrefAction):
 
     def __run(self, recipe: PrefRecipe, identifier: str = 'default') -> bool:
         if not self.__istarget(recipe):
-            rel = Path(STATIC_DIR, identifier, recipe.src).relative_to(Path.cwd())
+            rel = Path(Locator.static(), identifier, recipe.src).relative_to(Path.cwd())
             self.logger.info(f'File is not target: {rel}')
             return False
 
         if recipe.src.is_absolute():
             src = Path(recipe.src)
         else:
-            src = Path(STATIC_DIR, identifier, recipe.src).resolve()
+            src = Path(Locator.static(), identifier, recipe.src).resolve()
 
         if recipe.dst.is_absolute():
             dst = Path(recipe.dst)
@@ -313,7 +319,7 @@ class PrefUninstallAction(PrefAction):
         #
         # source
         #
-        src = Path(SNIPPET_DIR, snippet.src)
+        src = Path(Locator.snippet(), snippet.src)
 
         if not src.exists():
             return
@@ -390,7 +396,7 @@ class BrewAction(Action, metaclass=ABCMeta):
 
     def _load_kegs(self) -> List[Keg]:
         identity = kernel.identify()
-        src = Path(STATIC_DIR, identity.value, 'Brewfile').resolve()
+        src = Path(Locator.static(), identity.value, 'Brewfile').resolve()
 
         self.logger.debug(f'Read kegs from file: {src}')
 
