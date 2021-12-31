@@ -141,15 +141,13 @@ class PrefInstallAction(PrefAction):
                 self.logger.info(f"File already exists: {dst}")
                 return False
 
-            shell = Shell(logger=self.logger, noop=self.noop)
-
             # ensure parent directory
             dst_dir = dst.parent
             if not dst_dir.is_dir():
-                shell.mkdir(dst_dir, recursive=True)
+                self.__mkdir(dst_dir)
 
             # create symbolic link
-            return shell.symlink(src, dst, force=True)
+            return self.__symlink(src, dst)
 
         #
         # directory
@@ -160,6 +158,24 @@ class PrefInstallAction(PrefAction):
                 new_recipe = PrefRecipe(src=new_src, dst=new_dst)
                 self.__run(new_recipe, identifier=identifier)
 
+        return True
+
+    def __mkdir(self, path: Path) -> bool:
+        self.logger.execute(f"mkdir -p {path}")
+
+        if self.noop:
+            return False
+
+        path.mkdir(parents=True, exist_ok=True)
+        return True
+
+    def __symlink(self, src: Path, dst: Path) -> bool:
+        self.logger.execute(f"ln -s -f {src} {dst}")
+
+        if self.noop:
+            return False
+
+        dst.symlink_to(src)
         return True
 
     def __enable(self, snippet: SnipRecipe):
@@ -262,8 +278,7 @@ class PrefUninstallAction(PrefAction):
         # symlink
         #
         if dst.is_symlink():
-            shell = Shell(logger=self.logger, noop=self.noop)
-            return shell.remove(dst)
+            return self.__rm(dst)
 
         #
         # file
@@ -281,6 +296,15 @@ class PrefUninstallAction(PrefAction):
                 new_recipe = PrefRecipe(src=new_src, dst=new_dst)
                 self.__run(new_recipe, identifier=identifier)
 
+        return True
+
+    def __rm(self, path: Path) -> bool:
+        self.logger.execute(f"rm -r -f {path}")
+
+        if self.noop:
+            return False
+
+        path.unlink(missing_ok=True)
         return True
 
     def __disable(self, snippet: SnipRecipe):

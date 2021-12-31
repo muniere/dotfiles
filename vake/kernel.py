@@ -74,40 +74,6 @@ class Shell:
         )
         return code == 0
 
-    def mkdir(self, path: Union[str, Path], recursive: bool = False) -> bool:
-        args = ["mkdir"]
-
-        if recursive:
-            args.append("-p")
-
-        args.append(str(path))
-
-        return self.execute(args)
-
-    def remove(self, path: Union[str, Path], recursive: bool = False, force: bool = False) -> bool:
-        args = ["rm"]
-
-        if recursive:
-            args.append("-r")
-
-        if force:
-            args.append("-f")
-
-        args.append(str(path))
-
-        return self.execute(args)
-
-    def symlink(self, src: Union[str, Path], dst: Union[str, Path], force: bool = False) -> bool:
-        args = ["ln", "-s"]
-
-        if force:
-            args.append("-f")
-
-        args.append(str(src))
-        args.append(str(dst))
-
-        return self.execute(args)
-
     def execute(self, command: Union[List[str], str]) -> bool:
         if isinstance(command, list):
             args = command
