@@ -86,11 +86,10 @@ class PrefBook(metaclass=ABCMeta):
 class SnipRecipe:
     src: Path
     dst: Path
-    hook: Hook = Hook.noop()
 
     @staticmethod
-    def create(src: str, dst: str, hook: Hook = Hook.noop()) -> 'SnipRecipe':
-        return SnipRecipe(src=Path(src), dst=Path(dst), hook=hook)
+    def create(src: str, dst: str) -> 'SnipRecipe':
+        return SnipRecipe(src=Path(src), dst=Path(dst))
 
 
 class SnipBook(metaclass=ABCMeta):
