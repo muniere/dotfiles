@@ -16,8 +16,8 @@ __all__ = [
 
 
 class Command(Enum):
-    DEPLOY = "deploy"
-    UNDEPLOY = "undeploy"
+    LINK = "link"
+    UNLINK = "unlink"
     INSTALL = "install"
     UNINSTALL = "uninstall"
     STATUS = "status"
@@ -130,11 +130,11 @@ class CLI:
         context = parser.parse(args)
 
         # commands
-        if context.command == Command.DEPLOY:
+        if context.command == Command.LINK:
             self.__deploy(context)
             sys.exit(0)
 
-        if context.command == Command.UNDEPLOY:
+        if context.command == Command.UNLINK:
             self.__undeploy(context)
             sys.exit(0)
 
