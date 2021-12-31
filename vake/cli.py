@@ -4,10 +4,10 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import List
 
+from . import kernel
 from . import timber
 from .intent import BrewInstallAction, BrewUninstallAction, BrewStatusAction
 from .intent import PrefInstallAction, PrefUninstallAction, PrefStatusAction
-from .kernel import Identity
 from .timber import Level, ColoredFormatter, StreamHandler, Lumber
 
 __all__ = [
@@ -205,7 +205,7 @@ class Application:
 
         noop = context.dry_run
         logger = context.logger()
-        identity = Identity.detect()
+        identity = kernel.identify()
 
         actions = []
 

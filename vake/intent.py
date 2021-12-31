@@ -5,9 +5,9 @@ from pathlib import Path
 from typing import List
 
 from . import config
+from . import kernel
 from . import shell
 from .config import PrefRecipe, PrefBook, SnipRecipe, SnipBook
-from .kernel import Identity
 from .timber import Lumber
 
 __all__ = [
@@ -42,7 +42,7 @@ SNIPPET_DIR = "./snippet"
 
 class PrefAction(Action, metaclass=ABCMeta):
     def recipes(self) -> List[PrefRecipe]:
-        identity = Identity.detect()
+        identity = kernel.identify()
 
         # shared
         books: List[PrefBook] = [
@@ -88,7 +88,7 @@ class PrefAction(Action, metaclass=ABCMeta):
 
 class PrefInstallAction(PrefAction):
     def run(self):
-        identity = Identity.detect()
+        identity = kernel.identify()
 
         for recipe in self.recipes():
             if recipe.src.is_absolute():
@@ -233,7 +233,7 @@ class PrefInstallAction(PrefAction):
 
 class PrefUninstallAction(PrefAction):
     def run(self):
-        identity = Identity.detect()
+        identity = kernel.identify()
 
         for recipe in self.recipes():
             self.__run(recipe, identifier=identity.value)
@@ -358,7 +358,7 @@ class PrefUninstallAction(PrefAction):
 
 class PrefStatusAction(PrefAction):
     def run(self):
-        identity = Identity.detect()
+        identity = kernel.identify()
         recipes = sorted(self.recipes(), key=lambda x: x.dst)
 
         for recipe in recipes:
@@ -389,7 +389,7 @@ class BrewAction(Action, metaclass=ABCMeta):
         shell.ensure("brew")
 
     def _load_kegs(self) -> List[Keg]:
-        identity = Identity.detect()
+        identity = kernel.identify()
         src = Path(STATIC_DIR, identity.value, "Brewfile").resolve()
 
         self.logger.debug(f"Read kegs from file: {src}")
