@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Optional, List
 
 from .kernel import Identity, Shell
-from .winston import LoggerWrapper
+from .timber import Lumber
 
 __all__ = [
     'PrefInstallAction', 'PrefUninstallAction', 'PrefStatusAction',
@@ -19,10 +19,10 @@ __all__ = [
 # ==
 class Action(metaclass=ABCMeta):
     noop: bool
-    logger: Optional[LoggerWrapper]
+    logger: Optional[Lumber]
     shell: Shell
 
-    def __init__(self, noop: bool = False, logger: Optional[LoggerWrapper] = None):
+    def __init__(self, noop: bool = False, logger: Optional[Lumber] = None):
         self.noop = noop
         self.logger = logger
         self.shell = Shell(noop, logger)
@@ -35,10 +35,10 @@ class Action(metaclass=ABCMeta):
 
 class Hook(metaclass=ABCMeta):
     noop: bool
-    logger: Optional[LoggerWrapper]
+    logger: Optional[Lumber]
     shell: Shell
 
-    def __init__(self, noop: bool = False, logger: Optional[LoggerWrapper] = None):
+    def __init__(self, noop: bool = False, logger: Optional[Lumber] = None):
         self.noop = noop
         self.logger = logger
         self.shell = Shell(noop, logger)
@@ -153,7 +153,7 @@ class Cookbook:
         ])
 
     @staticmethod
-    def vim(noop: bool = False, logger: Optional[LoggerWrapper] = None) -> 'Cookbook':
+    def vim(noop: bool = False, logger: Optional[Lumber] = None) -> 'Cookbook':
         return Cookbook([
             Recipe.create(
                 src="vimrc",

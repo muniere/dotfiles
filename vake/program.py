@@ -3,11 +3,11 @@ from argparse import ArgumentParser
 from enum import Enum
 from typing import List
 
-from . import winston
+from . import timber
 from .intent import BrewInstallAction, BrewUninstallAction, BrewStatusAction
 from .intent import PrefInstallAction, PrefUninstallAction, PrefStatusAction
 from .kernel import Identity
-from .winston import Level, ColoredFormatter, StreamHandler, LoggerWrapper
+from .timber import Level, ColoredFormatter, StreamHandler, Lumber
 
 __all__ = [
     'CLI'
@@ -93,7 +93,7 @@ class Context:
         self.verbose = False
         return
 
-    def logger(self) -> LoggerWrapper:
+    def logger(self) -> Lumber:
         """
         Create a new logger.
 
@@ -110,7 +110,7 @@ class Context:
         handler.set_level(level)
         handler.set_formatter(formatter)
 
-        logger = winston.get_logger(__name__)
+        logger = timber.get_logger(__name__)
         logger.set_level(level)
         logger.add_handler(handler)
 
@@ -136,7 +136,7 @@ class CLI:
         """
 
         # logging
-        winston.bootstrap()
+        timber.bootstrap()
 
         # context
         context = Context.parse(args)

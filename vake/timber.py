@@ -3,7 +3,7 @@ from enum import Enum
 from typing import Optional
 
 __all__ = [
-    'Level', 'ColoredFormatter', 'StreamHandler', 'LoggerWrapper',
+    'Level', 'ColoredFormatter', 'StreamHandler', 'Lumber',
     'bootstrap', 'get_logger',
 ]
 
@@ -51,7 +51,7 @@ class StreamHandler(logging.StreamHandler):
         self.setFormatter(formatter)
 
 
-class LoggerWrapper:
+class Lumber:
 
     def __init__(self, delegate: logging.Logger):
         self._delegate = delegate
@@ -81,8 +81,8 @@ class LoggerWrapper:
         self._delegate.addHandler(handler)
 
 
-def get_logger(name: Optional[str] = None) -> LoggerWrapper:
-    return LoggerWrapper(delegate=logging.getLogger(name))
+def get_logger(name: Optional[str] = None) -> Lumber:
+    return Lumber(delegate=logging.getLogger(name))
 
 
 def bootstrap():

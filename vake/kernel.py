@@ -4,7 +4,7 @@ from pathlib import Path
 from subprocess import CompletedProcess
 from typing import Optional, Union, List
 
-from .winston import LoggerWrapper
+from .timber import Lumber
 
 __all__ = [
     'Identity', 'Shell'
@@ -58,9 +58,9 @@ class Identity(Enum):
 
 class Shell:
     noop: bool
-    logger: Optional[LoggerWrapper]
+    logger: Optional[Lumber]
 
-    def __init__(self, noop: bool = False, logger: Optional[LoggerWrapper] = None):
+    def __init__(self, noop: bool = False, logger: Optional[Lumber] = None):
         self.noop = noop
         self.logger = logger
         return
