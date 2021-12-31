@@ -3,7 +3,7 @@ import itertools
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional, List
+from typing import List
 
 from .kernel import Identity, Shell
 from .timber import Lumber
@@ -18,14 +18,14 @@ __all__ = [
 # Base
 # ==
 class Action(metaclass=ABCMeta):
+    logger: Lumber
     noop: bool
-    logger: Optional[Lumber]
     shell: Shell
 
-    def __init__(self, noop: bool = False, logger: Optional[Lumber] = None):
-        self.noop = noop
+    def __init__(self, logger: Lumber = Lumber.noop(), noop: bool = False):
         self.logger = logger
-        self.shell = Shell(noop, logger)
+        self.noop = noop
+        self.shell = Shell(logger, noop)
         return
 
     @abstractmethod
@@ -156,7 +156,7 @@ class Cookbook:
         ])
 
     @staticmethod
-    def vim(noop: bool = False, logger: Optional[Lumber] = None) -> 'Cookbook':
+    def vim(logger: Lumber = Lumber.noop(), noop: bool = False) -> 'Cookbook':
         return Cookbook([
             Recipe.create(
                 src="vimrc",
@@ -165,7 +165,7 @@ class Cookbook:
             Recipe.create(
                 src="vim",
                 dst="~/.vim",
-                hook=VimHook(noop=noop, logger=logger)
+                hook=VimHook(logger=logger, noop=noop)
             ),
         ])
 
@@ -309,7 +309,7 @@ class PrefAction(Action, metaclass=ABCMeta):
             Cookbook.bash(),
             Cookbook.zsh(),
             Cookbook.git(),
-            Cookbook.vim(noop=self.noop, logger=self.logger),
+            Cookbook.vim(logger=self.logger, noop=self.noop),
             Cookbook.tmux(),
             Cookbook.gradle(),
         ]
@@ -384,9 +384,8 @@ class PrefInstallAction(PrefAction):
 
     def __run(self, recipe: Recipe, identifier="default") -> bool:
         if not self.__istarget(recipe):
-            if self.logger:
-                rel = Path(STATIC_DIR, identifier, recipe.src).relative_to(Path.cwd())
-                self.logger.info(f"File is not target: {rel}")
+            rel = Path(STATIC_DIR, identifier, recipe.src).relative_to(Path.cwd())
+            self.logger.info(f"File is not target: {rel}")
             return False
 
         if recipe.src.is_absolute():
@@ -409,8 +408,7 @@ class PrefInstallAction(PrefAction):
 
         # dst link already exists
         if dst.is_symlink():
-            if self.logger:
-                self.logger.info(f"Symlink already exists: {dst}")
+            self.logger.info(f"Symlink already exists: {dst}")
             return False
 
         #
@@ -419,8 +417,7 @@ class PrefInstallAction(PrefAction):
         if src.is_file():
             # another file already exists
             if dst.is_file():
-                if self.logger:
-                    self.logger.info(f"File already exists: {dst}")
+                self.logger.info(f"File already exists: {dst}")
                 return False
 
             # ensure parent directory
@@ -461,8 +458,7 @@ class PrefInstallAction(PrefAction):
 
         # new file
         if not dst.exists():
-            if self.logger:
-                self.logger.execute(f"Enable snippet {src}")
+            self.logger.execute(f"Enable snippet {src}")
 
             if not self.noop:
                 dst.write_text(src_str + "\n")
@@ -473,13 +469,11 @@ class PrefInstallAction(PrefAction):
 
         # skip: already enabled
         if src_str in dst_str:
-            if self.logger:
-                self.logger.info(f"Snippet already enabled: {dst}")
+            self.logger.info(f"Snippet already enabled: {dst}")
             return
 
         # enable
-        if self.logger:
-            self.logger.execute(f"Enable {src}")
+        self.logger.execute(f"Enable {src}")
 
         if not self.noop:
             dst.write_text(dst_str + src_str + "\n")
@@ -514,9 +508,8 @@ class PrefUninstallAction(PrefAction):
 
     def __run(self, recipe: Recipe, identifier: str = "default") -> bool:
         if not self.__istarget(recipe):
-            if self.logger:
-                rel = Path(STATIC_DIR, identifier, recipe.src).relative_to(Path.cwd())
-                self.logger.info(f"File is not target: {rel}")
+            rel = Path(STATIC_DIR, identifier, recipe.src).relative_to(Path.cwd())
+            self.logger.info(f"File is not target: {rel}")
             return False
 
         if recipe.src.is_absolute():
@@ -539,8 +532,7 @@ class PrefUninstallAction(PrefAction):
 
         # dst not found
         if not dst.exists() and not dst.is_symlink():
-            if self.logger:
-                self.logger.info(f"File already removed: {dst}")
+            self.logger.info(f"File already removed: {dst}")
             return True
 
         #
@@ -553,8 +545,7 @@ class PrefUninstallAction(PrefAction):
         # file
         #
         if dst.is_file():
-            if self.logger:
-                self.logger.info(f"File is not symlink: {dst}")
+            self.logger.info(f"File is not symlink: {dst}")
             return False
 
         #
@@ -594,13 +585,11 @@ class PrefUninstallAction(PrefAction):
 
         # skip: already disabled
         if src_str not in dst_str:
-            if self.logger:
-                self.logger.info(f"Snippet already disabled: {dst}")
+            self.logger.info(f"Snippet already disabled: {dst}")
             return
 
         # disable
-        if self.logger:
-            self.logger.execute(f"Disable snippet {src}")
+        self.logger.execute(f"Disable snippet {src}")
 
         if not self.noop:
             dst.write_text(dst_str.replace(src_str, ""))
@@ -638,14 +627,14 @@ class PrefStatusAction(PrefAction):
 
 
 class VimHook(Hook):
+    logger: Lumber
     noop: bool
-    logger: Optional[Lumber]
     shell: Shell
 
-    def __init__(self, noop: bool = False, logger: Optional[Lumber] = None):
-        self.noop = noop
+    def __init__(self, logger: Lumber = Lumber.noop(), noop: bool = False):
         self.logger = logger
-        self.shell = Shell(noop, logger)
+        self.noop = noop
+        self.shell = Shell(logger, noop)
         return
 
     def activate(self):
@@ -685,8 +674,7 @@ class BrewAction(Action, metaclass=ABCMeta):
         identity = Identity.detect()
         src = Path(STATIC_DIR, identity.value, BREWFILE).resolve()
 
-        if self.logger:
-            self.logger.debug(f"Read kegs from file: {src}")
+        self.logger.debug(f"Read kegs from file: {src}")
 
         if not src.exists():
             return []

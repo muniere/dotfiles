@@ -1,6 +1,6 @@
 import logging
+from abc import ABCMeta, abstractmethod
 from enum import Enum
-from typing import Optional
 
 __all__ = [
     'Level', 'ColoredFormatter', 'StreamHandler', 'Lumber',
@@ -51,7 +51,46 @@ class StreamHandler(logging.StreamHandler):
         self.setFormatter(formatter)
 
 
-class Lumber:
+class Lumber(metaclass=ABCMeta):
+
+    @staticmethod
+    def noop() -> 'Lumber':
+        return NoopLumber()
+
+    @abstractmethod
+    def debug(self, msg, *args, **kwargs):
+        pass
+
+    @abstractmethod
+    def info(self, msg, *args, **kwargs):
+        pass
+
+    @abstractmethod
+    def warn(self, msg, *args, **kwargs):
+        pass
+
+    @abstractmethod
+    def warning(self, msg, *args, **kwargs):
+        pass
+
+    @abstractmethod
+    def error(self, msg, *args, **kwargs):
+        pass
+
+    @abstractmethod
+    def execute(self, cmd, *args, **kwargs):
+        pass
+
+    @abstractmethod
+    def set_level(self, level: Level):
+        pass
+
+    @abstractmethod
+    def add_handler(self, handler: logging.Handler):
+        pass
+
+
+class DefaultLumber(Lumber):
 
     def __init__(self, delegate: logging.Logger):
         self._delegate = delegate
@@ -81,8 +120,35 @@ class Lumber:
         self._delegate.addHandler(handler)
 
 
-def get_logger(name: Optional[str] = None) -> Lumber:
-    return Lumber(delegate=logging.getLogger(name))
+class NoopLumber(Lumber):
+
+    def debug(self, msg, *args, **kwargs):
+        pass
+
+    def info(self, msg, *args, **kwargs):
+        pass
+
+    def warn(self, msg, *args, **kwargs):
+        pass
+
+    def warning(self, msg, *args, **kwargs):
+        pass
+
+    def error(self, msg, *args, **kwargs):
+        pass
+
+    def execute(self, cmd, *args, **kwargs):
+        pass
+
+    def set_level(self, level: Level):
+        raise RuntimeError("Cannot set level for noop")
+
+    def add_handler(self, handler: logging.Handler):
+        raise RuntimeError("Cannot add handler for noop")
+
+
+def get_logger(name: str) -> Lumber:
+    return DefaultLumber(delegate=logging.getLogger(name))
 
 
 def bootstrap():

@@ -57,10 +57,10 @@ class Identity(Enum):
 
 
 class Shell:
+    logger: Lumber
     noop: bool
-    logger: Optional[Lumber]
 
-    def __init__(self, noop: bool = False, logger: Optional[Lumber] = None):
+    def __init__(self, logger: Lumber = Lumber.noop(), noop: bool = False):
         self.noop = noop
         self.logger = logger
         return
@@ -119,8 +119,7 @@ class Shell:
         if not args:
             return False
 
-        if self.logger:
-            self.logger.execute(" ".join(args))
+        self.logger.execute(" ".join(args))
 
         if self.noop:
             return True
