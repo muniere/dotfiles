@@ -7,6 +7,7 @@ from typing import List
 from . import config
 from . import kernel
 from . import shell
+from . import locate
 from .config import PrefRecipe, PrefBook, SnipRecipe, SnipBook
 from .timber import Lumber
 
@@ -36,16 +37,6 @@ class Action(metaclass=ABCMeta):
 # ==
 # Pref
 # ==
-class Locator:
-    @staticmethod
-    def static() -> Path:
-        return Path('./static')
-
-    @staticmethod
-    def snippet() -> Path:
-        return Path('./snippet')
-
-
 class PrefAction(Action, metaclass=ABCMeta):
     def recipes(self) -> List[PrefRecipe]:
         identity = kernel.identify()
@@ -112,14 +103,14 @@ class PrefInstallAction(PrefAction):
 
     def __run(self, recipe: PrefRecipe, identifier='default') -> bool:
         if not self.__istarget(recipe):
-            rel = Path(Locator.static(), identifier, recipe.src).relative_to(Path.cwd())
+            rel = Path(locate.static(), identifier, recipe.src).relative_to(Path.cwd())
             self.logger.info(f'File is not target: {rel}')
             return False
 
         if recipe.src.is_absolute():
             src = Path(recipe.src)
         else:
-            src = Path(Locator.static(), identifier, recipe.src).resolve()
+            src = Path(locate.static(), identifier, recipe.src).resolve()
 
         if recipe.dst.is_absolute():
             dst = Path(recipe.dst)
@@ -190,7 +181,7 @@ class PrefInstallAction(PrefAction):
         #
         # source
         #
-        src = Path(Locator.snippet(), snippet.src)
+        src = Path(locate.snippet(), snippet.src)
 
         if not src.exists():
             return
@@ -254,14 +245,14 @@ class PrefUninstallAction(PrefAction):
 
     def __run(self, recipe: PrefRecipe, identifier: str = 'default') -> bool:
         if not self.__istarget(recipe):
-            rel = Path(Locator.static(), identifier, recipe.src).relative_to(Path.cwd())
+            rel = Path(locate.static(), identifier, recipe.src).relative_to(Path.cwd())
             self.logger.info(f'File is not target: {rel}')
             return False
 
         if recipe.src.is_absolute():
             src = Path(recipe.src)
         else:
-            src = Path(Locator.static(), identifier, recipe.src).resolve()
+            src = Path(locate.static(), identifier, recipe.src).resolve()
 
         if recipe.dst.is_absolute():
             dst = Path(recipe.dst)
@@ -319,7 +310,7 @@ class PrefUninstallAction(PrefAction):
         #
         # source
         #
-        src = Path(Locator.snippet(), snippet.src)
+        src = Path(locate.snippet(), snippet.src)
 
         if not src.exists():
             return
@@ -396,7 +387,7 @@ class BrewAction(Action, metaclass=ABCMeta):
 
     def _load_kegs(self) -> List[Keg]:
         identity = kernel.identify()
-        src = Path(Locator.static(), identity.value, 'Brewfile').resolve()
+        src = Path(locate.static(), identity.value, 'Brewfile').resolve()
 
         self.logger.debug(f'Read kegs from file: {src}')
 
