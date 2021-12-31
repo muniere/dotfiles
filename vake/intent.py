@@ -365,9 +365,9 @@ class PrefStatusAction(PrefAction):
                 continue
 
             if identity.is_darwin():
-                shell.execute(['ls', '-lFG', target], logger=self.logger, noop=False)
+                shell.execute(['ls', '-lFG', str(target)], logger=self.logger, noop=False)
             else:
-                shell.execute(['ls', '-lFo', target], logger=self.logger, noop=False)
+                shell.execute(['ls', '-lFo', str(target)], logger=self.logger, noop=False)
 
         return True
 
