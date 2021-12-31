@@ -1,11 +1,12 @@
-import glob
 import itertools
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List
 
+from . import provision
 from .kernel import Identity, Shell
+from .provision import PrefRecipe, PrefBook, SnipRecipe, SnipBook
 from .timber import Lumber
 
 __all__ = [
@@ -33,29 +34,6 @@ class Action(metaclass=ABCMeta):
         pass
 
 
-class Hook(metaclass=ABCMeta):
-    @staticmethod
-    def noop() -> 'Hook':
-        return NoopHook()
-
-    @abstractmethod
-    def activate(self):
-        pass
-
-    @abstractmethod
-    def deactivate(self):
-        pass
-
-
-class NoopHook(Hook):
-
-    def activate(self):
-        pass
-
-    def deactivate(self):
-        pass
-
-
 # ==
 # Pref
 # ==
@@ -63,255 +41,20 @@ STATIC_DIR = "./static"
 SNIPPET_DIR = "./snippet"
 
 
-@dataclass
-class Recipe:
-    src: Path
-    dst: Path
-    hook: Hook = Hook.noop()
-
-    @staticmethod
-    def create(
-        src: str,
-        dst: str,
-        hook: Hook = Hook.noop(),
-    ) -> 'Recipe':
-        return Recipe(src=Path(src), dst=Path(dst), hook=hook)
-
-    @staticmethod
-    def glob(
-        src: str,
-        dst: str,
-        hook: Hook = Hook.noop(),
-    ) -> List['Recipe']:
-        pattern = str(Path(dst).expanduser())
-        return [
-            Recipe(src=Path(src), dst=Path(dst), hook=hook)
-            for dst in glob.glob(pattern)
-        ]
-
-
-@dataclass
-class Cookbook:
-    recipes: List[Recipe]
-
-    @staticmethod
-    def bin() -> 'Cookbook':
-        return Cookbook([
-            Recipe.create(
-                src="bin",
-                dst="~/.bin"
-            ),
-        ])
-
-    @staticmethod
-    def sh() -> 'Cookbook':
-        return Cookbook([
-            Recipe.create(
-                src="sh.d",
-                dst="~/.sh.d"
-            ),
-        ])
-
-    @staticmethod
-    def bash() -> 'Cookbook':
-        return Cookbook([
-            Recipe.create(
-                src="bash.d",
-                dst="~/.bash.d"
-            ),
-            Recipe.create(
-                src="bash_completion.d",
-                dst="~/.bash_completion.d"
-            ),
-        ])
-
-    @staticmethod
-    def zsh() -> 'Cookbook':
-        return Cookbook([
-            Recipe.create(
-                src="zsh.d",
-                dst="~/.zsh.d"
-            ),
-            Recipe.create(
-                src="zsh-completions",
-                dst="~/.zsh-completions"
-            ),
-            Recipe.create(
-                src="/usr/local/library/Contributions/brew_zsh_completion.zsh",
-                dst="~/.zsh-completions/_brew"
-            ),
-        ])
-
-    @staticmethod
-    def git() -> 'Cookbook':
-        return Cookbook([
-            Recipe.create(
-                src="gitconfig",
-                dst="~/.gitconfig"
-            ),
-            Recipe.create(
-                src="tigrc",
-                dst="~/.tigrc"
-            ),
-        ])
-
-    @staticmethod
-    def vim(logger: Lumber = Lumber.noop(), noop: bool = False) -> 'Cookbook':
-        return Cookbook([
-            Recipe.create(
-                src="vimrc",
-                dst="~/.vimrc"
-            ),
-            Recipe.create(
-                src="vim",
-                dst="~/.vim",
-                hook=VimHook(logger=logger, noop=noop)
-            ),
-        ])
-
-    @staticmethod
-    def asdf() -> 'Cookbook':
-        return Cookbook([
-            Recipe.create(
-                src="asdfrc",
-                dst="~/.asdfrc"
-            ),
-        ])
-
-    @staticmethod
-    def tmux() -> 'Cookbook':
-        return Cookbook([
-            Recipe.create(
-                src="tmux.conf",
-                dst="~/.tmux.conf"
-            ),
-        ])
-
-    @staticmethod
-    def gradle() -> 'Cookbook':
-        return Cookbook([
-            Recipe.create(
-                src="gradle",
-                dst="~/.gradle"
-            ),
-        ])
-
-    @staticmethod
-    def xcode() -> 'Cookbook':
-        return Cookbook([
-            *Recipe.glob(
-                src="Xcode",
-                dst="~/Library/Developer/Xcode"
-            )
-        ])
-
-    @staticmethod
-    def intellij_idea() -> 'Cookbook':
-        return Cookbook([
-            *Recipe.glob(
-                src="IntelliJIdea",
-                dst="~/Library/Preferences/IntelliJIdea*"
-            ),
-            *Recipe.glob(
-                src="IntelliJIdea",
-                dst="~/Library/ApplicationSupport/JetBrains/IntelliJIdea*"
-            ),
-        ])
-
-    @staticmethod
-    def android_studio() -> 'Cookbook':
-        return Cookbook([
-            *Recipe.glob(
-                src="AndroidStudio",
-                dst="~/Library/Preferences/AndroidStudio*"
-            ),
-            *Recipe.glob(
-                src="AndroidStudio",
-                dst="~/Library/ApplicationSupport/Google/AndroidStudio*"
-            ),
-        ])
-
-    @staticmethod
-    def app_code() -> 'Cookbook':
-        return Cookbook([
-            *Recipe.glob(
-                src="AppCode",
-                dst="~/Library/Preferences/AppCode*"
-            ),
-            *Recipe.glob(
-                src="AppCode",
-                dst="~/Library/ApplicationSupport/JetBrains/AppCode*"
-            ),
-        ])
-
-    @staticmethod
-    def ruby_mine() -> 'Cookbook':
-        return Cookbook([
-            *Recipe.glob(
-                src="RubyMine",
-                dst="~/Library/Preferences/RubyMine*"
-            ),
-            *Recipe.glob(
-                src="RubyMine",
-                dst="~/Library/ApplicationSupport/JetBrains/RubyMine*"
-            ),
-        ])
-
-    @staticmethod
-    def go_land() -> 'Cookbook':
-        return Cookbook([
-            *Recipe.glob(
-                src="GoLand",
-                dst="~/Library/Preferences/GoLand*"
-            ),
-            *Recipe.glob(
-                src="GoLand",
-                dst="~/Library/ApplicationSupport/JetBrains/GoLand*"
-            ),
-        ])
-
-    @staticmethod
-    def c_lion() -> 'Cookbook':
-        return Cookbook([
-            *Recipe.glob(
-                src="CLion",
-                dst="~/Library/Preferences/CLion*"
-            ),
-            *Recipe.glob(
-                src="CLion",
-                dst="~/Library/ApplicationSupport/JetBrains/CLion*"
-            ),
-        ])
-
-    @staticmethod
-    def rider() -> 'Cookbook':
-        return Cookbook([
-            *Recipe.glob(
-                src="Rider",
-                dst="~/Library/Preferences/Rider*"
-            ),
-            *Recipe.glob(
-                src="Rider",
-                dst="~/Library/ApplicationSupport/JetBrains/Rider*"
-            ),
-        ])
-
-
 class PrefAction(Action, metaclass=ABCMeta):
-    def recipes(self) -> List[Recipe]:
-        books: List[Cookbook] = []
+    def recipes(self) -> List[PrefRecipe]:
         identity = Identity.detect()
 
         # shared
-        books += [
-            Cookbook.bin(),
-            Cookbook.sh(),
-            Cookbook.bash(),
-            Cookbook.zsh(),
-            Cookbook.git(),
-            Cookbook.vim(logger=self.logger, noop=self.noop),
-            Cookbook.tmux(),
-            Cookbook.gradle(),
+        books: List[PrefBook] = [
+            provision.BinPrefBook(),
+            provision.ShPrefBook(),
+            provision.BashPrefBook(),
+            provision.ZshPrefBook(),
+            provision.GitPrefBook(),
+            provision.VimPrefBook(logger=self.logger, noop=self.noop),
+            provision.TmuxPrefBook(),
+            provision.GradlePrefBook(),
         ]
 
         # linux
@@ -321,47 +64,27 @@ class PrefAction(Action, metaclass=ABCMeta):
         # darwin
         if identity.is_darwin():
             books += [
-                Cookbook.xcode(),
-                Cookbook.intellij_idea(),
-                Cookbook.android_studio(),
-                Cookbook.app_code(),
-                Cookbook.ruby_mine(),
-                Cookbook.go_land(),
-                Cookbook.c_lion(),
-                Cookbook.rider(),
+                provision.XcodePrefBook(),
+                provision.IntelliJIdeaPrefBook(),
+                provision.AndroidStudioPrefBook(),
+                provision.AppCodePrefBook(),
+                provision.RubyMinePrefBook(),
+                provision.GoLandPrefBook(),
+                provision.CLionPrefBook(),
+                provision.RiderPrefBook(),
             ]
 
-        return list(itertools.chain.from_iterable([book.recipes for book in books]))
+        return list(itertools.chain(*[book.recipes for book in books]))
 
     @staticmethod
-    def snippets() -> List[Recipe]:
-        return [
-            # sh
-            Recipe.create(
-                src="shrc",
-                dst="~/.shrc"
-            ),
-
-            # bash
-            Recipe.create(
-                src="bashrc",
-                dst="~/.bashrc"
-            ),
-            Recipe.create(
-                src="bash_profile",
-                dst="~/.bash_profile"
-            ),
-
-            # zsh
-            Recipe.create(
-                src="zshrc",
-                dst="~/.zshrc"
-            ),
-            Recipe.create(
-                src="zshprofile",
-                dst="~/.zshprofile"
-            ),
+    def snippets() -> List[SnipRecipe]:
+        books: List[SnipBook] = [
+            provision.ShSnipBook(),
+            provision.BashSnipBook(),
+            provision.ZshSnipBook(),
         ]
+
+        return list(itertools.chain(*[book.recipes for book in books]))
 
 
 class PrefInstallAction(PrefAction):
@@ -382,7 +105,7 @@ class PrefInstallAction(PrefAction):
 
         return
 
-    def __run(self, recipe: Recipe, identifier="default") -> bool:
+    def __run(self, recipe: PrefRecipe, identifier="default") -> bool:
         if not self.__istarget(recipe):
             rel = Path(STATIC_DIR, identifier, recipe.src).relative_to(Path.cwd())
             self.logger.info(f"File is not target: {rel}")
@@ -434,12 +157,12 @@ class PrefInstallAction(PrefAction):
         if src.is_dir():
             for new_src in [x for x in src.glob("**/*") if x.is_file()]:
                 new_dst = Path(recipe.dst, new_src.relative_to(src))
-                new_recipe = Recipe(src=new_src, dst=new_dst)
+                new_recipe = PrefRecipe(src=new_src, dst=new_dst)
                 self.__run(new_recipe, identifier=identifier)
 
         return True
 
-    def __enable(self, snippet: Recipe):
+    def __enable(self, snippet: SnipRecipe):
 
         #
         # source
@@ -481,7 +204,7 @@ class PrefInstallAction(PrefAction):
         return
 
     @staticmethod
-    def __istarget(recipe: Recipe):
+    def __istarget(recipe: PrefRecipe):
         blacklist = ['*.swp', '*.bak', '*.DS_Store']
 
         for pattern in blacklist:
@@ -506,7 +229,7 @@ class PrefUninstallAction(PrefAction):
 
         return
 
-    def __run(self, recipe: Recipe, identifier: str = "default") -> bool:
+    def __run(self, recipe: PrefRecipe, identifier: str = "default") -> bool:
         if not self.__istarget(recipe):
             rel = Path(STATIC_DIR, identifier, recipe.src).relative_to(Path.cwd())
             self.logger.info(f"File is not target: {rel}")
@@ -554,12 +277,12 @@ class PrefUninstallAction(PrefAction):
         if src.is_dir():
             for new_src in [x for x in src.glob("**/*") if x.is_file()]:
                 new_dst = Path(recipe.dst, new_src.relative_to(src))
-                new_recipe = Recipe(src=new_src, dst=new_dst)
+                new_recipe = PrefRecipe(src=new_src, dst=new_dst)
                 self.__run(new_recipe, identifier=identifier)
 
         return True
 
-    def __disable(self, snippet: Recipe):
+    def __disable(self, snippet: SnipRecipe):
 
         #
         # source
@@ -597,7 +320,7 @@ class PrefUninstallAction(PrefAction):
         return
 
     @staticmethod
-    def __istarget(recipe: Recipe):
+    def __istarget(recipe: PrefRecipe):
         blacklist = ['*.swp', '*.DS_Store']
 
         for pattern in blacklist:
@@ -626,37 +349,6 @@ class PrefStatusAction(PrefAction):
         return True
 
 
-class VimHook(Hook):
-    logger: Lumber
-    noop: bool
-    shell: Shell
-
-    def __init__(self, logger: Lumber = Lumber.noop(), noop: bool = False):
-        self.logger = logger
-        self.noop = noop
-        self.shell = Shell(logger, noop)
-        return
-
-    def activate(self):
-        dst = Path("~/.vim/autoload/plug.vim").expanduser()
-
-        if dst.is_file():
-            self.logger.info(f"Vim-Plug is already downloaded: {dst}")
-            return
-
-        self.shell.execute([
-            "curl",
-            "--fail",
-            "--location",
-            "--create-dirs",
-            "--output", str(dst),
-            "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
-        ])
-
-    def deactivate(self):
-        pass
-
-
 # ==
 # Brew
 # ==
@@ -664,7 +356,7 @@ BREW = "brew"
 BREWFILE = "Brewfile"
 
 
-@dataclass(eq=True, frozen=True)
+@dataclass(frozen=True)
 class Keg:
     name: str
 
