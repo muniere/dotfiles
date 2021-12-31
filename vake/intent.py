@@ -34,21 +34,24 @@ class Action(metaclass=ABCMeta):
 
 
 class Hook(metaclass=ABCMeta):
-    noop: bool
-    logger: Optional[Lumber]
-    shell: Shell
-
-    def __init__(self, noop: bool = False, logger: Optional[Lumber] = None):
-        self.noop = noop
-        self.logger = logger
-        self.shell = Shell(noop, logger)
-        return
+    @staticmethod
+    def noop() -> 'Hook':
+        return NoopHook()
 
     @abstractmethod
     def activate(self):
         pass
 
     @abstractmethod
+    def deactivate(self):
+        pass
+
+
+class NoopHook(Hook):
+
+    def activate(self):
+        pass
+
     def deactivate(self):
         pass
 
@@ -64,13 +67,13 @@ SNIPPET_DIR = "./snippet"
 class Recipe:
     src: Path
     dst: Path
-    hook: Optional[Hook] = None
+    hook: Hook = Hook.noop()
 
     @staticmethod
     def create(
         src: str,
         dst: str,
-        hook: Optional[Hook] = None,
+        hook: Hook = Hook.noop(),
     ) -> 'Recipe':
         return Recipe(src=Path(src), dst=Path(dst), hook=hook)
 
@@ -78,7 +81,7 @@ class Recipe:
     def glob(
         src: str,
         dst: str,
-        hook: Optional[Hook] = None,
+        hook: Hook = Hook.noop(),
     ) -> List['Recipe']:
         pattern = str(Path(dst).expanduser())
         return [
@@ -372,8 +375,7 @@ class PrefInstallAction(PrefAction):
                 self.__run(recipe, identifier=identity.value)
                 self.__run(recipe, identifier="default")
 
-            if recipe.hook:
-                recipe.hook.activate()
+            recipe.hook.activate()
 
         for snippet in self.snippets():
             self.__enable(snippet)
@@ -503,8 +505,7 @@ class PrefUninstallAction(PrefAction):
             self.__run(recipe, identifier=identity.value)
             self.__run(recipe, identifier="default")
 
-            if recipe.hook:
-                recipe.hook.deactivate()
+            recipe.hook.deactivate()
 
         for snippet in self.snippets():
             self.__disable(snippet)
@@ -637,6 +638,15 @@ class PrefStatusAction(PrefAction):
 
 
 class VimHook(Hook):
+    noop: bool
+    logger: Optional[Lumber]
+    shell: Shell
+
+    def __init__(self, noop: bool = False, logger: Optional[Lumber] = None):
+        self.noop = noop
+        self.logger = logger
+        self.shell = Shell(noop, logger)
+        return
 
     def activate(self):
         dst = Path("~/.vim/autoload/plug.vim").expanduser()
