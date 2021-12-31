@@ -23,23 +23,23 @@ class ColoredFormatter(logging.Formatter):
         label = record.levelname.ljust(self.__class__.LEVEL_NAME_WIDTH)
         message = record.getMessage()
         levelno = record.levelno
-        return self.colorize(f"[{label}] {message}", levelno=levelno)
+        return self.colorize(f'[{label}] {message}', levelno=levelno)
 
     @staticmethod
     def colorize(message, levelno=logging.NOTSET):
-        reset_str = "\033[0m"
+        reset_str = '\033[0m'
 
         color_dict = {
-            Level.DEBUG.value: "\033[32m",  # green
-            Level.EXEC.value: "\033[35m",  # magenta
-            Level.INFO.value: "\033[36m",  # cyan
-            Level.WARN.value: "\033[33m",  # yellow
-            Level.ERROR.value: "\033[33m",  # red
+            Level.DEBUG.value: '\033[32m',  # green
+            Level.EXEC.value: '\033[35m',  # magenta
+            Level.INFO.value: '\033[36m',  # cyan
+            Level.WARN.value: '\033[33m',  # yellow
+            Level.ERROR.value: '\033[33m',  # red
         }
 
         color_str = color_dict.get(levelno, reset_str)
 
-        return f"{color_str}{message}{reset_str}"
+        return f'{color_str}{message}{reset_str}'
 
 
 class StreamHandler(logging.StreamHandler):
@@ -141,10 +141,10 @@ class NoopLumber(Lumber):
         pass
 
     def set_level(self, level: Level):
-        raise RuntimeError("Cannot set level for noop")
+        raise RuntimeError('Cannot set level for noop')
 
     def add_handler(self, handler: logging.Handler):
-        raise RuntimeError("Cannot add handler for noop")
+        raise RuntimeError('Cannot add handler for noop')
 
 
 def get_logger(name: str) -> Lumber:
@@ -152,8 +152,8 @@ def get_logger(name: str) -> Lumber:
 
 
 def bootstrap():
-    logging.addLevelName(Level.DEBUG.value, "DEBUG")
-    logging.addLevelName(Level.EXEC.value, "EXEC")
-    logging.addLevelName(Level.INFO.value, "INFO")
-    logging.addLevelName(Level.WARN.value, "WARN")
-    logging.addLevelName(Level.ERROR.value, "ERROR")
+    logging.addLevelName(Level.DEBUG.value, 'DEBUG')
+    logging.addLevelName(Level.EXEC.value, 'EXEC')
+    logging.addLevelName(Level.INFO.value, 'INFO')
+    logging.addLevelName(Level.WARN.value, 'WARN')
+    logging.addLevelName(Level.ERROR.value, 'ERROR')

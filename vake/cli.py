@@ -16,17 +16,17 @@ __all__ = [
 
 
 class Command(Enum):
-    LINK = "link"
-    UNLINK = "unlink"
-    INSTALL = "install"
-    UNINSTALL = "uninstall"
-    STATUS = "status"
-    COMPLETION = "completion"
+    LINK = 'link'
+    UNLINK = 'unlink'
+    INSTALL = 'install'
+    UNINSTALL = 'uninstall'
+    STATUS = 'status'
+    COMPLETION = 'completion'
 
 
 class Completion:
-    SOURCE = "template/_xake"
-    DESTINATION = "static/default/zsh-completions/_xake"
+    SOURCE = 'template/_xake'
+    DESTINATION = 'static/default/zsh-completions/_xake'
 
 
 @dataclass(frozen=True)
@@ -63,20 +63,20 @@ class ContextParser:
     delegate: ArgumentParser
 
     def __init__(self):
-        commands = "|".join([x.value for x in Command])
+        commands = '|'.join([x.value for x in Command])
 
         self.delegate = ArgumentParser()
-        self.delegate.add_argument("-n", "--dry-run",
-                                   dest="dry_run",
-                                   action="store_true",
-                                   help="Do not execute commands actually")
-        self.delegate.add_argument("-v", "--verbose",
-                                   dest="verbose",
-                                   action="store_true",
-                                   help="Show verbose messages")
-        self.delegate.add_argument("command",
+        self.delegate.add_argument('-n', '--dry-run',
+                                   dest='dry_run',
+                                   action='store_true',
+                                   help='Do not execute commands actually')
+        self.delegate.add_argument('-v', '--verbose',
+                                   dest='verbose',
+                                   action='store_true',
+                                   help='Show verbose messages')
+        self.delegate.add_argument('command',
                                    type=str,
-                                   help=f"Command to perform: ({commands})")
+                                   help=f'Command to perform: ({commands})')
 
     def parse(self, args: List[str]) -> 'Context':
         """
@@ -274,8 +274,8 @@ class Application:
 
         template = Template(
             filename=Completion.SOURCE,
-            input_encoding="utf-8",
-            output_encoding="utf-8",
+            input_encoding='utf-8',
+            output_encoding='utf-8',
             bytestring_passthrough=True,
         )
 

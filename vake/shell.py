@@ -5,12 +5,12 @@ from vake.timber import Lumber
 
 
 def ensure(command: str):
-    assert available(command), f"command not available: {command}"
+    assert available(command), f'command not available: {command}'
 
 
 def available(command: str) -> bool:
     code = subprocess.call(
-        ["which", command],
+        ['which', command],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
@@ -18,9 +18,9 @@ def available(command: str) -> bool:
 
 
 def execute(args: List[str], logger: Lumber = Lumber.noop(), noop: bool = False) -> bool:
-    assert len(args) > 0, "args must not be empty"
+    assert len(args) > 0, 'args must not be empty'
 
-    logger.execute(" ".join(args))
+    logger.execute(' '.join(args))
 
     if noop:
         return True
@@ -29,7 +29,7 @@ def execute(args: List[str], logger: Lumber = Lumber.noop(), noop: bool = False)
 
 
 def capture(args: List[str]) -> subprocess.CompletedProcess:
-    assert len(args) > 0, "args must not be empty"
+    assert len(args) > 0, 'args must not be empty'
 
     return subprocess.run(
         args,

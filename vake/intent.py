@@ -36,8 +36,8 @@ class Action(metaclass=ABCMeta):
 # ==
 # Pref
 # ==
-STATIC_DIR = "./static"
-SNIPPET_DIR = "./snippet"
+STATIC_DIR = './static'
+SNIPPET_DIR = './snippet'
 
 
 class PrefAction(Action, metaclass=ABCMeta):
@@ -95,7 +95,7 @@ class PrefInstallAction(PrefAction):
                 self.__run(recipe)
             else:
                 self.__run(recipe, identifier=identity.value)
-                self.__run(recipe, identifier="default")
+                self.__run(recipe, identifier='default')
 
             recipe.hook.activate()
 
@@ -104,10 +104,10 @@ class PrefInstallAction(PrefAction):
 
         return
 
-    def __run(self, recipe: PrefRecipe, identifier="default") -> bool:
+    def __run(self, recipe: PrefRecipe, identifier='default') -> bool:
         if not self.__istarget(recipe):
             rel = Path(STATIC_DIR, identifier, recipe.src).relative_to(Path.cwd())
-            self.logger.info(f"File is not target: {rel}")
+            self.logger.info(f'File is not target: {rel}')
             return False
 
         if recipe.src.is_absolute():
@@ -130,7 +130,7 @@ class PrefInstallAction(PrefAction):
 
         # dst link already exists
         if dst.is_symlink():
-            self.logger.info(f"Symlink already exists: {dst}")
+            self.logger.info(f'Symlink already exists: {dst}')
             return False
 
         #
@@ -139,7 +139,7 @@ class PrefInstallAction(PrefAction):
         if src.is_file():
             # another file already exists
             if dst.is_file():
-                self.logger.info(f"File already exists: {dst}")
+                self.logger.info(f'File already exists: {dst}')
                 return False
 
             # ensure parent directory
@@ -154,7 +154,7 @@ class PrefInstallAction(PrefAction):
         # directory
         #
         if src.is_dir():
-            for new_src in [x for x in src.glob("**/*") if x.is_file()]:
+            for new_src in [x for x in src.glob('**/*') if x.is_file()]:
                 new_dst = Path(recipe.dst, new_src.relative_to(src))
                 new_recipe = PrefRecipe(src=new_src, dst=new_dst)
                 self.__run(new_recipe, identifier=identifier)
@@ -162,7 +162,7 @@ class PrefInstallAction(PrefAction):
         return True
 
     def __mkdir(self, path: Path) -> bool:
-        self.logger.execute(f"mkdir -p {path}")
+        self.logger.execute(f'mkdir -p {path}')
 
         if self.noop:
             return False
@@ -171,7 +171,7 @@ class PrefInstallAction(PrefAction):
         return True
 
     def __symlink(self, src: Path, dst: Path) -> bool:
-        self.logger.execute(f"ln -s -f {src} {dst}")
+        self.logger.execute(f'ln -s -f {src} {dst}')
 
         if self.noop:
             return False
@@ -198,10 +198,10 @@ class PrefInstallAction(PrefAction):
 
         # new file
         if not dst.exists():
-            self.logger.execute(f"Enable snippet {src}")
+            self.logger.execute(f'Enable snippet {src}')
 
             if not self.noop:
-                dst.write_text(src_str + "\n")
+                dst.write_text(src_str + '\n')
 
             return
 
@@ -209,14 +209,14 @@ class PrefInstallAction(PrefAction):
 
         # skip: already enabled
         if src_str in dst_str:
-            self.logger.info(f"Snippet already enabled: {dst}")
+            self.logger.info(f'Snippet already enabled: {dst}')
             return
 
         # enable
-        self.logger.execute(f"Enable {src}")
+        self.logger.execute(f'Enable {src}')
 
         if not self.noop:
-            dst.write_text(dst_str + src_str + "\n")
+            dst.write_text(dst_str + src_str + '\n')
 
         return
 
@@ -237,7 +237,7 @@ class PrefUninstallAction(PrefAction):
 
         for recipe in self.recipes():
             self.__run(recipe, identifier=identity.value)
-            self.__run(recipe, identifier="default")
+            self.__run(recipe, identifier='default')
 
             recipe.hook.deactivate()
 
@@ -246,10 +246,10 @@ class PrefUninstallAction(PrefAction):
 
         return
 
-    def __run(self, recipe: PrefRecipe, identifier: str = "default") -> bool:
+    def __run(self, recipe: PrefRecipe, identifier: str = 'default') -> bool:
         if not self.__istarget(recipe):
             rel = Path(STATIC_DIR, identifier, recipe.src).relative_to(Path.cwd())
-            self.logger.info(f"File is not target: {rel}")
+            self.logger.info(f'File is not target: {rel}')
             return False
 
         if recipe.src.is_absolute():
@@ -272,7 +272,7 @@ class PrefUninstallAction(PrefAction):
 
         # dst not found
         if not dst.exists() and not dst.is_symlink():
-            self.logger.info(f"File already removed: {dst}")
+            self.logger.info(f'File already removed: {dst}')
             return True
 
         #
@@ -285,14 +285,14 @@ class PrefUninstallAction(PrefAction):
         # file
         #
         if dst.is_file():
-            self.logger.info(f"File is not symlink: {dst}")
+            self.logger.info(f'File is not symlink: {dst}')
             return False
 
         #
         # directory
         #
         if src.is_dir():
-            for new_src in [x for x in src.glob("**/*") if x.is_file()]:
+            for new_src in [x for x in src.glob('**/*') if x.is_file()]:
                 new_dst = Path(recipe.dst, new_src.relative_to(src))
                 new_recipe = PrefRecipe(src=new_src, dst=new_dst)
                 self.__run(new_recipe, identifier=identifier)
@@ -300,7 +300,7 @@ class PrefUninstallAction(PrefAction):
         return True
 
     def __rm(self, path: Path) -> bool:
-        self.logger.execute(f"rm -r -f {path}")
+        self.logger.execute(f'rm -r -f {path}')
 
         if self.noop:
             return False
@@ -327,21 +327,21 @@ class PrefUninstallAction(PrefAction):
 
         # not found
         if not dst.exists():
-            self.logger.info(f"File NOT FOUND: {dst}")
+            self.logger.info(f'File NOT FOUND: {dst}')
             return
 
         dst_str = dst.read_text()
 
         # skip: already disabled
         if src_str not in dst_str:
-            self.logger.info(f"Snippet already disabled: {dst}")
+            self.logger.info(f'Snippet already disabled: {dst}')
             return
 
         # disable
-        self.logger.execute(f"Disable snippet {src}")
+        self.logger.execute(f'Disable snippet {src}')
 
         if not self.noop:
-            dst.write_text(dst_str.replace(src_str, ""))
+            dst.write_text(dst_str.replace(src_str, ''))
 
         return
 
@@ -368,9 +368,9 @@ class PrefStatusAction(PrefAction):
                 continue
 
             if identity.is_darwin():
-                shell.execute(["ls", "-lFG", target], logger=self.logger, noop=False)
+                shell.execute(['ls', '-lFG', target], logger=self.logger, noop=False)
             else:
-                shell.execute(["ls", "-lFo", target], logger=self.logger, noop=False)
+                shell.execute(['ls', '-lFo', target], logger=self.logger, noop=False)
 
         return True
 
@@ -386,13 +386,13 @@ class Keg:
 class BrewAction(Action, metaclass=ABCMeta):
     @staticmethod
     def _validate():
-        shell.ensure("brew")
+        shell.ensure('brew')
 
     def _load_kegs(self) -> List[Keg]:
         identity = kernel.identify()
-        src = Path(STATIC_DIR, identity.value, "Brewfile").resolve()
+        src = Path(STATIC_DIR, identity.value, 'Brewfile').resolve()
 
-        self.logger.debug(f"Read kegs from file: {src}")
+        self.logger.debug(f'Read kegs from file: {src}')
 
         if not src.exists():
             return []
@@ -402,7 +402,7 @@ class BrewAction(Action, metaclass=ABCMeta):
 
     @staticmethod
     def _list_kegs() -> List[Keg]:
-        stdout = shell.capture(["brew", "list"]).stdout
+        stdout = shell.capture(['brew', 'list']).stdout
         lines = stdout.decode('utf8').strip().splitlines()
         return [Keg(name) for name in lines]
 
@@ -418,16 +418,16 @@ class BrewInstallAction(BrewAction):
         kegs = self._load_kegs()
 
         if not kegs:
-            self.logger.info("No available kegs were found")
+            self.logger.info('No available kegs were found')
             return
 
         found = self._list_kegs()
 
         for keg in kegs:
             if keg in found:
-                self.logger.info(f"{keg.name} is already installed")
+                self.logger.info(f'{keg.name} is already installed')
             else:
-                shell.execute(["brew", "install", keg.name], logger=self.logger, noop=self.noop)
+                shell.execute(['brew', 'install', keg.name], logger=self.logger, noop=self.noop)
 
         return
 
@@ -443,16 +443,16 @@ class BrewUninstallAction(BrewAction):
         kegs = self._load_kegs()
 
         if not kegs:
-            self.logger.info("No available kegs were found")
+            self.logger.info('No available kegs were found')
             return
 
         found = self._list_kegs()
 
         for keg in found:
             if keg in found:
-                shell.execute(["brew", "uninstall", keg.name], logger=self.logger, noop=self.noop)
+                shell.execute(['brew', 'uninstall', keg.name], logger=self.logger, noop=self.noop)
             else:
-                self.logger.info(f"{keg.name} is not installed")
+                self.logger.info(f'{keg.name} is not installed')
 
         return
 
@@ -465,6 +465,6 @@ class BrewStatusAction(BrewAction):
             self.logger.warning(err)
             return
 
-        shell.execute(["brew", "tap"], logger=self.logger, noop=False)
-        shell.execute(["brew", "list"], logger=self.logger, noop=False)
+        shell.execute(['brew', 'tap'], logger=self.logger, noop=False)
+        shell.execute(['brew', 'list'], logger=self.logger, noop=False)
         return

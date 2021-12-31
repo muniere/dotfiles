@@ -107,8 +107,8 @@ class BinPrefBook(PrefBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
-                src="bin",
-                dst="~/.bin"
+                src='bin',
+                dst='~/.bin'
             ),
         ]
 
@@ -118,8 +118,8 @@ class ShPrefBook(PrefBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
-                src="sh.d",
-                dst="~/.sh.d"
+                src='sh.d',
+                dst='~/.sh.d'
             ),
         ]
 
@@ -129,8 +129,8 @@ class ShSnipBook(SnipBook):
     def recipes(self) -> List[SnipRecipe]:
         return [
             SnipRecipe.create(
-                src="shrc",
-                dst="~/.shrc"
+                src='shrc',
+                dst='~/.shrc'
             ),
         ]
 
@@ -140,12 +140,12 @@ class BashPrefBook(PrefBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
-                src="bash.d",
-                dst="~/.bash.d"
+                src='bash.d',
+                dst='~/.bash.d'
             ),
             PrefRecipe.create(
-                src="bash_completion.d",
-                dst="~/.bash_completion.d"
+                src='bash_completion.d',
+                dst='~/.bash_completion.d'
             ),
         ]
 
@@ -155,12 +155,12 @@ class BashSnipBook(SnipBook):
     def recipes(self) -> List[SnipRecipe]:
         return [
             SnipRecipe.create(
-                src="bashrc",
-                dst="~/.bashrc"
+                src='bashrc',
+                dst='~/.bashrc'
             ),
             SnipRecipe.create(
-                src="bash_profile",
-                dst="~/.bash_profile"
+                src='bash_profile',
+                dst='~/.bash_profile'
             ),
         ]
 
@@ -170,16 +170,16 @@ class ZshPrefBook(PrefBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
-                src="zsh.d",
-                dst="~/.zsh.d"
+                src='zsh.d',
+                dst='~/.zsh.d'
             ),
             PrefRecipe.create(
-                src="zsh-completions",
-                dst="~/.zsh-completions"
+                src='zsh-completions',
+                dst='~/.zsh-completions'
             ),
             PrefRecipe.create(
-                src="/usr/local/library/Contributions/brew_zsh_completion.zsh",
-                dst="~/.zsh-completions/_brew"
+                src='/usr/local/library/Contributions/brew_zsh_completion.zsh',
+                dst='~/.zsh-completions/_brew'
             ),
         ]
 
@@ -189,12 +189,12 @@ class ZshSnipBook(SnipBook):
     def recipes(self) -> List[SnipRecipe]:
         return [
             SnipRecipe.create(
-                src="zshrc",
-                dst="~/.zshrc"
+                src='zshrc',
+                dst='~/.zshrc'
             ),
             SnipRecipe.create(
-                src="zshprofile",
-                dst="~/.zshprofile"
+                src='zshprofile',
+                dst='~/.zshprofile'
             ),
         ]
 
@@ -204,12 +204,12 @@ class GitPrefBook(PrefBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
-                src="gitconfig",
-                dst="~/.gitconfig"
+                src='gitconfig',
+                dst='~/.gitconfig'
             ),
             PrefRecipe.create(
-                src="tigrc",
-                dst="~/.tigrc"
+                src='tigrc',
+                dst='~/.tigrc'
             ),
         ]
 
@@ -227,12 +227,12 @@ class VimPrefBook(PrefBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
-                src="vimrc",
-                dst="~/.vimrc"
+                src='vimrc',
+                dst='~/.vimrc'
             ),
             PrefRecipe.create(
-                src="vim",
-                dst="~/.vim",
+                src='vim',
+                dst='~/.vim',
                 hook=VimHook(logger=self.logger, noop=self.noop)
             ),
         ]
@@ -248,18 +248,18 @@ class VimHook(Hook):
         return
 
     def activate(self):
-        dst = Path("~/.vim/autoload/plug.vim").expanduser()
+        dst = Path('~/.vim/autoload/plug.vim').expanduser()
         if dst.is_file():
-            self.logger.info(f"Vim-Plug is already downloaded: {dst}")
+            self.logger.info(f'Vim-Plug is already downloaded: {dst}')
             return
 
         args = [
-            "curl",
-            "--fail",
-            "--location",
-            "--create-dirs",
-            "--output", str(dst),
-            "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
+            'curl',
+            '--fail',
+            '--location',
+            '--create-dirs',
+            '--output', str(dst),
+            'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
         ]
 
         shell.execute(args, logger=self.logger, noop=self.noop)
@@ -273,8 +273,8 @@ class AsdfPrefBook(PrefBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
-                src="asdfrc",
-                dst="~/.asdfrc"
+                src='asdfrc',
+                dst='~/.asdfrc'
             ),
         ]
 
@@ -284,8 +284,8 @@ class TmuxPrefBook(PrefBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
-                src="tmux.conf",
-                dst="~/.tmux.conf"
+                src='tmux.conf',
+                dst='~/.tmux.conf'
             ),
         ]
 
@@ -295,8 +295,8 @@ class GradlePrefBook(PrefBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
-                src="gradle",
-                dst="~/.gradle"
+                src='gradle',
+                dst='~/.gradle'
             ),
         ]
 
@@ -306,8 +306,8 @@ class XcodePrefBook(PrefBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             *PrefRecipe.glob(
-                src="Xcode",
-                dst="~/Library/Developer/Xcode"
+                src='Xcode',
+                dst='~/Library/Developer/Xcode'
             )
         ]
 
@@ -317,12 +317,12 @@ class IntelliJIdeaPrefBook(PrefBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             *PrefRecipe.glob(
-                src="IntelliJIdea",
-                dst="~/Library/Preferences/IntelliJIdea*"
+                src='IntelliJIdea',
+                dst='~/Library/Preferences/IntelliJIdea*'
             ),
             *PrefRecipe.glob(
-                src="IntelliJIdea",
-                dst="~/Library/ApplicationSupport/JetBrains/IntelliJIdea*"
+                src='IntelliJIdea',
+                dst='~/Library/ApplicationSupport/JetBrains/IntelliJIdea*'
             ),
         ]
 
@@ -332,12 +332,12 @@ class AndroidStudioPrefBook(PrefBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             *PrefRecipe.glob(
-                src="AndroidStudio",
-                dst="~/Library/Preferences/AndroidStudio*"
+                src='AndroidStudio',
+                dst='~/Library/Preferences/AndroidStudio*'
             ),
             *PrefRecipe.glob(
-                src="AndroidStudio",
-                dst="~/Library/ApplicationSupport/Google/AndroidStudio*"
+                src='AndroidStudio',
+                dst='~/Library/ApplicationSupport/Google/AndroidStudio*'
             ),
         ]
 
@@ -347,12 +347,12 @@ class AppCodePrefBook(PrefBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             *PrefRecipe.glob(
-                src="AppCode",
-                dst="~/Library/Preferences/AppCode*"
+                src='AppCode',
+                dst='~/Library/Preferences/AppCode*'
             ),
             *PrefRecipe.glob(
-                src="AppCode",
-                dst="~/Library/ApplicationSupport/JetBrains/AppCode*"
+                src='AppCode',
+                dst='~/Library/ApplicationSupport/JetBrains/AppCode*'
             ),
         ]
 
@@ -362,12 +362,12 @@ class RubyMinePrefBook(PrefBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             *PrefRecipe.glob(
-                src="RubyMine",
-                dst="~/Library/Preferences/RubyMine*"
+                src='RubyMine',
+                dst='~/Library/Preferences/RubyMine*'
             ),
             *PrefRecipe.glob(
-                src="RubyMine",
-                dst="~/Library/ApplicationSupport/JetBrains/RubyMine*"
+                src='RubyMine',
+                dst='~/Library/ApplicationSupport/JetBrains/RubyMine*'
             ),
         ]
 
@@ -377,12 +377,12 @@ class GoLandPrefBook(PrefBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             *PrefRecipe.glob(
-                src="GoLand",
-                dst="~/Library/Preferences/GoLand*"
+                src='GoLand',
+                dst='~/Library/Preferences/GoLand*'
             ),
             *PrefRecipe.glob(
-                src="GoLand",
-                dst="~/Library/ApplicationSupport/JetBrains/GoLand*"
+                src='GoLand',
+                dst='~/Library/ApplicationSupport/JetBrains/GoLand*'
             ),
         ]
 
@@ -392,12 +392,12 @@ class CLionPrefBook(PrefBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             *PrefRecipe.glob(
-                src="CLion",
-                dst="~/Library/Preferences/CLion*"
+                src='CLion',
+                dst='~/Library/Preferences/CLion*'
             ),
             *PrefRecipe.glob(
-                src="CLion",
-                dst="~/Library/ApplicationSupport/JetBrains/CLion*"
+                src='CLion',
+                dst='~/Library/ApplicationSupport/JetBrains/CLion*'
             ),
         ]
 
@@ -407,11 +407,11 @@ class RiderPrefBook(PrefBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             *PrefRecipe.glob(
-                src="Rider",
-                dst="~/Library/Preferences/Rider*"
+                src='Rider',
+                dst='~/Library/Preferences/Rider*'
             ),
             *PrefRecipe.glob(
-                src="Rider",
-                dst="~/Library/ApplicationSupport/JetBrains/Rider*"
+                src='Rider',
+                dst='~/Library/ApplicationSupport/JetBrains/Rider*'
             ),
         ]
