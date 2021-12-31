@@ -7,7 +7,7 @@ from . import winston
 from .intent import BrewInstallAction, BrewUninstallAction, BrewStatusAction
 from .intent import PrefInstallAction, PrefUninstallAction, PrefStatusAction
 from .kernel import Identity
-from .winston import ColoredFormatter, StreamHandler, LoggerWrapper
+from .winston import Level, ColoredFormatter, StreamHandler, LoggerWrapper
 
 __all__ = [
     'CLI'
@@ -100,15 +100,15 @@ class Context:
         :return: New logger instance
         """
         if self.verbose:
-            level = winston.DEBUG
+            level = Level.DEBUG
         else:
-            level = winston.EXEC
+            level = Level.EXEC
 
         formatter = ColoredFormatter()
 
         handler = StreamHandler()
-        handler.setLevel(level)
-        handler.setFormatter(formatter)
+        handler.set_level(level)
+        handler.set_formatter(formatter)
 
         logger = winston.get_logger(__name__)
         logger.set_level(level)

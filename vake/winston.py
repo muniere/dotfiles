@@ -1,18 +1,19 @@
 import logging
-
+from enum import Enum
 from typing import Optional
 
 __all__ = [
-    'DEBUG', 'EXEC', 'INFO', 'WARN', 'ERROR',
-    'ColoredFormatter', 'StreamHandler', 'LoggerWrapper',
+    'Level', 'ColoredFormatter', 'StreamHandler', 'LoggerWrapper',
     'bootstrap', 'get_logger',
 ]
 
-DEBUG = 10
-EXEC = 15
-INFO = 20
-WARN = 30
-ERROR = 40
+
+class Level(Enum):
+    DEBUG = 10
+    EXEC = 15
+    INFO = 20
+    WARN = 30
+    ERROR = 40
 
 
 class ColoredFormatter(logging.Formatter):
@@ -29,11 +30,11 @@ class ColoredFormatter(logging.Formatter):
         reset_str = "\033[0m"
 
         color_dict = {
-            DEBUG: "\033[32m",  # green
-            EXEC: "\033[35m",  # magenta
-            INFO: "\033[36m",  # cyan
-            WARN: "\033[33m",  # yellow
-            ERROR: "\033[33m",  # red
+            Level.DEBUG.value: "\033[32m",  # green
+            Level.EXEC.value: "\033[35m",  # magenta
+            Level.INFO.value: "\033[36m",  # cyan
+            Level.WARN.value: "\033[33m",  # yellow
+            Level.ERROR.value: "\033[33m",  # red
         }
 
         color_str = color_dict.get(levelno, reset_str)
@@ -43,8 +44,8 @@ class ColoredFormatter(logging.Formatter):
 
 class StreamHandler(logging.StreamHandler):
 
-    def set_level(self, level: int):
-        self.setLevel(level)
+    def set_level(self, level: Level):
+        self.setLevel(level.value)
 
     def set_formatter(self, formatter: ColoredFormatter):
         self.setFormatter(formatter)
@@ -71,10 +72,10 @@ class LoggerWrapper:
         self._delegate.error(msg, *args, **kwargs)
 
     def execute(self, cmd, *args, **kwargs):
-        self._delegate.log(EXEC, cmd, *args, **kwargs)
+        self._delegate.log(Level.EXEC.value, cmd, *args, **kwargs)
 
-    def set_level(self, level: int):
-        self._delegate.setLevel(level)
+    def set_level(self, level: Level):
+        self._delegate.setLevel(level.value)
 
     def add_handler(self, handler: logging.Handler):
         self._delegate.addHandler(handler)
@@ -85,8 +86,8 @@ def get_logger(name: Optional[str] = None) -> LoggerWrapper:
 
 
 def bootstrap():
-    logging.addLevelName(DEBUG, "DEBUG")
-    logging.addLevelName(EXEC, "EXEC")
-    logging.addLevelName(INFO, "INFO")
-    logging.addLevelName(WARN, "WARN")
-    logging.addLevelName(ERROR, "ERROR")
+    logging.addLevelName(Level.DEBUG.value, "DEBUG")
+    logging.addLevelName(Level.EXEC.value, "EXEC")
+    logging.addLevelName(Level.INFO.value, "INFO")
+    logging.addLevelName(Level.WARN.value, "WARN")
+    logging.addLevelName(Level.ERROR.value, "ERROR")
