@@ -15,7 +15,7 @@ __all__ = [
 ]
 
 
-class Action(Enum):
+class Command(Enum):
     DEPLOY = "deploy"
     UNDEPLOY = "undeploy"
     INSTALL = "install"
@@ -31,7 +31,7 @@ class Completion:
 
 @dataclass(frozen=True)
 class Context:
-    action: Action
+    command: Command
     dry_run: bool
     verbose: bool
 
@@ -63,6 +63,8 @@ class ContextParser:
     delegate: ArgumentParser
 
     def __init__(self):
+        commands = "|".join([x.value for x in Command])
+
         self.delegate = ArgumentParser()
         self.delegate.add_argument("-n", "--dry-run",
                                    dest="dry_run",
@@ -72,9 +74,9 @@ class ContextParser:
                                    dest="verbose",
                                    action="store_true",
                                    help="Show verbose messages")
-        self.delegate.add_argument("action",
+        self.delegate.add_argument("command",
                                    type=str,
-                                   help="Action to perform: (%s)" % "|".join([x.value for x in Action]))
+                                   help=f"Command to perform: ({commands})")
 
     def parse(self, args: List[str]) -> 'Context':
         """
@@ -86,7 +88,7 @@ class ContextParser:
         namespace = self.delegate.parse_args(args)
 
         return Context(
-            action=Action(namespace.action),
+            command=Command(namespace.command),
             dry_run=namespace.dry_run,
             verbose=namespace.verbose,
         )
@@ -127,28 +129,28 @@ class CLI:
         parser = ContextParser()
         context = parser.parse(args)
 
-        # actions
-        if context.action == Action.DEPLOY:
+        # commands
+        if context.command == Command.DEPLOY:
             self.__deploy(context)
             sys.exit(0)
 
-        if context.action == Action.UNDEPLOY:
+        if context.command == Command.UNDEPLOY:
             self.__undeploy(context)
             sys.exit(0)
 
-        if context.action == Action.INSTALL:
+        if context.command == Command.INSTALL:
             self.__install(context)
             sys.exit(0)
 
-        if context.action == Action.UNINSTALL:
+        if context.command == Command.UNINSTALL:
             self.__uninstall(context)
             sys.exit(0)
 
-        if context.action == Action.STATUS:
+        if context.command == Command.STATUS:
             self.__status(context)
             sys.exit(0)
 
-        if context.action == Action.COMPLETION:
+        if context.command == Command.COMPLETION:
             self.__completion()
             sys.exit(0)
 
@@ -165,12 +167,12 @@ class CLI:
         noop = context.dry_run
         logger = context.logger()
 
-        commands = [
+        actions = [
             PrefInstallAction(noop=noop, logger=logger),
         ]
 
-        for command in commands:
-            command.run()
+        for action in actions:
+            action.run()
 
         return
 
@@ -184,12 +186,12 @@ class CLI:
         noop = context.dry_run
         logger = context.logger()
 
-        commands = [
+        actions = [
             PrefUninstallAction(noop=noop, logger=logger),
         ]
 
-        for command in commands:
-            command.run()
+        for action in actions:
+            action.run()
 
         return
 
@@ -205,18 +207,18 @@ class CLI:
         logger = context.logger()
         identity = Identity.detect()
 
-        commands = []
+        actions = []
 
         if identity.is_linux():
-            commands.extend([])
+            actions += []
 
         if identity.is_darwin():
-            commands.extend([
+            actions += [
                 BrewInstallAction(noop=noop, logger=logger),
-            ])
+            ]
 
-        for command in commands:
-            command.run()
+        for action in actions:
+            action.run()
 
         return
 
@@ -230,12 +232,12 @@ class CLI:
         noop = context.dry_run
         logger = context.logger()
 
-        commands = [
+        actions = [
             BrewUninstallAction(noop=noop, logger=logger),
         ]
 
-        for command in commands:
-            command.run()
+        for action in actions:
+            action.run()
 
         return
 
@@ -249,13 +251,13 @@ class CLI:
         noop = context.dry_run
         logger = context.logger()
 
-        commands = [
+        actions = [
             PrefStatusAction(noop=noop, logger=logger),
             BrewStatusAction(noop=noop, logger=logger),
         ]
 
-        for command in commands:
-            command.run()
+        for action in actions:
+            action.run()
 
         return
 
@@ -279,7 +281,7 @@ class CLI:
 
         rendered = template.render(
             options=parser.options(),
-            actions=[x.value for x in Action],
+            actions=[x.value for x in Command],
         )
 
         with open(Completion.DESTINATION, 'w') as dst:
