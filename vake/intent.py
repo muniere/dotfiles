@@ -1,13 +1,13 @@
 import itertools
 from abc import ABCMeta, abstractmethod
-from dataclasses import dataclass
 from pathlib import Path
 from typing import List
 
+from . import brew
 from . import config
 from . import kernel
-from . import shell
 from . import locate
+from . import shell
 from .config import PrefRecipe, PrefBook, SnipRecipe, SnipBook
 from .timber import Lumber
 
@@ -375,56 +375,31 @@ class PrefStatusAction(PrefAction):
 # ==
 # Brew
 # ==
-@dataclass(frozen=True)
-class Keg:
-    name: str
-
-
 class BrewAction(Action, metaclass=ABCMeta):
-    @staticmethod
-    def _validate():
-        shell.ensure('brew')
-
-    def _load_kegs(self) -> List[Keg]:
-        identity = kernel.identify()
-        src = Path(locate.static(), identity.value, 'Brewfile').resolve()
-
-        self.logger.debug(f'Read kegs from file: {src}')
-
-        if not src.exists():
-            return []
-
-        lines = src.read_text().splitlines()
-        return [Keg(name) for name in lines]
-
-    @staticmethod
-    def _list_kegs() -> List[Keg]:
-        stdout = shell.capture(['brew', 'list']).stdout
-        lines = stdout.decode('utf8').strip().splitlines()
-        return [Keg(name) for name in lines]
+    pass
 
 
 class BrewInstallAction(BrewAction):
     def run(self):
         try:
-            self._validate()
+            brew.ensure()
         except AssertionError as err:
             self.logger.warning(err)
             return
 
-        kegs = self._load_kegs()
+        kegs = brew.load()
 
         if not kegs:
             self.logger.info('No available kegs were found')
             return
 
-        found = self._list_kegs()
+        found = brew.capture()
 
         for keg in kegs:
             if keg in found:
                 self.logger.info(f'{keg.name} is already installed')
             else:
-                shell.execute(['brew', 'install', keg.name], logger=self.logger, noop=self.noop)
+                brew.install(keg, logger=self.logger, noop=self.noop)
 
         return
 
@@ -432,22 +407,22 @@ class BrewInstallAction(BrewAction):
 class BrewUninstallAction(BrewAction):
     def run(self):
         try:
-            self._validate()
+            brew.ensure()
         except AssertionError as err:
             self.logger.warning(err)
             return
 
-        kegs = self._load_kegs()
+        kegs = brew.load()
 
         if not kegs:
             self.logger.info('No available kegs were found')
             return
 
-        found = self._list_kegs()
+        found = brew.capture()
 
         for keg in found:
             if keg in found:
-                shell.execute(['brew', 'uninstall', keg.name], logger=self.logger, noop=self.noop)
+                brew.uninstall(keg, logger=self.logger, noop=self.noop)
             else:
                 self.logger.info(f'{keg.name} is not installed')
 
@@ -457,11 +432,11 @@ class BrewUninstallAction(BrewAction):
 class BrewStatusAction(BrewAction):
     def run(self):
         try:
-            self._validate()
+            brew.ensure()
         except AssertionError as err:
             self.logger.warning(err)
             return
 
-        shell.execute(['brew', 'tap'], logger=self.logger, noop=False)
-        shell.execute(['brew', 'list'], logger=self.logger, noop=False)
+        brew.tap(logger=self.logger, noop=False)
+        brew.list(logger=self.logger, noop=False)
         return
