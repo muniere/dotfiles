@@ -4,9 +4,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List
 
-from . import provision
+from . import config
+from .config import PrefRecipe, PrefBook, SnipRecipe, SnipBook
 from .kernel import Identity, Shell
-from .provision import PrefRecipe, PrefBook, SnipRecipe, SnipBook
 from .timber import Lumber
 
 __all__ = [
@@ -45,14 +45,14 @@ class PrefAction(Action, metaclass=ABCMeta):
 
         # shared
         books: List[PrefBook] = [
-            provision.BinPrefBook(),
-            provision.ShPrefBook(),
-            provision.BashPrefBook(),
-            provision.ZshPrefBook(),
-            provision.GitPrefBook(),
-            provision.VimPrefBook(logger=self.logger, noop=self.noop),
-            provision.TmuxPrefBook(),
-            provision.GradlePrefBook(),
+            config.BinPrefBook(),
+            config.ShPrefBook(),
+            config.BashPrefBook(),
+            config.ZshPrefBook(),
+            config.GitPrefBook(),
+            config.VimPrefBook(logger=self.logger, noop=self.noop),
+            config.TmuxPrefBook(),
+            config.GradlePrefBook(),
         ]
 
         # linux
@@ -62,14 +62,14 @@ class PrefAction(Action, metaclass=ABCMeta):
         # darwin
         if identity.is_darwin():
             books += [
-                provision.XcodePrefBook(),
-                provision.IntelliJIdeaPrefBook(),
-                provision.AndroidStudioPrefBook(),
-                provision.AppCodePrefBook(),
-                provision.RubyMinePrefBook(),
-                provision.GoLandPrefBook(),
-                provision.CLionPrefBook(),
-                provision.RiderPrefBook(),
+                config.XcodePrefBook(),
+                config.IntelliJIdeaPrefBook(),
+                config.AndroidStudioPrefBook(),
+                config.AppCodePrefBook(),
+                config.RubyMinePrefBook(),
+                config.GoLandPrefBook(),
+                config.CLionPrefBook(),
+                config.RiderPrefBook(),
             ]
 
         return list(itertools.chain(*[book.recipes for book in books]))
@@ -77,9 +77,9 @@ class PrefAction(Action, metaclass=ABCMeta):
     @staticmethod
     def snippets() -> List[SnipRecipe]:
         books: List[SnipBook] = [
-            provision.ShSnipBook(),
-            provision.BashSnipBook(),
-            provision.ZshSnipBook(),
+            config.ShSnipBook(),
+            config.BashSnipBook(),
+            config.ZshSnipBook(),
         ]
 
         return list(itertools.chain(*[book.recipes for book in books]))
