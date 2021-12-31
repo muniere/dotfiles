@@ -21,12 +21,10 @@ __all__ = [
 class Action(metaclass=ABCMeta):
     logger: Lumber
     noop: bool
-    shell: Shell
 
     def __init__(self, logger: Lumber = Lumber.noop(), noop: bool = False):
         self.logger = logger
         self.noop = noop
-        self.shell = Shell(logger, noop)
         return
 
     @abstractmethod
@@ -143,13 +141,15 @@ class PrefInstallAction(PrefAction):
                 self.logger.info(f"File already exists: {dst}")
                 return False
 
+            shell = Shell(logger=self.logger, noop=self.noop)
+
             # ensure parent directory
             dst_dir = dst.parent
             if not dst_dir.is_dir():
-                self.shell.mkdir(dst_dir, recursive=True)
+                shell.mkdir(dst_dir, recursive=True)
 
             # create symbolic link
-            return self.shell.symlink(src, dst, force=True)
+            return shell.symlink(src, dst, force=True)
 
         #
         # directory
@@ -262,7 +262,8 @@ class PrefUninstallAction(PrefAction):
         # symlink
         #
         if dst.is_symlink():
-            return self.shell.remove(dst)
+            shell = Shell(logger=self.logger, noop=self.noop)
+            return shell.remove(dst)
 
         #
         # file
@@ -334,6 +335,7 @@ class PrefStatusAction(PrefAction):
     def run(self):
         identity = Identity.detect()
         recipes = sorted(self.recipes(), key=lambda x: x.dst)
+        shell = Shell(logger=self.logger, noop=False)
 
         for recipe in recipes:
             target = Path(recipe.dst).expanduser()
@@ -342,9 +344,9 @@ class PrefStatusAction(PrefAction):
                 continue
 
             if identity.is_darwin():
-                self.shell.execute(f"ls -lFG {target}")
+                shell.execute(f"ls -lFG {target}")
             else:
-                self.shell.execute(f"ls -lFo {target}")
+                shell.execute(f"ls -lFo {target}")
 
         return True
 
@@ -362,7 +364,12 @@ class Keg:
 
 
 class BrewAction(Action, metaclass=ABCMeta):
-    def load_kegs(self) -> List[Keg]:
+    def _validate(self):
+        shell = Shell(logger=self.logger, noop=False)
+        if not shell.available(BREW):
+            raise RuntimeError(f'Command is not available: {BREW}')
+
+    def _load_kegs(self) -> List[Keg]:
         identity = Identity.detect()
         src = Path(STATIC_DIR, identity.value, BREWFILE).resolve()
 
@@ -374,52 +381,59 @@ class BrewAction(Action, metaclass=ABCMeta):
         lines = src.read_text().splitlines()
         return [Keg(name) for name in lines]
 
-    def list_kegs(self) -> List[Keg]:
-        stdout = self.shell.capture([BREW, "list"]).stdout
+    def _list_kegs(self) -> List[Keg]:
+        shell = Shell(logger=self.logger, noop=False)
+        stdout = shell.capture([BREW, "list"]).stdout
         lines = stdout.decode('utf8').strip().splitlines()
         return [Keg(name) for name in lines]
 
 
 class BrewInstallAction(BrewAction):
     def run(self):
-        if not self.shell.available(BREW):
-            self.logger.warning(f"Command is not available: {BREW}")
+        try:
+            self._validate()
+        except Exception as err:
+            self.logger.warning(err)
             return
 
-        kegs = self.load_kegs()
+        kegs = self._load_kegs()
 
         if not kegs:
             self.logger.info("No available kegs were found")
             return
 
-        found = set(self.list_kegs())
+        found = self._list_kegs()
+        shell = Shell(logger=self.logger, noop=self.noop)
 
         for keg in kegs:
             if keg in found:
                 self.logger.info(f"{keg.name} is already installed")
             else:
-                self.shell.execute([BREW, "install", keg.name])
+                shell.execute([BREW, "install", keg.name])
 
         return
 
 
 class BrewUninstallAction(BrewAction):
     def run(self):
-        if not self.shell.available(BREW):
-            self.logger.warn(f"Command is not available: {BREW}")
+        try:
+            self._validate()
+        except Exception as err:
+            self.logger.warning(err)
             return
 
-        kegs = self.load_kegs()
+        kegs = self._load_kegs()
 
         if not kegs:
             self.logger.info("No available kegs were found")
             return
 
-        found = set(self.list_kegs())
+        found = set(self._list_kegs())
+        shell = Shell(logger=self.logger, noop=self.noop)
 
         for keg in found:
             if keg in found:
-                self.shell.execute([BREW, "uninstall", keg.name])
+                shell.execute([BREW, "uninstall", keg.name])
             else:
                 self.logger.info(f"{keg.name} is not installed")
 
@@ -428,10 +442,13 @@ class BrewUninstallAction(BrewAction):
 
 class BrewStatusAction(BrewAction):
     def run(self):
-        if not self.shell.available(BREW):
-            self.logger.warn(f"Command is not available: {BREW}")
+        try:
+            self._validate()
+        except Exception as err:
+            self.logger.warning(err)
             return
 
-        self.shell.execute([BREW, "tap"])
-        self.shell.execute([BREW, "list"])
+        shell = Shell(logger=self.logger, noop=False)
+        shell.execute([BREW, "tap"])
+        shell.execute([BREW, "list"])
         return

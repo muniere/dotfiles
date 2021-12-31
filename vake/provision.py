@@ -242,22 +242,20 @@ class VimPrefBook(PrefBook):
 class VimHook(Hook):
     logger: Lumber
     noop: bool
-    shell: Shell
 
     def __init__(self, logger: Lumber = Lumber.noop(), noop: bool = False):
         self.logger = logger
         self.noop = noop
-        self.shell = Shell(logger, noop)
         return
 
     def activate(self):
         dst = Path("~/.vim/autoload/plug.vim").expanduser()
-
         if dst.is_file():
             self.logger.info(f"Vim-Plug is already downloaded: {dst}")
             return
 
-        self.shell.execute([
+        shell = Shell(logger=self.logger, noop=self.noop)
+        shell.execute([
             "curl",
             "--fail",
             "--location",
