@@ -5,8 +5,9 @@ from pathlib import Path
 from typing import List
 
 from . import config
+from . import shell
 from .config import PrefRecipe, PrefBook, SnipRecipe, SnipBook
-from .kernel import Identity, Shell
+from .kernel import Identity
 from .timber import Lumber
 
 __all__ = [
@@ -359,7 +360,6 @@ class PrefStatusAction(PrefAction):
     def run(self):
         identity = Identity.detect()
         recipes = sorted(self.recipes(), key=lambda x: x.dst)
-        shell = Shell(logger=self.logger, noop=False)
 
         for recipe in recipes:
             target = Path(recipe.dst).expanduser()
@@ -368,9 +368,9 @@ class PrefStatusAction(PrefAction):
                 continue
 
             if identity.is_darwin():
-                shell.execute(f"ls -lFG {target}")
+                shell.execute(["ls", "-lFG", target], logger=self.logger, noop=False)
             else:
-                shell.execute(f"ls -lFo {target}")
+                shell.execute(["ls", "-lFo", target], logger=self.logger, noop=False)
 
         return True
 
@@ -378,24 +378,19 @@ class PrefStatusAction(PrefAction):
 # ==
 # Brew
 # ==
-BREW = "brew"
-BREWFILE = "Brewfile"
-
-
 @dataclass(frozen=True)
 class Keg:
     name: str
 
 
 class BrewAction(Action, metaclass=ABCMeta):
-    def _validate(self):
-        shell = Shell(logger=self.logger, noop=False)
-        if not shell.available(BREW):
-            raise RuntimeError(f'Command is not available: {BREW}')
+    @staticmethod
+    def _validate():
+        shell.ensure("brew")
 
     def _load_kegs(self) -> List[Keg]:
         identity = Identity.detect()
-        src = Path(STATIC_DIR, identity.value, BREWFILE).resolve()
+        src = Path(STATIC_DIR, identity.value, "Brewfile").resolve()
 
         self.logger.debug(f"Read kegs from file: {src}")
 
@@ -405,9 +400,9 @@ class BrewAction(Action, metaclass=ABCMeta):
         lines = src.read_text().splitlines()
         return [Keg(name) for name in lines]
 
-    def _list_kegs(self) -> List[Keg]:
-        shell = Shell(logger=self.logger, noop=False)
-        stdout = shell.capture([BREW, "list"]).stdout
+    @staticmethod
+    def _list_kegs() -> List[Keg]:
+        stdout = shell.capture(["brew", "list"]).stdout
         lines = stdout.decode('utf8').strip().splitlines()
         return [Keg(name) for name in lines]
 
@@ -416,7 +411,7 @@ class BrewInstallAction(BrewAction):
     def run(self):
         try:
             self._validate()
-        except Exception as err:
+        except AssertionError as err:
             self.logger.warning(err)
             return
 
@@ -427,13 +422,12 @@ class BrewInstallAction(BrewAction):
             return
 
         found = self._list_kegs()
-        shell = Shell(logger=self.logger, noop=self.noop)
 
         for keg in kegs:
             if keg in found:
                 self.logger.info(f"{keg.name} is already installed")
             else:
-                shell.execute([BREW, "install", keg.name])
+                shell.execute(["brew", "install", keg.name], logger=self.logger, noop=self.noop)
 
         return
 
@@ -442,7 +436,7 @@ class BrewUninstallAction(BrewAction):
     def run(self):
         try:
             self._validate()
-        except Exception as err:
+        except AssertionError as err:
             self.logger.warning(err)
             return
 
@@ -452,12 +446,11 @@ class BrewUninstallAction(BrewAction):
             self.logger.info("No available kegs were found")
             return
 
-        found = set(self._list_kegs())
-        shell = Shell(logger=self.logger, noop=self.noop)
+        found = self._list_kegs()
 
         for keg in found:
             if keg in found:
-                shell.execute([BREW, "uninstall", keg.name])
+                shell.execute(["brew", "uninstall", keg.name], logger=self.logger, noop=self.noop)
             else:
                 self.logger.info(f"{keg.name} is not installed")
 
@@ -468,11 +461,10 @@ class BrewStatusAction(BrewAction):
     def run(self):
         try:
             self._validate()
-        except Exception as err:
+        except AssertionError as err:
             self.logger.warning(err)
             return
 
-        shell = Shell(logger=self.logger, noop=False)
-        shell.execute([BREW, "tap"])
-        shell.execute([BREW, "list"])
+        shell.execute(["brew", "tap"], logger=self.logger, noop=False)
+        shell.execute(["brew", "list"], logger=self.logger, noop=False)
         return

@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List
 
-from .kernel import Shell
+from . import shell
 from .timber import Lumber
 
 __all__ = [
@@ -253,15 +253,16 @@ class VimHook(Hook):
             self.logger.info(f"Vim-Plug is already downloaded: {dst}")
             return
 
-        shell = Shell(logger=self.logger, noop=self.noop)
-        shell.execute([
+        args = [
             "curl",
             "--fail",
             "--location",
             "--create-dirs",
             "--output", str(dst),
             "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
-        ])
+        ]
+
+        shell.execute(args, logger=self.logger, noop=self.noop)
 
     def deactivate(self):
         pass

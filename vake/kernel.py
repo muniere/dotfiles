@@ -1,13 +1,9 @@
 import subprocess
 from enum import Enum
 from pathlib import Path
-from subprocess import CompletedProcess
-from typing import Optional, Union, List
-
-from .timber import Lumber
 
 __all__ = [
-    'Identity', 'Shell'
+    'Identity'
 ]
 
 
@@ -54,61 +50,3 @@ class Identity(Enum):
             return Identity.DARWIN
 
         return Identity.DEFAULT
-
-
-class Shell:
-    logger: Lumber
-    noop: bool
-
-    def __init__(self, logger: Lumber = Lumber.noop(), noop: bool = False):
-        self.noop = noop
-        self.logger = logger
-        return
-
-    @classmethod
-    def available(cls, command: str) -> bool:
-        code = subprocess.call(
-            ["which", command],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        return code == 0
-
-    def execute(self, command: Union[List[str], str]) -> bool:
-        if isinstance(command, list):
-            args = command
-        elif isinstance(command, str):
-            args = command.split()
-        else:
-            args = []
-
-        if not args:
-            return False
-
-        self.logger.execute(" ".join(args))
-
-        if self.noop:
-            return True
-
-        return subprocess.call(args) == 0
-
-    def capture(self, command: Union[List[str], str]) -> Optional[CompletedProcess]:
-        if isinstance(command, list):
-            args = command
-        elif isinstance(command, str):
-            args = command.split()
-        else:
-            args = []
-
-        if not args:
-            return None
-
-        if self.noop:
-            return None
-
-        return subprocess.run(
-            args,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            check=True
-        )
