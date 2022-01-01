@@ -2,22 +2,19 @@
 
 function addpath() {
   # delete duplicated path
-  local lpath=$PATH
-  for del in $@; do
-    lpath=${lpath//$del/}
+  local base=$PATH
+  for x in $@; do
+    base=${base//$x/}
+    base=${base//::/:}
   done
 
   # add new path
-  local adds=""
-  for add in $@; do
-    if [ -z $adds ]; then
-      adds="$add"
-    else
-      adds="$adds:$add"
-    fi
-  done
+  local tmp="$IFS"
+  IFS=":"
+  local ext="${@[*]}"
+  IFS="$tmp"
 
-  export PATH="$(echo $adds:$lpath | sed 's/::*/:/g' | sed 's/:*$//g')"
+  export PATH="$ext:$base"
 }
 
 # Default LANG
