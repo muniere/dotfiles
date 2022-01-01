@@ -20,12 +20,12 @@ __all__ = [
 # Base
 # ==
 class Action(metaclass=ABCMeta):
-    logger: Lumber
-    noop: bool
+    _logger: Lumber
+    _noop: bool
 
     def __init__(self, logger: Lumber = Lumber.noop(), noop: bool = False):
-        self.logger = logger
-        self.noop = noop
+        self._logger = logger
+        self._noop = noop
         return
 
     @abstractmethod
@@ -37,7 +37,7 @@ class Action(metaclass=ABCMeta):
 # Pref
 # ==
 class PrefAction(Action, metaclass=ABCMeta):
-    def recipes(self) -> list[PrefRecipe]:
+    def _recipes(self) -> list[PrefRecipe]:
         identity = kernel.identify()
 
         # shared
@@ -47,7 +47,7 @@ class PrefAction(Action, metaclass=ABCMeta):
             config.BashPrefBook(),
             config.ZshPrefBook(),
             config.GitPrefBook(),
-            config.VimPrefBook(logger=self.logger, noop=self.noop),
+            config.VimPrefBook(logger=self._logger, noop=self._noop),
             config.TmuxPrefBook(),
             config.GradlePrefBook(),
         ]
@@ -72,7 +72,7 @@ class PrefAction(Action, metaclass=ABCMeta):
         return list(itertools.chain(*[book.recipes for book in books]))
 
     @staticmethod
-    def snippets() -> list[SnipRecipe]:
+    def _snippets() -> list[SnipRecipe]:
         books: list[SnipBook] = [
             config.ShSnipBook(),
             config.BashSnipBook(),
@@ -81,12 +81,22 @@ class PrefAction(Action, metaclass=ABCMeta):
 
         return list(itertools.chain(*[book.recipes for book in books]))
 
+    @staticmethod
+    def _test(recipe: PrefRecipe):
+        blacklist = ['*.swp', '*.bak', '*.DS_Store']
+
+        for pattern in blacklist:
+            if recipe.src.match(pattern):
+                return False
+
+        return True
+
 
 class PrefInstallAction(PrefAction):
     def run(self):
         identity = kernel.identify()
 
-        for recipe in self.recipes():
+        for recipe in self._recipes():
             if recipe.src.is_absolute():
                 self.__run(recipe)
             else:
@@ -95,15 +105,15 @@ class PrefInstallAction(PrefAction):
 
             recipe.hook.activate()
 
-        for snippet in self.snippets():
+        for snippet in self._snippets():
             self.__enable(snippet)
 
         return
 
     def __run(self, recipe: PrefRecipe, identifier='default') -> bool:
-        if not self.__test(recipe):
+        if not self._test(recipe):
             rel = Path(locate.static(), identifier, recipe.src).relative_to(Path.cwd())
-            self.logger.info(f'File is not target: {rel}')
+            self._logger.info(f'File is not target: {rel}')
             return False
 
         if recipe.src.is_absolute():
@@ -126,7 +136,7 @@ class PrefInstallAction(PrefAction):
 
         # dst link already exists
         if dst.is_symlink():
-            self.logger.info(f'Symlink already exists: {dst}')
+            self._logger.info(f'Symlink already exists: {dst}')
             return False
 
         #
@@ -135,7 +145,7 @@ class PrefInstallAction(PrefAction):
         if src.is_file():
             # another file already exists
             if dst.is_file():
-                self.logger.info(f'File already exists: {dst}')
+                self._logger.info(f'File already exists: {dst}')
                 return False
 
             # ensure parent directory
@@ -158,18 +168,18 @@ class PrefInstallAction(PrefAction):
         return True
 
     def __mkdir(self, path: Path) -> bool:
-        self.logger.execute(f'mkdir -p {path}')
+        self._logger.execute(f'mkdir -p {path}')
 
-        if self.noop:
+        if self._noop:
             return False
 
         path.mkdir(parents=True, exist_ok=True)
         return True
 
     def __symlink(self, src: Path, dst: Path) -> bool:
-        self.logger.execute(f'ln -s -f {src} {dst}')
+        self._logger.execute(f'ln -s -f {src} {dst}')
 
-        if self.noop:
+        if self._noop:
             return False
 
         dst.symlink_to(src)
@@ -194,9 +204,9 @@ class PrefInstallAction(PrefAction):
 
         # new file
         if not dst.exists():
-            self.logger.execute(f'Enable snippet {src}')
+            self._logger.execute(f'Enable snippet {src}')
 
-            if self.noop:
+            if self._noop:
                 return
 
             dst.write_text(src_str + '\n', encoding='utf-8')
@@ -206,48 +216,38 @@ class PrefInstallAction(PrefAction):
 
         # skip: already enabled
         if src_str in dst_str:
-            self.logger.info(f'Snippet already enabled: {dst}')
+            self._logger.info(f'Snippet already enabled: {dst}')
             return
 
         # enable
-        self.logger.execute(f'Enable {src}')
+        self._logger.execute(f'Enable {src}')
 
-        if self.noop:
+        if self._noop:
             return
 
         dst.write_text(dst_str + src_str + '\n', encoding='utf-8')
         return
-
-    @staticmethod
-    def __test(recipe: PrefRecipe):
-        blacklist = ['*.swp', '*.bak', '*.DS_Store']
-
-        for pattern in blacklist:
-            if recipe.src.match(pattern):
-                return False
-
-        return True
 
 
 class PrefUninstallAction(PrefAction):
     def run(self):
         identity = kernel.identify()
 
-        for recipe in self.recipes():
+        for recipe in self._recipes():
             self.__run(recipe, identifier=identity.value)
             self.__run(recipe, identifier='default')
 
             recipe.hook.deactivate()
 
-        for snippet in self.snippets():
+        for snippet in self._snippets():
             self.__disable(snippet)
 
         return
 
     def __run(self, recipe: PrefRecipe, identifier: str = 'default') -> bool:
-        if not self.__test(recipe):
+        if not self._test(recipe):
             rel = Path(locate.static(), identifier, recipe.src).relative_to(Path.cwd())
-            self.logger.info(f'File is not target: {rel}')
+            self._logger.info(f'File is not target: {rel}')
             return False
 
         if recipe.src.is_absolute():
@@ -270,7 +270,7 @@ class PrefUninstallAction(PrefAction):
 
         # dst not found
         if not dst.exists() and not dst.is_symlink():
-            self.logger.info(f'File already removed: {dst}')
+            self._logger.info(f'File already removed: {dst}')
             return True
 
         #
@@ -283,7 +283,7 @@ class PrefUninstallAction(PrefAction):
         # file
         #
         if dst.is_file():
-            self.logger.info(f'File is not symlink: {dst}')
+            self._logger.info(f'File is not symlink: {dst}')
             return False
 
         #
@@ -298,9 +298,9 @@ class PrefUninstallAction(PrefAction):
         return True
 
     def __rm(self, path: Path) -> bool:
-        self.logger.execute(f'rm -r -f {path}')
+        self._logger.execute(f'rm -r -f {path}')
 
-        if self.noop:
+        if self._noop:
             return False
 
         path.unlink(missing_ok=True)
@@ -325,40 +325,30 @@ class PrefUninstallAction(PrefAction):
 
         # not found
         if not dst.exists():
-            self.logger.info(f'File NOT FOUND: {dst}')
+            self._logger.info(f'File NOT FOUND: {dst}')
             return
 
         dst_str = dst.read_text(encoding='utf-8')
 
         # skip: already disabled
         if src_str not in dst_str:
-            self.logger.info(f'Snippet already disabled: {dst}')
+            self._logger.info(f'Snippet already disabled: {dst}')
             return
 
         # disable
-        self.logger.execute(f'Disable snippet {src}')
+        self._logger.execute(f'Disable snippet {src}')
 
-        if self.noop:
+        if self._noop:
             return
 
         dst.write_text(dst_str.replace(src_str, ''), encoding='utf-8')
         return
 
-    @staticmethod
-    def __test(recipe: PrefRecipe):
-        blacklist = ['*.swp', '*.DS_Store']
-
-        for pattern in blacklist:
-            if recipe.src.match(pattern):
-                return False
-
-        return True
-
 
 class PrefStatusAction(PrefAction):
     def run(self):
         identity = kernel.identify()
-        recipes = sorted(self.recipes(), key=lambda x: x.dst)
+        recipes = sorted(self._recipes(), key=lambda x: x.dst)
 
         for recipe in recipes:
             dst = Path(recipe.dst).expanduser()
@@ -367,9 +357,9 @@ class PrefStatusAction(PrefAction):
                 continue
 
             if identity.is_darwin():
-                shell.call(['ls', '-lFG', str(dst)], logger=self.logger, noop=False)
+                shell.call(['ls', '-lFG', str(dst)], logger=self._logger, noop=False)
             else:
-                shell.call(['ls', '-lFo', str(dst)], logger=self.logger, noop=False)
+                shell.call(['ls', '-lFo', str(dst)], logger=self._logger, noop=False)
 
         return True
 
@@ -386,22 +376,22 @@ class BrewInstallAction(BrewAction):
         try:
             brew.ensure()
         except AssertionError as err:
-            self.logger.error(err)
+            self._logger.error(err)
             return
 
         kegs = brew.load_list()
 
         if len(kegs) == 0:
-            self.logger.info('No available kegs were found')
+            self._logger.info('No available kegs were found')
             return
 
         found = brew.run_list()
 
         for keg in kegs:
             if keg in found:
-                self.logger.info(f'{keg.name} is already installed')
+                self._logger.info(f'{keg.name} is already installed')
             else:
-                brew.call_install(keg, logger=self.logger, noop=self.noop)
+                brew.call_install(keg, logger=self._logger, noop=self._noop)
 
         return
 
@@ -411,22 +401,22 @@ class BrewUninstallAction(BrewAction):
         try:
             brew.ensure()
         except AssertionError as err:
-            self.logger.error(err)
+            self._logger.error(err)
             return
 
         kegs = brew.load_list()
 
         if len(kegs) == 0:
-            self.logger.info('No available kegs were found')
+            self._logger.info('No available kegs were found')
             return
 
         found = brew.run_list()
 
         for keg in found:
             if keg in found:
-                brew.call_uninstall(keg, logger=self.logger, noop=self.noop)
+                brew.call_uninstall(keg, logger=self._logger, noop=self._noop)
             else:
-                self.logger.info(f'{keg.name} is not installed')
+                self._logger.info(f'{keg.name} is not installed')
 
         return
 
@@ -436,9 +426,9 @@ class BrewStatusAction(BrewAction):
         try:
             brew.ensure()
         except AssertionError as err:
-            self.logger.error(err)
+            self._logger.error(err)
             return
 
-        brew.call_tap(logger=self.logger, noop=False)
-        brew.call_list(logger=self.logger, noop=False)
+        brew.call_tap(logger=self._logger, noop=False)
+        brew.call_list(logger=self._logger, noop=False)
         return
