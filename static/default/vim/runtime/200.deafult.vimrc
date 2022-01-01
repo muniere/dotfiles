@@ -154,7 +154,17 @@ Plug 'editorconfig/editorconfig-vim'
 " == Completion
 Plug 'vim-scripts/AutoComplPop'
 
-inoremap <expr><Tab> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+function! InsertTabWrapper()
+    let col = col('.') - 1
+    if !col || getline('.')[col - 1] !~ '\k'
+        return "\<Tab>"
+    else
+        return "\<C-y>"
+    endif
+endfunction
+
+inoremap <Tab> <C-r>=InsertTabWrapper()<CR>
+inoremap <S-Tab> <C-n>
 
 " == File System
 Plug 'scrooloose/nerdtree'
