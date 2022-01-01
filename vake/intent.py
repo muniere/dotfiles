@@ -11,6 +11,7 @@ from .config import PrefRecipe, PrefBook, SnipRecipe, SnipBook
 from .timber import Lumber
 
 __all__ = [
+    'Action',
     'PrefInstallAction', 'PrefUninstallAction', 'PrefStatusAction',
     'BrewInstallAction', 'BrewUninstallAction', 'BrewStatusAction',
 ]
