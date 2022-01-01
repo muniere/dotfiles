@@ -367,9 +367,9 @@ class PrefStatusAction(PrefAction):
                 continue
 
             if identity.is_darwin():
-                shell.execute(['ls', '-lFG', str(dst)], logger=self.logger, noop=False)
+                shell.call(['ls', '-lFG', str(dst)], logger=self.logger, noop=False)
             else:
-                shell.execute(['ls', '-lFo', str(dst)], logger=self.logger, noop=False)
+                shell.call(['ls', '-lFo', str(dst)], logger=self.logger, noop=False)
 
         return True
 
@@ -386,22 +386,22 @@ class BrewInstallAction(BrewAction):
         try:
             brew.ensure()
         except AssertionError as err:
-            self.logger.warning(err)
+            self.logger.error(err)
             return
 
-        kegs = brew.load()
+        kegs = brew.load_list()
 
         if len(kegs) == 0:
             self.logger.info('No available kegs were found')
             return
 
-        found = brew.capture()
+        found = brew.run_list()
 
         for keg in kegs:
             if keg in found:
                 self.logger.info(f'{keg.name} is already installed')
             else:
-                brew.install(keg, logger=self.logger, noop=self.noop)
+                brew.call_install(keg, logger=self.logger, noop=self.noop)
 
         return
 
@@ -411,20 +411,20 @@ class BrewUninstallAction(BrewAction):
         try:
             brew.ensure()
         except AssertionError as err:
-            self.logger.warning(err)
+            self.logger.error(err)
             return
 
-        kegs = brew.load()
+        kegs = brew.load_list()
 
         if len(kegs) == 0:
             self.logger.info('No available kegs were found')
             return
 
-        found = brew.capture()
+        found = brew.run_list()
 
         for keg in found:
             if keg in found:
-                brew.uninstall(keg, logger=self.logger, noop=self.noop)
+                brew.call_uninstall(keg, logger=self.logger, noop=self.noop)
             else:
                 self.logger.info(f'{keg.name} is not installed')
 
@@ -436,9 +436,9 @@ class BrewStatusAction(BrewAction):
         try:
             brew.ensure()
         except AssertionError as err:
-            self.logger.warning(err)
+            self.logger.error(err)
             return
 
-        brew.tap(logger=self.logger, noop=False)
-        brew.list(logger=self.logger, noop=False)
+        brew.call_tap(logger=self.logger, noop=False)
+        brew.call_list(logger=self.logger, noop=False)
         return

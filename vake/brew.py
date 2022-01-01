@@ -1,3 +1,4 @@
+import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -13,10 +14,13 @@ class Keg:
 
 
 def ensure():
-    shell.ensure('brew')
+    try:
+        shell.which('brew')
+    except subprocess.CalledProcessError:
+        raise AssertionError('command not available: brew')
 
 
-def load() -> list[Keg]:
+def load_list() -> list[Keg]:
     identity = kernel.identify()
     src = Path(locate.static(), identity.value, 'Brewfile').resolve()
 
@@ -27,23 +31,23 @@ def load() -> list[Keg]:
     return [Keg(name) for name in lines]
 
 
-def capture() -> list[Keg]:
-    stdout = shell.capture(['brew', 'list']).stdout
-    lines = stdout.decode('utf8').strip().splitlines()
+def run_list() -> list[Keg]:
+    stdout = shell.run(['brew', 'list']).stdout
+    lines = stdout.decode('utf-8').strip().splitlines()
     return [Keg(name) for name in lines]
 
 
-def install(keg: Keg, logger: Lumber = Lumber.noop(), noop: bool = False):
-    shell.execute(['brew', 'install', keg.name], logger=logger, noop=noop)
+def call_install(keg: Keg, logger: Lumber = Lumber.noop(), noop: bool = False):
+    shell.call(['brew', 'install', keg.name], logger=logger, noop=noop)
 
 
-def uninstall(keg: Keg, logger: Lumber = Lumber.noop(), noop: bool = False):
-    shell.execute(['brew', 'uninstall', keg.name], logger=logger, noop=noop)
+def call_uninstall(keg: Keg, logger: Lumber = Lumber.noop(), noop: bool = False):
+    shell.call(['brew', 'uninstall', keg.name], logger=logger, noop=noop)
 
 
-def list(logger: Lumber = Lumber.noop(), noop: bool = False):
-    shell.execute(['brew', 'list'], logger=logger, noop=noop)
+def call_list(logger: Lumber = Lumber.noop(), noop: bool = False):
+    shell.call(['brew', 'list'], logger=logger, noop=noop)
 
 
-def tap(logger: Lumber = Lumber.noop(), noop: bool = False):
-    shell.execute(['brew', 'tap'], logger=logger, noop=noop)
+def call_tap(logger: Lumber = Lumber.noop(), noop: bool = False):
+    shell.call(['brew', 'tap'], logger=logger, noop=noop)

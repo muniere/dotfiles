@@ -3,20 +3,11 @@ import subprocess
 from vake.timber import Lumber
 
 
-def ensure(command: str):
-    assert available(command), f'command not available: {command}'
+def which(command: str) -> subprocess.CompletedProcess:
+    return subprocess.run(['which', command], capture_output=True, check=True)
 
 
-def available(command: str) -> bool:
-    code = subprocess.call(
-        ['which', command],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
-    return code == 0
-
-
-def execute(args: list[str], logger: Lumber = Lumber.noop(), noop: bool = False) -> bool:
+def call(args: list[str], logger: Lumber = Lumber.noop(), noop: bool = False) -> int:
     assert len(args) > 0, 'args must not be empty'
 
     logger.execute(' '.join(args))
@@ -24,15 +15,10 @@ def execute(args: list[str], logger: Lumber = Lumber.noop(), noop: bool = False)
     if noop:
         return True
 
-    return subprocess.call(args) == 0
+    return subprocess.call(args)
 
 
-def capture(args: list[str]) -> subprocess.CompletedProcess:
+def run(args: list[str]) -> subprocess.CompletedProcess:
     assert len(args) > 0, 'args must not be empty'
 
-    return subprocess.run(
-        args,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        check=True
-    )
+    return subprocess.run(args, capture_output=True, check=True)

@@ -261,7 +261,7 @@ class VimHook(Hook):
             'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
         ]
 
-        shell.execute(args, logger=self.logger, noop=self.noop)
+        shell.call(args, logger=self.logger, noop=self.noop)
 
     def deactivate(self):
         pass
