@@ -11,7 +11,7 @@ def identify() -> 'Identity':
     issue = Path('/etc/issue')
 
     if issue.is_file():
-        name = issue.read_text().lower()
+        name = issue.read_text(encoding='utf-8').lower()
     else:
         output = subprocess.check_output(['uname', '-a'])
         name = output.decode('utf-8').strip().lower()

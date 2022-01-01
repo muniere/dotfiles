@@ -185,7 +185,7 @@ class PrefInstallAction(PrefAction):
         if not src.exists():
             return
 
-        src_str = src.read_text().strip()
+        src_str = src.read_text(encoding='utf-8').strip()
 
         #
         # destination
@@ -199,10 +199,10 @@ class PrefInstallAction(PrefAction):
             if self.noop:
                 return
 
-            dst.write_text(src_str + '\n')
+            dst.write_text(src_str + '\n', encoding='utf-8')
             return
 
-        dst_str = dst.read_text()
+        dst_str = dst.read_text(encoding='utf-8')
 
         # skip: already enabled
         if src_str in dst_str:
@@ -215,7 +215,7 @@ class PrefInstallAction(PrefAction):
         if self.noop:
             return
 
-        dst.write_text(dst_str + src_str + '\n')
+        dst.write_text(dst_str + src_str + '\n', encoding='utf-8')
         return
 
     @staticmethod
@@ -316,7 +316,7 @@ class PrefUninstallAction(PrefAction):
         if not src.exists():
             return
 
-        src_str = src.read_text().strip()
+        src_str = src.read_text(encoding='utf-8').strip()
 
         #
         # destination
@@ -328,7 +328,7 @@ class PrefUninstallAction(PrefAction):
             self.logger.info(f'File NOT FOUND: {dst}')
             return
 
-        dst_str = dst.read_text()
+        dst_str = dst.read_text(encoding='utf-8')
 
         # skip: already disabled
         if src_str not in dst_str:
@@ -341,7 +341,7 @@ class PrefUninstallAction(PrefAction):
         if self.noop:
             return
 
-        dst.write_text(dst_str.replace(src_str, ''))
+        dst.write_text(dst_str.replace(src_str, ''), encoding='utf-8')
         return
 
     @staticmethod

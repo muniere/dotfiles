@@ -291,7 +291,7 @@ class Application:
             actions=[x.value for x in Command],
         )
 
-        dst.write_text(rendered)
+        dst.write_text(rendered, encoding='utf-8')
 
         sys.stdout.write(rendered)
         return

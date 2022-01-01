@@ -23,7 +23,7 @@ def load() -> list[Keg]:
     if not src.exists():
         return []
 
-    lines = src.read_text().splitlines()
+    lines = src.read_text(encoding='utf-8').splitlines()
     return [Keg(name) for name in lines]
 
 
