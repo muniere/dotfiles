@@ -1,6 +1,6 @@
 import subprocess
 
-from vake.timber import Lumber
+from .timber import Lumber
 
 
 def which(command: str) -> subprocess.CompletedProcess:
