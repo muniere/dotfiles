@@ -1,4 +1,6 @@
 import itertools
+import os
+import re
 from abc import ABCMeta, abstractmethod
 from pathlib import Path
 
@@ -210,7 +212,8 @@ class PrefInstallAction(PrefAction):
             if self._noop:
                 return
 
-            dst.write_text(src_str + '\n', encoding='utf-8')
+            new_str = src_str + os.linesep
+            dst.write_text(new_str, encoding='utf-8')
             return
 
         dst_str = dst.read_text(encoding='utf-8')
@@ -226,7 +229,13 @@ class PrefInstallAction(PrefAction):
         if self._noop:
             return
 
-        dst.write_text(dst_str + src_str + '\n', encoding='utf-8')
+        if not dst_str.strip():
+            new_str = src_str + os.linesep
+            dst.write_text(new_str, encoding='utf-8')
+            return
+
+        new_str = dst_str.rstrip() + os.linesep + src_str + os.linesep
+        dst.write_text(new_str, encoding='utf-8')
         return
 
 
@@ -342,7 +351,9 @@ class PrefUninstallAction(PrefAction):
         if self._noop:
             return
 
-        dst.write_text(dst_str.replace(src_str, ''), encoding='utf-8')
+        pattern = re.escape(src_str) + os.linesep + '*'
+        new_str = re.sub(pattern, '', dst_str)
+        dst.write_text(new_str, encoding='utf-8')
         return
 
 
