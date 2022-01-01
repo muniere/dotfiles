@@ -209,6 +209,9 @@ Plug 'neoclide/jsonc.vim', { 'for': 'json' }
 " == Languages / Shell Script
 Plug 'vim-scripts/sh.vim', { 'for': 'sh' }
 
+" == Languages / Fish
+Plug 'dag/vim-fish', { 'for': 'fish' }
+
 " == Languages / Ruby
 Plug 'vim-scripts/ruby.vim', { 'for': 'ruby' }
 
