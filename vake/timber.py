@@ -34,7 +34,7 @@ class ColoredFormatter(logging.Formatter):
             Level.EXEC.value: '\033[35m',  # magenta
             Level.INFO.value: '\033[36m',  # cyan
             Level.WARN.value: '\033[33m',  # yellow
-            Level.ERROR.value: '\033[33m',  # red
+            Level.ERROR.value: '\033[31m',  # red
         }
 
         color_str = color_dict.get(levelno, reset_str)
