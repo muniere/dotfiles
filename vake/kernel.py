@@ -3,11 +3,29 @@ from enum import Enum
 from pathlib import Path
 
 __all__ = [
-    'Identity'
+    'Identity', 'identify'
 ]
 
 
-def identify() -> 'Identity':
+class Identity(Enum):
+    UBUNTU = 'ubuntu'
+    DEBIAN = 'debian'
+    CENTOS = 'centos'
+    AMAZON = 'amazon'
+    DARWIN = 'darwin'
+    DEFAULT = 'default'
+
+    def is_linux(self) -> bool:
+        return self in [Identity.UBUNTU, Identity.DEBIAN, Identity.CENTOS, Identity.AMAZON]
+
+    def is_darwin(self) -> bool:
+        return self in [Identity.DARWIN]
+
+    def is_windows(self) -> bool:
+        return self in []
+
+
+def identify() -> Identity:
     issue = Path('/etc/issue')
 
     if issue.is_file():
@@ -32,21 +50,3 @@ def identify() -> 'Identity':
         return Identity.DARWIN
 
     return Identity.DEFAULT
-
-
-class Identity(Enum):
-    UBUNTU = 'ubuntu'
-    DEBIAN = 'debian'
-    CENTOS = 'centos'
-    AMAZON = 'amazon'
-    DARWIN = 'darwin'
-    DEFAULT = 'default'
-
-    def is_linux(self) -> bool:
-        return self in [Identity.UBUNTU, Identity.DEBIAN, Identity.CENTOS, Identity.AMAZON]
-
-    def is_darwin(self) -> bool:
-        return self in [Identity.DARWIN]
-
-    def is_windows(self) -> bool:
-        return self in []
