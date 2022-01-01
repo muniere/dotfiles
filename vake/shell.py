@@ -1,5 +1,4 @@
 import subprocess
-from typing import List
 
 from vake.timber import Lumber
 
@@ -17,7 +16,7 @@ def available(command: str) -> bool:
     return code == 0
 
 
-def execute(args: List[str], logger: Lumber = Lumber.noop(), noop: bool = False) -> bool:
+def execute(args: list[str], logger: Lumber = Lumber.noop(), noop: bool = False) -> bool:
     assert len(args) > 0, 'args must not be empty'
 
     logger.execute(' '.join(args))
@@ -28,7 +27,7 @@ def execute(args: List[str], logger: Lumber = Lumber.noop(), noop: bool = False)
     return subprocess.call(args) == 0
 
 
-def capture(args: List[str]) -> subprocess.CompletedProcess:
+def capture(args: list[str]) -> subprocess.CompletedProcess:
     assert len(args) > 0, 'args must not be empty'
 
     return subprocess.run(

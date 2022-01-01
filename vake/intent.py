@@ -1,7 +1,6 @@
 import itertools
 from abc import ABCMeta, abstractmethod
 from pathlib import Path
-from typing import List
 
 from . import brew
 from . import config
@@ -38,11 +37,11 @@ class Action(metaclass=ABCMeta):
 # Pref
 # ==
 class PrefAction(Action, metaclass=ABCMeta):
-    def recipes(self) -> List[PrefRecipe]:
+    def recipes(self) -> list[PrefRecipe]:
         identity = kernel.identify()
 
         # shared
-        books: List[PrefBook] = [
+        books: list[PrefBook] = [
             config.BinPrefBook(),
             config.ShPrefBook(),
             config.BashPrefBook(),
@@ -73,8 +72,8 @@ class PrefAction(Action, metaclass=ABCMeta):
         return list(itertools.chain(*[book.recipes for book in books]))
 
     @staticmethod
-    def snippets() -> List[SnipRecipe]:
-        books: List[SnipBook] = [
+    def snippets() -> list[SnipRecipe]:
+        books: list[SnipBook] = [
             config.ShSnipBook(),
             config.BashSnipBook(),
             config.ZshSnipBook(),

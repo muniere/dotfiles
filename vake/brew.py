@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List
 
 from . import kernel
 from . import locate
@@ -17,7 +16,7 @@ def ensure():
     shell.ensure('brew')
 
 
-def load() -> List[Keg]:
+def load() -> list[Keg]:
     identity = kernel.identify()
     src = Path(locate.static(), identity.value, 'Brewfile').resolve()
 
@@ -28,7 +27,7 @@ def load() -> List[Keg]:
     return [Keg(name) for name in lines]
 
 
-def capture() -> List[Keg]:
+def capture() -> list[Keg]:
     stdout = shell.capture(['brew', 'list']).stdout
     lines = stdout.decode('utf8').strip().splitlines()
     return [Keg(name) for name in lines]

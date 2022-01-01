@@ -3,7 +3,6 @@ from argparse import ArgumentParser
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import List
 
 from . import kernel
 from . import timber
@@ -84,7 +83,7 @@ class ContextParser:
                                    type=str,
                                    help=f'Command to perform: ({commands})')
 
-    def parse(self, args: List[str]) -> 'Context':
+    def parse(self, args: list[str]) -> 'Context':
         """
         Compose context for arguments
 
@@ -121,7 +120,7 @@ class Application:
         """
         pass
 
-    def run(self, args: List[str]) -> None:
+    def run(self, args: list[str]) -> None:
         """
         Run application with given arguments.
 
