@@ -218,7 +218,7 @@ Plug 'vim-scripts/ruby.vim', { 'for': 'ruby' }
 " == Languages / Python
 Plug 'hynek/vim-python-pep8-indent', { 'for': 'python' }
 
-" == Languages / Javascript
+" == Languages / JavaScript
 Plug 'jelera/vim-javascript-syntax', { 'for': 'javascript' }
 Plug 'jiangmiao/simple-javascript-indenter', { 'for': 'javascript' }
 Plug 'kchmck/vim-coffee-script', { 'for': 'javascript' }
