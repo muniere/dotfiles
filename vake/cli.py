@@ -65,23 +65,31 @@ class Context:
 
 
 class ContextParser:
-    delegate: ArgumentParser
+    __delegate: ArgumentParser
 
     def __init__(self):
         commands = '|'.join([x.value for x in Command])
 
-        self.delegate = ArgumentParser()
-        self.delegate.add_argument('-n', '--dry-run',
-                                   dest='dry_run',
-                                   action='store_true',
-                                   help='Do not execute commands actually')
-        self.delegate.add_argument('-v', '--verbose',
-                                   dest='verbose',
-                                   action='store_true',
-                                   help='Show verbose messages')
-        self.delegate.add_argument('command',
-                                   type=str,
-                                   help=f'Command to perform: ({commands})')
+        parser = ArgumentParser()
+        parser.add_argument(
+            '-n', '--dry-run',
+            dest='dry_run',
+            action='store_true',
+            help='Do not execute commands actually'
+        )
+        parser.add_argument(
+            '-v', '--verbose',
+            dest='verbose',
+            action='store_true',
+            help='Show verbose messages'
+        )
+        parser.add_argument(
+            'command',
+            type=str,
+            help=f'Command to perform: ({commands})'
+        )
+
+        self.__delegate = parser
 
     def parse(self, args: list[str]) -> 'Context':
         """
@@ -90,7 +98,7 @@ class ContextParser:
         :param args: Arguments
         :return: Context
         """
-        namespace = self.delegate.parse_args(args)
+        namespace = self.__delegate.parse_args(args)
 
         return Context(
             command=Command(namespace.command),
@@ -106,7 +114,7 @@ class ContextParser:
         """
 
         # pylint: disable=protected-access
-        return self.delegate._optionals._group_actions
+        return self.__delegate._optionals._group_actions
 
 
 class Application:
