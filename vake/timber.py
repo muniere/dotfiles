@@ -1,5 +1,6 @@
 import logging
 from abc import ABCMeta, abstractmethod
+from dataclasses import dataclass
 from enum import Enum
 
 __all__ = [
@@ -16,30 +17,55 @@ class Level(Enum):
     ERROR = 40
 
 
-class ColoredFormatter(logging.Formatter):
-    LEVEL_NAME_WIDTH = 5
+class AnsiColor(Enum):
+    BLACK = 30
+    RED = 31
+    GREEN = 32
+    YELLOW = 33
+    BLUE = 34
+    MAGENTA = 35
+    CYAN = 36
+    WHITE = 37
+    RESET = 39
 
-    def format(self, record: logging.LogRecord):
-        label = record.levelname.ljust(self.__class__.LEVEL_NAME_WIDTH)
-        message = record.getMessage()
-        levelno = record.levelno
-        return self.colorize(f'[{label}] {message}', levelno=levelno)
+    def escape(self):
+        return f'\033[{self.value}m'
+
+
+@dataclass(frozen=True)
+class AnsiColorPalette:
+    values: dict[int, AnsiColor]
 
     @staticmethod
-    def colorize(message, levelno=logging.NOTSET):
-        reset_str = '\033[0m'
+    def default() -> 'AnsiColorPalette':
+        return AnsiColorPalette({
+            Level.DEBUG.value: AnsiColor.GREEN,
+            Level.EXEC.value: AnsiColor.MAGENTA,
+            Level.INFO.value: AnsiColor.CYAN,
+            Level.WARN.value: AnsiColor.YELLOW,
+            Level.ERROR.value: AnsiColor.RESET,
+        })
 
-        color_dict = {
-            Level.DEBUG.value: '\033[32m',  # green
-            Level.EXEC.value: '\033[35m',  # magenta
-            Level.INFO.value: '\033[36m',  # cyan
-            Level.WARN.value: '\033[33m',  # yellow
-            Level.ERROR.value: '\033[31m',  # red
-        }
+    def get(self, key: int) -> AnsiColor:
+        return self.values.get(key, AnsiColor.RESET)
 
-        color_str = color_dict.get(levelno, reset_str)
 
-        return f'{color_str}{message}{reset_str}'
+class ColoredFormatter(logging.Formatter):
+    __palette: AnsiColorPalette
+    __label: int
+
+    def __init__(self, palette: AnsiColorPalette = AnsiColorPalette.default(), label: int = 5):
+        super().__init__()
+        self.__palette = palette
+        self.__label = label
+        return
+
+    def format(self, record: logging.LogRecord):
+        label = record.levelname.ljust(self.__label)
+        message = record.getMessage()
+        prefix = self.__palette.get(record.levelno).escape()
+        suffix = AnsiColor.RESET.escape()
+        return f'{prefix}[{label}] {message}{suffix}'
 
 
 class StreamHandler(logging.StreamHandler):
