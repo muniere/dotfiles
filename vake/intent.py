@@ -86,7 +86,7 @@ class PrefAction(Action, metaclass=ABCMeta):
 
     @staticmethod
     def _test(recipe: PrefRecipe):
-        blacklist = ['*.swp', '*.bak', '*.DS_Store']
+        blacklist = ['*.swp', '*.bak', '.DS_Store', '.keep', '.gitkeep']
 
         for pattern in blacklist:
             if recipe.src.match(pattern):
