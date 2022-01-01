@@ -64,7 +64,7 @@ if [ -d ~/.zsh-completions ]; then
 fi
 
 autoload -Uz colors; colors
-autoload -Uz compinit; compinit -u
+autoload -Uz compinit && compinit -C
 setopt auto_cd
 setopt auto_menu
 setopt autopushd
