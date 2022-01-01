@@ -16,8 +16,8 @@ class Keg:
 def ensure():
     try:
         shell.which('brew')
-    except subprocess.CalledProcessError:
-        raise AssertionError('command not available: brew')
+    except subprocess.CalledProcessError as err:
+        raise AssertionError('command not available: brew') from err
 
 
 def load_list() -> list[Keg]:
