@@ -1,14 +1,16 @@
 import itertools
 import os
 import re
+import sys
 from abc import ABCMeta, abstractmethod
 from pathlib import Path
+from typing import TextIO
 
 from . import brew
 from . import config
 from . import kernel
 from . import locate
-from . import shell
+from .ansi import AnsiColor
 from .config import PrefChain, PrefRecipe, PrefBook, SnipRecipe, SnipBook
 from .timber import Lumber
 
@@ -263,22 +265,75 @@ class PrefUninstallAction(PrefAction):
 
 
 class PrefListAction(PrefAction):
+    _stream: TextIO
+    _long: bool
+
+    def __init__(self, long: bool = False, logger: Lumber = Lumber.noop(), noop: bool = False):
+        super().__init__(logger=logger, noop=noop)
+        self._stream = sys.stdout
+        self._long = long
+
     def run(self):
         identity = kernel.identify()
-        recipes = sorted(self._recipes(), key=lambda x: x.dst)
 
-        for recipe in recipes:
-            dst = Path(recipe.dst).expanduser()
+        chains: list[PrefChain] = []
 
-            if not dst.exists():
-                continue
-
-            if identity.is_darwin():
-                shell.call(['ls', '-lFG', str(dst)], logger=self._logger, noop=False)
+        for recipe in sorted(self._recipes(), key=lambda x: x.dst):
+            if recipe.src.is_absolute():
+                chains += recipe.expand()
             else:
-                shell.call(['ls', '-lFo', str(dst)], logger=self._logger, noop=False)
+                chains += recipe.expand(src_prefix=Path(locate.static(), identity.value))
+                chains += recipe.expand(src_prefix=Path(locate.static(), 'default'))
+
+        self._stream.writelines([
+            self.__line(x) for x in chains if self._test(x.src)
+        ])
 
         return True
+
+    def __line(self, chain: PrefChain, sep: str = ' -> ', end: str = os.linesep) -> str:
+        cwd = Path.cwd()
+
+        src = chain.src.relative_to(cwd) if chain.src.is_relative_to(cwd) else chain.src
+        dst = chain.dst if chain.dst.exists() else Path('(null)')
+
+        if self._stream.isatty():
+            color = self.__color(dst)
+            if self._long:
+                pair = (
+                    color.surround(dst),
+                    str(src),
+                )
+            else:
+                pair = (
+                    color.surround(dst),
+                )
+            return sep.join(pair) + end
+        else:
+            if self._long:
+                pair = (
+                    str(dst),
+                    str(src),
+                )
+            else:
+                pair = (
+                    str(dst),
+                )
+
+            return sep.join(pair) + end
+
+    @staticmethod
+    def __color(path: Path) -> AnsiColor:
+        if not path.exists():
+            return AnsiColor.RED
+        elif path.is_symlink():
+            return AnsiColor.MAGENTA
+        elif path.is_dir():
+            return AnsiColor.BLUE
+        elif path.is_file():
+            return AnsiColor.RESET
+        else:
+            return AnsiColor.RESET
 
 
 # ==

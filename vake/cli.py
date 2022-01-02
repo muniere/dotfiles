@@ -7,7 +7,7 @@ from pathlib import Path
 from . import kernel
 from . import timber
 from .intent import Action
-from .intent import BrewInstallAction, BrewUninstallAction, BrewListAction
+from .intent import BrewInstallAction, BrewUninstallAction
 from .intent import PrefInstallAction, PrefUninstallAction, PrefListAction
 from .timber import Level, TaggedFormatter, StreamHandler, Lumber
 
@@ -178,9 +178,7 @@ def __list(context: Context) -> None:
         actions += []
 
     if identity.is_darwin():
-        actions += [
-            BrewListAction(noop=noop, logger=logger),
-        ]
+        actions += []
 
     for action in actions:
         action.run()
