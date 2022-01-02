@@ -19,10 +19,9 @@ __all__ = [
 
 
 class Command(metaclass=abc.ABCMeta):
-    @classmethod
     @abstractmethod
-    def name(cls):
-        return NotImplementedError
+    def run(self):
+        raise NotImplementedError()
 
     @staticmethod
     def _logger(verbose: bool) -> Lumber:
@@ -51,57 +50,95 @@ class Command(metaclass=abc.ABCMeta):
 
 @dataclass(frozen=True)
 class ListCommand(Command):
-    @classmethod
-    def name(cls):
-        return 'list'
+    NAME = 'list'
 
     long: bool
+
+    def run(self):
+        identity = kernel.identify()
+
+        actions: list[Action] = [
+            PrefListAction(long=self.long),
+        ]
+
+        if identity.is_linux():
+            actions += []
+
+        if identity.is_darwin():
+            actions += []
+
+        for action in actions:
+            action.run()
+
+        return
 
 
 @dataclass(frozen=True)
 class LinkCommand(Command):
-    @classmethod
-    def name(cls):
-        return 'link'
+    NAME = 'link'
 
     dry_run: bool
     verbose: bool
 
-    def logger(self) -> Lumber:
-        return self._logger(verbose=self.verbose)
+    def run(self):
+        noop = self.dry_run
+        logger = self._logger(verbose=self.verbose)
+
+        actions = [
+            PrefInstallAction(noop=noop, logger=logger),
+        ]
+
+        for action in actions:
+            action.run()
+
+        return
 
 
 @dataclass(frozen=True)
 class UnlinkCommand(Command):
-    @classmethod
-    def name(cls):
-        return 'unlink'
+    NAME = 'unlink'
 
     dry_run: bool
     verbose: bool
 
-    def logger(self) -> Lumber:
-        return self._logger(verbose=self.verbose)
+    def run(self) -> None:
+        noop = self.dry_run
+        logger = self._logger(verbose=self.verbose)
+
+        actions = [
+            PrefUninstallAction(noop=noop, logger=logger),
+        ]
+
+        for action in actions:
+            action.run()
+
+        return
 
 
 @dataclass(frozen=True)
 class CleanupCommand(Command):
-    @classmethod
-    def name(cls):
-        return 'cleanup'
+    NAME = 'cleanup'
 
     dry_run: bool
     verbose: bool
 
-    def logger(self) -> Lumber:
-        return self._logger(verbose=self.verbose)
+    def run(self) -> None:
+        noop = self.dry_run
+        logger = self._logger(verbose=self.verbose)
+
+        actions = [
+            PrefCleanupAction(noop=noop, logger=logger),
+        ]
+
+        for action in actions:
+            action.run()
+
+        return
 
 
 @dataclass(frozen=True)
 class CompletionCommand(Command):
-    @classmethod
-    def name(cls):
-        return 'completion'
+    NAME = 'completion'
 
     @property
     def src(self) -> Path:
@@ -110,6 +147,31 @@ class CompletionCommand(Command):
     @property
     def dst(self) -> Path:
         return Path('static/default/zsh-completions/_xake')
+
+    def run(self) -> None:
+        # pylint: disable=import-outside-toplevel
+        from mako.template import Template
+
+        parser = CommandParser()
+        src = self.src
+        dst = self.dst
+
+        template = Template(
+            filename=str(src),
+            input_encoding='utf-8',
+            output_encoding='utf-8',
+            bytestring_passthrough=True,
+        )
+
+        rendered = template.render(
+            options=parser.options,
+            actions=parser.actions,
+        )
+
+        dst.write_text(rendered, encoding='utf-8')
+
+        sys.stdout.write(rendered)
+        return
 
 
 class CommandParser:
@@ -120,8 +182,8 @@ class CommandParser:
 
         subparsers = parser.add_subparsers()
 
-        list_parser = subparsers.add_parser(ListCommand.name())
-        list_parser.set_defaults(command=ListCommand.name())
+        list_parser = subparsers.add_parser(ListCommand.NAME)
+        list_parser.set_defaults(command=ListCommand.NAME)
         list_parser.add_argument(
             '-l', '--long',
             dest='long',
@@ -129,12 +191,12 @@ class CommandParser:
             help='Show in long format'
         )
 
-        completion_parser = subparsers.add_parser(CompletionCommand.name())
-        completion_parser.set_defaults(command=CompletionCommand.name())
+        completion_parser = subparsers.add_parser(CompletionCommand.NAME)
+        completion_parser.set_defaults(command=CompletionCommand.NAME)
 
-        for cmd in [LinkCommand, UnlinkCommand, CleanupCommand]:
-            child_parser = subparsers.add_parser(cmd.name())
-            child_parser.set_defaults(command=cmd.name())
+        for command in [LinkCommand.NAME, UnlinkCommand.NAME, CleanupCommand.NAME]:
+            child_parser = subparsers.add_parser(command)
+            child_parser.set_defaults(command=command)
             child_parser.add_argument(
                 '-n', '--dry-run',
                 dest='dry_run',
@@ -176,30 +238,30 @@ class CommandParser:
 
         command_s: str = namespace.command
 
-        if command_s == ListCommand.name():
+        if command_s == ListCommand.NAME:
             return ListCommand(
                 long=namespace.long,
             )
 
-        if command_s == LinkCommand.name():
+        if command_s == LinkCommand.NAME:
             return LinkCommand(
                 dry_run=namespace.dry_run,
                 verbose=namespace.verbose,
             )
 
-        if command_s == UnlinkCommand.name():
+        if command_s == UnlinkCommand.NAME:
             return UnlinkCommand(
                 dry_run=namespace.dry_run,
                 verbose=namespace.verbose,
             )
 
-        if command_s == CleanupCommand.name():
+        if command_s == CleanupCommand.NAME:
             return CleanupCommand(
                 dry_run=namespace.dry_run,
                 verbose=namespace.verbose,
             )
 
-        if command_s == CompletionCommand.name():
+        if command_s == CompletionCommand.NAME:
             return CompletionCommand()
 
         raise ArgumentError(argument=None, message=f'unknown command: {command_s}')
@@ -212,131 +274,15 @@ class CommandParser:
 
 
 def run(args: list[str]) -> None:
-    """
-    Run application with given arguments.
-
-    :param args: CLI arguments
-    """
-
-    # logging
     timber.bootstrap()
 
-    # context
     parser = CommandParser()
 
     try:
         command = parser.parse(args)
+        command.run()
+        sys.exit(0)
     except ArgumentError as err:
         builtins.print(err, file=sys.stderr)
         builtins.print(file=sys.stderr)
         sys.exit(parser.format_help())
-
-    # commands
-    if isinstance(command, ListCommand):
-        __list(command)
-        sys.exit(0)
-
-    if isinstance(command, LinkCommand):
-        __link(command)
-        sys.exit(0)
-
-    if isinstance(command, UnlinkCommand):
-        __unlink(command)
-        sys.exit(0)
-
-    if isinstance(command, CleanupCommand):
-        __cleanup(command)
-        sys.exit(0)
-
-    if isinstance(command, CompletionCommand):
-        __completion(command)
-        sys.exit(0)
-
-    sys.exit(1)
-
-
-def __list(command: ListCommand) -> None:
-    identity = kernel.identify()
-
-    actions: list[Action] = [
-        PrefListAction(long=command.long),
-    ]
-
-    if identity.is_linux():
-        actions += []
-
-    if identity.is_darwin():
-        actions += []
-
-    for action in actions:
-        action.run()
-
-    return
-
-
-def __link(command: LinkCommand) -> None:
-    noop = command.dry_run
-    logger = command.logger()
-
-    actions = [
-        PrefInstallAction(noop=noop, logger=logger),
-    ]
-
-    for action in actions:
-        action.run()
-
-    return
-
-
-def __unlink(command: UnlinkCommand) -> None:
-    noop = command.dry_run
-    logger = command.logger()
-
-    actions = [
-        PrefUninstallAction(noop=noop, logger=logger),
-    ]
-
-    for action in actions:
-        action.run()
-
-    return
-
-
-def __cleanup(command: CleanupCommand) -> None:
-    noop = command.dry_run
-    logger = command.logger()
-
-    actions = [
-        PrefCleanupAction(noop=noop, logger=logger),
-    ]
-
-    for action in actions:
-        action.run()
-
-    return
-
-
-def __completion(command: CompletionCommand) -> None:
-    # pylint: disable=import-outside-toplevel
-    from mako.template import Template
-
-    parser = CommandParser()
-    src = command.src
-    dst = command.dst
-
-    template = Template(
-        filename=str(src),
-        input_encoding='utf-8',
-        output_encoding='utf-8',
-        bytestring_passthrough=True,
-    )
-
-    rendered = template.render(
-        options=parser.options,
-        actions=parser.actions,
-    )
-
-    dst.write_text(rendered, encoding='utf-8')
-
-    sys.stdout.write(rendered)
-    return
