@@ -1,7 +1,14 @@
 import os
 import subprocess
+from typing import Optional
 
 from .timber import Lumber
+
+__all__ = [
+    'SubprocessError', 'which', 'call', 'run'
+]
+
+SubprocessError = subprocess.SubprocessError
 
 
 def which(command: str) -> subprocess.CompletedProcess:
@@ -10,7 +17,7 @@ def which(command: str) -> subprocess.CompletedProcess:
 
 def call(
     args: list[str],
-    env: dict[str, str] = None,
+    env: Optional[dict[str, str]] = None,
     logger: Lumber = Lumber.noop(),
     noop: bool = False,
 ) -> int:
@@ -33,7 +40,8 @@ def call(
 
 def run(
     args: list[str],
-    env: dict[str, str] = None,
+    env: Optional[dict[str, str]] = None,
+    check: bool = False,
 ) -> subprocess.CompletedProcess:
     assert len(args) > 0, 'args must not be empty'
 
@@ -42,4 +50,4 @@ def run(
     else:
         env_vars = None
 
-    return subprocess.run(args, env=env_vars, capture_output=True, check=True)
+    return subprocess.run(args, env=env_vars, capture_output=True, check=check)

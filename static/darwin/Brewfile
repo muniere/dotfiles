@@ -1,36 +1,40 @@
-aacgain
-asdf
-bash
-bash-completion
-carthage
-colordiff
-coreutils
-curl
-direnv
-ffmpeg
-fish
-fzf
-ghq
-gibo
-git
-gh
-go
-grep
-imagemagick
-jq
-nkf
-node
-osxutils
-python
-rename
-ripgrep
-ruby
-terminal-notifier
-tig
-tmux
-tree
-vim
-watch
-wget
-zsh
-zsh-completions
+tap "homebrew/core"
+tap "sanemat/font"
+
+brew "aacgain"
+brew "asdf"
+brew "bash"
+brew "bash-completion"
+brew "carthage"
+brew "colordiff"
+brew "coreutils"
+brew "curl"
+brew "direnv"
+brew "ffmpeg"
+brew "fish"
+brew "fzf"
+brew "gh"
+brew "ghq"
+brew "gibo"
+brew "git"
+brew "go"
+brew "grep"
+brew "imagemagick"
+brew "jq"
+brew "nkf"
+brew "node"
+brew "osxutils"
+brew "python"
+brew "rename"
+brew "ripgrep"
+brew "ruby"
+brew "ricty"
+brew "terminal-notifier"
+brew "tig"
+brew "tmux"
+brew "tree"
+brew "vim"
+brew "watch"
+brew "wget"
+brew "zsh"
+brew "zsh-completions"

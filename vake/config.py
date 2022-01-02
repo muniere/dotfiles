@@ -19,6 +19,7 @@ __all__ = [
     'AsdfPrefBook',
     'TmuxPrefBook',
     'GradlePrefBook',
+    'BrewPrefBook',
     'XcodePrefBook',
     'IntelliJIdeaPrefBook',
     'AndroidStudioPrefBook',
@@ -407,6 +408,62 @@ class GradlePrefBook(PrefBook):
                 dst='~/.gradle'
             ),
         ]
+
+
+class BrewPrefBook(PrefBook):
+    logger: Lumber
+    noop: bool
+
+    def __init__(self, logger: Lumber = Lumber.noop(), noop: bool = False):
+        super().__init__()
+        self.logger = logger
+        self.noop = noop
+
+    @property
+    def recipes(self) -> list[PrefRecipe]:
+        return [
+            PrefRecipe.create(
+                src='Brewfile',
+                dst='~/.Brewfile',
+                hook=BrewHook(logger=self.logger, noop=self.noop)
+            ),
+        ]
+
+
+class BrewHook(Hook):
+    logger: Lumber
+    noop: bool
+
+    def __init__(self, logger: Lumber = Lumber.noop(), noop: bool = False):
+        super().__init__()
+        self.logger = logger
+        self.noop = noop
+
+    # noinspection PyBroadException
+    def activate(self):
+        try:
+            shell.which('brew')
+        except shell.SubprocessError:
+            self.logger.warn('skip bundle. command not found: brew')
+            return
+
+        self.logger.info('Checking if all formulae are installed ...')
+
+        proc = shell.run(
+            args=['brew', 'bundle', 'check', '--global']
+        )
+        if proc.returncode == 0:
+            self.logger.info('All formulae are satisfied.')
+            return
+
+        shell.call(
+            args=['brew', 'bundle', 'install', '--global'],
+            logger=self.logger,
+            noop=self.noop,
+        )
+
+    def deactivate(self):
+        pass
 
 
 class XcodePrefBook(PrefBook):

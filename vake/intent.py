@@ -6,7 +6,6 @@ from abc import ABCMeta, abstractmethod
 from pathlib import Path
 from typing import TextIO
 
-from . import brew
 from . import config
 from . import kernel
 from . import locate
@@ -17,7 +16,6 @@ from .timber import Lumber
 __all__ = [
     'Action',
     'PrefInstallAction', 'PrefUninstallAction', 'PrefListAction',
-    'BrewInstallAction', 'BrewUninstallAction', 'BrewListAction',
 ]
 
 
@@ -67,6 +65,7 @@ class PrefAction(Action, metaclass=ABCMeta):
         # darwin
         if identity.is_darwin():
             books += [
+                config.BrewPrefBook(logger=self._logger, noop=self._noop),
                 config.XcodePrefBook(),
                 config.IntelliJIdeaPrefBook(),
                 config.AndroidStudioPrefBook(),
@@ -336,73 +335,3 @@ class PrefListAction(PrefAction):
             return AnsiColor.RESET
         else:
             return AnsiColor.RESET
-
-
-# ==
-# Brew
-# ==
-class BrewAction(Action, metaclass=ABCMeta):
-    pass
-
-
-class BrewInstallAction(BrewAction):
-    def run(self):
-        try:
-            brew.ensure()
-        except AssertionError as err:
-            self._logger.error(err)
-            return
-
-        kegs = brew.load_list()
-
-        if len(kegs) == 0:
-            self._logger.info('No available kegs were found')
-            return
-
-        found = brew.run_list()
-
-        for keg in kegs:
-            if keg in found:
-                self._logger.info(f'{keg.name} is already installed')
-            else:
-                brew.call_install(keg, logger=self._logger, noop=self._noop)
-
-        return
-
-
-class BrewUninstallAction(BrewAction):
-    def run(self):
-        try:
-            brew.ensure()
-        except AssertionError as err:
-            self._logger.error(err)
-            return
-
-        kegs = brew.load_list()
-
-        if len(kegs) == 0:
-            self._logger.info('No available kegs were found')
-            return
-
-        found = brew.run_list()
-
-        for keg in found:
-            if keg in found:
-                brew.call_uninstall(keg, logger=self._logger, noop=self._noop)
-            else:
-                self._logger.info(f'{keg.name} is not installed')
-
-        return
-
-
-class BrewListAction(BrewAction):
-    def run(self):
-        try:
-            brew.ensure()
-        except AssertionError as err:
-            self._logger.error(err)
-            return
-
-        brew.call_tap(logger=self._logger, noop=False)
-        brew.call_list(logger=self._logger, noop=False)
-        return

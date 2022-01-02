@@ -190,4 +190,7 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+
+### Others
 .vscode
+*.lock.json

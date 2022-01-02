@@ -10,7 +10,6 @@ from pathlib import Path
 from . import kernel
 from . import timber
 from .intent import Action
-from .intent import BrewInstallAction, BrewUninstallAction
 from .intent import PrefInstallAction, PrefUninstallAction, PrefListAction
 from .timber import Level, TaggedFormatter, StreamHandler, Lumber
 
@@ -86,32 +85,6 @@ class UnlinkCommand(Command):
 
 
 @dataclass(frozen=True)
-class InstallCommand(Command):
-    @classmethod
-    def name(cls):
-        return 'install'
-
-    dry_run: bool
-    verbose: bool
-
-    def logger(self) -> Lumber:
-        return self._logger(verbose=self.verbose)
-
-
-@dataclass(frozen=True)
-class UninstallCommand(Command):
-    @classmethod
-    def name(cls):
-        return 'uninstall'
-
-    dry_run: bool
-    verbose: bool
-
-    def logger(self) -> Lumber:
-        return self._logger(verbose=self.verbose)
-
-
-@dataclass(frozen=True)
 class CompletionCommand(Command):
     @classmethod
     def name(cls):
@@ -146,7 +119,7 @@ class CommandParser:
         completion_parser = subparsers.add_parser(CompletionCommand.name())
         completion_parser.set_defaults(command=CompletionCommand.name())
 
-        for cmd in [LinkCommand, UnlinkCommand, InstallCommand, UninstallCommand]:
+        for cmd in [LinkCommand, UnlinkCommand]:
             child_parser = subparsers.add_parser(cmd.name())
             child_parser.set_defaults(command=cmd.name())
             child_parser.add_argument(
@@ -207,18 +180,6 @@ class CommandParser:
                 verbose=namespace.verbose,
             )
 
-        elif command_s == InstallCommand.name():
-            return InstallCommand(
-                dry_run=namespace.dry_run,
-                verbose=namespace.verbose,
-            )
-
-        if command_s == UninstallCommand.name():
-            return UninstallCommand(
-                dry_run=namespace.dry_run,
-                verbose=namespace.verbose,
-            )
-
         if command_s == CompletionCommand.name():
             return CompletionCommand()
 
@@ -262,14 +223,6 @@ def run(args: list[str]) -> None:
 
     if isinstance(command, UnlinkCommand):
         __unlink(command)
-        sys.exit(0)
-
-    if isinstance(command, InstallCommand):
-        __install(command)
-        sys.exit(0)
-
-    if isinstance(command, UninstallCommand):
-        __uninstall(command)
         sys.exit(0)
 
     if isinstance(command, CompletionCommand):
@@ -319,48 +272,6 @@ def __unlink(command: UnlinkCommand) -> None:
     actions = [
         PrefUninstallAction(noop=noop, logger=logger),
     ]
-
-    for action in actions:
-        action.run()
-
-    return
-
-
-def __install(command: InstallCommand) -> None:
-    noop = command.dry_run
-    logger = command.logger()
-    identity = kernel.identify()
-
-    actions: list[Action] = []
-
-    if identity.is_linux():
-        actions += []
-
-    if identity.is_darwin():
-        actions += [
-            BrewInstallAction(noop=noop, logger=logger),
-        ]
-
-    for action in actions:
-        action.run()
-
-    return
-
-
-def __uninstall(command: UninstallCommand) -> None:
-    noop = command.dry_run
-    logger = command.logger()
-    identity = kernel.identify()
-
-    actions: list[Action] = []
-
-    if identity.is_linux():
-        actions += []
-
-    if identity.is_darwin():
-        actions += [
-            BrewUninstallAction(noop=noop, logger=logger),
-        ]
 
     for action in actions:
         action.run()
