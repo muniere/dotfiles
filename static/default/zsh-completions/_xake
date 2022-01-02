@@ -3,14 +3,12 @@
 function _xake() {
   _arguments -C \
     '(-h --help)'{-h,--help}'[show this help message and exit]' \
-    '(-n --dry-run)'{-n,--dry-run}'[Do not execute commands actually]' \
-    '(-v --verbose)'{-v,--verbose}'[Show verbose messages]' \
     '1: :->actions' && ret=0
 
   case "$state" in
     actions)
       local -a actions
-      actions=(list link unlink install uninstall completion)
+      actions=(list completion link unlink install uninstall)
       _describe 'actions' actions && ret=0
       ;;
 

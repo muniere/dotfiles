@@ -21,6 +21,8 @@ __all__ = [
 ]
 
 
+# TODO: define logger and noop on each action, not on base
+
 # ==
 # Base
 # ==

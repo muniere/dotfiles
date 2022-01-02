@@ -1,7 +1,10 @@
+import abc
+import argparse
+import builtins
 import sys
-from argparse import ArgumentParser
+from abc import abstractmethod
+from argparse import ArgumentParser, ArgumentError
 from dataclasses import dataclass
-from enum import Enum
 from pathlib import Path
 
 from . import kernel
@@ -16,38 +19,15 @@ __all__ = [
 ]
 
 
-class Command(Enum):
-    LIST = 'list'
-    LINK = 'link'
-    UNLINK = 'unlink'
-    INSTALL = 'install'
-    UNINSTALL = 'uninstall'
-    COMPLETION = 'completion'
-
-
-class Locator:
-    @staticmethod
-    def completion_src() -> Path:
-        return Path('template/_xake')
+class Command(metaclass=abc.ABCMeta):
+    @classmethod
+    @abstractmethod
+    def name(cls):
+        return NotImplementedError
 
     @staticmethod
-    def completion_dst() -> Path:
-        return Path('static/default/zsh-completions/_xake')
-
-
-@dataclass(frozen=True)
-class Context:
-    command: Command
-    dry_run: bool
-    verbose: bool
-
-    def logger(self) -> Lumber:
-        """
-        Create a new logger.
-
-        :return: New logger instance
-        """
-        if self.verbose:
+    def _logger(verbose: bool) -> Lumber:
+        if verbose:
             level = Level.DEBUG
         else:
             level = Level.EXEC
@@ -70,57 +50,185 @@ class Context:
         return logger
 
 
-class ContextParser:
+@dataclass(frozen=True)
+class ListCommand(Command):
+    @classmethod
+    def name(cls):
+        return 'list'
+
+    long: bool
+
+
+@dataclass(frozen=True)
+class LinkCommand(Command):
+    @classmethod
+    def name(cls):
+        return 'link'
+
+    dry_run: bool
+    verbose: bool
+
+    def logger(self) -> Lumber:
+        return self._logger(verbose=self.verbose)
+
+
+@dataclass(frozen=True)
+class UnlinkCommand(Command):
+    @classmethod
+    def name(cls):
+        return 'unlink'
+
+    dry_run: bool
+    verbose: bool
+
+    def logger(self) -> Lumber:
+        return self._logger(verbose=self.verbose)
+
+
+@dataclass(frozen=True)
+class InstallCommand(Command):
+    @classmethod
+    def name(cls):
+        return 'install'
+
+    dry_run: bool
+    verbose: bool
+
+    def logger(self) -> Lumber:
+        return self._logger(verbose=self.verbose)
+
+
+@dataclass(frozen=True)
+class UninstallCommand(Command):
+    @classmethod
+    def name(cls):
+        return 'uninstall'
+
+    dry_run: bool
+    verbose: bool
+
+    def logger(self) -> Lumber:
+        return self._logger(verbose=self.verbose)
+
+
+@dataclass(frozen=True)
+class CompletionCommand(Command):
+    @classmethod
+    def name(cls):
+        return 'completion'
+
+    @property
+    def src(self) -> Path:
+        return Path('template/_xake')
+
+    @property
+    def dst(self) -> Path:
+        return Path('static/default/zsh-completions/_xake')
+
+
+class CommandParser:
     __delegate: ArgumentParser
 
     def __init__(self):
-        commands = '|'.join([x.value for x in Command])
+        parser = ArgumentParser(exit_on_error=False)
 
-        parser = ArgumentParser()
-        parser.add_argument(
-            '-n', '--dry-run',
-            dest='dry_run',
+        subparsers = parser.add_subparsers()
+
+        list_parser = subparsers.add_parser(ListCommand.name())
+        list_parser.set_defaults(command=ListCommand.name())
+        list_parser.add_argument(
+            '-l', '--long',
+            dest='long',
             action='store_true',
-            help='Do not execute commands actually'
+            help='Show in long format'
         )
-        parser.add_argument(
-            '-v', '--verbose',
-            dest='verbose',
-            action='store_true',
-            help='Show verbose messages'
-        )
-        parser.add_argument(
-            'command',
-            type=str,
-            help=f'Command to perform: ({commands})'
-        )
+
+        completion_parser = subparsers.add_parser(CompletionCommand.name())
+        completion_parser.set_defaults(command=CompletionCommand.name())
+
+        for cmd in [LinkCommand, UnlinkCommand, InstallCommand, UninstallCommand]:
+            child_parser = subparsers.add_parser(cmd.name())
+            child_parser.set_defaults(command=cmd.name())
+            child_parser.add_argument(
+                '-n', '--dry-run',
+                dest='dry_run',
+                action='store_true',
+                help='Do not execute commands actually'
+            )
+            child_parser.add_argument(
+                '-v', '--verbose',
+                dest='verbose',
+                action='store_true',
+                help='Show verbose messages'
+            )
 
         self.__delegate = parser
 
-    def parse(self, args: list[str]) -> 'Context':
-        """
-        Compose context for arguments
+    # noinspection PyUnresolvedReferences,PyProtectedMember
+    @property
+    def actions(self):
+        # pylint: disable=protected-access
+        for action in self.__delegate._subparsers._actions:
+            if isinstance(action, argparse._SubParsersAction):
+                return list(action.choices.keys())
+        # pylint: enable=protected-access
 
-        :param args: Arguments
-        :return: Context
-        """
-        namespace = self.__delegate.parse_args(args)
+        return []
 
-        return Context(
-            command=Command(namespace.command),
-            dry_run=namespace.dry_run,
-            verbose=namespace.verbose,
-        )
-
+    # noinspection PyUnresolvedReferences,PyProtectedMember
+    @property
     def options(self):
-        """
-        Returns all available options
-
-        :return: List of available options
-        """
-
         # pylint: disable=protected-access
         return self.__delegate._optionals._group_actions
+        # pylint: enable=protected-access
+
+    def parse(self, args: list[str]) -> Command:
+        namespace = self.__delegate.parse_args(args)
+
+        if not hasattr(namespace, 'command'):
+            raise ArgumentError(argument=None, message='no subcommand given')
+
+        command_s: str = namespace.command
+
+        if command_s == ListCommand.name():
+            return ListCommand(
+                long=namespace.long,
+            )
+
+        if command_s == LinkCommand.name():
+            return LinkCommand(
+                dry_run=namespace.dry_run,
+                verbose=namespace.verbose,
+            )
+
+        if command_s == UnlinkCommand.name():
+            return UnlinkCommand(
+                dry_run=namespace.dry_run,
+                verbose=namespace.verbose,
+            )
+
+        elif command_s == InstallCommand.name():
+            return InstallCommand(
+                dry_run=namespace.dry_run,
+                verbose=namespace.verbose,
+            )
+
+        if command_s == UninstallCommand.name():
+            return UninstallCommand(
+                dry_run=namespace.dry_run,
+                verbose=namespace.verbose,
+            )
+
+        if command_s == CompletionCommand.name():
+            return CompletionCommand()
+
+        raise ArgumentError(argument=None, message=f'unknown command: {command_s}')
+
+    def print_help(self):
+        self.__delegate.print_help()
+
+    def format_help(self) -> str:
+        return self.__delegate.format_help()
 
 
 def run(args: list[str]) -> None:
@@ -134,44 +242,48 @@ def run(args: list[str]) -> None:
     timber.bootstrap()
 
     # context
-    parser = ContextParser()
-    context = parser.parse(args)
+    parser = CommandParser()
+
+    try:
+        command = parser.parse(args)
+    except ArgumentError as err:
+        builtins.print(err, file=sys.stderr)
+        builtins.print(file=sys.stderr)
+        sys.exit(parser.format_help())
 
     # commands
-    if context.command == Command.LIST:
-        __list(context)
+    if isinstance(command, ListCommand):
+        __list(command)
         sys.exit(0)
 
-    if context.command == Command.LINK:
-        __link(context)
+    if isinstance(command, LinkCommand):
+        __link(command)
         sys.exit(0)
 
-    if context.command == Command.UNLINK:
-        __unlink(context)
+    if isinstance(command, UnlinkCommand):
+        __unlink(command)
         sys.exit(0)
 
-    if context.command == Command.INSTALL:
-        __install(context)
+    if isinstance(command, InstallCommand):
+        __install(command)
         sys.exit(0)
 
-    if context.command == Command.UNINSTALL:
-        __uninstall(context)
+    if isinstance(command, UninstallCommand):
+        __uninstall(command)
         sys.exit(0)
 
-    if context.command == Command.COMPLETION:
-        __completion()
+    if isinstance(command, CompletionCommand):
+        __completion(command)
         sys.exit(0)
 
     sys.exit(1)
 
 
-def __list(context: Context) -> None:
-    noop = context.dry_run
-    logger = context.logger()
+def __list(command: ListCommand) -> None:
     identity = kernel.identify()
 
     actions: list[Action] = [
-        PrefListAction(noop=noop, logger=logger),
+        PrefListAction(long=command.long),
     ]
 
     if identity.is_linux():
@@ -186,9 +298,9 @@ def __list(context: Context) -> None:
     return
 
 
-def __link(context: Context) -> None:
-    noop = context.dry_run
-    logger = context.logger()
+def __link(command: LinkCommand) -> None:
+    noop = command.dry_run
+    logger = command.logger()
 
     actions = [
         PrefInstallAction(noop=noop, logger=logger),
@@ -200,9 +312,9 @@ def __link(context: Context) -> None:
     return
 
 
-def __unlink(context: Context) -> None:
-    noop = context.dry_run
-    logger = context.logger()
+def __unlink(command: UnlinkCommand) -> None:
+    noop = command.dry_run
+    logger = command.logger()
 
     actions = [
         PrefUninstallAction(noop=noop, logger=logger),
@@ -214,9 +326,9 @@ def __unlink(context: Context) -> None:
     return
 
 
-def __install(context: Context) -> None:
-    noop = context.dry_run
-    logger = context.logger()
+def __install(command: InstallCommand) -> None:
+    noop = command.dry_run
+    logger = command.logger()
     identity = kernel.identify()
 
     actions: list[Action] = []
@@ -235,9 +347,9 @@ def __install(context: Context) -> None:
     return
 
 
-def __uninstall(context: Context) -> None:
-    noop = context.dry_run
-    logger = context.logger()
+def __uninstall(command: UninstallCommand) -> None:
+    noop = command.dry_run
+    logger = command.logger()
     identity = kernel.identify()
 
     actions: list[Action] = []
@@ -256,13 +368,13 @@ def __uninstall(context: Context) -> None:
     return
 
 
-def __completion() -> None:
+def __completion(command: CompletionCommand) -> None:
     # pylint: disable=import-outside-toplevel
     from mako.template import Template
 
-    parser = ContextParser()
-    src = Locator.completion_src()
-    dst = Locator.completion_dst()
+    parser = CommandParser()
+    src = command.src
+    dst = command.dst
 
     template = Template(
         filename=str(src),
@@ -272,8 +384,8 @@ def __completion() -> None:
     )
 
     rendered = template.render(
-        options=parser.options(),
-        actions=[x.value for x in Command],
+        options=parser.options,
+        actions=parser.actions,
     )
 
     dst.write_text(rendered, encoding='utf-8')
