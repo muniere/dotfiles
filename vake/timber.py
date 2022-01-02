@@ -2,11 +2,12 @@ import logging
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
+from typing import Optional
 
 from .ansi import AnsiColor
 
 __all__ = [
-    'Level', 'ColoredFormatter', 'StreamHandler', 'Lumber',
+    'Level', 'TaggedFormatter', 'StreamHandler', 'Lumber',
     'bootstrap', 'get_logger',
 ]
 
@@ -37,21 +38,34 @@ class ColorPalette:
         return self.values.get(key, AnsiColor.RESET)
 
 
-class ColoredFormatter(logging.Formatter):
+class TaggedFormatter(logging.Formatter):
     __palette: ColorPalette
     __label: int
 
-    def __init__(self, palette: ColorPalette = ColorPalette.default(), label: int = 5):
+    @classmethod
+    def default(cls, label: int = 5):
+        return cls(palette=None, label=label)
+
+    @classmethod
+    def colored(cls, label: int = 5):
+        return cls(palette=ColorPalette.default(), label=label)
+
+    def __init__(self, palette: Optional[ColorPalette] = None, label: int = 5):
         super().__init__()
         self.__palette = palette
         self.__label = label
         return
 
     def format(self, record: logging.LogRecord):
+        base = record.getMessage()
         label = record.levelname.ljust(self.__label)
-        message = record.getMessage()
+        message = f'[{label}] {base}'
+
+        if not self.__palette:
+            return message
+
         color = self.__palette.get(record.levelno)
-        return color.surround(f'[{label}] {message}')
+        return color.surround(message)
 
 
 class StreamHandler(logging.StreamHandler):
@@ -59,7 +73,7 @@ class StreamHandler(logging.StreamHandler):
     def set_level(self, level: Level):
         self.setLevel(level.value)
 
-    def set_formatter(self, formatter: ColoredFormatter):
+    def set_formatter(self, formatter: TaggedFormatter):
         self.setFormatter(formatter)
 
 

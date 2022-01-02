@@ -9,7 +9,7 @@ from . import timber
 from .intent import Action
 from .intent import BrewInstallAction, BrewUninstallAction, BrewListAction
 from .intent import PrefInstallAction, PrefUninstallAction, PrefListAction
-from .timber import Level, ColoredFormatter, StreamHandler, Lumber
+from .timber import Level, TaggedFormatter, StreamHandler, Lumber
 
 __all__ = [
     'run'
@@ -52,9 +52,14 @@ class Context:
         else:
             level = Level.EXEC
 
-        formatter = ColoredFormatter()
+        stream = sys.stdout
 
-        handler = StreamHandler()
+        if stream.isatty():
+            formatter = TaggedFormatter.colored()
+        else:
+            formatter = TaggedFormatter.default()
+
+        handler = StreamHandler(stream=stream)
         handler.set_level(level)
         handler.set_formatter(formatter)
 
