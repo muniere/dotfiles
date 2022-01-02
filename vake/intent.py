@@ -157,55 +157,33 @@ class PrefInstallAction(PrefAction):
         dst.symlink_to(src)
         return True
 
-    def __enable(self, snippet: SnipRecipe):
-
-        #
-        # source
-        #
-        src = Path(locate.snippet(), snippet.src)
-
-        if not src.exists():
-            return
-
-        src_str = src.read_text(encoding='utf-8').strip()
-
-        #
-        # destination
-        #
+    def __enable(self, snippet: SnipRecipe) -> bool:
+        src = Path(locate.snippet(), snippet.src).resolve()
         dst = Path(snippet.dst).expanduser()
 
-        # new file
-        if not dst.exists():
-            self._logger.execute(f'Enable snippet {src}')
+        if not src.exists():
+            self._logger.info(f'File not found: {snippet.src}')
+            return False
 
-            if self._noop:
-                return
+        src_str = src.read_text(encoding='utf-8').strip()
+        dst_str = dst.read_text(encoding='utf-8').strip() if dst.exists() else ''
 
-            new_str = src_str + os.linesep
-            dst.write_text(new_str, encoding='utf-8')
-            return
-
-        dst_str = dst.read_text(encoding='utf-8')
-
-        # skip: already enabled
         if src_str in dst_str:
             self._logger.info(f'Snippet already enabled: {dst}')
-            return
+            return False
 
-        # enable
-        self._logger.execute(f'Enable {src}')
+        self._logger.info(f'Enable snippet: {src}')
 
         if self._noop:
-            return
+            return False
 
-        if not dst_str.strip():
+        if len(dst_str) > 0:
+            new_str = dst_str + os.linesep + src_str + os.linesep
+        else:
             new_str = src_str + os.linesep
-            dst.write_text(new_str, encoding='utf-8')
-            return
 
-        new_str = dst_str.rstrip() + os.linesep + src_str + os.linesep
         dst.write_text(new_str, encoding='utf-8')
-        return
+        return True
 
 
 class PrefUninstallAction(PrefAction):
@@ -253,45 +231,34 @@ class PrefUninstallAction(PrefAction):
         path.unlink(missing_ok=True)
         return True
 
-    def __disable(self, snippet: SnipRecipe):
-
-        #
-        # source
-        #
-        src = Path(locate.snippet(), snippet.src)
-
-        if not src.exists():
-            return
-
-        src_str = src.read_text(encoding='utf-8').strip()
-
-        #
-        # destination
-        #
+    def __disable(self, snippet: SnipRecipe) -> bool:
+        src = Path(locate.snippet(), snippet.src).resolve()
         dst = Path(snippet.dst).expanduser()
 
-        # not found
-        if not dst.exists():
-            self._logger.info(f'File NOT FOUND: {dst}')
-            return
+        if not src.exists():
+            self._logger.info(f'File not found: {src}')
+            return False
 
+        if not dst.exists():
+            self._logger.info(f'File not found: {dst}')
+            return False
+
+        src_str = src.read_text(encoding='utf-8').strip()
         dst_str = dst.read_text(encoding='utf-8')
 
-        # skip: already disabled
         if src_str not in dst_str:
             self._logger.info(f'Snippet already disabled: {dst}')
-            return
+            return False
 
-        # disable
-        self._logger.execute(f'Disable snippet {src}')
+        self._logger.info(f'Disable snippet: {src}')
 
         if self._noop:
-            return
+            return False
 
         pattern = re.escape(src_str) + os.linesep + '*'
         new_str = re.sub(pattern, '', dst_str)
         dst.write_text(new_str, encoding='utf-8')
-        return
+        return True
 
 
 class PrefStatusAction(PrefAction):
