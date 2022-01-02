@@ -7,7 +7,7 @@ from . import shell
 from .timber import Lumber
 
 __all__ = [
-    'PrefRecipe', 'PrefBook',
+    'PrefChain', 'PrefRecipe', 'PrefBook',
     'SnipRecipe', 'SnipBook',
     'BinPrefBook',
     'ShPrefBook', 'ShSnipBook',
@@ -56,6 +56,12 @@ class NoopHook(Hook):
 
 
 @dataclass(frozen=True)
+class PrefChain:
+    src: Path
+    dst: Path
+
+
+@dataclass(frozen=True)
 class PrefRecipe:
     src: Path
     dst: Path
@@ -71,6 +77,43 @@ class PrefRecipe:
         return [
             PrefRecipe(src=Path(src), dst=Path(dst), hook=hook)
             for dst in glob.glob(pattern)
+        ]
+
+    def expand(self, src_prefix: Path = Path(), dst_prefix: Path = Path()) -> list[PrefChain]:
+        # resolve
+        ex_src = self.src.expanduser()
+
+        if ex_src.is_absolute():
+            abs_src = Path(ex_src)
+        else:
+            abs_src = Path(src_prefix, ex_src).resolve()
+
+        ex_dst = self.dst.expanduser()
+
+        if ex_dst.is_absolute():
+            abs_dst = Path(ex_dst)
+        else:
+            abs_dst = Path(dst_prefix, ex_dst).resolve()
+
+        # guard : none
+        if not abs_src.exists():
+            return []
+
+        # expand : file
+        if abs_src.is_file():
+            return [
+                PrefChain(src=abs_src, dst=abs_dst)
+            ]
+
+        # expand
+        abs_dir = abs_src
+
+        return [
+            PrefChain(
+                src=abs_file,
+                dst=Path(abs_dst, abs_file.relative_to(abs_dir)),
+            )
+            for abs_file in [x for x in abs_dir.glob('**/*') if x.is_file()]
         ]
 
 

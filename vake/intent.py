@@ -9,7 +9,7 @@ from . import config
 from . import kernel
 from . import locate
 from . import shell
-from .config import PrefRecipe, PrefBook, SnipRecipe, SnipBook
+from .config import PrefChain, PrefRecipe, PrefBook, SnipRecipe, SnipBook
 from .timber import Lumber
 
 __all__ = [
@@ -85,11 +85,11 @@ class PrefAction(Action, metaclass=ABCMeta):
         return list(itertools.chain(*[book.recipes for book in books]))
 
     @staticmethod
-    def _test(recipe: PrefRecipe):
+    def _test(path: Path):
         blacklist = ['*.swp', '*.bak', '.DS_Store', '.keep', '.gitkeep']
 
         for pattern in blacklist:
-            if recipe.src.match(pattern):
+            if path.match(pattern):
                 return False
 
         return True
@@ -101,10 +101,13 @@ class PrefInstallAction(PrefAction):
 
         for recipe in self._recipes():
             if recipe.src.is_absolute():
-                self.__run(recipe)
+                chains = recipe.expand()
             else:
-                self.__run(recipe, identifier=identity.value)
-                self.__run(recipe, identifier='default')
+                chains = recipe.expand(src_prefix=Path(locate.static(), identity.value)) + \
+                         recipe.expand(src_prefix=Path(locate.static(), 'default'))
+
+            for chain in chains:
+                self.__link(chain)
 
             recipe.hook.activate()
 
@@ -113,61 +116,27 @@ class PrefInstallAction(PrefAction):
 
         return
 
-    def __run(self, recipe: PrefRecipe, identifier='default') -> bool:
-        if not self._test(recipe):
-            rel = Path(locate.static(), identifier, recipe.src).relative_to(Path.cwd())
-            self._logger.info(f'File is not target: {rel}')
+    def __link(self, chain: PrefChain) -> bool:
+        if not self._test(chain.src):
+            self._logger.info(f'File is not target: {chain.src}')
             return False
 
-        if recipe.src.is_absolute():
-            src = Path(recipe.src)
-        else:
-            src = Path(locate.static(), identifier, recipe.src).resolve()
-
-        if recipe.dst.is_absolute():
-            dst = Path(recipe.dst)
-        else:
-            dst = Path(recipe.dst).expanduser()
-
-        #
-        # guard
-        #
-
-        # src not found
-        if not src.exists():
+        if not chain.src.exists():
+            self._logger.info(f'File not found: {chain.src}')
             return False
 
-        # dst link already exists
-        if dst.is_symlink():
-            self._logger.info(f'Symlink already exists: {dst}')
+        if chain.dst.is_symlink():
+            self._logger.info(f'Symlink already exists: {chain.dst}')
             return False
 
-        #
-        # file
-        #
-        if src.is_file():
-            # another file already exists
-            if dst.is_file():
-                self._logger.info(f'File already exists: {dst}')
-                return False
+        if chain.dst.is_file():
+            self._logger.info(f'File already exists: {chain.dst}')
+            return False
 
-            # ensure parent directory
-            dst_dir = dst.parent
-            if not dst_dir.is_dir():
-                self.__mkdir(dst_dir)
+        if not chain.dst.parent.is_dir():
+            self.__mkdir(chain.dst.parent)
 
-            # create symbolic link
-            return self.__symlink(src, dst)
-
-        #
-        # directory
-        #
-        if src.is_dir():
-            for new_src in [x for x in src.glob('**/*') if x.is_file()]:
-                new_dst = Path(recipe.dst, new_src.relative_to(src))
-                new_recipe = PrefRecipe(src=new_src, dst=new_dst)
-                self.__run(new_recipe, identifier=identifier)
-
+        self.__symlink(chain.src, chain.dst)
         return True
 
     def __mkdir(self, path: Path) -> bool:
@@ -244,8 +213,14 @@ class PrefUninstallAction(PrefAction):
         identity = kernel.identify()
 
         for recipe in self._recipes():
-            self.__run(recipe, identifier=identity.value)
-            self.__run(recipe, identifier='default')
+            if recipe.src.is_absolute():
+                chains = recipe.expand()
+            else:
+                chains = recipe.expand(src_prefix=Path(locate.static(), identity.value)) + \
+                         recipe.expand(src_prefix=Path(locate.static(), 'default'))
+
+            for chain in chains:
+                self.__unlink(chain)
 
             recipe.hook.deactivate()
 
@@ -254,61 +229,23 @@ class PrefUninstallAction(PrefAction):
 
         return
 
-    def __run(self, recipe: PrefRecipe, identifier: str = 'default') -> bool:
-        if not self._test(recipe):
-            rel = Path(locate.static(), identifier, recipe.src).relative_to(Path.cwd())
-            self._logger.info(f'File is not target: {rel}')
+    def __unlink(self, chain: PrefChain) -> bool:
+        if not self._test(chain.src):
+            self._logger.info(f'File is not target: {chain.src}')
             return False
 
-        if recipe.src.is_absolute():
-            src = Path(recipe.src)
-        else:
-            src = Path(locate.static(), identifier, recipe.src).resolve()
-
-        if recipe.dst.is_absolute():
-            dst = Path(recipe.dst)
-        else:
-            dst = Path(recipe.dst).expanduser()
-
-        #
-        # guard
-        #
-
-        # src not found
-        if not src.exists():
-            return True
-
-        # dst not found
-        if not dst.exists() and not dst.is_symlink():
-            self._logger.info(f'File already removed: {dst}')
-            return True
-
-        #
-        # symlink
-        #
-        if dst.is_symlink():
-            return self.__rm(dst)
-
-        #
-        # file
-        #
-        if dst.is_file():
-            self._logger.info(f'File is not symlink: {dst}')
+        if not chain.src.exists():
+            self._logger.info(f'File not found: {chain.src}')
             return False
 
-        #
-        # directory
-        #
-        if src.is_dir():
-            for new_src in [x for x in src.glob('**/*') if x.is_file()]:
-                new_dst = Path(recipe.dst, new_src.relative_to(src))
-                new_recipe = PrefRecipe(src=new_src, dst=new_dst)
-                self.__run(new_recipe, identifier=identifier)
+        if not chain.dst.exists() and not chain.dst.is_symlink():
+            self._logger.info(f'File already removed: {chain.dst}')
+            return True
 
-        return True
+        return self.__rm(chain.dst)
 
     def __rm(self, path: Path) -> bool:
-        self._logger.execute(f'rm -r -f {path}')
+        self._logger.execute(f'rm -f {path}')
 
         if self._noop:
             return False
