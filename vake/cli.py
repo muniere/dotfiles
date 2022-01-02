@@ -133,6 +133,10 @@ def run(args: list[str]) -> None:
     context = parser.parse(args)
 
     # commands
+    if context.command == Command.LIST:
+        __list(context)
+        sys.exit(0)
+
     if context.command == Command.LINK:
         __link(context)
         sys.exit(0)
@@ -149,15 +153,34 @@ def run(args: list[str]) -> None:
         __uninstall(context)
         sys.exit(0)
 
-    if context.command == Command.LIST:
-        __list(context)
-        sys.exit(0)
-
     if context.command == Command.COMPLETION:
         __completion()
         sys.exit(0)
 
     sys.exit(1)
+
+
+def __list(context: Context) -> None:
+    noop = context.dry_run
+    logger = context.logger()
+    identity = kernel.identify()
+
+    actions: list[Action] = [
+        PrefListAction(noop=noop, logger=logger),
+    ]
+
+    if identity.is_linux():
+        actions += []
+
+    if identity.is_darwin():
+        actions += [
+            BrewListAction(noop=noop, logger=logger),
+        ]
+
+    for action in actions:
+        action.run()
+
+    return
 
 
 def __link(context: Context) -> None:
@@ -222,29 +245,6 @@ def __uninstall(context: Context) -> None:
     if identity.is_darwin():
         actions += [
             BrewUninstallAction(noop=noop, logger=logger),
-        ]
-
-    for action in actions:
-        action.run()
-
-    return
-
-
-def __list(context: Context) -> None:
-    noop = context.dry_run
-    logger = context.logger()
-    identity = kernel.identify()
-
-    actions: list[Action] = [
-        PrefListAction(noop=noop, logger=logger),
-    ]
-
-    if identity.is_linux():
-        actions += []
-
-    if identity.is_darwin():
-        actions += [
-            BrewListAction(noop=noop, logger=logger),
         ]
 
     for action in actions:
