@@ -1,4 +1,5 @@
 import glob
+import tempfile
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
@@ -208,12 +209,21 @@ class BashSnipBook(SnipBook):
 
 
 class ZshPrefBook(PrefBook):
+    logger: Lumber
+    noop: bool
+
+    def __init__(self, logger: Lumber = Lumber.noop(), noop: bool = False):
+        super().__init__()
+        self.logger = logger
+        self.noop = noop
+
     @property
     def recipes(self) -> list[PrefRecipe]:
         return [
             PrefRecipe.create(
                 src='zsh.d',
-                dst='~/.zsh.d'
+                dst='~/.zsh.d',
+                hook=ZshHook(logger=self.logger, noop=self.noop)
             ),
             PrefRecipe.create(
                 src='zsh-completions',
@@ -224,6 +234,49 @@ class ZshPrefBook(PrefBook):
                 dst='~/.zsh-completions/_brew'
             ),
         ]
+
+
+class ZshHook(Hook):
+    logger: Lumber
+    noop: bool
+
+    def __init__(self, logger: Lumber = Lumber.noop(), noop: bool = False):
+        self.logger = logger
+        self.noop = noop
+        return
+
+    def activate(self):
+        dst = Path('~/.local/share/zinit/zinit.git').expanduser()
+        if dst.exists():
+            self.logger.info(f'Zinit is already downloaded: {dst}')
+            return
+
+        with tempfile.NamedTemporaryFile() as tmp:
+            shell.call(
+                args=[
+                    'curl',
+                    '--fail',
+                    '--silent',
+                    '--show-error',
+                    '--location',
+                    '--output', tmp.name,
+                    'https://git.io/zinit-install'
+                ],
+                logger=self.logger,
+                noop=self.noop,
+            )
+
+            shell.call(
+                args=['sh', tmp.name],
+                env={'NO_EDIT': '1'},
+                logger=self.logger,
+                noop=self.noop,
+            )
+
+        pass
+
+    def deactivate(self):
+        pass
 
 
 class ZshSnipBook(SnipBook):
@@ -295,16 +348,18 @@ class VimHook(Hook):
             self.logger.info(f'Vim-Plug is already downloaded: {dst}')
             return
 
-        args = [
-            'curl',
-            '--fail',
-            '--location',
-            '--create-dirs',
-            '--output', str(dst),
-            'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-        ]
-
-        shell.call(args, logger=self.logger, noop=self.noop)
+        shell.call(
+            args=[
+                'curl',
+                '--fail',
+                '--location',
+                '--create-dirs',
+                '--output', str(dst),
+                'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+            ],
+            logger=self.logger,
+            noop=self.noop,
+        )
 
     def deactivate(self):
         pass
