@@ -2,17 +2,15 @@
 
 function addpath() {
   # delete duplicated path
+  local args="$@"
   local base=$PATH
-  for x in $@; do
+  for x in $args; do
     base=${base//$x/}
     base=${base//::/:}
   done
 
   # add new path
-  local tmp="$IFS"
-  IFS=":"
-  local ext="${@[*]}"
-  IFS="$tmp"
+  local ext="${args// /:}"
 
   export PATH="$ext:$base"
 }
