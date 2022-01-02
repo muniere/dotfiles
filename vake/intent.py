@@ -15,7 +15,7 @@ from .timber import Lumber
 
 __all__ = [
     'Action',
-    'PrefInstallAction', 'PrefUninstallAction', 'PrefListAction',
+    'PrefInstallAction', 'PrefUninstallAction', 'PrefCleanupAction', 'PrefListAction',
 ]
 
 
@@ -122,7 +122,7 @@ class PrefInstallAction(PrefAction):
 
     def __link(self, chain: PrefChain) -> bool:
         if not self._test(chain.src):
-            self._logger.info(f'File is not target: {chain.src}')
+            self._logger.debug(f'File is not target: {chain.src}')
             return False
 
         if not chain.src.exists():
@@ -213,7 +213,7 @@ class PrefUninstallAction(PrefAction):
 
     def __unlink(self, chain: PrefChain) -> bool:
         if not self._test(chain.src):
-            self._logger.info(f'File is not target: {chain.src}')
+            self._logger.debug(f'File is not target: {chain.src}')
             return False
 
         if not chain.src.exists():
@@ -335,3 +335,52 @@ class PrefListAction(PrefAction):
             return AnsiColor.RESET
         else:
             return AnsiColor.RESET
+
+
+class PrefCleanupAction(PrefAction):
+    def run(self):
+        paths = [
+            x.dst.expanduser() for x
+            in sorted(self._recipes(), key=lambda x: x.dst)
+            if not x.private
+        ]
+
+        found: list[Path] = []
+
+        for path in paths:
+            self._logger.debug(f'Scanning {path} ...')
+            found += self.__scan(path)
+
+        self._logger.debug(f'Found {len(found)} broken symlinks')
+        for path in found:
+            self.__rm(path)
+
+        return True
+
+    def __scan(self, path: Path) -> [Path]:
+        if path.is_symlink() and not path.exists():
+            return [path]
+
+        if not path.exists():
+            return []
+
+        if path.is_file():
+            return []
+
+        if path.is_dir():
+            return [
+                x for x
+                in path.glob('**/*')
+                if x.is_symlink() and not x.exists()
+            ]
+
+        return []
+
+    def __rm(self, path: Path) -> bool:
+        self._logger.execute(f'rm -f {path}')
+
+        if self._noop:
+            return False
+
+        path.unlink(missing_ok=True)
+        return True

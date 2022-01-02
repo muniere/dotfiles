@@ -68,16 +68,27 @@ class PrefRecipe:
     src: Path
     dst: Path
     hook: Hook = Hook.noop()
+    private: bool = False
 
     @staticmethod
-    def create(src: str, dst: str, hook: Hook = Hook.noop()) -> 'PrefRecipe':
-        return PrefRecipe(src=Path(src), dst=Path(dst), hook=hook)
+    def create(
+        src: str,
+        dst: str,
+        hook: Hook = Hook.noop(),
+        private: bool = False,
+    ) -> 'PrefRecipe':
+        return PrefRecipe(src=Path(src), dst=Path(dst), hook=hook, private=private)
 
     @staticmethod
-    def glob(src: str, dst: str, hook: Hook = Hook.noop()) -> list['PrefRecipe']:
+    def glob(
+        src: str,
+        dst: str,
+        hook: Hook = Hook.noop(),
+        private: bool = False,
+    ) -> list['PrefRecipe']:
         pattern = str(Path(dst).expanduser())
         return [
-            PrefRecipe(src=Path(src), dst=Path(dst), hook=hook)
+            PrefRecipe(src=Path(src), dst=Path(dst), hook=hook, private=private)
             for dst in glob.glob(pattern)
         ]
 
@@ -405,7 +416,8 @@ class GradlePrefBook(PrefBook):
         return [
             PrefRecipe.create(
                 src='gradle',
-                dst='~/.gradle'
+                dst='~/.gradle',
+                private=True,
             ),
         ]
 
@@ -472,7 +484,8 @@ class XcodePrefBook(PrefBook):
         return [
             *PrefRecipe.glob(
                 src='Xcode',
-                dst='~/Library/Developer/Xcode'
+                dst='~/Library/Developer/Xcode',
+                private=True,
             )
         ]
 
@@ -483,11 +496,13 @@ class IntelliJIdeaPrefBook(PrefBook):
         return [
             *PrefRecipe.glob(
                 src='IntelliJIdea',
-                dst='~/Library/Preferences/IntelliJIdea*'
+                dst='~/Library/Preferences/IntelliJIdea*',
+                private=True,
             ),
             *PrefRecipe.glob(
                 src='IntelliJIdea',
-                dst='~/Library/ApplicationSupport/JetBrains/IntelliJIdea*'
+                dst='~/Library/ApplicationSupport/JetBrains/IntelliJIdea*',
+                private=True,
             ),
         ]
 
@@ -498,11 +513,13 @@ class AndroidStudioPrefBook(PrefBook):
         return [
             *PrefRecipe.glob(
                 src='AndroidStudio',
-                dst='~/Library/Preferences/AndroidStudio*'
+                dst='~/Library/Preferences/AndroidStudio*',
+                private=True,
             ),
             *PrefRecipe.glob(
                 src='AndroidStudio',
-                dst='~/Library/ApplicationSupport/Google/AndroidStudio*'
+                dst='~/Library/ApplicationSupport/Google/AndroidStudio*',
+                private=True,
             ),
         ]
 
@@ -513,11 +530,13 @@ class AppCodePrefBook(PrefBook):
         return [
             *PrefRecipe.glob(
                 src='AppCode',
-                dst='~/Library/Preferences/AppCode*'
+                dst='~/Library/Preferences/AppCode*',
+                private=True,
             ),
             *PrefRecipe.glob(
                 src='AppCode',
-                dst='~/Library/ApplicationSupport/JetBrains/AppCode*'
+                dst='~/Library/ApplicationSupport/JetBrains/AppCode*',
+                private=True,
             ),
         ]
 
@@ -528,11 +547,13 @@ class RubyMinePrefBook(PrefBook):
         return [
             *PrefRecipe.glob(
                 src='RubyMine',
-                dst='~/Library/Preferences/RubyMine*'
+                dst='~/Library/Preferences/RubyMine*',
+                private=True,
             ),
             *PrefRecipe.glob(
                 src='RubyMine',
-                dst='~/Library/ApplicationSupport/JetBrains/RubyMine*'
+                dst='~/Library/ApplicationSupport/JetBrains/RubyMine*',
+                private=True,
             ),
         ]
 
@@ -543,11 +564,13 @@ class GoLandPrefBook(PrefBook):
         return [
             *PrefRecipe.glob(
                 src='GoLand',
-                dst='~/Library/Preferences/GoLand*'
+                dst='~/Library/Preferences/GoLand*',
+                private=True,
             ),
             *PrefRecipe.glob(
                 src='GoLand',
-                dst='~/Library/ApplicationSupport/JetBrains/GoLand*'
+                dst='~/Library/ApplicationSupport/JetBrains/GoLand*',
+                private=True,
             ),
         ]
 
@@ -558,11 +581,13 @@ class CLionPrefBook(PrefBook):
         return [
             *PrefRecipe.glob(
                 src='CLion',
-                dst='~/Library/Preferences/CLion*'
+                dst='~/Library/Preferences/CLion*',
+                private=True,
             ),
             *PrefRecipe.glob(
                 src='CLion',
-                dst='~/Library/ApplicationSupport/JetBrains/CLion*'
+                dst='~/Library/ApplicationSupport/JetBrains/CLion*',
+                private=True,
             ),
         ]
 
@@ -573,10 +598,12 @@ class RiderPrefBook(PrefBook):
         return [
             *PrefRecipe.glob(
                 src='Rider',
-                dst='~/Library/Preferences/Rider*'
+                dst='~/Library/Preferences/Rider*',
+                private=True,
             ),
             *PrefRecipe.glob(
                 src='Rider',
-                dst='~/Library/ApplicationSupport/JetBrains/Rider*'
+                dst='~/Library/ApplicationSupport/JetBrains/Rider*',
+                private=True,
             ),
         ]

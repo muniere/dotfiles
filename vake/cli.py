@@ -10,7 +10,7 @@ from pathlib import Path
 from . import kernel
 from . import timber
 from .intent import Action
-from .intent import PrefInstallAction, PrefUninstallAction, PrefListAction
+from .intent import PrefInstallAction, PrefUninstallAction, PrefCleanupAction, PrefListAction
 from .timber import Level, TaggedFormatter, StreamHandler, Lumber
 
 __all__ = [
@@ -85,6 +85,19 @@ class UnlinkCommand(Command):
 
 
 @dataclass(frozen=True)
+class CleanupCommand(Command):
+    @classmethod
+    def name(cls):
+        return 'cleanup'
+
+    dry_run: bool
+    verbose: bool
+
+    def logger(self) -> Lumber:
+        return self._logger(verbose=self.verbose)
+
+
+@dataclass(frozen=True)
 class CompletionCommand(Command):
     @classmethod
     def name(cls):
@@ -119,7 +132,7 @@ class CommandParser:
         completion_parser = subparsers.add_parser(CompletionCommand.name())
         completion_parser.set_defaults(command=CompletionCommand.name())
 
-        for cmd in [LinkCommand, UnlinkCommand]:
+        for cmd in [LinkCommand, UnlinkCommand, CleanupCommand]:
             child_parser = subparsers.add_parser(cmd.name())
             child_parser.set_defaults(command=cmd.name())
             child_parser.add_argument(
@@ -180,6 +193,12 @@ class CommandParser:
                 verbose=namespace.verbose,
             )
 
+        if command_s == CleanupCommand.name():
+            return CleanupCommand(
+                dry_run=namespace.dry_run,
+                verbose=namespace.verbose,
+            )
+
         if command_s == CompletionCommand.name():
             return CompletionCommand()
 
@@ -223,6 +242,10 @@ def run(args: list[str]) -> None:
 
     if isinstance(command, UnlinkCommand):
         __unlink(command)
+        sys.exit(0)
+
+    if isinstance(command, CleanupCommand):
+        __cleanup(command)
         sys.exit(0)
 
     if isinstance(command, CompletionCommand):
@@ -271,6 +294,20 @@ def __unlink(command: UnlinkCommand) -> None:
 
     actions = [
         PrefUninstallAction(noop=noop, logger=logger),
+    ]
+
+    for action in actions:
+        action.run()
+
+    return
+
+
+def __cleanup(command: CleanupCommand) -> None:
+    noop = command.dry_run
+    logger = command.logger()
+
+    actions = [
+        PrefCleanupAction(noop=noop, logger=logger),
     ]
 
     for action in actions:
