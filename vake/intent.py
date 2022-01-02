@@ -14,8 +14,8 @@ from .timber import Lumber
 
 __all__ = [
     'Action',
-    'PrefInstallAction', 'PrefUninstallAction', 'PrefStatusAction',
-    'BrewInstallAction', 'BrewUninstallAction', 'BrewStatusAction',
+    'PrefInstallAction', 'PrefUninstallAction', 'PrefListAction',
+    'BrewInstallAction', 'BrewUninstallAction', 'BrewListAction',
 ]
 
 
@@ -262,7 +262,7 @@ class PrefUninstallAction(PrefAction):
         return True
 
 
-class PrefStatusAction(PrefAction):
+class PrefListAction(PrefAction):
     def run(self):
         identity = kernel.identify()
         recipes = sorted(self._recipes(), key=lambda x: x.dst)
@@ -338,7 +338,7 @@ class BrewUninstallAction(BrewAction):
         return
 
 
-class BrewStatusAction(BrewAction):
+class BrewListAction(BrewAction):
     def run(self):
         try:
             brew.ensure()

@@ -7,8 +7,8 @@ from pathlib import Path
 from . import kernel
 from . import timber
 from .intent import Action
-from .intent import BrewInstallAction, BrewUninstallAction, BrewStatusAction
-from .intent import PrefInstallAction, PrefUninstallAction, PrefStatusAction
+from .intent import BrewInstallAction, BrewUninstallAction, BrewListAction
+from .intent import PrefInstallAction, PrefUninstallAction, PrefListAction
 from .timber import Level, ColoredFormatter, StreamHandler, Lumber
 
 __all__ = [
@@ -17,11 +17,11 @@ __all__ = [
 
 
 class Command(Enum):
+    LIST = 'list'
     LINK = 'link'
     UNLINK = 'unlink'
     INSTALL = 'install'
     UNINSTALL = 'uninstall'
-    STATUS = 'status'
     COMPLETION = 'completion'
 
 
@@ -149,8 +149,8 @@ def run(args: list[str]) -> None:
         __uninstall(context)
         sys.exit(0)
 
-    if context.command == Command.STATUS:
-        __status(context)
+    if context.command == Command.LIST:
+        __list(context)
         sys.exit(0)
 
     if context.command == Command.COMPLETION:
@@ -230,13 +230,13 @@ def __uninstall(context: Context) -> None:
     return
 
 
-def __status(context: Context) -> None:
+def __list(context: Context) -> None:
     noop = context.dry_run
     logger = context.logger()
     identity = kernel.identify()
 
     actions: list[Action] = [
-        PrefStatusAction(noop=noop, logger=logger),
+        PrefListAction(noop=noop, logger=logger),
     ]
 
     if identity.is_linux():
@@ -244,7 +244,7 @@ def __status(context: Context) -> None:
 
     if identity.is_darwin():
         actions += [
-            BrewStatusAction(noop=noop, logger=logger),
+            BrewListAction(noop=noop, logger=logger),
         ]
 
     for action in actions:
