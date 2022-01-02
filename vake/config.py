@@ -14,8 +14,8 @@ __all__ = [
     'ShPrefBook', 'ShSnipBook',
     'BashPrefBook', 'BashSnipBook',
     'ZshPrefBook', 'ZshSnipBook',
-    'GitPrefBook',
     'VimPrefBook',
+    'GitPrefBook', 'GitHubPrefBook',
     'AsdfPrefBook',
     'TmuxPrefBook',
     'GradlePrefBook',
@@ -294,21 +294,6 @@ class ZshSnipBook(SnipBook):
         ]
 
 
-class GitPrefBook(PrefBook):
-    @property
-    def recipes(self) -> list[PrefRecipe]:
-        return [
-            PrefRecipe.create(
-                src='gitconfig',
-                dst='~/.gitconfig'
-            ),
-            PrefRecipe.create(
-                src='tigrc',
-                dst='~/.tigrc'
-            ),
-        ]
-
-
 class VimPrefBook(PrefBook):
     logger: Lumber
     noop: bool
@@ -363,6 +348,32 @@ class VimHook(Hook):
 
     def deactivate(self):
         pass
+
+
+class GitPrefBook(PrefBook):
+    @property
+    def recipes(self) -> list[PrefRecipe]:
+        return [
+            PrefRecipe.create(
+                src='gitconfig',
+                dst='~/.gitconfig'
+            ),
+            PrefRecipe.create(
+                src='tigrc',
+                dst='~/.tigrc'
+            ),
+        ]
+
+
+class GitHubPrefBook(PrefBook):
+    @property
+    def recipes(self) -> list[PrefRecipe]:
+        return [
+            PrefRecipe.create(
+                src='gh-extensions',
+                dst='~/.local/share/gh/extensions'
+            ),
+        ]
 
 
 class AsdfPrefBook(PrefBook):

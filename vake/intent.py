@@ -49,8 +49,9 @@ class PrefAction(Action, metaclass=ABCMeta):
             config.ShPrefBook(),
             config.BashPrefBook(),
             config.ZshPrefBook(logger=self._logger, noop=self._noop),
-            config.GitPrefBook(),
             config.VimPrefBook(logger=self._logger, noop=self._noop),
+            config.GitPrefBook(),
+            config.GitHubPrefBook(),
             config.TmuxPrefBook(),
             config.GradlePrefBook(),
         ]
