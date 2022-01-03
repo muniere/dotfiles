@@ -210,10 +210,10 @@ Plug 'vim-scripts/sudo.vim'
 " == Fuzzy Finder
 Plug 'ctrlpvim/ctrlp.vim'
 
-nnoremap <C-x><C-f> :CtrlP .<CR>
-inoremap <C-x><C-f> <ESC>:CtrlP .<CR>
-nnoremap <C-x><C-b> :CtrlPBuffer<CR>
-inoremap <C-x><C-b> <ESC>:CtrlPBuffer<CR>
+nnoremap <silent> <C-x><C-f> :CtrlP .<CR>
+inoremap <silent> <C-x><C-f> <ESC>:CtrlP .<CR>
+nnoremap <silent> <C-x><C-b> :CtrlPBuffer<CR>
+inoremap <silent> <C-x><C-b> <ESC>:CtrlPBuffer<CR>
 
 if executable('ag')
   let g:ctrlp_use_caching=0
