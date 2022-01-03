@@ -147,8 +147,6 @@ Plug 'vim-scripts/Align'
 
 Plug 'vim-scripts/surround.vim'
 
-Plug 'scrooloose/nerdcommenter'
-
 Plug 'editorconfig/editorconfig-vim'
 
 " == Completion
@@ -189,80 +187,6 @@ if executable('ag')
 endif
 
 Plug 'vim-scripts/sudo.vim'
-
-" == Syntax Highlight
-Plug 'scrooloose/syntastic'
-
-let g:syntastic_mode_map = { 
-      \ 'mode': 'active',
-      \ 'active_filetypes': [],
-      \ 'passive_filetypes': ['java'] 
-      \ }
-let g:syntastic_html_tidy_ignore_errors = [
-      \'proprietary attribute "ng-',
-      \'proprietary attribute "v-'
-      \]
-
-" == Languages / JSONC
-Plug 'neoclide/jsonc.vim', { 'for': 'json' }
-
-" == Languages / Shell Script
-Plug 'vim-scripts/sh.vim', { 'for': 'sh' }
-
-" == Languages / Fish
-Plug 'dag/vim-fish', { 'for': 'fish' }
-
-" == Languages / Ruby
-Plug 'vim-scripts/ruby.vim', { 'for': 'ruby' }
-
-" == Languages / Python
-Plug 'hynek/vim-python-pep8-indent', { 'for': 'python' }
-
-" == Languages / JavaScript
-Plug 'jelera/vim-javascript-syntax', { 'for': 'javascript' }
-Plug 'jiangmiao/simple-javascript-indenter', { 'for': 'javascript' }
-Plug 'kchmck/vim-coffee-script', { 'for': 'javascript' }
-let g:SimpleJsIndenter_BriefMode=1
-
-Plug 'myhere/vim-nodejs-complete', { 'for': 'javascript' }
-Plug 'posva/vim-vue', { 'for': 'vue' }
-
-" == Languages / Scala
-Plug 'vim-scripts/scala.vim', { 'for': 'scala' }
-
-" == Languages / Go
-set runtimepath+=$GOROOT/misc/vim
-exe "set runtimepath+=".globpath($GOPATH, "src/github.com/nsf/gocode/vim")
-exe "set runtimepath+=".globpath($GOPATH, "src/github.com/golang/lint/misc/vim")
-Plug 'Blackrush/vim-gocode', { 'for': 'go' }
-
-" == Languages / HTML
-Plug 'mattn/emmet-vim', { 'for': 'html' }
-Plug 'othree/html5.vim', { 'for': 'html' }
-
-" == Languages / Jade
-Plug 'digitaltoad/vim-jade', { 'for': 'pug' }
-
-" == Languages / Handlebars
-Plug 'nono/vim-handlebars', { 'for': 'handlebars.html' }
-
-" == Languages / YAML
-Plug 'vim-scripts/yaml.vim', { 'for': 'yaml' }
-
-" == Languages / Swift
-Plug 'toyamarinyon/vim-swift', { 'for': 'swift' }
-Plug 'keith/swift.vim', { 'for': 'swift' }
-Plug 'cfdrake/vim-carthage', { 'for': 'carthage' }
-
-" == Languages / Kotlin
-Plug 'udalov/kotlin-vim', { 'for': 'kotlin' }
-
-" == Languages / Crystal
-Plug 'rhysd/vim-crystal', { 'for': 'crystal' }
-
-" == Languages / Elixir
-Plug 'elixir-lang/vim-elixir', { 'for': 'elixir' }
-Plug 'mattreduce/vim-mix', { 'for': 'elixir' }
 
 call plug#end()
 
