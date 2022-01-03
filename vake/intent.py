@@ -15,7 +15,7 @@ from .timber import Lumber
 
 __all__ = [
     'Action',
-    'PrefInstallAction', 'PrefUninstallAction', 'PrefCleanupAction', 'PrefListAction',
+    'PrefLinkAction', 'PrefUnlinkAction', 'PrefCleanupAction', 'PrefListAction',
 ]
 
 
@@ -90,7 +90,7 @@ class PrefAction(Action, metaclass=ABCMeta):
         return True
 
 
-class PrefInstallAction(PrefAction):
+class PrefLinkAction(PrefAction):
     _logger: Lumber
     _noop: bool
 
@@ -100,9 +100,11 @@ class PrefInstallAction(PrefAction):
         return
 
     def run(self):
-        identity = kernel.identify()
         recipes = self._recipes(logger=self._logger, noop=self._noop)
+        return self.perform(recipes)
 
+    def perform(self, recipes: list[PrefRecipe]):
+        identity = kernel.identify()
         for recipe in recipes:
             if recipe.src.is_absolute():
                 chains = recipe.expand()
@@ -117,8 +119,6 @@ class PrefInstallAction(PrefAction):
 
         for snippet in self._snippets():
             self.__enable(snippet)
-
-        return
 
     def __link(self, chain: PrefChain) -> bool:
         if not self._test(chain.src):
@@ -190,7 +190,7 @@ class PrefInstallAction(PrefAction):
         return True
 
 
-class PrefUninstallAction(PrefAction):
+class PrefUnlinkAction(PrefAction):
     _logger: Lumber
     _noop: bool
 
@@ -200,8 +200,11 @@ class PrefUninstallAction(PrefAction):
         return
 
     def run(self):
-        identity = kernel.identify()
         recipes = self._recipes(logger=self._logger, noop=self._noop)
+        return self.perform(recipes)
+
+    def perform(self, recipes: list[PrefRecipe]):
+        identity = kernel.identify()
 
         for recipe in recipes:
             if recipe.src.is_absolute():
@@ -357,7 +360,9 @@ class PrefCleanupAction(PrefAction):
 
     def run(self):
         recipes = self._recipes(logger=self._logger, noop=self._noop)
+        return self.perform(recipes)
 
+    def perform(self, recipes: list[PrefRecipe]):
         paths = [
             recipe.dst.expanduser() for recipe
             in sorted(recipes, key=lambda x: x.dst)
@@ -374,7 +379,7 @@ class PrefCleanupAction(PrefAction):
         for path in found:
             self.__rm(path)
 
-        return True
+        return
 
     @staticmethod
     def __scan(path: Path) -> [Path]:

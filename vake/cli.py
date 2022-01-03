@@ -11,7 +11,7 @@ from typing import TypeVar, Generic
 from . import kernel
 from . import timber
 from .intent import Action
-from .intent import PrefInstallAction, PrefUninstallAction, PrefCleanupAction, PrefListAction
+from .intent import PrefLinkAction, PrefUnlinkAction, PrefCleanupAction, PrefListAction
 from .timber import Level, TaggedFormatter, StreamHandler, Lumber
 
 __all__ = [
@@ -119,7 +119,7 @@ class LinkCommand(Command):
         logger = self._logger(verbose=self.verbose)
 
         actions = [
-            PrefInstallAction(noop=noop, logger=logger),
+            PrefLinkAction(noop=noop, logger=logger),
         ]
 
         for action in actions:
@@ -166,7 +166,7 @@ class UnlinkCommand(Command):
         logger = self._logger(verbose=self.verbose)
 
         actions = [
-            PrefUninstallAction(noop=noop, logger=logger),
+            PrefUnlinkAction(noop=noop, logger=logger),
         ]
 
         for action in actions:
