@@ -10,7 +10,7 @@ from typing import TypeVar, Generic
 
 from . import kernel
 from . import timber
-from .intent import Action
+from .intent import Action, PrefListColorOption, PrefListStyleOption
 from .intent import PrefLinkAction, PrefUnlinkAction, PrefCleanupAction, PrefListAction
 from .timber import Level, TaggedFormatter, StreamHandler, Lumber
 
@@ -68,12 +68,16 @@ class ListCommand(Command):
     NAME = 'list'
 
     long: bool
+    color: str
 
     def run(self):
         identity = kernel.identify()
 
         actions: list[Action] = [
-            PrefListAction(long=self.long),
+            PrefListAction(
+                color=PrefListColorOption(self.color),
+                style=PrefListStyleOption.LONG if self.long else PrefListStyleOption.SHORT,
+            ),
         ]
 
         if identity.is_linux():
@@ -100,10 +104,18 @@ class ListCommand(Command):
                 action='store_true',
                 help='Show in long format'
             )
+            child.add_argument(
+                '--color',
+                dest='color',
+                choices=['auto', 'always', 'never'],
+                default='auto',
+                help='Choose how to colorize output'
+            )
 
         def create(self, args: Namespace) -> 'ListCommand':
             return ListCommand(
                 long=args.long,
+                color=args.color,
             )
 
 

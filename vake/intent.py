@@ -3,6 +3,7 @@ import os
 import re
 import sys
 from abc import ABCMeta, abstractmethod
+from enum import Enum, auto
 from pathlib import Path
 from typing import TextIO
 
@@ -15,7 +16,8 @@ from .timber import Lumber
 
 __all__ = [
     'Action',
-    'PrefLinkAction', 'PrefUnlinkAction', 'PrefCleanupAction', 'PrefListAction',
+    'PrefLinkAction', 'PrefUnlinkAction', 'PrefCleanupAction',
+    'PrefListAction', 'PrefListColorOption', 'PrefListStyleOption',
 ]
 
 
@@ -289,13 +291,29 @@ class PrefUnlinkAction(PrefAction):
         return True
 
 
+class PrefListColorOption(Enum):
+    AUTO = 'auto'
+    ALWAYS = 'always'
+    NEVER = 'never'
+
+
+class PrefListStyleOption(Enum):
+    SHORT = auto()
+    LONG = auto()
+
+
 class PrefListAction(PrefAction):
     _stream: TextIO
-    _long: bool
+    _color: PrefListColorOption
+    _style: PrefListStyleOption
 
-    def __init__(self, stream: TextIO = sys.stdout, long: bool = False):
+    def __init__(self,
+                 stream: TextIO = sys.stdout,
+                 color: PrefListColorOption = PrefListColorOption.AUTO,
+                 style: PrefListStyleOption = PrefListStyleOption.SHORT):
         self._stream = stream
-        self._long = long
+        self._color = color
+        self._style = style
 
     def run(self):
         identity = kernel.identify()
@@ -322,23 +340,42 @@ class PrefListAction(PrefAction):
         src = chain.src.relative_to(cwd) if chain.src.is_relative_to(cwd) else chain.src
         dst = chain.dst if chain.dst.exists() else Path('(null)')
 
-        if self._stream.isatty():
+        if self._color == PrefListColorOption.ALWAYS:
+            colorized = True
+        elif self._color == PrefListColorOption.NEVER:
+            colorized = False
+        elif self._color == PrefListColorOption.AUTO:
+            colorized = self._stream.isatty()
+        else:
+            colorized = self._stream.isatty()
+
+        if colorized:
             color = self.__color(dst)
-            if self._long:
+
+            if self._style == PrefListStyleOption.LONG:
                 pair = (
                     color.surround(dst),
                     str(src),
+                )
+            elif self._style == PrefListStyleOption.SHORT:
+                pair = (
+                    color.surround(dst),
                 )
             else:
                 pair = (
                     color.surround(dst),
                 )
+
             return sep.join(pair) + end
         else:
-            if self._long:
+            if self._style == PrefListStyleOption.LONG:
                 pair = (
                     str(dst),
                     str(src),
+                )
+            elif self._style == PrefListStyleOption.SHORT:
+                pair = (
+                    str(dst),
                 )
             else:
                 pair = (
