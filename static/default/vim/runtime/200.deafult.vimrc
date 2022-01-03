@@ -182,7 +182,8 @@ inoremap <S-Tab> <C-n>
 Plug 'vim-scripts/sudo.vim'
 
 " == Fuzzy Finder
-Plug 'kien/ctrlp.vim'
+Plug 'ctrlpvim/ctrlp.vim'
+
 nnoremap <C-x><C-f> :CtrlP .<CR>
 inoremap <C-x><C-f> <ESC>:CtrlP .<CR>
 nnoremap <C-x><C-b> :CtrlPBuffer<CR>
