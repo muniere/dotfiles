@@ -19,20 +19,10 @@ __all__ = [
 ]
 
 
-# TODO: define logger and noop on each action, not on base
-
 # ==
 # Base
 # ==
 class Action(metaclass=ABCMeta):
-    _logger: Lumber
-    _noop: bool
-
-    def __init__(self, logger: Lumber = Lumber.noop(), noop: bool = False):
-        self._logger = logger
-        self._noop = noop
-        return
-
     @abstractmethod
     def run(self):
         pass
@@ -42,7 +32,8 @@ class Action(metaclass=ABCMeta):
 # Pref
 # ==
 class PrefAction(Action, metaclass=ABCMeta):
-    def _recipes(self) -> list[PrefRecipe]:
+    @staticmethod
+    def _recipes(logger: Lumber = Lumber.noop(), noop: bool = False) -> list[PrefRecipe]:
         identity = kernel.identify()
 
         # shared
@@ -50,8 +41,8 @@ class PrefAction(Action, metaclass=ABCMeta):
             config.BinPrefBook(),
             config.ShPrefBook(),
             config.BashPrefBook(),
-            config.ZshPrefBook(logger=self._logger, noop=self._noop),
-            config.VimPrefBook(logger=self._logger, noop=self._noop),
+            config.ZshPrefBook(logger=logger, noop=noop),
+            config.VimPrefBook(logger=logger, noop=noop),
             config.GitPrefBook(),
             config.GitHubPrefBook(),
             config.TmuxPrefBook(),
@@ -65,7 +56,7 @@ class PrefAction(Action, metaclass=ABCMeta):
         # darwin
         if identity.is_darwin():
             books += [
-                config.BrewPrefBook(logger=self._logger, noop=self._noop),
+                config.BrewPrefBook(logger=logger, noop=noop),
                 config.XcodePrefBook(),
                 config.IntelliJIdeaPrefBook(),
                 config.AndroidStudioPrefBook(),
@@ -100,10 +91,19 @@ class PrefAction(Action, metaclass=ABCMeta):
 
 
 class PrefInstallAction(PrefAction):
+    _logger: Lumber
+    _noop: bool
+
+    def __init__(self, logger: Lumber = Lumber.noop(), noop: bool = False):
+        self._logger = logger
+        self._noop = noop
+        return
+
     def run(self):
         identity = kernel.identify()
+        recipes = self._recipes(logger=self._logger, noop=self._noop)
 
-        for recipe in self._recipes():
+        for recipe in recipes:
             if recipe.src.is_absolute():
                 chains = recipe.expand()
             else:
@@ -191,10 +191,19 @@ class PrefInstallAction(PrefAction):
 
 
 class PrefUninstallAction(PrefAction):
+    _logger: Lumber
+    _noop: bool
+
+    def __init__(self, logger: Lumber = Lumber.noop(), noop: bool = False):
+        self._logger = logger
+        self._noop = noop
+        return
+
     def run(self):
         identity = kernel.identify()
+        recipes = self._recipes(logger=self._logger, noop=self._noop)
 
-        for recipe in self._recipes():
+        for recipe in recipes:
             if recipe.src.is_absolute():
                 chains = recipe.expand()
             else:
@@ -269,17 +278,17 @@ class PrefListAction(PrefAction):
     _stream: TextIO
     _long: bool
 
-    def __init__(self, long: bool = False, logger: Lumber = Lumber.noop(), noop: bool = False):
-        super().__init__(logger=logger, noop=noop)
-        self._stream = sys.stdout
+    def __init__(self, stream: TextIO = sys.stdout, long: bool = False):
+        self._stream = stream
         self._long = long
 
     def run(self):
         identity = kernel.identify()
+        recipes = self._recipes(logger=Lumber.noop(), noop=False)
 
         chains: list[PrefChain] = []
 
-        for recipe in sorted(self._recipes(), key=lambda x: x.dst):
+        for recipe in sorted(recipes, key=lambda x: x.dst):
             if recipe.src.is_absolute():
                 chains += recipe.expand()
             else:
@@ -338,11 +347,21 @@ class PrefListAction(PrefAction):
 
 
 class PrefCleanupAction(PrefAction):
+    _logger: Lumber
+    _noop: bool
+
+    def __init__(self, logger: Lumber = Lumber.noop(), noop: bool = False):
+        self._logger = logger
+        self._noop = noop
+        return
+
     def run(self):
+        recipes = self._recipes(logger=self._logger, noop=self._noop)
+
         paths = [
-            x.dst.expanduser() for x
-            in sorted(self._recipes(), key=lambda x: x.dst)
-            if not x.private
+            recipe.dst.expanduser() for recipe
+            in sorted(recipes, key=lambda x: x.dst)
+            if not recipe.private
         ]
 
         found: list[Path] = []
@@ -357,7 +376,8 @@ class PrefCleanupAction(PrefAction):
 
         return True
 
-    def __scan(self, path: Path) -> [Path]:
+    @staticmethod
+    def __scan(path: Path) -> [Path]:
         if path.is_symlink() and not path.exists():
             return [path]
 
