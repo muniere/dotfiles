@@ -129,6 +129,20 @@ nnoremap tp :tabprevious<CR>
 nnoremap tm :tabmove
 
 """
+" Explore
+"""
+let g:netrw_liststyle=3
+let g:netrw_banner=0
+let g:netrw_preview=1
+let g:netrw_list_hide= '.*\.swp$,\~$,\.orig$'
+let g:netrw_winsize = 25
+
+nnoremap <C-e><C-e> :Lexplore .<CR>
+inoremap <C-e><C-e> <ESC>:Lexplore .<CR>
+nnoremap <C-e><C-f> :Lexplore %:p:h<CR>
+inoremap <C-e><C-f> <ESC>Lexplore %:p:h<CR>
+
+"""
 " Plugins
 """
 
@@ -165,16 +179,9 @@ inoremap <Tab> <C-r>=InsertTabWrapper()<CR>
 inoremap <S-Tab> <C-n>
 
 " == File System
-Plug 'scrooloose/nerdtree'
+Plug 'vim-scripts/sudo.vim'
 
-Plug 'jistr/vim-nerdtree-tabs'
-let g:nerdtree_tabs_open_on_gui_startup = 0
-let g:nerdtree_tabs_open_on_console_startup = 0
-nnoremap <C-e><C-e> :NERDTreeTabsToggle<CR>
-inoremap <C-e><C-e> <ESC>:NERDTreeTabsToggle<CR>
-nnoremap <C-e><C-f> :NERDTreeTabsOpen<CR><C-w>p:NERDTreeTabsFind<CR>
-inoremap <C-e><C-f> <ESC>:NERDTreeTabsOpen<CR><C-w>p:NERDTreeTabsFind<CR>
-
+" == Fuzzy Finder
 Plug 'kien/ctrlp.vim'
 nnoremap <C-x><C-f> :CtrlP .<CR>
 inoremap <C-x><C-f> <ESC>:CtrlP .<CR>
@@ -185,8 +192,6 @@ if executable('ag')
   let g:ctrlp_use_caching=0
   let g:ctrlp_user_command='ag %s -i --nocolor --nogroup -g ""'
 endif
-
-Plug 'vim-scripts/sudo.vim'
 
 call plug#end()
 
