@@ -111,15 +111,17 @@ class ListCommand(Command):
 class LinkCommand(Command):
     NAME = 'link'
 
+    cleanup: bool
     dry_run: bool
     verbose: bool
 
     def run(self):
+        cleanup = self.cleanup
         noop = self.dry_run
         logger = self._logger(verbose=self.verbose)
 
         actions = [
-            PrefLinkAction(noop=noop, logger=logger),
+            PrefLinkAction(cleanup=cleanup, noop=noop, logger=logger),
         ]
 
         for action in actions:
@@ -135,6 +137,12 @@ class LinkCommand(Command):
             child = subparsers.add_parser(LinkCommand.NAME)
             child.set_defaults(factory=cls())
             child.add_argument(
+                '--skip-cleanup',
+                dest='skip_cleanup',
+                action='store_true',
+                help='Skip cleanup action before link'
+            )
+            child.add_argument(
                 '-n', '--dry-run',
                 dest='dry_run',
                 action='store_true',
@@ -149,6 +157,7 @@ class LinkCommand(Command):
 
         def create(self, args: Namespace) -> 'LinkCommand':
             return LinkCommand(
+                cleanup=not args.skip_cleanup,
                 dry_run=args.dry_run,
                 verbose=args.verbose,
             )
@@ -158,15 +167,17 @@ class LinkCommand(Command):
 class UnlinkCommand(Command):
     NAME = 'unlink'
 
+    cleanup: bool
     dry_run: bool
     verbose: bool
 
     def run(self) -> None:
+        cleanup = self.cleanup
         noop = self.dry_run
         logger = self._logger(verbose=self.verbose)
 
         actions = [
-            PrefUnlinkAction(noop=noop, logger=logger),
+            PrefUnlinkAction(cleanup=cleanup, noop=noop, logger=logger),
         ]
 
         for action in actions:
@@ -182,6 +193,12 @@ class UnlinkCommand(Command):
             child = subparsers.add_parser(UnlinkCommand.NAME)
             child.set_defaults(factory=cls)
             child.add_argument(
+                '--skip-cleanup',
+                dest='skip_cleanup',
+                action='store_true',
+                help='Skip cleanup action before link'
+            )
+            child.add_argument(
                 '-n', '--dry-run',
                 dest='dry_run',
                 action='store_true',
@@ -196,6 +213,7 @@ class UnlinkCommand(Command):
 
         def create(self, args: Namespace) -> 'UnlinkCommand':
             return UnlinkCommand(
+                cleanup=not args.skip_cleanup,
                 dry_run=args.dry_run,
                 verbose=args.verbose,
             )

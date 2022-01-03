@@ -91,16 +91,22 @@ class PrefAction(Action, metaclass=ABCMeta):
 
 
 class PrefLinkAction(PrefAction):
+    _cleanup: bool
     _logger: Lumber
     _noop: bool
 
-    def __init__(self, logger: Lumber = Lumber.noop(), noop: bool = False):
+    def __init__(self, cleanup: bool = True, logger: Lumber = Lumber.noop(), noop: bool = False):
+        self._cleanup = cleanup
         self._logger = logger
         self._noop = noop
         return
 
     def run(self):
         recipes = self._recipes(logger=self._logger, noop=self._noop)
+
+        if self._cleanup:
+            PrefCleanupAction(logger=self._logger, noop=self._noop).perform(recipes)
+
         return self.perform(recipes)
 
     def perform(self, recipes: list[PrefRecipe]):
@@ -191,16 +197,22 @@ class PrefLinkAction(PrefAction):
 
 
 class PrefUnlinkAction(PrefAction):
+    _cleanup: bool
     _logger: Lumber
     _noop: bool
 
-    def __init__(self, logger: Lumber = Lumber.noop(), noop: bool = False):
+    def __init__(self, cleanup: bool = True, logger: Lumber = Lumber.noop(), noop: bool = False):
+        self._cleanup = cleanup
         self._logger = logger
         self._noop = noop
         return
 
     def run(self):
         recipes = self._recipes(logger=self._logger, noop=self._noop)
+
+        if self._cleanup:
+            PrefCleanupAction(logger=self._logger, noop=self._noop).perform(recipes)
+
         return self.perform(recipes)
 
     def perform(self, recipes: list[PrefRecipe]):

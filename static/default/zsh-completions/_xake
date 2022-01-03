@@ -8,7 +8,7 @@ function _xake() {
   case "$state" in
     actions)
       local -a actions
-      actions=(list completion link unlink)
+      actions=(list link unlink cleanup completion)
       _describe 'actions' actions && ret=0
       ;;
 
