@@ -303,18 +303,18 @@ class PrefListAction(PrefAction):
 
         chains: list[PrefChain] = []
 
-        for recipe in sorted(recipes, key=lambda x: x.dst):
+        for recipe in recipes:
             if recipe.src.is_absolute():
                 chains += recipe.expand()
             else:
                 chains += recipe.expand(src_prefix=Path(locate.static(), identity.value))
                 chains += recipe.expand(src_prefix=Path(locate.static(), 'default'))
 
-        self._stream.writelines([
-            self.__line(x) for x in chains if self._test(x.src)
-        ])
+        chains.sort(key=lambda x: x.dst)
+        lines = [self.__line(x) for x in chains if self._test(x.src)]
 
-        return True
+        self._stream.writelines(lines)
+        return
 
     def __line(self, chain: PrefChain, sep: str = ' -> ', end: str = os.linesep) -> str:
         cwd = Path.cwd()
@@ -375,11 +375,8 @@ class PrefCleanupAction(PrefAction):
         return self.perform(recipes)
 
     def perform(self, recipes: list[PrefRecipe]):
-        paths = [
-            recipe.dst.expanduser() for recipe
-            in sorted(recipes, key=lambda x: x.dst)
-            if not recipe.private
-        ]
+        paths = [recipe.dst.expanduser() for recipe in recipes if not recipe.private]
+        paths.sort()
 
         found: list[Path] = []
 
