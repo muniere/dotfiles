@@ -1,3 +1,4 @@
+tap "homebrew/cask"
 tap "homebrew/core"
 tap "sanemat/font"
 
@@ -38,3 +39,5 @@ brew "watch"
 brew "wget"
 brew "zsh"
 brew "zsh-completions"
+
+cask "temurin"
