@@ -131,16 +131,42 @@ nnoremap tm :tabmove
 """
 " Explore
 """
-let g:netrw_liststyle=3
+let g:netrw_liststyle=1
 let g:netrw_banner=0
 let g:netrw_preview=1
+let g:netrw_timefmt="%Y/%m/%d(%a) %H:%M:%S"
 let g:netrw_list_hide= '.*\.swp$,\~$,\.orig$'
-let g:netrw_winsize = 25
 
-nnoremap <C-e><C-e> :Lexplore .<CR>
-inoremap <C-e><C-e> <ESC>:Lexplore .<CR>
-nnoremap <C-e><C-f> :Lexplore %:p:h<CR>
-inoremap <C-e><C-f> <ESC>Lexplore %:p:h<CR>
+let g:_netrw_open=0
+
+function! ToggleNetrw(focus)
+  if ! g:_netrw_open
+    let g:_netrw_open=1
+    if a:focus
+      silent Explore %:p:h
+    else
+      silent Explore 
+    endif
+    return
+  endif
+
+  let i = bufnr("$")
+
+  while (i >= 1)
+    if (getbufvar(i, "&filetype") == "netrw")
+      silent exe "bwipeout " . i
+    endif
+    let i-=1
+  endwhile
+
+  let g:_netrw_open=0
+endfunction
+
+nnoremap <silent> <C-e><C-e> :call ToggleNetrw(0)<CR>
+inoremap <silent> <C-e><C-e> <ESC>:call ToggleNetrw(0)<CR>
+nnoremap <silent> <C-e><C-f> :call ToggleNetrw(1)<CR>
+inoremap <silent> <C-e><C-f> <ESC>:call ToggleNetrw(1)<CR>
+
 
 """
 " Plugins
