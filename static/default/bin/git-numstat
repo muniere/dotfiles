@@ -1,69 +1,12 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env bash
 
-require 'open3'
-require 'optparse'
-
-class String
-  def red;     "\033[31m#{self}\033[0m"; end
-  def green;   "\033[32m#{self}\033[0m"; end
-  def yellow;  "\033[33m#{self}\033[0m"; end
-  def blue;    "\033[34m#{self}\033[0m"; end
-  def magenta; "\033[35m#{self}\033[0m"; end
-  def cyan;    "\033[36m#{self}\033[0m"; end
-  def gray;    "\033[37m#{self}\033[0m"; end
-end
-
-class Integer
-  def decorate(colored: false)
-    if colored
-      case
-      when self > 0 then "+#{self.abs}".green
-      when self < 0 then "-#{self.abs}".red
-      else "0"
-      end
-    else
-      case
-      when self > 0 then "+#{self.abs}"
-      when self < 0 then "-#{self.abs}"
-      else "0"
-      end
-    end
-  end
-end
-
-def main(args)
-  command = ['git', 'diff', '--numstat'].concat(args).join(' ')
-
-  output, _, status = Open3.capture3(command)
-
-  unless status.success?
-    Kernel.exit(status.to_i)
-  end
-
-  colored = -> {
-    if args.include?('--color=never')
-      next false
-    end
-
-    if args.include?('--color=always')
-      next true
-    end
-
-    return STDOUT.tty?
-  }.call
-
-  output.lines.each do |line|
-    inc_s, dec_s, path = line.split($;, 3)
-
-    STDOUT.puts "%{inc}\t%{dec}\t(%{delta})\t%{path}" % {
-      :inc   => (inc_s.to_i * +1).decorate(colored: colored),
-      :dec   => (dec_s.to_i * -1).decorate(colored: colored),
-      :delta => (inc_s.to_i - dec_s.to_i).decorate(colored: colored),
-      :path  => path,
-    }
-  end
-end
-
-if __FILE__ == $0
-  main(ARGV)
-end
+if [ -t 1 ]; then
+    git diff --numstat $@ | awk '{
+        add = $1 > 0 ? "\033[32m" "+" $1 "\033[0m" : $1
+        del = $2 > 0 ? "\033[31m" "-" $2 "\033[0m" : $2
+        file = $3 
+        print add "\t" del "\t" file
+    }'
+else
+    git diff --numstat $@ 
+fi
