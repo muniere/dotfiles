@@ -3,9 +3,10 @@ import argparse
 import builtins
 import sys
 from abc import abstractmethod
-from argparse import ArgumentParser, ArgumentError
+from argparse import ArgumentParser, ArgumentError, Namespace
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TypeVar, Generic
 
 from . import kernel
 from . import timber
@@ -16,6 +17,8 @@ from .timber import Level, TaggedFormatter, StreamHandler, Lumber
 __all__ = [
     'run'
 ]
+
+AnyCommand = TypeVar('AnyCommand', bound='Command')
 
 
 class Command(metaclass=abc.ABCMeta):
@@ -47,6 +50,18 @@ class Command(metaclass=abc.ABCMeta):
 
         return logger
 
+    class Factory(Generic[AnyCommand], metaclass=abc.ABCMeta):
+
+        # noinspection PyUnresolvedReferences,PyProtectedMember
+        @classmethod
+        @abstractmethod
+        def register(cls, subparsers: argparse._SubParsersAction):
+            raise NotImplementedError()
+
+        @abstractmethod
+        def create(self, args: Namespace) -> AnyCommand:
+            raise NotImplementedError()
+
 
 @dataclass(frozen=True)
 class ListCommand(Command):
@@ -72,6 +87,25 @@ class ListCommand(Command):
 
         return
 
+    class Factory(Command.Factory):
+
+        # noinspection PyUnresolvedReferences,PyProtectedMember
+        @classmethod
+        def register(cls, subparsers: argparse._SubParsersAction):
+            child = subparsers.add_parser(ListCommand.NAME)
+            child.set_defaults(factory=cls())
+            child.add_argument(
+                '-l', '--long',
+                dest='long',
+                action='store_true',
+                help='Show in long format'
+            )
+
+        def create(self, args: Namespace) -> 'ListCommand':
+            return ListCommand(
+                long=args.long,
+            )
+
 
 @dataclass(frozen=True)
 class LinkCommand(Command):
@@ -92,6 +126,32 @@ class LinkCommand(Command):
             action.run()
 
         return
+
+    class Factory(Command.Factory):
+
+        # noinspection PyUnresolvedReferences,PyProtectedMember
+        @classmethod
+        def register(cls, subparsers: argparse._SubParsersAction):
+            child = subparsers.add_parser(LinkCommand.NAME)
+            child.set_defaults(factory=cls())
+            child.add_argument(
+                '-n', '--dry-run',
+                dest='dry_run',
+                action='store_true',
+                help='Do not execute commands actually'
+            )
+            child.add_argument(
+                '-v', '--verbose',
+                dest='verbose',
+                action='store_true',
+                help='Show verbose messages'
+            )
+
+        def create(self, args: Namespace) -> 'LinkCommand':
+            return LinkCommand(
+                dry_run=args.dry_run,
+                verbose=args.verbose,
+            )
 
 
 @dataclass(frozen=True)
@@ -114,6 +174,32 @@ class UnlinkCommand(Command):
 
         return
 
+    class Factory(Command.Factory):
+
+        # noinspection PyUnresolvedReferences,PyProtectedMember
+        @classmethod
+        def register(cls, subparsers: argparse._SubParsersAction):
+            child = subparsers.add_parser(UnlinkCommand.NAME)
+            child.set_defaults(factory=cls)
+            child.add_argument(
+                '-n', '--dry-run',
+                dest='dry_run',
+                action='store_true',
+                help='Do not execute commands actually'
+            )
+            child.add_argument(
+                '-v', '--verbose',
+                dest='verbose',
+                action='store_true',
+                help='Show verbose messages'
+            )
+
+        def create(self, args: Namespace) -> 'UnlinkCommand':
+            return UnlinkCommand(
+                dry_run=args.dry_run,
+                verbose=args.verbose,
+            )
+
 
 @dataclass(frozen=True)
 class CleanupCommand(Command):
@@ -134,6 +220,32 @@ class CleanupCommand(Command):
             action.run()
 
         return
+
+    class Factory(Command.Factory):
+
+        # noinspection PyUnresolvedReferences,PyProtectedMember
+        @classmethod
+        def register(cls, subparsers: argparse._SubParsersAction):
+            child = subparsers.add_parser(CleanupCommand.NAME)
+            child.set_defaults(factory=cls())
+            child.add_argument(
+                '-n', '--dry-run',
+                dest='dry_run',
+                action='store_true',
+                help='Do not execute commands actually'
+            )
+            child.add_argument(
+                '-v', '--verbose',
+                dest='verbose',
+                action='store_true',
+                help='Show verbose messages'
+            )
+
+        def create(self, args: Namespace) -> 'CleanupCommand':
+            return CleanupCommand(
+                dry_run=args.dry_run,
+                verbose=args.verbose,
+            )
 
 
 @dataclass(frozen=True)
@@ -173,42 +285,29 @@ class CompletionCommand(Command):
         sys.stdout.write(rendered)
         return
 
+    class Factory(Command.Factory):
+
+        # noinspection PyUnresolvedReferences,PyProtectedMember
+        @classmethod
+        def register(cls, subparsers: argparse._SubParsersAction):
+            child = subparsers.add_parser(CompletionCommand.NAME)
+            child.set_defaults(factory=cls())
+
+        def create(self, args: Namespace) -> 'CompletionCommand':
+            return CompletionCommand()
+
 
 class CommandParser:
     __delegate: ArgumentParser
 
     def __init__(self):
         parser = ArgumentParser(exit_on_error=False)
-
         subparsers = parser.add_subparsers()
-
-        list_parser = subparsers.add_parser(ListCommand.NAME)
-        list_parser.set_defaults(command=ListCommand.NAME)
-        list_parser.add_argument(
-            '-l', '--long',
-            dest='long',
-            action='store_true',
-            help='Show in long format'
-        )
-
-        completion_parser = subparsers.add_parser(CompletionCommand.NAME)
-        completion_parser.set_defaults(command=CompletionCommand.NAME)
-
-        for command in [LinkCommand.NAME, UnlinkCommand.NAME, CleanupCommand.NAME]:
-            child_parser = subparsers.add_parser(command)
-            child_parser.set_defaults(command=command)
-            child_parser.add_argument(
-                '-n', '--dry-run',
-                dest='dry_run',
-                action='store_true',
-                help='Do not execute commands actually'
-            )
-            child_parser.add_argument(
-                '-v', '--verbose',
-                dest='verbose',
-                action='store_true',
-                help='Show verbose messages'
-            )
+        ListCommand.Factory.register(subparsers)
+        LinkCommand.Factory.register(subparsers)
+        UnlinkCommand.Factory.register(subparsers)
+        CleanupCommand.Factory.register(subparsers)
+        CompletionCommand.Factory.register(subparsers)
 
         self.__delegate = parser
 
@@ -231,40 +330,13 @@ class CommandParser:
         # pylint: enable=protected-access
 
     def parse(self, args: list[str]) -> Command:
-        namespace = self.__delegate.parse_args(args)
+        args = self.__delegate.parse_args(args)
 
-        if not hasattr(namespace, 'command'):
-            raise ArgumentError(argument=None, message='no subcommand given')
-
-        command_s: str = namespace.command
-
-        if command_s == ListCommand.NAME:
-            return ListCommand(
-                long=namespace.long,
-            )
-
-        if command_s == LinkCommand.NAME:
-            return LinkCommand(
-                dry_run=namespace.dry_run,
-                verbose=namespace.verbose,
-            )
-
-        if command_s == UnlinkCommand.NAME:
-            return UnlinkCommand(
-                dry_run=namespace.dry_run,
-                verbose=namespace.verbose,
-            )
-
-        if command_s == CleanupCommand.NAME:
-            return CleanupCommand(
-                dry_run=namespace.dry_run,
-                verbose=namespace.verbose,
-            )
-
-        if command_s == CompletionCommand.NAME:
-            return CompletionCommand()
-
-        raise ArgumentError(argument=None, message=f'unknown command: {command_s}')
+        if hasattr(args, 'factory'):
+            factory: Command.Factory = args.factory
+            return factory.create(args)
+        else:
+            raise ArgumentError(argument=None, message='unknown command')
 
     def print_help(self):
         self.__delegate.print_help()
