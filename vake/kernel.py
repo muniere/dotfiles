@@ -11,12 +11,11 @@ class Identity(Enum):
     UBUNTU = 'ubuntu'
     DEBIAN = 'debian'
     CENTOS = 'centos'
-    AMAZON = 'amazon'
     DARWIN = 'darwin'
     DEFAULT = 'default'
 
     def is_linux(self) -> bool:
-        return self in [Identity.UBUNTU, Identity.DEBIAN, Identity.CENTOS, Identity.AMAZON]
+        return self in [Identity.UBUNTU, Identity.DEBIAN, Identity.CENTOS]
 
     def is_darwin(self) -> bool:
         return self in [Identity.DARWIN]
@@ -42,9 +41,6 @@ def identify() -> Identity:
 
     if 'centos' in name:
         return Identity.CENTOS
-
-    if 'amzn' in name:
-        return Identity.AMAZON
 
     if 'darwin' in name:
         return Identity.DARWIN

@@ -1,7 +1,0 @@
-# ls
-alias ls='ls --color=auto'
-alias ll='ls -lhF'
-alias l='ls -lAhF'
-
-# grep
-alias grep='grep --color=auto'
