@@ -26,23 +26,6 @@ addpath $HOME/.bin /usr/local/bin /usr/local/sbin /usr/bin /bin /usr/sbin /sbin
 # Editor
 export EDITOR=vim
 
-function tstatus() {
-  local addr=""
-  local load=""
-
-  if [ "`uname`" == "Linux" ]; then
-    [ -z "${addr}" ] && addr=`ifconfig eth0 | awk '/inet addr/ { sub("inet addr:", "", $0); print $1 }'`
-    [ -z "${addr}" ] && addr=`ifconfig eth1 | awk '/inet addr/ { sub("inet addr:", "", $0); print $1 }'`
-    [ -z "${load}" ] && load=`uptime | sed 's/.*load average: \(.*\)/\1/g'`
-  elif [ "`uname`" == "Darwin" ]; then
-    [ -z "${addr}" ] && addr=`ifconfig en0 | awk '/inet / { sub("inet", "", $0); print $1 }'`
-    [ -z "${addr}" ] && addr=`ifconfig en1 | awk '/inet / { sub("inet", "", $0); print $1 }'`
-    [ -z "${load}" ] && load=`uptime | sed 's/.*load averages: \(.*\)/\1/g'`
-  fi
-  
-  echo "\"`hostname`($addr)\" [$load] `date +'%Y/%m/%d %H:%M:%S'`"
-}
-
 # =====
 # Python
 # =====
