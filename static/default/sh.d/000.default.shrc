@@ -1,0 +1,14 @@
+function addpath() {
+  # delete duplicated path
+  local args="$@"
+  local base=$PATH
+  for x in $args; do
+    base=${base//$x/}
+    base=${base//::/:}
+  done
+
+  # add new path
+  local ext="${args// /:}"
+
+  export PATH="$ext:$base"
+}
