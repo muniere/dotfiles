@@ -47,6 +47,7 @@ class PrefAction(Action, metaclass=ABCMeta):
             config.VimPrefBook(logger=logger, noop=noop),
             config.GitPrefBook(),
             config.GitHubPrefBook(),
+            config.AsdfPrefBook(),
             config.TmuxPrefBook(),
             config.GradlePrefBook(),
         ]
@@ -428,7 +429,7 @@ class PrefCleanupAction(PrefAction):
         return
 
     @staticmethod
-    def __scan(path: Path) -> [Path]:
+    def __scan(path: Path) -> list[Path]:
         if path.is_symlink() and not path.exists():
             return [path]
 
