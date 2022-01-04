@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+git diff "$@" | delta --side-by-side --navigate
