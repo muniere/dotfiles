@@ -1,5 +1,5 @@
-if (which git-delta &> /dev/null); then
-  function _git_delta() {
+if (which git-numdiff &> /dev/null); then
+  function _git_numdiff() {
     _git_diff $@
   }
 fi
