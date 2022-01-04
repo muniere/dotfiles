@@ -131,7 +131,7 @@ class PrefLinkAction(PrefAction):
 
     def __link(self, chain: PrefChain) -> bool:
         if not self._test(chain.src):
-            self._logger.debug(f'File is not target: {chain.src}')
+            self._logger.debug(f'File ignored: {chain.src}')
             return False
 
         if not chain.src.exists():
