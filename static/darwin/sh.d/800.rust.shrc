@@ -1,6 +1,0 @@
-# Rust
-if [ -d $HOME/.cargo ] ; then
-  addpath "$HOME/.cargo/bin"
-fi
-
-# vim: ft=sh sw=2 ts=2 sts=2

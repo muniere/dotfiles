@@ -1,14 +1,12 @@
+# =====
+# Shell
+# =====
+
 # LC
 export LC_ALL=
 
 # PATH
 addpath $HOME/.local/bin
-
-# Java
-if (which java &> /dev/null); then
-  export JAVA_HOME=$(/usr/libexec/java_home)
-  export JAVA_OPTS="-Dfile.encoding=UTF-8"
-fi
 
 # ls
 alias ls="ls -Gv"
@@ -18,5 +16,118 @@ alias l="ls -lAhF"
 # grep
 alias grep="grep --color=always"
 alias egrep="egrep --color=always"
+
+# ===
+# Java
+# ===
+if (which java &> /dev/null); then
+  export JAVA_HOME=$(/usr/libexec/java_home)
+  export JAVA_OPTS="-Dfile.encoding=UTF-8"
+fi
+
+# =====
+# Android
+# =====
+if [ -d ${HOME}/Library/Android/sdk/platform-tools ]; then
+  addpath "${HOME}/Library/Android/sdk/platform-tools"
+fi
+
+# =====
+# Flutter
+# =====
+if [ -d /usr/local/opt/flutter/bin/cache/dart-sdk/bin/ ]; then
+  addpath /usr/local/opt/flutter/bin /usr/local/opt/flutter/bin/cache/dart-sdk/bin
+elif [ -d /usr/local/opt/flutter ]; then
+  addpath /usr/local/opt/flutter/bin
+fi
+
+if [ -d $HOME/.pub-cache/bin ]; then
+  addpath $HOME/.pub-cache/bin
+fi
+
+if (which fvm &> /dev/null); then
+  export FVM_HOME=$HOME/.fvm
+fi
+
+# =====
+# Git
+# =====
+if [ -d /usr/local/share/git-core/contrib/diff-highlight/ ]; then
+  addpath "/usr/local/share/git-core/contrib/diff-highlight"
+fi
+
+# =====
+# Go
+# =====
+if [ -d /usr/local/opt/go ]; then
+  export GOROOT=/usr/local/opt/go/libexec
+  export GOPATH=$HOME/Projects
+
+  addpath $GOPATH/bin $GOROOT/bin
+fi
+
+# =====
+# Homebrew
+# =====
+export HOMEBREW_CASK_OPTS="--appdir=/Applications"
+
+# =====
+# Maven
+# =====
+if [ -d /usr/local/opt/maven/libexec ]; then
+  export MAVEN_HOME="/usr/local/opt/maven/libexec"
+fi
+
+# =====
+# MySQL
+# =====
+if ! (which mysql &> /dev/null) && [ -d /usr/local/opt/mysql ]; then
+  addpath "/usr/local/opt/mysql/bin"
+fi
+
+if ! (which mysql &> /dev/null) && [ -d /usr/local/opt/mysql@5.7 ]; then
+  addpath "/usr/local/opt/mysql@5.7/bin"
+fi
+
+if ! (which mysql &> /dev/null) && [ -d /usr/local/opt/mysql-client ]; then
+  addpath "/usr/local/opt/mysql-client/bin"
+fi
+
+# =====
+# pkgconfig
+# =====
+if [ -d /usr/local/opt/pkg-config ]; then
+  export PKG_CONFIG_PATH="/opt/X11/lib/pkgconfig"
+fi
+
+# =====
+# Python
+# =====
+if [ -e /usr/local/opt/python@3.8/ ]; then
+  addpath "/usr/local/opt/python@3.8/bin"
+fi
+
+if [ -e /usr/local/opt/python@3.9/ ]; then
+  addpath "/usr/local/opt/python@3.9/bin"
+fi
+
+if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
+    export WORKON_HOME=$HOME/.virtualenvs
+    source /usr/local/bin/virtualenvwrapper.sh
+fi
+
+# =====
+# Rust
+# =====
+if [ -d $HOME/.cargo ] ; then
+  addpath "$HOME/.cargo/bin"
+fi
+
+# =====
+# Tomcat
+# =====
+if [ -d /usr/local/opt/tomcat/libexec ]; then
+  export CATALINA_HOME="/usr/local/opt/tomcat/libexec"
+fi
 
 # vim: ft=sh sw=2 ts=2 sts=2

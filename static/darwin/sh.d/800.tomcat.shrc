@@ -1,6 +1,0 @@
-# Tomcat
-if [ -d /usr/local/opt/tomcat/libexec ]; then
-  export CATALINA_HOME="/usr/local/opt/tomcat/libexec"
-fi
-
-# vim: ft=sh sw=2 ts=2 sts=2

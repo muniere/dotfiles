@@ -1,7 +1,8 @@
 bindkey -e
 
-## Hook Funcitons 
-
+# =====
+# Zsh : Hooks
+# =====
 function zshaddhistory() { 
   local line=${1%%$'\n'}
   local cmd=${line%% *}
@@ -22,11 +23,11 @@ function precmd() {
   psvar[1]="$vcs_info_msg_0_"
 }
 
-## Overriding Functions
+# =====
+# Zsh : Overrides
+# =====
 
-#
-# override sudo for sudo.vim
-#
+# sudo.vim
 function sudo() { 
   local args
   case $1 in
@@ -45,20 +46,9 @@ function sudo() {
   esac
 } 
 
-## Prompt Functions
-function prefix() {
-  # print nothing
-}
-
-function suffix() {
-  # show virtual env
-  if [[ -n "$VIRTUAL_ENV" && -n "$DIRENV_DIR" ]]; then
-    echo " ($(basename $VIRTUAL_ENV))"
-  fi
-}
-
-### Completion 
-
+# =====
+# Zsh : Completion
+# =====
 if [ -d ~/.zsh-completions ]; then
   fpath=(~/.zsh-completions $fpath)
 fi
@@ -85,7 +75,18 @@ zstyle ':completion:*:messages' format '%F{yellow}%d%f'$DEFAULT
 zstyle ':completion:*:warnings' format '%F{red}No matches for:%F{yellow}%d'$DEFAULT
 zstyle ':completion:*:descriptions' format '%F{cyan}%B%d%b%f'$DEFAULT
 
-### Prompt 
+# =====
+# Zsh : Prompt
+# =====
+function prefix() {
+  # print nothing
+}
+
+function suffix() {
+  if [[ -n "$VIRTUAL_ENV" && -n "$DIRENV_DIR" ]]; then
+    echo " ($(basename $VIRTUAL_ENV))"
+  fi
+}
 
 autoload -Uz vcs_info
 setopt prompt_subst
@@ -96,8 +97,9 @@ PROMPT='$(prefix)%(?.%F{cyan}.%F{red})%n%f@%(?.%F{cyan}.%F{red})%m%f$(suffix): %
 %(!.#.%%) '
 RPROMPT='%1(v|%F{magenta}%1v%f|)'
 
-### History  
-
+# =====
+# Zsh : History
+# =====
 HISTFILE=~/.zsh_history
 HISTSIZE=100000
 SAVEHIST=100000
@@ -115,8 +117,88 @@ bindkey "^P" history-beginning-search-backward-end
 bindkey "^N" history-beginning-search-forward-end 
 bindkey "\e[Z" reverse-menu-complete
 
-### Time 
-
+# =====
+# Zsh : Time
+# =====
 TIMEFMT=$'\nreal\t%E\nuser\t%U\nsys\t%S'
+
+# =====
+# direnv : Completion
+# =====
+if (which direnv &> /dev/null); then
+  eval "$(direnv hook zsh)"
+fi
+
+# =====
+# fzf : Binding
+# =====
+
+# <C-x><C-f>: find file
+if (which fzf-file &> /dev/null); then
+  zle -N fzf-file
+  bindkey '^x^f' fzf-file
+fi
+
+# <C-]>: src with ghq
+if (which fzf-src &> /dev/null); then
+  zle -N fzf-src
+  bindkey '^]' fzf-src
+fi
+
+# <C-@>: git log
+if (which fzf-gitlog &> /dev/null); then
+  zle -N fzf-gitlog
+  bindkey '^x^l' fzf-gitlog
+fi
+
+# <C-[>: git branch
+if (which fzf-branch &> /dev/null); then
+  zle -N fzf-branch
+  bindkey '^x^b' fzf-branch
+fi
+
+# <C-r>: history
+if (which fzf-history &> /dev/null); then
+  zle -N fzf-history
+  bindkey '^r' fzf-history
+fi
+
+# =====
+# Git : Completion
+# =====
+if (which git-numdiff &> /dev/null); then
+  function _git_numdiff() {
+    _git_diff $@
+  }
+fi
+
+if (which git-delta &> /dev/null); then
+  function _git_delta() {
+    _git_diff $@
+  }
+fi
+
+# =====
+# Zinit : Load
+# =====
+if [[ ! -f $HOME/.local/share/zinit/zinit.git/zinit.zsh ]]; then
+    print -P "%F{33} %F{220}Installing %F{33}ZDHARMA-CONTINUUM%F{220} Initiative Plugin Manager (%F{33}zdharma-continuum/zinit%F{220})…%f"
+    command mkdir -p "$HOME/.local/share/zinit" && command chmod g-rwX "$HOME/.local/share/zinit"
+    command git clone https://github.com/zdharma-continuum/zinit "$HOME/.local/share/zinit/zinit.git" && \
+        print -P "%F{33} %F{34}Installation successful.%f%b" || \
+        print -P "%F{160} The clone has failed.%f%b"
+fi
+
+source "$HOME/.local/share/zinit/zinit.git/zinit.zsh"
+autoload -Uz _zinit
+(( ${+_comps} )) && _comps[zinit]=_zinit
+
+zinit light-mode for \
+    zdharma-continuum/zinit-annex-as-monitor \
+    zdharma-continuum/zinit-annex-bin-gem-node \
+    zdharma-continuum/zinit-annex-patch-dl \
+    zdharma-continuum/zinit-annex-rust
+
+zinit load zsh-users/zsh-syntax-highlighting
 
 # vim: ft=zsh sw=2 ts=2 sts=2

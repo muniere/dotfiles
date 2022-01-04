@@ -1,4 +1,0 @@
-# Homebrew Cask
-export HOMEBREW_CASK_OPTS="--appdir=/Applications"
-
-# vim: ft=sh sw=2 ts=2 sts=2
