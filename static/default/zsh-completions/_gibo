@@ -1,5 +1,0 @@
-#compdef gibo
-
-compadd $( find $HOME/.gitignore-boilerplates -name "*.gitignore" -exec basename \{\} .gitignore \; )
-
-# vim: ft=zsh sw=2 ts=2 sts=2
