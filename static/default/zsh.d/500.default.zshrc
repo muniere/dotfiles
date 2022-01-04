@@ -50,7 +50,7 @@ function sudo() {
 # Zsh : Completion
 # =====
 if [ -d ~/.zsh-completions ]; then
-  fpath=(~/.zsh-completions $fpath)
+  addfpath ~/.zsh-completions
 fi
 
 autoload -Uz colors; colors
