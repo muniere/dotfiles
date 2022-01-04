@@ -202,6 +202,22 @@ class BashPrefBook(PrefBook):
                 src='bash_completion.d',
                 dst='~/.bash_completion.d'
             ),
+            PrefRecipe.create(
+                src='/Applications/Docker.app/Contents/Resources/etc/docker.bash-completion',
+                dst='/usr/local/etc/bash_completion.d/docker'
+            ),
+            PrefRecipe.create(
+                src='/Applications/Docker.app/Contents/Resources/etc/docker-compose.bash-completion',
+                dst='/usr/local/etc/bash_completion.d/docker-compose'
+            ),
+            PrefRecipe.create(
+                src='/Applications/Docker.app/Contents/Resources/etc/docker.zsh-completion',
+                dst='/usr/local/share/zsh/site-functions/_docker'
+            ),
+            PrefRecipe.create(
+                src='/Applications/Docker.app/Contents/Resources/etc/docker-compose.zsh-completion',
+                dst='/usr/local/share/zsh/site-functions/_docker-compose'
+            ),
         ]
 
 
