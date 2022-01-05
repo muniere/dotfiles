@@ -70,6 +70,23 @@ class TaggedFormatter(logging.Formatter):
 
 class StreamHandler(logging.StreamHandler):
 
+    def emit(self, record: logging.LogRecord) -> None:
+        # noinspection PyBroadException
+        # pylint: disable=broad-except
+        try:
+            msg = self.format(record)
+            stream = self.stream
+            if record.__dict__.get('terminate', True):
+                stream.write(msg + self.terminator)
+            else:
+                stream.write(msg)
+            self.flush()
+        except RecursionError:  # See issue 36272
+            raise
+        except Exception:
+            self.handleError(record)
+        # pylint: enable=broad-except
+
     def set_level(self, level: Level):
         self.setLevel(level.value)
 
@@ -84,27 +101,27 @@ class Lumber(metaclass=ABCMeta):
         return NoopLumber()
 
     @abstractmethod
-    def debug(self, msg, *args, **kwargs):
+    def debug(self, msg: object, terminate: bool = False):
         pass
 
     @abstractmethod
-    def info(self, msg, *args, **kwargs):
+    def info(self, msg: object, terminate: bool = False):
         pass
 
     @abstractmethod
-    def warn(self, msg, *args, **kwargs):
+    def warn(self, msg: object, terminate: bool = False):
         pass
 
     @abstractmethod
-    def warning(self, msg, *args, **kwargs):
+    def warning(self, msg: object, terminate: bool = False):
         pass
 
     @abstractmethod
-    def error(self, msg, *args, **kwargs):
+    def error(self, msg: object, terminate: bool = False):
         pass
 
     @abstractmethod
-    def execute(self, cmd, *args, **kwargs):
+    def execute(self, msg: object, terminate: bool = False):
         pass
 
     @abstractmethod
@@ -121,23 +138,23 @@ class DefaultLumber(Lumber):
     def __init__(self, delegate: logging.Logger):
         self._delegate = delegate
 
-    def debug(self, msg, *args, **kwargs):
-        self._delegate.debug(msg, *args, **kwargs)
+    def debug(self, msg: object, terminate: bool = True):
+        self._delegate.debug(msg, extra={'terminate': terminate})
 
-    def info(self, msg, *args, **kwargs):
-        self._delegate.info(msg, *args, **kwargs)
+    def info(self, msg: object, terminate: bool = True):
+        self._delegate.info(msg, extra={'terminate': terminate})
 
-    def warn(self, msg, *args, **kwargs):
-        self._delegate.warning(msg, *args, **kwargs)
+    def warn(self, msg: object, terminate: bool = True):
+        self._delegate.warning(msg, extra={'terminate': terminate})
 
-    def warning(self, msg, *args, **kwargs):
-        self._delegate.warning(msg, *args, **kwargs)
+    def warning(self, msg: object, terminate: bool = True):
+        self._delegate.warning(msg, extra={'terminate': terminate})
 
-    def error(self, msg, *args, **kwargs):
-        self._delegate.error(msg, *args, **kwargs)
+    def error(self, msg: object, terminate: bool = True):
+        self._delegate.error(msg, extra={'terminate': terminate})
 
-    def execute(self, cmd, *args, **kwargs):
-        self._delegate.log(Level.EXEC.value, cmd, *args, **kwargs)
+    def execute(self, cmd, terminate: bool = True):
+        self._delegate.log(Level.EXEC.value, cmd, extra={'terminate': terminate})
 
     def set_level(self, level: Level):
         self._delegate.setLevel(level.value)
@@ -148,22 +165,22 @@ class DefaultLumber(Lumber):
 
 class NoopLumber(Lumber):
 
-    def debug(self, msg, *args, **kwargs):
+    def debug(self, msg: object, terminate: bool = True):
         pass
 
-    def info(self, msg, *args, **kwargs):
+    def info(self, msg: object, terminate: bool = True):
         pass
 
-    def warn(self, msg, *args, **kwargs):
+    def warn(self, msg: object, terminate: bool = True):
         pass
 
-    def warning(self, msg, *args, **kwargs):
+    def warning(self, msg: object, terminate: bool = True):
         pass
 
-    def error(self, msg, *args, **kwargs):
+    def error(self, msg: object, terminate: bool = True):
         pass
 
-    def execute(self, cmd, *args, **kwargs):
+    def execute(self, msg: object, terminate: bool = True):
         pass
 
     def set_level(self, level: Level):

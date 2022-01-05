@@ -475,14 +475,19 @@ class BrewHook(Hook):
             self.logger.warn('skip bundle. command not found: brew')
             return
 
-        self.logger.info('Checking if all kegs are installed ...')
+        msg = 'Checking if all kegs are installed'
+
+        self.logger.info(f'{msg}...\r', terminate=False)
 
         proc = shell.run(
             args=['brew', 'bundle', 'check', '--global']
         )
+
         if proc.returncode == 0:
-            self.logger.info('All kegs are satisfied.')
+            self.logger.info(f'{msg}: Up to date')
             return
+
+        self.logger.info(f'{msg}: Found Some Updates')
 
         shell.call(
             args=['brew', 'bundle', 'install', '--global'],
