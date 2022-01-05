@@ -1,5 +1,7 @@
 import glob
+import sys
 import tempfile
+import time
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
@@ -475,19 +477,31 @@ class BrewHook(Hook):
             self.logger.warn('skip bundle. command not found: brew')
             return
 
-        msg = 'Checking if all kegs are installed'
+        message = 'Checking if all kegs are installed'
 
-        self.logger.info(f'{msg}...\r', terminate=False)
+        self.logger.info(f'{message}...', terminate=False)
 
-        proc = shell.run(
-            args=['brew', 'bundle', 'check', '--global']
-        )
+        popen = shell.popen(['brew', 'bundle', 'check', '--global'])
+        spinner = shell.Sequencer(['|', '/', '-', '\\'])
 
-        if proc.returncode == 0:
-            self.logger.info(f'{msg}: Up to date')
+        while True:
+            retcode = popen.poll()
+
+            if retcode is None:
+                seq = next(spinner)
+                sys.stdout.write(seq)
+                sys.stdout.flush()
+                time.sleep(0.1)
+                sys.stdout.write('\b' * len(seq))
+            else:
+                sys.stdout.write('\r')
+                break
+
+        if retcode == 0:
+            self.logger.info(f'{message}: Up to date')
             return
 
-        self.logger.info(f'{msg}: Found Some Updates')
+        self.logger.info(f'{message}: Found Some Updates')
 
         shell.call(
             args=['brew', 'bundle', 'install', '--global'],

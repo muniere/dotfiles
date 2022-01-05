@@ -51,3 +51,34 @@ def run(
         env_vars = None
 
     return subprocess.run(args, env=env_vars, capture_output=True, check=check)
+
+
+def popen(
+    args: list[str],
+    env: Optional[dict[str, str]] = None,
+) -> subprocess.Popen:
+    assert len(args) > 0, 'args must not be empty'
+
+    if env:
+        env_vars = os.environ.copy().update(env)
+    else:
+        env_vars = None
+
+    return subprocess.Popen(args, env=env_vars, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
+class Sequencer:
+    __seq: list[str]
+    __i: int
+
+    def __init__(self, seq: list[str]):
+        self.__seq = seq
+        self.__i = 0
+
+    def __next__(self):
+        char = self.__seq[self.__i]
+        self.__i = (self.__i + 1) % len(self.__seq)
+        return char
+
+    def __iter__(self):
+        return self
