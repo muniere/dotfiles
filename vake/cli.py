@@ -203,7 +203,7 @@ class UnlinkCommand(Command):
         @classmethod
         def register(cls, subparsers: argparse._SubParsersAction):
             child = subparsers.add_parser(UnlinkCommand.NAME)
-            child.set_defaults(factory=cls)
+            child.set_defaults(factory=cls())
             child.add_argument(
                 '--skip-cleanup',
                 dest='skip_cleanup',
