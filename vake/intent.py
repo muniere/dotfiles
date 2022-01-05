@@ -419,8 +419,10 @@ class PrefCleanupAction(PrefAction):
         found: list[Path] = []
 
         for path in paths:
-            self._logger.debug(f'Scanning {path} ...')
+            message = f'Scanning {path}'
+            self._logger.debug(f'{message}...\r', terminate=False)
             found += self.__scan(path)
+            self._logger.debug(f'{message}... Done')
 
         self._logger.debug(f'Found {len(found)} broken symlinks')
         for path in found:
