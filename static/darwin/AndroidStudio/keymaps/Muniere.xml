@@ -1,4 +1,7 @@
 <keymap version="1" name="Muniere" parent="Mac OS X 10.5+">
+  <action id="AndroidLogConsole.ScreenshotAction">
+    <keyboard-shortcut first-keystroke="ctrl meta s" />
+  </action>
   <action id="EditorBackSpace">
     <keyboard-shortcut first-keystroke="back_space" />
     <keyboard-shortcut first-keystroke="shift back_space" />
