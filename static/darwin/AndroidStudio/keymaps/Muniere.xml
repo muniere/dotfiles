@@ -7,5 +7,9 @@
     <keyboard-shortcut first-keystroke="shift back_space" />
     <keyboard-shortcut first-keystroke="ctrl h" />
   </action>
+  <action id="MakeGradleModule">
+    <keyboard-shortcut first-keystroke="shift meta f9" />
+  </action>
+  <action id="MakeModule" />
   <action id="TypeHierarchy" />
 </keymap>
