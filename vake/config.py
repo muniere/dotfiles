@@ -274,18 +274,29 @@ class ZshHook(Hook):
 
     def activate(self):
         dst = Path('~/.local/share/zinit/zinit.git').expanduser()
+
         if dst.exists():
             self.logger.info(f'Zinit is already downloaded: {dst}')
+        else:
+            url = 'https://git.io/zinit-install'
+            shell.call(
+                cmd=f'sh -c "NO_EDIT=1 $(curl -fsSL {url})"',
+                logger=self.logger,
+                noop=self.noop,
+            )
+
+        try:
+            shell.which('zsh')
+        except shell.SubprocessError:
+            self.logger.warn('skip updating zsh plugins. command not found: zsh')
             return
 
-        url = 'https://git.io/zinit-install'
         shell.call(
-            cmd=f'sh -c "NO_EDIT=1 $(curl -fsSL {url})"',
+            cmd='zsh -i -c "zinit update --parallel"',
             logger=self.logger,
             noop=self.noop,
         )
-
-        pass
+        return
 
     def deactivate(self):
         pass
@@ -341,16 +352,30 @@ class VimHook(Hook):
 
     def activate(self):
         dst = Path('~/.vim/autoload/plug.vim').expanduser()
+
         if dst.is_file():
             self.logger.info(f'Vim-Plug is already downloaded: {dst}')
+        else:
+            url = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+            shell.call(
+                cmd=f'curl -fLo {dst} --create-dirs {url}',
+                logger=self.logger,
+                noop=self.noop,
+            )
+
+        try:
+            shell.which('vim')
+        except shell.SubprocessError:
+            self.logger.warn('skip updating vim plugins. command not found: vim')
             return
 
-        url = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
         shell.call(
-            cmd=f'curl -fLo {dst} --create-dirs {url}',
+            cmd='vim +PlugInstall +qall >/dev/null 2>&1',
             logger=self.logger,
             noop=self.noop,
         )
+
+        return
 
     def deactivate(self):
         pass
@@ -453,23 +478,13 @@ class BrewHook(Hook):
             self.logger.warn('skip bundle. command not found: brew')
             return
 
-        message = 'Checking if all kegs are installed'
-
-        self.logger.info(f'{message}...', terminate=False)
-
-        proc = shell.poll('brew bundle check --global')
-
-        if proc.returncode == 0:
-            self.logger.info(f'{message}: Up to date')
-            return
-
-        self.logger.info(f'{message}: Found Some Updates')
-
         shell.call(
             cmd='brew bundle install --global',
             logger=self.logger,
             noop=self.noop,
         )
+
+        return
 
     def deactivate(self):
         pass
