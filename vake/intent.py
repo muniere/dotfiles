@@ -10,9 +10,9 @@ from typing import TextIO
 from . import config
 from . import kernel
 from . import locate
-from .ansi import AnsiColor
 from .config import PrefChain, PrefRecipe, PrefBook, SnipRecipe, SnipBook
 from .timber import Lumber
+from .tty import Color
 
 __all__ = [
     'Action',
@@ -355,16 +355,16 @@ class PrefListAction(PrefAction):
 
             if self._style == PrefListStyleOption.LONG:
                 pair = (
-                    color.surround(dst),
+                    color.decorate(dst),
                     str(src),
                 )
             elif self._style == PrefListStyleOption.SHORT:
                 pair = (
-                    color.surround(dst),
+                    color.decorate(dst),
                 )
             else:
                 pair = (
-                    color.surround(dst),
+                    color.decorate(dst),
                 )
 
             return sep.join(pair) + end
@@ -386,17 +386,17 @@ class PrefListAction(PrefAction):
             return sep.join(pair) + end
 
     @staticmethod
-    def __color(path: Path) -> AnsiColor:
+    def __color(path: Path) -> Color:
         if not path.exists():
-            return AnsiColor.RED
+            return Color.RED
         elif path.is_symlink():
-            return AnsiColor.MAGENTA
+            return Color.MAGENTA
         elif path.is_dir():
-            return AnsiColor.BLUE
+            return Color.BLUE
         elif path.is_file():
-            return AnsiColor.RESET
+            return Color.RESET
         else:
-            return AnsiColor.RESET
+            return Color.RESET
 
 
 class PrefCleanupAction(PrefAction):

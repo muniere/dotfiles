@@ -1,6 +1,4 @@
 import glob
-import sys
-import time
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
@@ -459,23 +457,9 @@ class BrewHook(Hook):
 
         self.logger.info(f'{message}...', terminate=False)
 
-        popen = shell.popen('brew bundle check --global')
-        spinner = shell.Sequencer(['|', '/', '-', '\\'])
+        code = shell.poll('brew bundle check --global')
 
-        while True:
-            retcode = popen.poll()
-
-            if retcode is None:
-                seq = next(spinner)
-                sys.stdout.write(seq)
-                sys.stdout.flush()
-                time.sleep(0.1)
-                sys.stdout.write('\b' * len(seq))
-            else:
-                sys.stdout.write('\r')
-                break
-
-        if retcode == 0:
+        if code == 0:
             self.logger.info(f'{message}: Up to date')
             return
 

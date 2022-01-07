@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
 
-from .ansi import AnsiColor
+from .tty import Color
 
 __all__ = [
     'Level', 'TaggedFormatter', 'StreamHandler', 'Lumber',
@@ -22,20 +22,20 @@ class Level(Enum):
 
 @dataclass(frozen=True)
 class ColorPalette:
-    values: dict[int, AnsiColor]
+    values: dict[int, Color]
 
     @staticmethod
     def default() -> 'ColorPalette':
         return ColorPalette({
-            Level.DEBUG.value: AnsiColor.GREEN,
-            Level.EXEC.value: AnsiColor.MAGENTA,
-            Level.INFO.value: AnsiColor.CYAN,
-            Level.WARN.value: AnsiColor.YELLOW,
-            Level.ERROR.value: AnsiColor.RESET,
+            Level.DEBUG.value: Color.GREEN,
+            Level.EXEC.value: Color.MAGENTA,
+            Level.INFO.value: Color.CYAN,
+            Level.WARN.value: Color.YELLOW,
+            Level.ERROR.value: Color.RESET,
         })
 
-    def get(self, key: int) -> AnsiColor:
-        return self.values.get(key, AnsiColor.RESET)
+    def get(self, key: int) -> Color:
+        return self.values.get(key, Color.RESET)
 
 
 class TaggedFormatter(logging.Formatter):
@@ -65,7 +65,7 @@ class TaggedFormatter(logging.Formatter):
             return message
 
         color = self.__palette.get(record.levelno)
-        return color.surround(message)
+        return color.decorate(message)
 
 
 class StreamHandler(logging.StreamHandler):
@@ -153,8 +153,8 @@ class DefaultLumber(Lumber):
     def error(self, msg: object, terminate: bool = True):
         self._delegate.error(msg, extra={'terminate': terminate})
 
-    def execute(self, cmd, terminate: bool = True):
-        self._delegate.log(Level.EXEC.value, cmd, extra={'terminate': terminate})
+    def execute(self, msg, terminate: bool = True):
+        self._delegate.log(Level.EXEC.value, msg, extra={'terminate': terminate})
 
     def set_level(self, level: Level):
         self._delegate.setLevel(level.value)

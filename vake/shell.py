@@ -1,18 +1,17 @@
 import os
 import subprocess
+import sys
+import time
 from typing import Optional
 
 from .timber import Lumber
+from .tty import Looper
 
 __all__ = [
     'SubprocessError', 'which', 'call', 'run'
 ]
 
 SubprocessError = subprocess.SubprocessError
-
-
-def which(command: str) -> subprocess.CompletedProcess:
-    return subprocess.run(f'which {command}', capture_output=True, check=True, shell=True)
 
 
 def call(
@@ -38,6 +37,36 @@ def call(
     return subprocess.call(command, env=env_vars, shell=True)
 
 
+def poll(
+    cmd: str,
+    env: Optional[dict[str, str]] = None,
+    eol: Optional[Looper] = None,
+    fps: int = 10,
+) -> int:
+    assert len(cmd) > 0, 'cmd must not be empty'
+
+    if env:
+        env_vars = os.environ.copy().update(env)
+    else:
+        env_vars = None
+
+    with subprocess.Popen(cmd, env=env_vars, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True) as popen:
+        looper = eol or Looper.dots()
+
+        while True:
+            ret = popen.poll()
+
+            if ret is None:
+                text = next(looper)
+                sys.stdout.write(text)
+                sys.stdout.flush()
+                time.sleep(1.0 / fps)
+                sys.stdout.write('\b' * len(text))
+            else:
+                sys.stdout.write('\r')
+                return ret
+
+
 def run(
     cmd: str,
     env: Optional[dict[str, str]] = None,
@@ -53,32 +82,5 @@ def run(
     return subprocess.run(cmd, env=env_vars, capture_output=True, check=check, shell=True)
 
 
-def popen(
-    cmd: str,
-    env: Optional[dict[str, str]] = None,
-) -> subprocess.Popen:
-    assert len(cmd) > 0, 'cmd must not be empty'
-
-    if env:
-        env_vars = os.environ.copy().update(env)
-    else:
-        env_vars = None
-
-    return subprocess.Popen(cmd, env=env_vars, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True)
-
-
-class Sequencer:
-    __seq: list[str]
-    __i: int
-
-    def __init__(self, seq: list[str]):
-        self.__seq = seq
-        self.__i = 0
-
-    def __next__(self):
-        char = self.__seq[self.__i]
-        self.__i = (self.__i + 1) % len(self.__seq)
-        return char
-
-    def __iter__(self):
-        return self
+def which(command: str) -> subprocess.CompletedProcess:
+    return subprocess.run(f'which {command}', capture_output=True, check=True, shell=True)
