@@ -95,11 +95,17 @@ class PrefAction(Action, metaclass=ABCMeta):
 
 class PrefLinkAction(PrefAction):
     _cleanup: bool
+    _activate: bool
     _logger: Lumber
     _noop: bool
 
-    def __init__(self, cleanup: bool = True, logger: Lumber = Lumber.noop(), noop: bool = False):
+    def __init__(self,
+                 cleanup: bool = True,
+                 activate: bool = True,
+                 logger: Lumber = Lumber.noop(),
+                 noop: bool = False):
         self._cleanup = cleanup
+        self._activate = activate
         self._logger = logger
         self._noop = noop
         return
@@ -124,7 +130,8 @@ class PrefLinkAction(PrefAction):
             for chain in chains:
                 self.__link(chain)
 
-            recipe.hook.activate()
+            if self._activate:
+                recipe.hook.activate()
 
         for snippet in self._snippets():
             self.__enable(snippet)
@@ -201,11 +208,17 @@ class PrefLinkAction(PrefAction):
 
 class PrefUnlinkAction(PrefAction):
     _cleanup: bool
+    _deactivate: bool
     _logger: Lumber
     _noop: bool
 
-    def __init__(self, cleanup: bool = True, logger: Lumber = Lumber.noop(), noop: bool = False):
+    def __init__(self,
+                 cleanup: bool = True,
+                 deactivate: bool = True,
+                 logger: Lumber = Lumber.noop(),
+                 noop: bool = False):
         self._cleanup = cleanup
+        self._deactivate = deactivate
         self._logger = logger
         self._noop = noop
         return
@@ -231,7 +244,8 @@ class PrefUnlinkAction(PrefAction):
             for chain in chains:
                 self.__unlink(chain)
 
-            recipe.hook.deactivate()
+            if self._deactivate:
+                recipe.hook.deactivate()
 
         for snippet in self._snippets():
             self.__disable(snippet)

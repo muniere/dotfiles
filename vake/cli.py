@@ -124,16 +124,18 @@ class LinkCommand(Command):
     NAME = 'link'
 
     cleanup: bool
+    activate: bool
     dry_run: bool
     verbose: bool
 
     def run(self):
         cleanup = self.cleanup
+        activate = self.activate
         noop = self.dry_run
         logger = self._logger(verbose=self.verbose)
 
         actions = [
-            PrefLinkAction(cleanup=cleanup, noop=noop, logger=logger),
+            PrefLinkAction(cleanup=cleanup, activate=activate, noop=noop, logger=logger),
         ]
 
         for action in actions:
@@ -155,6 +157,12 @@ class LinkCommand(Command):
                 help='Skip cleanup action before link'
             )
             child.add_argument(
+                '--skip-activate',
+                dest='skip_activate',
+                action='store_true',
+                help='Skip activation after each link'
+            )
+            child.add_argument(
                 '-n', '--dry-run',
                 dest='dry_run',
                 action='store_true',
@@ -170,6 +178,7 @@ class LinkCommand(Command):
         def create(self, args: Namespace) -> 'LinkCommand':
             return LinkCommand(
                 cleanup=not args.skip_cleanup,
+                activate=not args.skip_activate,
                 dry_run=args.dry_run,
                 verbose=args.verbose,
             )
@@ -180,16 +189,18 @@ class UnlinkCommand(Command):
     NAME = 'unlink'
 
     cleanup: bool
+    deactivate: bool
     dry_run: bool
     verbose: bool
 
     def run(self) -> None:
         cleanup = self.cleanup
+        deactivate = self.deactivate
         noop = self.dry_run
         logger = self._logger(verbose=self.verbose)
 
         actions = [
-            PrefUnlinkAction(cleanup=cleanup, noop=noop, logger=logger),
+            PrefUnlinkAction(cleanup=cleanup, deactivate=deactivate, noop=noop, logger=logger),
         ]
 
         for action in actions:
@@ -208,7 +219,13 @@ class UnlinkCommand(Command):
                 '--skip-cleanup',
                 dest='skip_cleanup',
                 action='store_true',
-                help='Skip cleanup action before link'
+                help='Skip cleanup action before unlink'
+            )
+            child.add_argument(
+                '--skip-deactivate',
+                dest='skip_deactivate',
+                action='store_true',
+                help='Skip deactivation after each unlink'
             )
             child.add_argument(
                 '-n', '--dry-run',
@@ -226,6 +243,7 @@ class UnlinkCommand(Command):
         def create(self, args: Namespace) -> 'UnlinkCommand':
             return UnlinkCommand(
                 cleanup=not args.skip_cleanup,
+                deactivate=not args.skip_deactivate,
                 dry_run=args.dry_run,
                 verbose=args.verbose,
             )
