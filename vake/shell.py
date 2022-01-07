@@ -15,18 +15,18 @@ SubprocessError = subprocess.SubprocessError
 
 
 def call(
-    command: str,
+    cmd: str,
     env: Optional[dict[str, str]] = None,
     logger: Lumber = Lumber.noop(),
     noop: bool = False,
 ) -> int:
-    assert len(command) > 0, 'cmd must not be empty'
+    assert len(cmd) > 0, 'cmd must not be empty'
 
     if env:
-        words = [f'{k}={v}' for (k, v) in env.items()] + [command]
+        words = [f'{k}={v}' for (k, v) in env.items()] + [cmd]
         env_vars = os.environ.copy().update(env)
     else:
-        words = [command]
+        words = [cmd]
         env_vars = None
 
     logger.execute(' '.join(words))
@@ -34,7 +34,7 @@ def call(
     if noop:
         return True
 
-    return subprocess.call(command, env=env_vars, shell=True)
+    return subprocess.call(cmd, env=env_vars, shell=True)
 
 
 def poll(
@@ -42,7 +42,7 @@ def poll(
     env: Optional[dict[str, str]] = None,
     eol: Optional[Looper] = None,
     fps: int = 10,
-) -> int:
+) -> subprocess.CompletedProcess:
     assert len(cmd) > 0, 'cmd must not be empty'
 
     if env:
@@ -50,7 +50,7 @@ def poll(
     else:
         env_vars = None
 
-    with subprocess.Popen(cmd, env=env_vars, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True) as popen:
+    with subprocess.Popen(cmd, env=env_vars, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True) as popen:
         looper = eol or Looper.dots()
 
         while True:
@@ -64,7 +64,12 @@ def poll(
                 sys.stdout.write('\b' * len(text))
             else:
                 sys.stdout.write('\r')
-                return ret
+                return subprocess.CompletedProcess(
+                    args=cmd,
+                    returncode=ret,
+                    stdout=popen.stdout,
+                    stderr=popen.stderr,
+                )
 
 
 def run(

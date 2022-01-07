@@ -280,7 +280,7 @@ class ZshHook(Hook):
 
         url = 'https://git.io/zinit-install'
         shell.call(
-            command=f'sh -c "NO_EDIT=1 $(curl -fsSL {url})"',
+            cmd=f'sh -c "NO_EDIT=1 $(curl -fsSL {url})"',
             logger=self.logger,
             noop=self.noop,
         )
@@ -347,7 +347,7 @@ class VimHook(Hook):
 
         url = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
         shell.call(
-            command=f'curl -fLo {dst} --create-dirs {url}',
+            cmd=f'curl -fLo {dst} --create-dirs {url}',
             logger=self.logger,
             noop=self.noop,
         )
@@ -457,16 +457,16 @@ class BrewHook(Hook):
 
         self.logger.info(f'{message}...', terminate=False)
 
-        code = shell.poll('brew bundle check --global')
+        proc = shell.poll('brew bundle check --global')
 
-        if code == 0:
+        if proc.returncode == 0:
             self.logger.info(f'{message}: Up to date')
             return
 
         self.logger.info(f'{message}: Found Some Updates')
 
         shell.call(
-            command='brew bundle install --global',
+            cmd='brew bundle install --global',
             logger=self.logger,
             noop=self.noop,
         )
