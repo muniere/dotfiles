@@ -12,22 +12,22 @@ SubprocessError = subprocess.SubprocessError
 
 
 def which(command: str) -> subprocess.CompletedProcess:
-    return subprocess.run(['which', command], capture_output=True, check=True)
+    return subprocess.run(f'which {command}', capture_output=True, check=True, shell=True)
 
 
 def call(
-    args: list[str],
+    command: str,
     env: Optional[dict[str, str]] = None,
     logger: Lumber = Lumber.noop(),
     noop: bool = False,
 ) -> int:
-    assert len(args) > 0, 'args must not be empty'
+    assert len(command) > 0, 'cmd must not be empty'
 
     if env:
-        words = [f'{k}={v}' for (k, v) in env.items()] + args
+        words = [f'{k}={v}' for (k, v) in env.items()] + [command]
         env_vars = os.environ.copy().update(env)
     else:
-        words = args
+        words = [command]
         env_vars = None
 
     logger.execute(' '.join(words))
@@ -35,36 +35,36 @@ def call(
     if noop:
         return True
 
-    return subprocess.call(args, env=env_vars)
+    return subprocess.call(command, env=env_vars, shell=True)
 
 
 def run(
-    args: list[str],
+    cmd: str,
     env: Optional[dict[str, str]] = None,
     check: bool = False,
 ) -> subprocess.CompletedProcess:
-    assert len(args) > 0, 'args must not be empty'
+    assert len(cmd) > 0, 'cmd must not be empty'
 
     if env:
         env_vars = os.environ.copy().update(env)
     else:
         env_vars = None
 
-    return subprocess.run(args, env=env_vars, capture_output=True, check=check)
+    return subprocess.run(cmd, env=env_vars, capture_output=True, check=check, shell=True)
 
 
 def popen(
-    args: list[str],
+    cmd: str,
     env: Optional[dict[str, str]] = None,
 ) -> subprocess.Popen:
-    assert len(args) > 0, 'args must not be empty'
+    assert len(cmd) > 0, 'cmd must not be empty'
 
     if env:
         env_vars = os.environ.copy().update(env)
     else:
         env_vars = None
 
-    return subprocess.Popen(args, env=env_vars, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    return subprocess.Popen(cmd, env=env_vars, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True)
 
 
 class Sequencer:

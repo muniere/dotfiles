@@ -1,6 +1,5 @@
 import glob
 import sys
-import tempfile
 import time
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
@@ -281,27 +280,12 @@ class ZshHook(Hook):
             self.logger.info(f'Zinit is already downloaded: {dst}')
             return
 
-        with tempfile.NamedTemporaryFile() as tmp:
-            shell.call(
-                args=[
-                    'curl',
-                    '--fail',
-                    '--silent',
-                    '--show-error',
-                    '--location',
-                    '--output', tmp.name,
-                    'https://git.io/zinit-install'
-                ],
-                logger=self.logger,
-                noop=self.noop,
-            )
-
-            shell.call(
-                args=['sh', tmp.name],
-                env={'NO_EDIT': '1'},
-                logger=self.logger,
-                noop=self.noop,
-            )
+        url = 'https://git.io/zinit-install'
+        shell.call(
+            command=f'sh -c "NO_EDIT=1 $(curl -fsSL {url})"',
+            logger=self.logger,
+            noop=self.noop,
+        )
 
         pass
 
@@ -363,15 +347,9 @@ class VimHook(Hook):
             self.logger.info(f'Vim-Plug is already downloaded: {dst}')
             return
 
+        url = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
         shell.call(
-            args=[
-                'curl',
-                '--fail',
-                '--location',
-                '--create-dirs',
-                '--output', str(dst),
-                'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-            ],
+            command=f'curl -fLo {dst} --create-dirs {url}',
             logger=self.logger,
             noop=self.noop,
         )
@@ -481,7 +459,7 @@ class BrewHook(Hook):
 
         self.logger.info(f'{message}...', terminate=False)
 
-        popen = shell.popen(['brew', 'bundle', 'check', '--global'])
+        popen = shell.popen('brew bundle check --global')
         spinner = shell.Sequencer(['|', '/', '-', '\\'])
 
         while True:
@@ -504,7 +482,7 @@ class BrewHook(Hook):
         self.logger.info(f'{message}: Found Some Updates')
 
         shell.call(
-            args=['brew', 'bundle', 'install', '--global'],
+            command='brew bundle install --global',
             logger=self.logger,
             noop=self.noop,
         )
