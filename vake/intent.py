@@ -1,4 +1,3 @@
-import itertools
 import os
 import re
 import sys
@@ -10,7 +9,7 @@ from typing import TextIO
 from . import config
 from . import kernel
 from . import locate
-from .config import PrefChain, PrefRecipe, PrefBook, SnipRecipe, SnipBook
+from .config import PrefChain, CookBook, SnipRecipe
 from .timber import Lumber
 from .tty import Color
 
@@ -35,21 +34,21 @@ class Action(metaclass=ABCMeta):
 # ==
 class PrefAction(Action, metaclass=ABCMeta):
     @staticmethod
-    def _recipes(logger: Lumber = Lumber.noop(), noop: bool = False) -> list[PrefRecipe]:
+    def _books(logger: Lumber = Lumber.noop(), noop: bool = False) -> list[CookBook]:
         identity = kernel.identify()
 
         # shared
-        books: list[PrefBook] = [
-            config.BinPrefBook(),
-            config.ShPrefBook(),
-            config.BashPrefBook(),
-            config.ZshPrefBook(logger=logger, noop=noop),
-            config.VimPrefBook(logger=logger, noop=noop),
-            config.GitPrefBook(),
-            config.GitHubPrefBook(),
-            config.AsdfPrefBook(),
-            config.TmuxPrefBook(),
-            config.GradlePrefBook(),
+        books: list[CookBook] = [
+            config.BinCookBook(),
+            config.ShCookBook(),
+            config.BashCookBook(),
+            config.ZshCookBook(logger=logger, noop=noop),
+            config.VimCookBook(logger=logger, noop=noop),
+            config.GitCookBook(),
+            config.GitHubCookBook(),
+            config.AsdfCookBook(),
+            config.TmuxCookBook(),
+            config.GradleCookBook(),
         ]
 
         # linux
@@ -59,28 +58,18 @@ class PrefAction(Action, metaclass=ABCMeta):
         # darwin
         if identity.is_darwin():
             books += [
-                config.BrewPrefBook(logger=logger, noop=noop),
-                config.XcodePrefBook(),
-                config.IntelliJIdeaPrefBook(),
-                config.AndroidStudioPrefBook(),
-                config.AppCodePrefBook(),
-                config.RubyMinePrefBook(),
-                config.GoLandPrefBook(),
-                config.CLionPrefBook(),
-                config.RiderPrefBook(),
+                config.BrewCookBook(logger=logger, noop=noop),
+                config.XcodeCookBook(),
+                config.IntelliJIdeaCookBook(),
+                config.AndroidStudioCookBook(),
+                config.AppCodeCookBook(),
+                config.RubyMineCookBook(),
+                config.GoLandCookBook(),
+                config.CLionCookBook(),
+                config.RiderCookBook(),
             ]
 
-        return list(itertools.chain(*[book.recipes for book in books]))
-
-    @staticmethod
-    def _snippets() -> list[SnipRecipe]:
-        books: list[SnipBook] = [
-            config.ShSnipBook(),
-            config.BashSnipBook(),
-            config.ZshSnipBook(),
-        ]
-
-        return list(itertools.chain(*[book.recipes for book in books]))
+        return books
 
     @staticmethod
     def _test(path: Path):
@@ -111,30 +100,32 @@ class PrefLinkAction(PrefAction):
         return
 
     def run(self):
-        recipes = self._recipes(logger=self._logger, noop=self._noop)
+        books = self._books(logger=self._logger, noop=self._noop)
 
         if self._cleanup:
-            PrefCleanupAction(logger=self._logger, noop=self._noop).perform(recipes)
+            PrefCleanupAction(logger=self._logger, noop=self._noop).perform(books)
 
-        return self.perform(recipes)
+        return self.perform(books)
 
-    def perform(self, recipes: list[PrefRecipe]):
+    def perform(self, books: list[CookBook]):
         identity = kernel.identify()
-        for recipe in recipes:
-            if recipe.src.is_absolute():
-                chains = recipe.expand()
-            else:
-                chains = recipe.expand(src_prefix=Path(locate.static(), identity.value)) + \
-                         recipe.expand(src_prefix=Path(locate.static(), 'default'))
 
-            for chain in chains:
-                self.__link(chain)
+        for book in books:
+            for recipe in book.recipes:
+                if recipe.src.is_absolute():
+                    chains = recipe.expand()
+                else:
+                    chains = recipe.expand(src_prefix=Path(locate.static(), identity.value)) + \
+                             recipe.expand(src_prefix=Path(locate.static(), 'default'))
+
+                for chain in chains:
+                    self.__link(chain)
+
+            for snippet in book.snippets:
+                self.__enable(snippet)
 
             if self._activate:
-                recipe.hook.activate()
-
-        for snippet in self._snippets():
-            self.__enable(snippet)
+                book.activate()
 
     def __link(self, chain: PrefChain) -> bool:
         if not self._test(chain.src):
@@ -224,31 +215,32 @@ class PrefUnlinkAction(PrefAction):
         return
 
     def run(self):
-        recipes = self._recipes(logger=self._logger, noop=self._noop)
+        books = self._books(logger=self._logger, noop=self._noop)
 
         if self._cleanup:
-            PrefCleanupAction(logger=self._logger, noop=self._noop).perform(recipes)
+            PrefCleanupAction(logger=self._logger, noop=self._noop).perform(books)
 
-        return self.perform(recipes)
+        return self.perform(books)
 
-    def perform(self, recipes: list[PrefRecipe]):
+    def perform(self, books: list[CookBook]):
         identity = kernel.identify()
 
-        for recipe in recipes:
-            if recipe.src.is_absolute():
-                chains = recipe.expand()
-            else:
-                chains = recipe.expand(src_prefix=Path(locate.static(), identity.value)) + \
-                         recipe.expand(src_prefix=Path(locate.static(), 'default'))
-
-            for chain in chains:
-                self.__unlink(chain)
-
+        for book in books:
             if self._deactivate:
-                recipe.hook.deactivate()
+                book.deactivate()
 
-        for snippet in self._snippets():
-            self.__disable(snippet)
+            for snippet in book.snippets:
+                self.__disable(snippet)
+
+            for recipe in book.recipes:
+                if recipe.src.is_absolute():
+                    chains = recipe.expand()
+                else:
+                    chains = recipe.expand(src_prefix=Path(locate.static(), identity.value)) + \
+                             recipe.expand(src_prefix=Path(locate.static(), 'default'))
+
+                for chain in chains:
+                    self.__unlink(chain)
 
         return
 
@@ -335,16 +327,17 @@ class PrefListAction(PrefAction):
 
     def run(self):
         identity = kernel.identify()
-        recipes = self._recipes(logger=Lumber.noop(), noop=False)
+        books = self._books(logger=Lumber.noop(), noop=False)
 
         chains: list[PrefChain] = []
 
-        for recipe in recipes:
-            if recipe.src.is_absolute():
-                chains += recipe.expand()
-            else:
-                chains += recipe.expand(src_prefix=Path(locate.static(), identity.value))
-                chains += recipe.expand(src_prefix=Path(locate.static(), 'default'))
+        for book in books:
+            for recipe in book.recipes:
+                if recipe.src.is_absolute():
+                    chains += recipe.expand()
+                else:
+                    chains += recipe.expand(src_prefix=Path(locate.static(), identity.value))
+                    chains += recipe.expand(src_prefix=Path(locate.static(), 'default'))
 
         chains.sort(key=lambda x: x.dst)
         lines = [self.__line(x) for x in chains if self._test(x.src)]
@@ -432,16 +425,21 @@ class PrefCleanupAction(PrefAction):
         return
 
     def run(self):
-        recipes = self._recipes(logger=self._logger, noop=self._noop)
-        return self.perform(recipes)
+        books = self._books(logger=self._logger, noop=self._noop)
+        return self.perform(books)
 
-    def perform(self, recipes: list[PrefRecipe]):
-        paths = [recipe.dst.expanduser() for recipe in recipes if not recipe.private]
-        paths.sort()
+    def perform(self, books: list[CookBook]):
+        candidates: list[Path] = []
+
+        for book in books:
+            if book.private:
+                continue
+
+            candidates += [x.dst.expanduser() for x in book.recipes]
 
         found: list[Path] = []
 
-        for path in paths:
+        for path in sorted(candidates):
             message = f'Scanning {path}'
             self._logger.debug(f'{message}...\r', terminate=False)
             found += self.__scan(path)

@@ -7,55 +7,32 @@ from . import shell
 from .timber import Lumber
 
 __all__ = [
-    'PrefChain', 'PrefRecipe', 'PrefBook',
-    'SnipRecipe', 'SnipBook',
-    'BinPrefBook',
-    'ShPrefBook', 'ShSnipBook',
-    'BashPrefBook', 'BashSnipBook',
-    'ZshPrefBook', 'ZshSnipBook',
-    'VimPrefBook',
-    'GitPrefBook', 'GitHubPrefBook',
-    'AsdfPrefBook',
-    'TmuxPrefBook',
-    'GradlePrefBook',
-    'BrewPrefBook',
-    'XcodePrefBook',
-    'IntelliJIdeaPrefBook',
-    'AndroidStudioPrefBook',
-    'AppCodePrefBook',
-    'RubyMinePrefBook',
-    'GoLandPrefBook',
-    'CLionPrefBook',
-    'RiderPrefBook',
+    'PrefChain', 'PrefRecipe',
+    'SnipRecipe', 'CookBook',
+    'BinCookBook',
+    'ShCookBook',
+    'BashCookBook',
+    'ZshCookBook',
+    'VimCookBook',
+    'GitCookBook', 'GitHubCookBook',
+    'AsdfCookBook',
+    'TmuxCookBook',
+    'GradleCookBook',
+    'BrewCookBook',
+    'XcodeCookBook',
+    'IntelliJIdeaCookBook',
+    'AndroidStudioCookBook',
+    'AppCodeCookBook',
+    'RubyMineCookBook',
+    'GoLandCookBook',
+    'CLionCookBook',
+    'RiderCookBook',
 ]
 
 
 # ==
 # Base
 # ==
-class Hook(metaclass=ABCMeta):
-    @staticmethod
-    def noop() -> 'Hook':
-        return NoopHook()
-
-    @abstractmethod
-    def activate(self):
-        pass
-
-    @abstractmethod
-    def deactivate(self):
-        pass
-
-
-class NoopHook(Hook):
-
-    def activate(self):
-        pass
-
-    def deactivate(self):
-        pass
-
-
 @dataclass(frozen=True)
 class PrefChain:
     src: Path
@@ -66,28 +43,16 @@ class PrefChain:
 class PrefRecipe:
     src: Path
     dst: Path
-    hook: Hook = Hook.noop()
-    private: bool = False
 
     @staticmethod
-    def create(
-        src: str,
-        dst: str,
-        hook: Hook = Hook.noop(),
-        private: bool = False,
-    ) -> 'PrefRecipe':
-        return PrefRecipe(src=Path(src), dst=Path(dst), hook=hook, private=private)
+    def create(src: str, dst: str) -> 'PrefRecipe':
+        return PrefRecipe(src=Path(src), dst=Path(dst))
 
     @staticmethod
-    def glob(
-        src: str,
-        dst: str,
-        hook: Hook = Hook.noop(),
-        private: bool = False,
-    ) -> list['PrefRecipe']:
+    def glob(src: str, dst: str) -> list['PrefRecipe']:
         pattern = str(Path(dst).expanduser())
         return [
-            PrefRecipe(src=Path(src), dst=Path(dst), hook=hook, private=private)
+            PrefRecipe(src=Path(src), dst=Path(dst))
             for dst in glob.glob(pattern)
         ]
 
@@ -129,13 +94,6 @@ class PrefRecipe:
         ]
 
 
-class PrefBook(metaclass=ABCMeta):
-    @property
-    @abstractmethod
-    def recipes(self) -> list[PrefRecipe]:
-        pass
-
-
 @dataclass
 class SnipRecipe:
     src: Path
@@ -146,17 +104,31 @@ class SnipRecipe:
         return SnipRecipe(src=Path(src), dst=Path(dst))
 
 
-class SnipBook(metaclass=ABCMeta):
+class CookBook(metaclass=ABCMeta):
     @property
     @abstractmethod
-    def recipes(self) -> list[SnipRecipe]:
+    def recipes(self) -> list[PrefRecipe]:
+        raise NotImplementedError()
+
+    @property
+    def snippets(self) -> list[SnipRecipe]:
+        return []
+
+    @property
+    def private(self) -> bool:
+        return False
+
+    def activate(self):
+        pass
+
+    def deactivate(self):
         pass
 
 
 # ==
 # Concrete
 # ==
-class BinPrefBook(PrefBook):
+class BinCookBook(CookBook):
     @property
     def recipes(self) -> list[PrefRecipe]:
         return [
@@ -167,7 +139,7 @@ class BinPrefBook(PrefBook):
         ]
 
 
-class ShPrefBook(PrefBook):
+class ShCookBook(CookBook):
     @property
     def recipes(self) -> list[PrefRecipe]:
         return [
@@ -177,10 +149,8 @@ class ShPrefBook(PrefBook):
             ),
         ]
 
-
-class ShSnipBook(SnipBook):
     @property
-    def recipes(self) -> list[SnipRecipe]:
+    def snippets(self) -> list[SnipRecipe]:
         return [
             SnipRecipe.create(
                 src='shrc',
@@ -189,7 +159,7 @@ class ShSnipBook(SnipBook):
         ]
 
 
-class BashPrefBook(PrefBook):
+class BashCookBook(CookBook):
     @property
     def recipes(self) -> list[PrefRecipe]:
         return [
@@ -219,10 +189,8 @@ class BashPrefBook(PrefBook):
             ),
         ]
 
-
-class BashSnipBook(SnipBook):
     @property
-    def recipes(self) -> list[SnipRecipe]:
+    def snippets(self) -> list[SnipRecipe]:
         return [
             SnipRecipe.create(
                 src='bashrc',
@@ -235,7 +203,7 @@ class BashSnipBook(SnipBook):
         ]
 
 
-class ZshPrefBook(PrefBook):
+class ZshCookBook(CookBook):
     logger: Lumber
     noop: bool
 
@@ -250,7 +218,6 @@ class ZshPrefBook(PrefBook):
             PrefRecipe.create(
                 src='zsh.d',
                 dst='~/.zsh.d',
-                hook=ZshHook(logger=self.logger, noop=self.noop)
             ),
             PrefRecipe.create(
                 src='zsh-completions',
@@ -262,15 +229,18 @@ class ZshPrefBook(PrefBook):
             ),
         ]
 
-
-class ZshHook(Hook):
-    logger: Lumber
-    noop: bool
-
-    def __init__(self, logger: Lumber = Lumber.noop(), noop: bool = False):
-        self.logger = logger
-        self.noop = noop
-        return
+    @property
+    def snippets(self) -> list[SnipRecipe]:
+        return [
+            SnipRecipe.create(
+                src='zshrc',
+                dst='~/.zshrc'
+            ),
+            SnipRecipe.create(
+                src='zshprofile',
+                dst='~/.zshprofile'
+            ),
+        ]
 
     def activate(self):
         dst = Path('~/.local/share/zinit/zinit.git').expanduser()
@@ -292,7 +262,7 @@ class ZshHook(Hook):
             return
 
         shell.call(
-            cmd='zsh -i -c "zinit update --parallel"',
+            cmd='zsh -i -c "zinit update"',
             logger=self.logger,
             noop=self.noop,
         )
@@ -302,22 +272,7 @@ class ZshHook(Hook):
         pass
 
 
-class ZshSnipBook(SnipBook):
-    @property
-    def recipes(self) -> list[SnipRecipe]:
-        return [
-            SnipRecipe.create(
-                src='zshrc',
-                dst='~/.zshrc'
-            ),
-            SnipRecipe.create(
-                src='zshprofile',
-                dst='~/.zshprofile'
-            ),
-        ]
-
-
-class VimPrefBook(PrefBook):
+class VimCookBook(CookBook):
     logger: Lumber
     noop: bool
 
@@ -336,19 +291,8 @@ class VimPrefBook(PrefBook):
             PrefRecipe.create(
                 src='vim',
                 dst='~/.vim',
-                hook=VimHook(logger=self.logger, noop=self.noop)
             ),
         ]
-
-
-class VimHook(Hook):
-    logger: Lumber
-    noop: bool
-
-    def __init__(self, logger: Lumber = Lumber.noop(), noop: bool = False):
-        self.logger = logger
-        self.noop = noop
-        return
 
     def activate(self):
         dst = Path('~/.vim/autoload/plug.vim').expanduser()
@@ -381,7 +325,7 @@ class VimHook(Hook):
         pass
 
 
-class GitPrefBook(PrefBook):
+class GitCookBook(CookBook):
     @property
     def recipes(self) -> list[PrefRecipe]:
         return [
@@ -396,7 +340,7 @@ class GitPrefBook(PrefBook):
         ]
 
 
-class GitHubPrefBook(PrefBook):
+class GitHubCookBook(CookBook):
     @property
     def recipes(self) -> list[PrefRecipe]:
         return [
@@ -407,7 +351,7 @@ class GitHubPrefBook(PrefBook):
         ]
 
 
-class AsdfPrefBook(PrefBook):
+class AsdfCookBook(CookBook):
     @property
     def recipes(self) -> list[PrefRecipe]:
         return [
@@ -418,7 +362,7 @@ class AsdfPrefBook(PrefBook):
         ]
 
 
-class TmuxPrefBook(PrefBook):
+class TmuxCookBook(CookBook):
     @property
     def recipes(self) -> list[PrefRecipe]:
         return [
@@ -429,19 +373,22 @@ class TmuxPrefBook(PrefBook):
         ]
 
 
-class GradlePrefBook(PrefBook):
+class GradleCookBook(CookBook):
     @property
     def recipes(self) -> list[PrefRecipe]:
         return [
             PrefRecipe.create(
                 src='gradle',
                 dst='~/.gradle',
-                private=True,
             ),
         ]
 
+    @property
+    def private(self) -> bool:
+        return True
 
-class BrewPrefBook(PrefBook):
+
+class BrewCookBook(CookBook):
     logger: Lumber
     noop: bool
 
@@ -456,19 +403,8 @@ class BrewPrefBook(PrefBook):
             PrefRecipe.create(
                 src='Brewfile',
                 dst='~/.Brewfile',
-                hook=BrewHook(logger=self.logger, noop=self.noop)
             ),
         ]
-
-
-class BrewHook(Hook):
-    logger: Lumber
-    noop: bool
-
-    def __init__(self, logger: Lumber = Lumber.noop(), noop: bool = False):
-        super().__init__()
-        self.logger = logger
-        self.noop = noop
 
     # noinspection PyBroadException
     def activate(self):
@@ -490,132 +426,149 @@ class BrewHook(Hook):
         pass
 
 
-class XcodePrefBook(PrefBook):
+class XcodeCookBook(CookBook):
     @property
     def recipes(self) -> list[PrefRecipe]:
         return [
             *PrefRecipe.glob(
                 src='Xcode',
                 dst='~/Library/Developer/Xcode',
-                private=True,
             )
         ]
 
+    @property
+    def private(self) -> bool:
+        return True
 
-class IntelliJIdeaPrefBook(PrefBook):
+
+class IntelliJIdeaCookBook(CookBook):
     @property
     def recipes(self) -> list[PrefRecipe]:
         return [
             *PrefRecipe.glob(
                 src='IntelliJIdea',
                 dst='~/Library/Preferences/IntelliJIdea*',
-                private=True,
             ),
             *PrefRecipe.glob(
                 src='IntelliJIdea',
                 dst='~/Library/ApplicationSupport/JetBrains/IntelliJIdea*',
-                private=True,
             ),
         ]
 
+    @property
+    def private(self) -> bool:
+        return True
 
-class AndroidStudioPrefBook(PrefBook):
+
+class AndroidStudioCookBook(CookBook):
     @property
     def recipes(self) -> list[PrefRecipe]:
         return [
             *PrefRecipe.glob(
                 src='AndroidStudio',
                 dst='~/Library/Preferences/AndroidStudio*',
-                private=True,
             ),
             *PrefRecipe.glob(
                 src='AndroidStudio',
                 dst='~/Library/ApplicationSupport/Google/AndroidStudio*',
-                private=True,
             ),
         ]
 
+    @property
+    def private(self) -> bool:
+        return True
 
-class AppCodePrefBook(PrefBook):
+
+class AppCodeCookBook(CookBook):
     @property
     def recipes(self) -> list[PrefRecipe]:
         return [
             *PrefRecipe.glob(
                 src='AppCode',
                 dst='~/Library/Preferences/AppCode*',
-                private=True,
             ),
             *PrefRecipe.glob(
                 src='AppCode',
                 dst='~/Library/ApplicationSupport/JetBrains/AppCode*',
-                private=True,
             ),
         ]
 
+    @property
+    def private(self) -> bool:
+        return True
 
-class RubyMinePrefBook(PrefBook):
+
+class RubyMineCookBook(CookBook):
     @property
     def recipes(self) -> list[PrefRecipe]:
         return [
             *PrefRecipe.glob(
                 src='RubyMine',
                 dst='~/Library/Preferences/RubyMine*',
-                private=True,
             ),
             *PrefRecipe.glob(
                 src='RubyMine',
                 dst='~/Library/ApplicationSupport/JetBrains/RubyMine*',
-                private=True,
             ),
         ]
 
+    @property
+    def private(self) -> bool:
+        return True
 
-class GoLandPrefBook(PrefBook):
+
+class GoLandCookBook(CookBook):
     @property
     def recipes(self) -> list[PrefRecipe]:
         return [
             *PrefRecipe.glob(
                 src='GoLand',
                 dst='~/Library/Preferences/GoLand*',
-                private=True,
             ),
             *PrefRecipe.glob(
                 src='GoLand',
                 dst='~/Library/ApplicationSupport/JetBrains/GoLand*',
-                private=True,
             ),
         ]
 
+    @property
+    def private(self) -> bool:
+        return True
 
-class CLionPrefBook(PrefBook):
+
+class CLionCookBook(CookBook):
     @property
     def recipes(self) -> list[PrefRecipe]:
         return [
             *PrefRecipe.glob(
                 src='CLion',
                 dst='~/Library/Preferences/CLion*',
-                private=True,
             ),
             *PrefRecipe.glob(
                 src='CLion',
                 dst='~/Library/ApplicationSupport/JetBrains/CLion*',
-                private=True,
             ),
         ]
 
+    @property
+    def private(self) -> bool:
+        return True
 
-class RiderPrefBook(PrefBook):
+
+class RiderCookBook(CookBook):
     @property
     def recipes(self) -> list[PrefRecipe]:
         return [
             *PrefRecipe.glob(
                 src='Rider',
                 dst='~/Library/Preferences/Rider*',
-                private=True,
             ),
             *PrefRecipe.glob(
                 src='Rider',
                 dst='~/Library/ApplicationSupport/JetBrains/Rider*',
-                private=True,
             ),
         ]
+
+    @property
+    def private(self) -> bool:
+        return True
