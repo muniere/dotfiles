@@ -322,6 +322,9 @@ class PrefListAction(PrefAction):
     _color: PrefListColorOption
     _style: PrefListStyleOption
 
+    SEP = ' -> '
+    END = os.linesep
+
     def __init__(self,
                  stream: TextIO = sys.stdout,
                  color: PrefListColorOption = PrefListColorOption.AUTO,
@@ -349,68 +352,74 @@ class PrefListAction(PrefAction):
         self._stream.writelines(lines)
         return
 
-    def __line(self, chain: PrefChain, sep: str = ' -> ', end: str = os.linesep) -> str:
-        cwd = Path.cwd()
+    def __line(self, chain: PrefChain) -> str:
+        if self.__colorful():
+            return self.__line_colored(chain)
+        else:
+            return self.__line_plain(chain)
 
-        src = chain.src.relative_to(cwd) if chain.src.is_relative_to(cwd) else chain.src
-        dst = chain.dst if chain.dst.exists() else Path('(null)')
+    def __line_colored(self, chain: PrefChain) -> str:
+        sep = self.SEP
+        end = self.END
 
+        src, dst = self.__resolve(chain)
+        color = self.__color_for(dst)
+
+        if self._style == PrefListStyleOption.LONG:
+            return sep.join([color.decorate(dst), str(src)]) + end
+
+        if self._style == PrefListStyleOption.SHORT:
+            return color.decorate(dst) + end
+
+        return color.decorate(dst) + end
+
+    def __line_plain(self, chain: PrefChain) -> str:
+        sep = self.SEP
+        end = self.END
+
+        src, dst = self.__resolve(chain)
+
+        if self._style == PrefListStyleOption.LONG:
+            return sep.join([str(dst), str(src)]) + end
+
+        if self._style == PrefListStyleOption.SHORT:
+            return str(dst) + end
+
+        return str(dst) + end
+
+    def __colorful(self) -> bool:
         if self._color == PrefListColorOption.ALWAYS:
-            colorized = True
-        elif self._color == PrefListColorOption.NEVER:
-            colorized = False
-        elif self._color == PrefListColorOption.AUTO:
-            colorized = self._stream.isatty()
-        else:
-            colorized = self._stream.isatty()
+            return True
 
-        if colorized:
-            color = self.__color(dst)
+        if self._color == PrefListColorOption.NEVER:
+            return False
 
-            if self._style == PrefListStyleOption.LONG:
-                pair = (
-                    color.decorate(dst),
-                    str(src),
-                )
-            elif self._style == PrefListStyleOption.SHORT:
-                pair = (
-                    color.decorate(dst),
-                )
-            else:
-                pair = (
-                    color.decorate(dst),
-                )
-
-            return sep.join(pair) + end
-        else:
-            if self._style == PrefListStyleOption.LONG:
-                pair = (
-                    str(dst),
-                    str(src),
-                )
-            elif self._style == PrefListStyleOption.SHORT:
-                pair = (
-                    str(dst),
-                )
-            else:
-                pair = (
-                    str(dst),
-                )
-
-            return sep.join(pair) + end
+        return self._stream.isatty()
 
     @staticmethod
-    def __color(path: Path) -> Color:
+    def __resolve(chain: PrefChain) -> (Path, Path):
+        cwd = Path.cwd()
+
+        return (
+            chain.src.relative_to(cwd) if chain.src.is_relative_to(cwd) else chain.src,
+            chain.dst if chain.dst.exists() else Path('(null)')
+        )
+
+    @staticmethod
+    def __color_for(path: Path) -> Color:
         if not path.exists():
             return Color.RED
-        elif path.is_symlink():
+
+        if path.is_symlink():
             return Color.MAGENTA
-        elif path.is_dir():
+
+        if path.is_dir():
             return Color.BLUE
-        elif path.is_file():
+
+        if path.is_file():
             return Color.RESET
-        else:
-            return Color.RESET
+
+        return Color.RESET
 
 
 class PrefCleanupAction(PrefAction):
