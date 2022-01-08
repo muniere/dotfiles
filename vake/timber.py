@@ -14,7 +14,7 @@ __all__ = [
 
 class Level(Enum):
     DEBUG = 10
-    EXEC = 15
+    TRACE = 15
     INFO = 20
     WARN = 30
     ERROR = 40
@@ -28,7 +28,7 @@ class ColorPalette:
     def default() -> 'ColorPalette':
         return ColorPalette({
             Level.DEBUG.value: Color.GREEN,
-            Level.EXEC.value: Color.MAGENTA,
+            Level.TRACE.value: Color.MAGENTA,
             Level.INFO.value: Color.CYAN,
             Level.WARN.value: Color.YELLOW,
             Level.ERROR.value: Color.RESET,
@@ -121,7 +121,7 @@ class Lumber(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def execute(self, msg: object, terminate: bool = False):
+    def trace(self, msg: object, terminate: bool = False):
         pass
 
     @abstractmethod
@@ -153,8 +153,8 @@ class DefaultLumber(Lumber):
     def error(self, msg: object, terminate: bool = True):
         self._delegate.error(msg, extra={'terminate': terminate})
 
-    def execute(self, msg, terminate: bool = True):
-        self._delegate.log(Level.EXEC.value, msg, extra={'terminate': terminate})
+    def trace(self, msg, terminate: bool = True):
+        self._delegate.log(Level.TRACE.value, msg, extra={'terminate': terminate})
 
     def set_level(self, level: Level):
         self._delegate.setLevel(level.value)
@@ -180,7 +180,7 @@ class NoopLumber(Lumber):
     def error(self, msg: object, terminate: bool = True):
         pass
 
-    def execute(self, msg: object, terminate: bool = True):
+    def trace(self, msg: object, terminate: bool = True):
         pass
 
     def set_level(self, level: Level):
@@ -196,7 +196,7 @@ def get_logger(name: str) -> Lumber:
 
 def bootstrap():
     logging.addLevelName(Level.DEBUG.value, 'DEBUG')
-    logging.addLevelName(Level.EXEC.value, 'EXEC')
+    logging.addLevelName(Level.TRACE.value, 'TRACE')
     logging.addLevelName(Level.INFO.value, 'INFO')
     logging.addLevelName(Level.WARN.value, 'WARN')
     logging.addLevelName(Level.ERROR.value, 'ERROR')

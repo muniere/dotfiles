@@ -160,7 +160,7 @@ class PrefLinkAction(PrefAction):
         return True
 
     def __mkdir(self, path: Path) -> bool:
-        self._logger.execute(f'mkdir -p {path}')
+        self._logger.trace(f'mkdir -p {path}')
 
         if self._noop:
             return False
@@ -169,7 +169,7 @@ class PrefLinkAction(PrefAction):
         return True
 
     def __symlink(self, src: Path, dst: Path) -> bool:
-        self._logger.execute(f'ln -s -f {src} {dst}')
+        self._logger.trace(f'ln -s -f {src} {dst}')
 
         if self._noop:
             return False
@@ -268,7 +268,7 @@ class PrefUnlinkAction(PrefAction):
         return self.__rm(chain.dst)
 
     def __rm(self, path: Path) -> bool:
-        self._logger.execute(f'rm -f {path}')
+        self._logger.trace(f'rm -f {path}')
 
         if self._noop:
             return False
@@ -465,7 +465,7 @@ class PrefCleanupAction(PrefAction):
         return []
 
     def __rm(self, path: Path) -> bool:
-        self._logger.execute(f'rm -f {path}')
+        self._logger.trace(f'rm -f {path}')
 
         if self._noop:
             return False

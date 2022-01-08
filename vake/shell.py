@@ -29,7 +29,7 @@ def call(
         words = [cmd]
         env_vars = None
 
-    logger.execute(' '.join(words))
+    logger.trace(' '.join(words))
 
     if noop:
         return True

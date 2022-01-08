@@ -31,7 +31,7 @@ class Command(metaclass=abc.ABCMeta):
         if verbose:
             level = Level.DEBUG
         else:
-            level = Level.EXEC
+            level = Level.TRACE
 
         stream = sys.stdout
 
