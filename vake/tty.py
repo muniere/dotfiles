@@ -20,7 +20,7 @@ class Color(Enum):
 
 
 class Looper:
-    __seq: [str]
+    __seq: list[str]
     __i: int
 
     @classmethod

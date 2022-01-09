@@ -390,7 +390,7 @@ class PrefListAction(PrefAction):
         return self._stream.isatty()
 
     @staticmethod
-    def __resolve(chain: PrefChain) -> (Path, Path):
+    def __resolve(chain: PrefChain) -> tuple[Path, Path]:
         cwd = Path.cwd()
 
         return (
