@@ -6,7 +6,6 @@ from abc import abstractmethod
 from argparse import ArgumentParser, ArgumentError, Namespace
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TypeVar, Generic
 
 from . import kernel
 from . import timber
@@ -17,8 +16,6 @@ from .timber import Level, TaggedFormatter, StreamHandler, Lumber
 __all__ = [
     'run'
 ]
-
-AnyCommand = TypeVar('AnyCommand', bound='Command')
 
 
 class Command(metaclass=abc.ABCMeta):
@@ -50,7 +47,7 @@ class Command(metaclass=abc.ABCMeta):
 
         return logger
 
-    class Factory(Generic[AnyCommand], metaclass=abc.ABCMeta):
+    class Factory(metaclass=abc.ABCMeta):
 
         # noinspection PyUnresolvedReferences,PyProtectedMember
         @classmethod
@@ -59,7 +56,7 @@ class Command(metaclass=abc.ABCMeta):
             raise NotImplementedError()
 
         @abstractmethod
-        def create(self, args: Namespace) -> AnyCommand:
+        def create(self, args: Namespace) -> 'Command':
             raise NotImplementedError()
 
 
@@ -112,7 +109,7 @@ class ListCommand(Command):
                 help='Choose how to colorize output'
             )
 
-        def create(self, args: Namespace) -> 'ListCommand':
+        def create(self, args: Namespace) -> Command:
             return ListCommand(
                 long=args.long,
                 color=args.color,
@@ -175,7 +172,7 @@ class LinkCommand(Command):
                 help='Show verbose messages'
             )
 
-        def create(self, args: Namespace) -> 'LinkCommand':
+        def create(self, args: Namespace) -> Command:
             return LinkCommand(
                 cleanup=not args.skip_cleanup,
                 activate=not args.skip_activate,
@@ -240,7 +237,7 @@ class UnlinkCommand(Command):
                 help='Show verbose messages'
             )
 
-        def create(self, args: Namespace) -> 'UnlinkCommand':
+        def create(self, args: Namespace) -> Command:
             return UnlinkCommand(
                 cleanup=not args.skip_cleanup,
                 deactivate=not args.skip_deactivate,
@@ -289,7 +286,7 @@ class CleanupCommand(Command):
                 help='Show verbose messages'
             )
 
-        def create(self, args: Namespace) -> 'CleanupCommand':
+        def create(self, args: Namespace) -> Command:
             return CleanupCommand(
                 dry_run=args.dry_run,
                 verbose=args.verbose,
@@ -341,7 +338,7 @@ class CompletionCommand(Command):
             child = subparsers.add_parser(CompletionCommand.NAME)
             child.set_defaults(factory=cls())
 
-        def create(self, args: Namespace) -> 'CompletionCommand':
+        def create(self, args: Namespace) -> Command:
             return CompletionCommand()
 
 
