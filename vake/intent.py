@@ -34,11 +34,11 @@ class Action(metaclass=ABCMeta):
 # ==
 class PrefAction(Action, metaclass=ABCMeta):
     @staticmethod
-    def _books(logger: Lumber = Lumber.noop(), noop: bool = False) -> list[CookBook]:
+    def _books(logger: Lumber = Lumber.noop(), noop: bool = False, reverse: bool = False) -> list[CookBook]:
         identity = kernel.identify()
 
         # shared
-        books: list[CookBook] = [
+        core_books: list[CookBook] = [
             config.BinCookBook(),
             config.ShCookBook(),
             config.BashCookBook(),
@@ -51,14 +51,20 @@ class PrefAction(Action, metaclass=ABCMeta):
             config.GradleCookBook(),
         ]
 
+        pre_books: list[CookBook] = []
+        post_books: list[CookBook] = []
+
         # linux
         if identity.is_linux():
-            books += []
+            pre_books += []
+            post_books += []
 
         # darwin
         if identity.is_darwin():
-            books += [
+            pre_books += [
                 config.BrewCookBook(logger=logger, noop=noop),
+            ]
+            post_books += [
                 config.XcodeCookBook(),
                 config.IntelliJIdeaCookBook(),
                 config.AndroidStudioCookBook(),
@@ -69,7 +75,12 @@ class PrefAction(Action, metaclass=ABCMeta):
                 config.RiderCookBook(),
             ]
 
-        return books
+        books = pre_books + core_books + post_books
+
+        if reverse:
+            return list(reversed(books))
+        else:
+            return list(books)
 
     @staticmethod
     def _test(path: Path):
@@ -100,7 +111,7 @@ class PrefLinkAction(PrefAction):
         return
 
     def run(self):
-        books = self._books(logger=self._logger, noop=self._noop)
+        books = self._books(logger=self._logger, noop=self._noop, reverse=False)
 
         if self._cleanup:
             PrefCleanupAction(logger=self._logger, noop=self._noop).perform(books)
@@ -215,7 +226,7 @@ class PrefUnlinkAction(PrefAction):
         return
 
     def run(self):
-        books = self._books(logger=self._logger, noop=self._noop)
+        books = self._books(logger=self._logger, noop=self._noop, reverse=True)
 
         if self._cleanup:
             PrefCleanupAction(logger=self._logger, noop=self._noop).perform(books)
