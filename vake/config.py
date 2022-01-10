@@ -243,17 +243,13 @@ class ZshCookBook(CookBook):
         ]
 
     def activate(self):
-        dst = Path('~/.local/share/zinit/zinit.git').expanduser()
+        url = 'https://git.io/zinit-install'
 
-        if dst.exists():
-            self.logger.info(f'Zinit is already downloaded: {dst}')
-        else:
-            url = 'https://git.io/zinit-install'
-            shell.call(
-                cmd=f'sh -c "NO_EDIT=1 $(curl -fsSL {url})"',
-                logger=self.logger,
-                noop=self.noop,
-            )
+        shell.call(
+            cmd=f'sh -c "NO_EMOJI=1 NO_EDIT=1 NO_TUTORIAL=1 $(curl -fSL {url})"',
+            logger=self.logger,
+            noop=self.noop,
+        )
 
         try:
             shell.which('zsh')
@@ -262,7 +258,7 @@ class ZshCookBook(CookBook):
             return
 
         shell.call(
-            cmd='zsh -i -c "zinit update"',
+            cmd='zsh -i -c "zinit update --all"',
             logger=self.logger,
             noop=self.noop,
         )
@@ -295,17 +291,14 @@ class VimCookBook(CookBook):
         ]
 
     def activate(self):
-        dst = Path('~/.vim/autoload/plug.vim').expanduser()
+        url = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+        out = '~/.vim/autoload/plug.vim'
 
-        if dst.is_file():
-            self.logger.info(f'Vim-Plug is already downloaded: {dst}')
-        else:
-            url = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-            shell.call(
-                cmd=f'curl -fLo {dst} --create-dirs {url}',
-                logger=self.logger,
-                noop=self.noop,
-            )
+        shell.call(
+            cmd=f'sh -c "curl -fSL -o {out} --create-dirs {url}"',
+            logger=self.logger,
+            noop=self.noop,
+        )
 
         try:
             shell.which('vim')
