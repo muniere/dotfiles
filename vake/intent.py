@@ -6,6 +6,7 @@ from enum import Enum, auto
 from pathlib import Path
 from typing import TextIO
 
+from . import _
 from . import config
 from . import kernel
 from . import locate
@@ -199,10 +200,10 @@ class PrefLinkAction(PrefAction):
         if self._noop:
             return False
 
-        if len(dst_str) > 0:
-            new_str = dst_str + os.linesep + src_str + os.linesep
-        else:
-            new_str = src_str + os.linesep
+        new_str = _.box(len(dst_str)).fold(
+            some=lambda: dst_str + os.linesep + src_str + os.linesep,
+            none=lambda: src_str + os.linesep,
+        )
 
         dst.write_text(new_str, encoding='utf-8')
         return True

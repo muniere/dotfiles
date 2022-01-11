@@ -3,6 +3,7 @@ from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
 
+from . import _
 from . import shell
 from .timber import Lumber
 
@@ -59,18 +60,16 @@ class PrefRecipe:
     def expand(self, src_prefix: Path = Path(), dst_prefix: Path = Path()) -> list[PrefChain]:
         # resolve
         ex_src = self.src.expanduser()
-
-        if ex_src.is_absolute():
-            abs_src = Path(ex_src)
-        else:
-            abs_src = Path(src_prefix, ex_src).resolve()
+        abs_src = _.box(ex_src.is_absolute()).fold(
+            some=lambda: Path(ex_src),
+            none=lambda: Path(src_prefix, ex_src).resolve(),
+        )
 
         ex_dst = self.dst.expanduser()
-
-        if ex_dst.is_absolute():
-            abs_dst = Path(ex_dst)
-        else:
-            abs_dst = Path(dst_prefix, ex_dst).resolve()
+        abs_dst = _.box(ex_dst.is_absolute()).fold(
+            some=lambda: Path(ex_dst),
+            none=lambda: Path(dst_prefix, ex_dst).resolve(),
+        )
 
         # guard : none
         if not abs_src.exists():

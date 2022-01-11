@@ -7,6 +7,7 @@ from argparse import ArgumentParser, ArgumentError, Namespace
 from dataclasses import dataclass
 from pathlib import Path
 
+from . import _
 from . import kernel
 from . import timber
 from .intent import Action, PrefListColorOption, PrefListStyleOption
@@ -25,17 +26,17 @@ class Command(metaclass=abc.ABCMeta):
 
     @staticmethod
     def _logger(verbose: bool) -> Lumber:
-        if verbose:
-            level = Level.DEBUG
-        else:
-            level = Level.TRACE
-
         stream = sys.stdout
 
-        if stream.isatty():
-            formatter = TaggedFormatter.colored()
-        else:
-            formatter = TaggedFormatter.default()
+        level = _.box(verbose).fold(
+            some=lambda: Level.DEBUG,
+            none=lambda: Level.TRACE
+        )
+
+        formatter = _.box(stream.isatty()).fold(
+            some=lambda: TaggedFormatter.colored(),
+            none=lambda: TaggedFormatter.default(),
+        )
 
         handler = StreamHandler(stream=stream)
         handler.set_level(level)
