@@ -4,6 +4,7 @@ import sys
 import time
 from typing import Optional
 
+from . import _
 from .timber import Lumber
 from .tty import Looper
 
@@ -22,19 +23,15 @@ def call(
 ) -> int:
     assert len(cmd) > 0, 'cmd must not be empty'
 
-    if env:
-        words = [f'{k}={v}' for (k, v) in env.items()] + [cmd]
-        env_vars = os.environ.copy().update(env)
-    else:
-        words = [cmd]
-        env_vars = None
+    environ = _.safe(env, {})
 
+    words = [f'{k}={v}' for (k, v) in environ.items()] + [cmd]
     logger.trace(' '.join(words))
 
     if noop:
         return True
 
-    return subprocess.call(cmd, env=env_vars, shell=True)
+    return subprocess.call(cmd, env={**os.environ.copy(), **environ}, shell=True)
 
 
 def poll(
@@ -45,13 +42,10 @@ def poll(
 ) -> subprocess.CompletedProcess:
     assert len(cmd) > 0, 'cmd must not be empty'
 
-    if env:
-        env_vars = os.environ.copy().update(env)
-    else:
-        env_vars = None
+    environ = _.safe(env, {})
 
-    with subprocess.Popen(cmd, env=env_vars, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True) as popen:
-        looper = eol or Looper.dots()
+    with subprocess.Popen(cmd, env=environ, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True) as popen:
+        looper = _.safe(eol, Looper.dots())
 
         while True:
             ret = popen.poll()
@@ -79,12 +73,9 @@ def run(
 ) -> subprocess.CompletedProcess:
     assert len(cmd) > 0, 'cmd must not be empty'
 
-    if env:
-        env_vars = os.environ.copy().update(env)
-    else:
-        env_vars = None
+    environ = _.safe(env, {})
 
-    return subprocess.run(cmd, env=env_vars, capture_output=True, check=check, shell=True)
+    return subprocess.run(cmd, env=environ, capture_output=True, check=check, shell=True)
 
 
 def which(command: str) -> subprocess.CompletedProcess:
