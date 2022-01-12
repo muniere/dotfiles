@@ -49,6 +49,7 @@ class PrefAction(Action, metaclass=ABCMeta):
             config.GitHubCookBook(),
             config.AsdfCookBook(),
             config.TmuxCookBook(),
+            config.RangerCookBook(),
             config.GradleCookBook(),
         ]
 

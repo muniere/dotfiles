@@ -365,6 +365,17 @@ class TmuxCookBook(CookBook):
         ]
 
 
+class RangerCookBook(CookBook):
+    @property
+    def recipes(self) -> list[PrefRecipe]:
+        return [
+            PrefRecipe.create(
+                src='ranger/',
+                dst='~/.config/ranger'
+            ),
+        ]
+
+
 class GradleCookBook(CookBook):
     @property
     def recipes(self) -> list[PrefRecipe]:
