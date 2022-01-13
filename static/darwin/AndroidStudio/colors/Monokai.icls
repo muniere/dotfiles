@@ -505,7 +505,6 @@
         <option name="FOREGROUND" value="9876aa" />
       </value>
     </option>
-    <option name="KOTLIN_ANNOTATION" baseAttributes="ANNOTATION_NAME_ATTRIBUTES" />
     <option name="KOTLIN_SMART_CAST_VALUE">
       <value />
     </option>
