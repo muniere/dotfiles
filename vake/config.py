@@ -137,7 +137,7 @@ class BinCookBook(CookBook):
         return [
             PrefRecipe.create(
                 src='bin/',
-                dst='~/.bin'
+                dst='~/.local/bin'
             ),
         ]
 
