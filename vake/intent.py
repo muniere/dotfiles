@@ -45,7 +45,7 @@ class PrefAction(Action, metaclass=ABCMeta):
             config.BashCookBook(),
             config.ZshCookBook(logger=logger, noop=noop),
             config.VimCookBook(logger=logger, noop=noop),
-            config.GitCookBook(),
+            config.GitCookBook(logger=logger, noop=noop),
             config.GitHubCookBook(),
             config.AsdfCookBook(),
             config.TmuxCookBook(),
