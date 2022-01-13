@@ -35,14 +35,16 @@ fi
 # =====
 # Flutter
 # =====
+export PUB_CACHE="$HOME/.cache/pub"
+
 if [ -d /usr/local/opt/flutter/bin/cache/dart-sdk/bin/ ]; then
   addpath /usr/local/opt/flutter/bin /usr/local/opt/flutter/bin/cache/dart-sdk/bin
 elif [ -d /usr/local/opt/flutter ]; then
   addpath /usr/local/opt/flutter/bin
 fi
 
-if [ -d $HOME/.pub-cache/bin ]; then
-  addpath $HOME/.pub-cache/bin
+if [ -d $PUB_CACHE/bin ]; then
+  addpath $PUB_CACHE/bin
 fi
 
 if (which fvm &> /dev/null); then
