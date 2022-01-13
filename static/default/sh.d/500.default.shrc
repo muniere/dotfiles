@@ -86,6 +86,11 @@ if (which fzf &> /dev/null); then
 fi
 
 # =====
+# gibo
+# =====
+export GIBO_BOILERPLATES="$XDG_CACHE_HOME/gibo"
+
+# =====
 # npm
 # =====
 
