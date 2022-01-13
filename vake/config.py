@@ -322,8 +322,8 @@ class GitCookBook(CookBook):
     def recipes(self) -> list[PrefRecipe]:
         return [
             PrefRecipe.create(
-                src='gitconfig',
-                dst='~/.gitconfig'
+                src='git/',
+                dst='~/.config/git'
             ),
             PrefRecipe.create(
                 src='tigrc',
