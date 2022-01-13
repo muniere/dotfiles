@@ -123,7 +123,9 @@ class PrefLinkAction(PrefAction):
     def perform(self, books: list[CookBook]):
         identity = kernel.identify()
 
-        for book in books:
+        for i, book in enumerate(books, start=1):
+            self._logger.mark(f"{book.name} Launched ({i:02}/{len(books)})".ljust(80), bold=True)
+
             for recipe in book.recipes:
                 if recipe.src.is_absolute():
                     chains = recipe.expand()
@@ -238,7 +240,9 @@ class PrefUnlinkAction(PrefAction):
     def perform(self, books: list[CookBook]):
         identity = kernel.identify()
 
-        for book in books:
+        for i, book in enumerate(books, start=1):
+            self._logger.mark(f"{book.name} Launched ({i:02}/{len(books)})".ljust(80), bold=True)
+
             if self._deactivate:
                 book.deactivate()
 

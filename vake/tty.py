@@ -12,8 +12,12 @@ class Color(Enum):
     WHITE = 37
     RESET = 39
 
-    def decorate(self, obj: object) -> str:
-        return f'{self.escape()}{obj}{Color.RESET.escape()}'
+    def decorate(self, obj: object, bold: bool = False) -> str:
+        base = f'{self.escape()}{obj}{Color.RESET.escape()}'
+        if bold:
+            return f'\033[1m{base}\033[0m'
+        else:
+            return base
 
     def escape(self):
         return f'\033[{self.value}m'

@@ -105,6 +105,10 @@ class SnipRecipe:
 
 class CookBook(metaclass=ABCMeta):
     @property
+    def name(self) -> str:
+        return type(self).__name__
+
+    @property
     @abstractmethod
     def recipes(self) -> list[PrefRecipe]:
         raise NotImplementedError()

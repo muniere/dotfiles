@@ -15,6 +15,7 @@ __all__ = [
 class Level(Enum):
     DEBUG = 10
     TRACE = 15
+    MARK = 18
     INFO = 20
     WARN = 30
     ERROR = 40
@@ -29,6 +30,7 @@ class ColorPalette:
         return ColorPalette({
             Level.DEBUG.value: Color.GREEN,
             Level.TRACE.value: Color.MAGENTA,
+            Level.MARK.value: Color.WHITE,
             Level.INFO.value: Color.CYAN,
             Level.WARN.value: Color.YELLOW,
             Level.ERROR.value: Color.RESET,
@@ -65,7 +67,9 @@ class TaggedFormatter(logging.Formatter):
             return message
 
         color = self.__palette.get(record.levelno)
-        return color.decorate(message)
+        bold = record.__dict__.get('bold', False)
+
+        return color.decorate(message, bold=bold)
 
 
 class StreamHandler(logging.StreamHandler):
@@ -101,27 +105,31 @@ class Lumber(metaclass=ABCMeta):
         return NoopLumber()
 
     @abstractmethod
-    def debug(self, msg: object, terminate: bool = False):
+    def debug(self, msg: object, terminate: bool = False, bold: bool = False):
         pass
 
     @abstractmethod
-    def info(self, msg: object, terminate: bool = False):
+    def info(self, msg: object, terminate: bool = False, bold: bool = False):
         pass
 
     @abstractmethod
-    def warn(self, msg: object, terminate: bool = False):
+    def warn(self, msg: object, terminate: bool = False, bold: bool = False):
         pass
 
     @abstractmethod
-    def warning(self, msg: object, terminate: bool = False):
+    def warning(self, msg: object, terminate: bool = False, bold: bool = False):
         pass
 
     @abstractmethod
-    def error(self, msg: object, terminate: bool = False):
+    def error(self, msg: object, terminate: bool = False, bold: bool = False):
         pass
 
     @abstractmethod
-    def trace(self, msg: object, terminate: bool = False):
+    def mark(self, msg: object, terminate: bool = False, bold: bool = False):
+        pass
+
+    @abstractmethod
+    def trace(self, msg: object, terminate: bool = False, bold: bool = False):
         pass
 
     @abstractmethod
@@ -138,23 +146,26 @@ class DefaultLumber(Lumber):
     def __init__(self, delegate: logging.Logger):
         self._delegate = delegate
 
-    def debug(self, msg: object, terminate: bool = True):
-        self._delegate.debug(msg, extra={'terminate': terminate})
+    def debug(self, msg: object, terminate: bool = True, bold: bool = False):
+        self._delegate.debug(msg, extra={'terminate': terminate, 'bold': bold})
 
-    def info(self, msg: object, terminate: bool = True):
-        self._delegate.info(msg, extra={'terminate': terminate})
+    def info(self, msg: object, terminate: bool = True, bold: bool = False):
+        self._delegate.info(msg, extra={'terminate': terminate, 'bold': bold})
 
-    def warn(self, msg: object, terminate: bool = True):
-        self._delegate.warning(msg, extra={'terminate': terminate})
+    def warn(self, msg: object, terminate: bool = True, bold: bool = False):
+        self._delegate.warning(msg, extra={'terminate': terminate, 'bold': bold})
 
-    def warning(self, msg: object, terminate: bool = True):
-        self._delegate.warning(msg, extra={'terminate': terminate})
+    def warning(self, msg: object, terminate: bool = True, bold: bool = False):
+        self._delegate.warning(msg, extra={'terminate': terminate, 'bold': bold})
 
-    def error(self, msg: object, terminate: bool = True):
-        self._delegate.error(msg, extra={'terminate': terminate})
+    def error(self, msg: object, terminate: bool = True, bold: bool = False):
+        self._delegate.error(msg, extra={'terminate': terminate, 'bold': bold})
 
-    def trace(self, msg, terminate: bool = True):
-        self._delegate.log(Level.TRACE.value, msg, extra={'terminate': terminate})
+    def mark(self, msg: object, terminate: bool = True, bold: bool = False):
+        self._delegate.log(Level.MARK.value, msg, extra={'terminate': terminate, 'bold': bold})
+
+    def trace(self, msg, terminate: bool = True, bold: bool = False):
+        self._delegate.log(Level.TRACE.value, msg, extra={'terminate': terminate, 'bold': bold})
 
     def set_level(self, level: Level):
         self._delegate.setLevel(level.value)
@@ -165,22 +176,25 @@ class DefaultLumber(Lumber):
 
 class NoopLumber(Lumber):
 
-    def debug(self, msg: object, terminate: bool = True):
+    def debug(self, msg: object, terminate: bool = True, bold: bool = False):
         pass
 
-    def info(self, msg: object, terminate: bool = True):
+    def info(self, msg: object, terminate: bool = True, bold: bool = False):
         pass
 
-    def warn(self, msg: object, terminate: bool = True):
+    def warn(self, msg: object, terminate: bool = True, bold: bool = False):
         pass
 
-    def warning(self, msg: object, terminate: bool = True):
+    def warning(self, msg: object, terminate: bool = True, bold: bool = False):
         pass
 
-    def error(self, msg: object, terminate: bool = True):
+    def error(self, msg: object, terminate: bool = True, bold: bool = False):
         pass
 
-    def trace(self, msg: object, terminate: bool = True):
+    def mark(self, msg: object, terminate: bool = True, bold: bool = False):
+        pass
+
+    def trace(self, msg: object, terminate: bool = True, bold: bool = False):
         pass
 
     def set_level(self, level: Level):
@@ -197,6 +211,7 @@ def get_logger(name: str) -> Lumber:
 def bootstrap():
     logging.addLevelName(Level.DEBUG.value, 'DEBUG')
     logging.addLevelName(Level.TRACE.value, 'TRACE')
+    logging.addLevelName(Level.MARK.value, 'MARK')
     logging.addLevelName(Level.INFO.value, 'INFO')
     logging.addLevelName(Level.WARN.value, 'WARN')
     logging.addLevelName(Level.ERROR.value, 'ERROR')
