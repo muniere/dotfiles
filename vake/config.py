@@ -132,7 +132,7 @@ class BinCookBook(CookBook):
     def recipes(self) -> list[PrefRecipe]:
         return [
             PrefRecipe.create(
-                src='bin',
+                src='bin/',
                 dst='~/.bin'
             ),
         ]
@@ -143,7 +143,7 @@ class ShCookBook(CookBook):
     def recipes(self) -> list[PrefRecipe]:
         return [
             PrefRecipe.create(
-                src='sh.d',
+                src='sh.d/',
                 dst='~/.sh.d'
             ),
         ]
@@ -152,7 +152,7 @@ class ShCookBook(CookBook):
     def snippets(self) -> list[SnipRecipe]:
         return [
             SnipRecipe.create(
-                src='shrc',
+                src='shrc/',
                 dst='~/.shrc'
             ),
         ]
@@ -163,11 +163,11 @@ class BashCookBook(CookBook):
     def recipes(self) -> list[PrefRecipe]:
         return [
             PrefRecipe.create(
-                src='bash.d',
+                src='bash.d/',
                 dst='~/.bash.d'
             ),
             PrefRecipe.create(
-                src='bash_completion.d',
+                src='bash_completion.d/',
                 dst='~/.bash_completion.d'
             ),
             PrefRecipe.create(
@@ -215,11 +215,11 @@ class ZshCookBook(CookBook):
     def recipes(self) -> list[PrefRecipe]:
         return [
             PrefRecipe.create(
-                src='zsh.d',
+                src='zsh.d/',
                 dst='~/.zsh.d',
             ),
             PrefRecipe.create(
-                src='zsh-completions',
+                src='zsh-completions/',
                 dst='~/.zsh-completions'
             ),
             PrefRecipe.create(
@@ -284,7 +284,7 @@ class VimCookBook(CookBook):
                 dst='~/.vimrc'
             ),
             PrefRecipe.create(
-                src='vim',
+                src='vim/',
                 dst='~/.vim',
             ),
         ]
@@ -337,7 +337,7 @@ class GitHubCookBook(CookBook):
     def recipes(self) -> list[PrefRecipe]:
         return [
             PrefRecipe.create(
-                src='gh-extensions',
+                src='gh-extensions/',
                 dst='~/.local/share/gh/extensions'
             ),
         ]
@@ -434,7 +434,7 @@ class XcodeCookBook(CookBook):
     def recipes(self) -> list[PrefRecipe]:
         return [
             *PrefRecipe.glob(
-                src='Xcode',
+                src='Xcode/',
                 dst='~/Library/Developer/Xcode',
             )
         ]
@@ -449,11 +449,11 @@ class IntelliJIdeaCookBook(CookBook):
     def recipes(self) -> list[PrefRecipe]:
         return [
             *PrefRecipe.glob(
-                src='IntelliJIdea',
+                src='IntelliJIdea/',
                 dst='~/Library/Preferences/IntelliJIdea*',
             ),
             *PrefRecipe.glob(
-                src='IntelliJIdea',
+                src='IntelliJIdea/',
                 dst='~/Library/ApplicationSupport/JetBrains/IntelliJIdea*',
             ),
         ]
@@ -468,11 +468,11 @@ class AndroidStudioCookBook(CookBook):
     def recipes(self) -> list[PrefRecipe]:
         return [
             *PrefRecipe.glob(
-                src='AndroidStudio',
+                src='AndroidStudio/',
                 dst='~/Library/Preferences/AndroidStudio*',
             ),
             *PrefRecipe.glob(
-                src='AndroidStudio',
+                src='AndroidStudio/',
                 dst='~/Library/ApplicationSupport/Google/AndroidStudio*',
             ),
         ]
@@ -487,11 +487,11 @@ class AppCodeCookBook(CookBook):
     def recipes(self) -> list[PrefRecipe]:
         return [
             *PrefRecipe.glob(
-                src='AppCode',
+                src='AppCode/',
                 dst='~/Library/Preferences/AppCode*',
             ),
             *PrefRecipe.glob(
-                src='AppCode',
+                src='AppCode/',
                 dst='~/Library/ApplicationSupport/JetBrains/AppCode*',
             ),
         ]
@@ -506,11 +506,11 @@ class RubyMineCookBook(CookBook):
     def recipes(self) -> list[PrefRecipe]:
         return [
             *PrefRecipe.glob(
-                src='RubyMine',
+                src='RubyMine/',
                 dst='~/Library/Preferences/RubyMine*',
             ),
             *PrefRecipe.glob(
-                src='RubyMine',
+                src='RubyMine/',
                 dst='~/Library/ApplicationSupport/JetBrains/RubyMine*',
             ),
         ]
@@ -525,11 +525,11 @@ class GoLandCookBook(CookBook):
     def recipes(self) -> list[PrefRecipe]:
         return [
             *PrefRecipe.glob(
-                src='GoLand',
+                src='GoLand/',
                 dst='~/Library/Preferences/GoLand*',
             ),
             *PrefRecipe.glob(
-                src='GoLand',
+                src='GoLand/',
                 dst='~/Library/ApplicationSupport/JetBrains/GoLand*',
             ),
         ]
@@ -544,11 +544,11 @@ class CLionCookBook(CookBook):
     def recipes(self) -> list[PrefRecipe]:
         return [
             *PrefRecipe.glob(
-                src='CLion',
+                src='CLion/',
                 dst='~/Library/Preferences/CLion*',
             ),
             *PrefRecipe.glob(
-                src='CLion',
+                src='CLion/',
                 dst='~/Library/ApplicationSupport/JetBrains/CLion*',
             ),
         ]
@@ -563,11 +563,11 @@ class RiderCookBook(CookBook):
     def recipes(self) -> list[PrefRecipe]:
         return [
             *PrefRecipe.glob(
-                src='Rider',
+                src='Rider/',
                 dst='~/Library/Preferences/Rider*',
             ),
             *PrefRecipe.glob(
-                src='Rider',
+                src='Rider/',
                 dst='~/Library/ApplicationSupport/JetBrains/Rider*',
             ),
         ]
