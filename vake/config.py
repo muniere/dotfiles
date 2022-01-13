@@ -382,8 +382,8 @@ class AsdfCookBook(CookBook):
     def recipes(self) -> list[PrefRecipe]:
         return [
             PrefRecipe.create(
-                src='asdfrc',
-                dst='~/.asdfrc'
+                src='asdf/',
+                dst='~/.config/asdf'
             ),
         ]
 
