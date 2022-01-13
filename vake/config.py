@@ -439,7 +439,7 @@ class BrewCookBook(CookBook):
         return [
             PrefRecipe.create(
                 src='Brewfile',
-                dst='~/.Brewfile',
+                dst='~/.config/homebrew/Brewfile',
             ),
         ]
 
@@ -452,7 +452,7 @@ class BrewCookBook(CookBook):
             return
 
         shell.call(
-            cmd='brew bundle install --global',
+            cmd='brew bundle install --file ~/.config/homebrew/Brewfile --no-lock',
             logger=self.logger,
             noop=self.noop,
         )
