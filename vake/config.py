@@ -397,8 +397,8 @@ class TmuxCookBook(CookBook):
     def recipes(self) -> list[PrefRecipe]:
         return [
             PrefRecipe.create(
-                src='tmux.conf',
-                dst='~/.tmux.conf'
+                src='tmux/',
+                dst='~/.config/tmux'
             ),
         ]
 
