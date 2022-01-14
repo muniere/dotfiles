@@ -429,6 +429,17 @@ class GradleCookBook(CookBook):
         return True
 
 
+class NpmCookBook(CookBook):
+    @property
+    def recipes(self) -> list[PrefRecipe]:
+        return [
+            PrefRecipe.create(
+                src='npm/',
+                dst='~/.config/npm'
+            ),
+        ]
+
+
 class BrewCookBook(CookBook):
     logger: Lumber
     noop: bool
