@@ -35,12 +35,16 @@ fi
 # =====
 # CocoaPods
 # =====
-export CP_HOME_DIR="$XDG_CACHE_HOME/cocoapods"
+if [ -n "$XDG_CACHE_HOME" ]; then
+  export CP_HOME_DIR="$XDG_CACHE_HOME/cocoapods"
+fi
 
 # =====
 # Flutter
 # =====
-export PUB_CACHE="$XDG_CACHE_HOME/pub"
+if [ -n "$XDG_CACHE_HOME" ]; then
+  export PUB_CACHE="$XDG_CACHE_HOME/pub"
+fi
 
 if [ -d /usr/local/opt/flutter/bin/cache/dart-sdk/bin/ ]; then
   addpath /usr/local/opt/flutter/bin /usr/local/opt/flutter/bin/cache/dart-sdk/bin
