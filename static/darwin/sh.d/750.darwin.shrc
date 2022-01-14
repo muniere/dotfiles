@@ -40,7 +40,7 @@ export CP_HOME_DIR="$XDG_CACHE_HOME/cocoapods"
 # =====
 # Flutter
 # =====
-export PUB_CACHE="$HOME/.cache/pub"
+export PUB_CACHE="$XDG_CACHE_HOME/pub"
 
 if [ -d /usr/local/opt/flutter/bin/cache/dart-sdk/bin/ ]; then
   addpath /usr/local/opt/flutter/bin /usr/local/opt/flutter/bin/cache/dart-sdk/bin
