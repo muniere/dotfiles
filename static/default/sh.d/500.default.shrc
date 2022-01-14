@@ -18,6 +18,19 @@ if [ -n "$XDG_CONFIG_HOME" ]; then
 fi
 
 # =====
+# Ruby / Bundler
+# =====
+if [ -n "$XDG_CACHE_HOME" ]; then
+  export BUNDLE_USER_CACHE="$XDG_CACHE_HOME/bundle"
+fi
+if [ -n "$XDG_CONFIG_HOME" ]; then
+  export BUNDLE_USER_CONFIG="$XDG_CONFIG_HOME/bundle/config"
+fi
+if [ -n "$XDG_DATA_HOME" ]; then
+  export BUNDLE_USER_PLUGIN="$XDG_DATA_HOME/bundle/plugin"
+fi
+
+# =====
 # asdf
 # =====
 if (which asdf &> /dev/null); then

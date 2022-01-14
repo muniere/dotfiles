@@ -51,6 +51,7 @@ class PrefAction(Action, metaclass=ABCMeta):
             config.TmuxCookBook(),
             config.RangerCookBook(),
             config.GradleCookBook(),
+            config.RubyCookBook(),
             config.NpmCookBook(),
         ]
 

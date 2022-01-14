@@ -429,6 +429,17 @@ class GradleCookBook(CookBook):
         return True
 
 
+class RubyCookBook(CookBook):
+    @property
+    def recipes(self) -> list[PrefRecipe]:
+        return [
+            PrefRecipe.create(
+                src='bundle/',
+                dst='~/.config/bundle'
+            ),
+        ]
+
+
 class NpmCookBook(CookBook):
     @property
     def recipes(self) -> list[PrefRecipe]:
