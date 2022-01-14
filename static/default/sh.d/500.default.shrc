@@ -12,7 +12,10 @@ addpath $HOME/.local/bin /usr/local/bin /usr/local/sbin /usr/bin /bin /usr/sbin 
 # =====
 export PYTHONDONTWRITEBYTECODE=1
 export PIPENV_VENV_IN_PROJECT=true
-export IPYTHONDIR="$HOME/.config/ipython"
+
+if [ -n "$XDG_CONFIG_HOME" ]; then
+  export IPYTHONDIR="$XDG_CONFIG_HOME/ipython"
+fi
 
 # =====
 # asdf
