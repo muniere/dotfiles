@@ -33,6 +33,11 @@ if [ -d ${HOME}/Library/Android/sdk/platform-tools ]; then
 fi
 
 # =====
+# CocoaPods
+# =====
+export CP_HOME_DIR="$XDG_CACHE_HOME/cocoapods"
+
+# =====
 # Flutter
 # =====
 export PUB_CACHE="$HOME/.cache/pub"
