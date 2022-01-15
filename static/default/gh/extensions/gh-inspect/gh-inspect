@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+if [ $# -eq 0 ]; then
+    echo "no commit hash given. abort." >&2
+    exit 1
+fi
+
+url="$(gh browse --branch $1 --no-browser)"
+open "${url/tree/commit}"

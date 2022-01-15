@@ -375,8 +375,8 @@ class GitHubCookBook(CookBook):
     def recipes(self) -> list[PrefRecipe]:
         return [
             PrefRecipe.create(
-                src='gh-extensions/',
-                dst='~/.local/share/gh/extensions'
+                src='gh/',
+                dst='~/.local/share/gh'
             ),
         ]
 
