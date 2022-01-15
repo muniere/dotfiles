@@ -121,11 +121,31 @@ class CookBook(metaclass=ABCMeta):
     def private(self) -> bool:
         return False
 
-    def activate(self):
+    def activate(self, logger: Lumber = Lumber.noop(), noop: bool = False):
         pass
 
-    def deactivate(self):
+    def deactivate(self, logger: Lumber = Lumber.noop(), noop: bool = False):
         pass
+
+    @staticmethod
+    def _mkdir(path: Path, logger: Lumber = Lumber.noop(), noop: bool = False) -> bool:
+        logger.trace(f'mkdir -p {path}')
+
+        if noop:
+            return False
+
+        path.mkdir(parents=True, exist_ok=True)
+        return True
+
+    @staticmethod
+    def _touch(path: Path, logger: Lumber = Lumber.noop(), noop: bool = False) -> bool:
+        logger.trace(f'touch {path}')
+
+        if noop:
+            return False
+
+        path.touch(exist_ok=True)
+        return True
 
 
 # ==
@@ -207,14 +227,6 @@ class BashCookBook(CookBook):
 
 
 class ZshCookBook(CookBook):
-    logger: Lumber
-    noop: bool
-
-    def __init__(self, logger: Lumber = Lumber.noop(), noop: bool = False):
-        super().__init__()
-        self.logger = logger
-        self.noop = noop
-
     @property
     def recipes(self) -> list[PrefRecipe]:
         return [
@@ -245,41 +257,30 @@ class ZshCookBook(CookBook):
             ),
         ]
 
-    def activate(self):
+    def activate(self, logger: Lumber = Lumber.noop(), noop: bool = False):
         url = 'https://git.io/zinit-install'
 
         shell.call(
             cmd=f'sh -c "NO_EMOJI=1 NO_EDIT=1 NO_TUTORIAL=1 $(curl -fSL {url})"',
-            logger=self.logger,
-            noop=self.noop,
+            logger=logger,
+            noop=noop,
         )
 
         try:
             shell.which('zsh')
         except shell.SubprocessError:
-            self.logger.warn('skip updating zsh plugins. command not found: zsh')
+            logger.warn('skip updating zsh plugins. command not found: zsh')
             return
 
         shell.call(
             cmd='zsh -i -c "zinit update --all"',
-            logger=self.logger,
-            noop=self.noop,
+            logger=logger,
+            noop=noop,
         )
         return
 
-    def deactivate(self):
-        pass
-
 
 class VimCookBook(CookBook):
-    logger: Lumber
-    noop: bool
-
-    def __init__(self, logger: Lumber = Lumber.noop(), noop: bool = False):
-        super().__init__()
-        self.logger = logger
-        self.noop = noop
-
     @property
     def recipes(self) -> list[PrefRecipe]:
         return [
@@ -293,43 +294,32 @@ class VimCookBook(CookBook):
             ),
         ]
 
-    def activate(self):
+    def activate(self, logger: Lumber = Lumber.noop(), noop: bool = False):
         url = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
         out = '~/.vim/autoload/plug.vim'
 
         shell.call(
             cmd=f'sh -c "curl -fSL -o {out} --create-dirs {url}"',
-            logger=self.logger,
-            noop=self.noop,
+            logger=logger,
+            noop=noop,
         )
 
         try:
             shell.which('vim')
         except shell.SubprocessError:
-            self.logger.warn('skip updating vim plugins. command not found: vim')
+            logger.warn('skip updating vim plugins. command not found: vim')
             return
 
         shell.call(
             cmd='vim +PlugInstall +qall >/dev/null 2>&1',
-            logger=self.logger,
-            noop=self.noop,
+            logger=logger,
+            noop=noop,
         )
 
         return
 
-    def deactivate(self):
-        pass
-
 
 class GitCookBook(CookBook):
-    logger: Lumber
-    noop: bool
-
-    def __init__(self, logger: Lumber = Lumber.noop(), noop: bool = False):
-        super().__init__()
-        self.logger = logger
-        self.noop = noop
-
     @property
     def recipes(self) -> list[PrefRecipe]:
         return [
@@ -343,31 +333,13 @@ class GitCookBook(CookBook):
             ),
         ]
 
-    def activate(self):
+    def activate(self, logger: Lumber = Lumber.noop(), noop: bool = False):
         hist = Path('~/.local/share/tig/history').expanduser()
 
         if not hist.parent.is_dir():
-            self.__mkdir(hist.parent)
+            self._mkdir(hist.parent, logger=logger, noop=noop)
 
-        self.__touch(hist)
-
-    def __mkdir(self, path: Path) -> bool:
-        self.logger.trace(f'mkdir -p {path}')
-
-        if self.noop:
-            return False
-
-        path.mkdir(parents=True, exist_ok=True)
-        return True
-
-    def __touch(self, path: Path) -> bool:
-        self.logger.trace(f'touch {path}')
-
-        if self.noop:
-            return False
-
-        path.touch(exist_ok=True)
-        return True
+        self._touch(hist, logger=logger, noop=noop)
 
 
 class GitHubCookBook(CookBook):
@@ -441,14 +413,6 @@ class RubyCookBook(CookBook):
 
 
 class NodeCookBook(CookBook):
-    logger: Lumber
-    noop: bool
-
-    def __init__(self, logger: Lumber = Lumber.noop(), noop: bool = False):
-        super().__init__()
-        self.logger = logger
-        self.noop = noop
-
     @property
     def recipes(self) -> list[PrefRecipe]:
         return [
@@ -458,41 +422,16 @@ class NodeCookBook(CookBook):
             ),
         ]
 
-    def activate(self):
+    def activate(self, logger: Lumber = Lumber.noop(), noop: bool = False):
         hist = Path('~/.local/share/node/history').expanduser()
 
         if not hist.parent.is_dir():
-            self.__mkdir(hist.parent)
+            self._mkdir(hist.parent, logger=logger, noop=noop)
 
-        self.__touch(hist)
-
-    def __mkdir(self, path: Path) -> bool:
-        self.logger.trace(f'mkdir -p {path}')
-
-        if self.noop:
-            return False
-
-        path.mkdir(parents=True, exist_ok=True)
-        return True
-
-    def __touch(self, path: Path) -> bool:
-        self.logger.trace(f'touch {path}')
-
-        if self.noop:
-            return False
-
-        path.touch(exist_ok=True)
-        return True
+        self._touch(hist, logger=logger, noop=noop)
 
 
 class BrewCookBook(CookBook):
-    logger: Lumber
-    noop: bool
-
-    def __init__(self, logger: Lumber = Lumber.noop(), noop: bool = False):
-        super().__init__()
-        self.logger = logger
-        self.noop = noop
 
     @property
     def recipes(self) -> list[PrefRecipe]:
@@ -504,23 +443,20 @@ class BrewCookBook(CookBook):
         ]
 
     # noinspection PyBroadException
-    def activate(self):
+    def activate(self, logger: Lumber = Lumber.noop(), noop: bool = False):
         try:
             shell.which('brew')
         except shell.SubprocessError:
-            self.logger.warn('skip bundle. command not found: brew')
+            logger.warn('skip bundle. command not found: brew')
             return
 
         shell.call(
             cmd='brew bundle install --file ~/.config/homebrew/Brewfile --no-lock',
-            logger=self.logger,
-            noop=self.noop,
+            logger=logger,
+            noop=noop,
         )
 
         return
-
-    def deactivate(self):
-        pass
 
 
 class XcodeCookBook(CookBook):

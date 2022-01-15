@@ -35,7 +35,7 @@ class Action(metaclass=ABCMeta):
 # ==
 class PrefAction(Action, metaclass=ABCMeta):
     @staticmethod
-    def _books(logger: Lumber = Lumber.noop(), noop: bool = False, reverse: bool = False) -> list[CookBook]:
+    def _books(reverse: bool = False) -> list[CookBook]:
         identity = kernel.identify()
 
         # shared
@@ -43,16 +43,16 @@ class PrefAction(Action, metaclass=ABCMeta):
             config.BinCookBook(),
             config.ShCookBook(),
             config.BashCookBook(),
-            config.ZshCookBook(logger=logger, noop=noop),
-            config.VimCookBook(logger=logger, noop=noop),
-            config.GitCookBook(logger=logger, noop=noop),
+            config.ZshCookBook(),
+            config.VimCookBook(),
+            config.GitCookBook(),
             config.GitHubCookBook(),
             config.AsdfCookBook(),
             config.TmuxCookBook(),
             config.RangerCookBook(),
             config.GradleCookBook(),
             config.RubyCookBook(),
-            config.NodeCookBook(logger=logger, noop=noop),
+            config.NodeCookBook(),
         ]
 
         pre_books: list[CookBook] = []
@@ -66,7 +66,7 @@ class PrefAction(Action, metaclass=ABCMeta):
         # darwin
         if identity.is_darwin():
             pre_books += [
-                config.BrewCookBook(logger=logger, noop=noop),
+                config.BrewCookBook(),
             ]
             post_books += [
                 config.XcodeCookBook(),
@@ -115,7 +115,7 @@ class PrefLinkAction(PrefAction):
         return
 
     def run(self):
-        books = self._books(logger=self._logger, noop=self._noop, reverse=False)
+        books = self._books(reverse=False)
 
         if self._cleanup:
             PrefCleanupAction(logger=self._logger, noop=self._noop).perform(books)
@@ -142,7 +142,7 @@ class PrefLinkAction(PrefAction):
                 self.__enable(snippet)
 
             if self._activate:
-                book.activate()
+                book.activate(logger=self._logger, noop=self._noop)
 
     def __link(self, chain: PrefChain) -> bool:
         if not self._test(chain.src):
@@ -232,7 +232,7 @@ class PrefUnlinkAction(PrefAction):
         return
 
     def run(self):
-        books = self._books(logger=self._logger, noop=self._noop, reverse=True)
+        books = self._books(reverse=True)
 
         if self._cleanup:
             PrefCleanupAction(logger=self._logger, noop=self._noop).perform(books)
@@ -246,7 +246,7 @@ class PrefUnlinkAction(PrefAction):
             self._logger.mark(f"{book.name} Launched ({i:02}/{len(books)})".ljust(80), bold=True)
 
             if self._deactivate:
-                book.deactivate()
+                book.deactivate(logger=self._logger, noop=self._noop)
 
             for snippet in book.snippets:
                 self.__disable(snippet)
@@ -346,7 +346,7 @@ class PrefListAction(PrefAction):
 
     def run(self):
         identity = kernel.identify()
-        books = self._books(logger=Lumber.noop(), noop=False)
+        books = self._books()
 
         chains: list[PrefChain] = []
 
@@ -444,7 +444,7 @@ class PrefCleanupAction(PrefAction):
         return
 
     def run(self):
-        books = self._books(logger=self._logger, noop=self._noop)
+        books = self._books()
         return self.perform(books)
 
     def perform(self, books: list[CookBook]):
