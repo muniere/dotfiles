@@ -127,7 +127,14 @@ if [ -n "$XDG_CACHE_HOME" ]; then
 fi
 
 # =====
-# npm
+# Node.js
+# =====
+if [ -n "$XDG_DATA_HOME" ]; then
+  export NODE_REPL_HISTORY="$XDG_DATA_HOME/node/history"
+fi
+
+# =====
+# Node.js / npm
 # =====
 if [ -n "$XDG_CONFIG_HOME" ]; then
   export NPM_CONFIG_USERCONFIG="$XDG_CONFIG_HOME/npm/config"

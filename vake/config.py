@@ -440,7 +440,15 @@ class RubyCookBook(CookBook):
         ]
 
 
-class NpmCookBook(CookBook):
+class NodeCookBook(CookBook):
+    logger: Lumber
+    noop: bool
+
+    def __init__(self, logger: Lumber = Lumber.noop(), noop: bool = False):
+        super().__init__()
+        self.logger = logger
+        self.noop = noop
+
     @property
     def recipes(self) -> list[PrefRecipe]:
         return [
@@ -449,6 +457,32 @@ class NpmCookBook(CookBook):
                 dst='~/.config/npm'
             ),
         ]
+
+    def activate(self):
+        hist = Path('~/.local/share/node/history').expanduser()
+
+        if not hist.parent.is_dir():
+            self.__mkdir(hist.parent)
+
+        self.__touch(hist)
+
+    def __mkdir(self, path: Path) -> bool:
+        self.logger.trace(f'mkdir -p {path}')
+
+        if self.noop:
+            return False
+
+        path.mkdir(parents=True, exist_ok=True)
+        return True
+
+    def __touch(self, path: Path) -> bool:
+        self.logger.trace(f'touch {path}')
+
+        if self.noop:
+            return False
+
+        path.touch(exist_ok=True)
+        return True
 
 
 class BrewCookBook(CookBook):

@@ -52,7 +52,7 @@ class PrefAction(Action, metaclass=ABCMeta):
             config.RangerCookBook(),
             config.GradleCookBook(),
             config.RubyCookBook(),
-            config.NpmCookBook(),
+            config.NodeCookBook(logger=logger, noop=noop),
         ]
 
         pre_books: list[CookBook] = []
