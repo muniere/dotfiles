@@ -183,8 +183,6 @@ let g:lightline = {
   \ }
 
 " == Text Editing
-Plug 'vim-scripts/Align'
-
 Plug 'vim-scripts/surround.vim'
 
 Plug 'editorconfig/editorconfig-vim'
