@@ -188,19 +188,22 @@ Plug 'vim-scripts/surround.vim'
 Plug 'editorconfig/editorconfig-vim'
 
 " == Completion
-Plug 'vim-scripts/AutoComplPop'
+" https://gist.github.com/maxboisvert/a63e96a67d0a83d71e9f49af73e71d93
+set completeopt=menu,menuone,noinsert
 
-function! InsertTabWrapper()
-    let col = col('.') - 1
-    if !col || getline('.')[col - 1] !~ '\k'
-        return "\<Tab>"
-    else
-        return "\<C-y>"
-    endif
-endfunction
+inoremap <expr> <Tab> pumvisible() ? "\<C-Y>" : "\<Tab>"
 
-inoremap <Tab> <C-r>=InsertTabWrapper()<CR>
-inoremap <S-Tab> <C-n>
+autocmd InsertCharPre * call AutoComplete()
+function! AutoComplete()
+    if v:char =~ '\K'
+        \ && getline('.')[col('.') - 4] !~ '\K'
+        \ && getline('.')[col('.') - 3] =~ '\K'
+        \ && getline('.')[col('.') - 2] =~ '\K' " last char
+        \ && getline('.')[col('.') - 1] !~ '\K'
+
+        call feedkeys("\<C-N>", 't')
+    end
+endfun
 
 " == File System
 Plug 'vim-scripts/sudo.vim'
