@@ -28,8 +28,9 @@ fi
 # =====
 # Android
 # =====
-if [ -d ${HOME}/Library/Android/sdk/platform-tools ]; then
+if [ -d ${HOME}/Library/Android/sdk ]; then
   addpath "${HOME}/Library/Android/sdk/platform-tools"
+  addpath "${HOME}/Library/Android/sdk/tools/bin"
 fi
 
 # =====
