@@ -8,9 +8,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List
 
-from . import _
 from . import kernel
 from . import timber
+from .box import TernaryBox
 from .intent import Action, PrefListColorOption, PrefListStyleOption
 from .intent import PrefLinkAction, PrefUnlinkAction, PrefCleanupAction, PrefListAction
 from .timber import Level, TaggedFormatter, StreamHandler, Lumber
@@ -29,12 +29,12 @@ class Command(metaclass=abc.ABCMeta):
     def _logger(verbose: bool) -> Lumber:
         stream = sys.stdout
 
-        level = _.box(verbose).fold(
+        level = TernaryBox(verbose).fold(
             some=lambda: Level.DEBUG,
             none=lambda: Level.TRACE
         )
 
-        formatter = _.box(stream.isatty()).fold(
+        formatter = TernaryBox(stream.isatty()).fold(
             some=lambda: TaggedFormatter.colored(),
             none=lambda: TaggedFormatter.default(),
         )

@@ -4,8 +4,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List
 
-from . import _
 from . import shell
+from .box import TernaryBox
 from .timber import Lumber
 
 __all__ = [
@@ -73,13 +73,13 @@ class PrefRecipe:
     def expand(self, src_prefix: Path = Path(), dst_prefix: Path = Path()) -> List[PrefChain]:
         # resolve
         ex_src = self.src.expanduser()
-        abs_src = _.box(ex_src.is_absolute()).fold(
+        abs_src = TernaryBox(ex_src.is_absolute()).fold(
             some=lambda: Path(ex_src),
             none=lambda: Path(src_prefix, ex_src).resolve(),
         )
 
         ex_dst = self.dst.expanduser()
-        abs_dst = _.box(ex_dst.is_absolute()).fold(
+        abs_dst = TernaryBox(ex_dst.is_absolute()).fold(
             some=lambda: Path(ex_dst),
             none=lambda: Path(dst_prefix, ex_dst).resolve(),
         )

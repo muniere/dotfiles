@@ -6,10 +6,10 @@ from enum import Enum, auto
 from pathlib import Path
 from typing import TextIO, List, Tuple
 
-from . import _
 from . import config
 from . import kernel
 from . import locate
+from .box import TernaryBox
 from .config import PrefChain, CookBook, SnipRecipe
 from .timber import Lumber
 from .tty import Color
@@ -205,7 +205,7 @@ class PrefLinkAction(PrefAction):
         if self._noop:
             return False
 
-        new_str = _.box(len(dst_str)).fold(
+        new_str = TernaryBox(len(dst_str)).fold(
             some=lambda: dst_str + os.linesep + src_str + os.linesep,
             none=lambda: src_str + os.linesep,
         )

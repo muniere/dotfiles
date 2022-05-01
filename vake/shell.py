@@ -4,7 +4,7 @@ import sys
 import time
 from typing import Optional, Dict
 
-from . import _
+from .box import OptionalBox
 from .timber import Lumber
 from .tty import Looper
 
@@ -23,7 +23,7 @@ def call(
 ) -> int:
     assert len(cmd) > 0, 'cmd must not be empty'
 
-    environ = _.safe(env, {})
+    environ = OptionalBox(env).fold({})
 
     words = [f'{k}={v}' for (k, v) in environ.items()] + [cmd]
     logger.trace(' '.join(words))
@@ -42,10 +42,10 @@ def poll(
 ) -> subprocess.CompletedProcess:
     assert len(cmd) > 0, 'cmd must not be empty'
 
-    environ = _.safe(env, {})
+    environ = OptionalBox(env).fold({})
 
     with subprocess.Popen(cmd, env=environ, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True) as popen:
-        looper = _.safe(eol, Looper.dots())
+        looper = OptionalBox(eol).fold(Looper.dots())
 
         while True:
             ret = popen.poll()
@@ -73,7 +73,7 @@ def run(
 ) -> subprocess.CompletedProcess:
     assert len(cmd) > 0, 'cmd must not be empty'
 
-    environ = _.safe(env, {})
+    environ = OptionalBox(env).fold({})
 
     return subprocess.run(cmd, env=environ, capture_output=True, check=check, shell=True)
 
