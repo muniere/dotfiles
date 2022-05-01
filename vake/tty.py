@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import List
 
 
 class Color(Enum):
@@ -24,7 +25,7 @@ class Color(Enum):
 
 
 class Looper:
-    __seq: list[str]
+    __seq: List[str]
     __i: int
 
     @classmethod
@@ -43,7 +44,7 @@ class Looper:
         else:
             return Looper(list(reversed(seq)))
 
-    def __init__(self, seq: list[str]):
+    def __init__(self, seq: List[str]):
         self.__seq = seq
         self.__i = 0
 

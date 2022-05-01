@@ -2,7 +2,7 @@ import os
 import subprocess
 import sys
 import time
-from typing import Optional
+from typing import Optional, Dict
 
 from . import _
 from .timber import Lumber
@@ -17,7 +17,7 @@ SubprocessError = subprocess.SubprocessError
 
 def call(
     cmd: str,
-    env: Optional[dict[str, str]] = None,
+    env: Optional[Dict[str, str]] = None,
     logger: Lumber = Lumber.noop(),
     noop: bool = False,
 ) -> int:
@@ -36,7 +36,7 @@ def call(
 
 def poll(
     cmd: str,
-    env: Optional[dict[str, str]] = None,
+    env: Optional[Dict[str, str]] = None,
     eol: Optional[Looper] = None,
     fps: int = 10,
 ) -> subprocess.CompletedProcess:
@@ -68,7 +68,7 @@ def poll(
 
 def run(
     cmd: str,
-    env: Optional[dict[str, str]] = None,
+    env: Optional[Dict[str, str]] = None,
     check: bool = False,
 ) -> subprocess.CompletedProcess:
     assert len(cmd) > 0, 'cmd must not be empty'

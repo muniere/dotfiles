@@ -5,8 +5,8 @@ import sys
 
 import vake
 
-if sys.hexversion < 0x3090000:
-    sys.exit('python 3.9 or newer is required')
+if sys.hexversion < 0x3080000:
+    sys.exit('python 3.8 or newer is required')
 
 os.chdir(pathlib.Path(__file__).parent)
 

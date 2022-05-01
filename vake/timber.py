@@ -2,7 +2,7 @@ import logging
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional
+from typing import Optional, Dict
 
 from .tty import Color
 
@@ -23,7 +23,7 @@ class Level(Enum):
 
 @dataclass(frozen=True)
 class ColorPalette:
-    values: dict[int, Color]
+    values: Dict[int, Color]
 
     @staticmethod
     def default() -> 'ColorPalette':

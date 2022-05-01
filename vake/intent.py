@@ -4,7 +4,7 @@ import sys
 from abc import ABCMeta, abstractmethod
 from enum import Enum, auto
 from pathlib import Path
-from typing import TextIO
+from typing import TextIO, List, Tuple
 
 from . import _
 from . import config
@@ -35,11 +35,11 @@ class Action(metaclass=ABCMeta):
 # ==
 class PrefAction(Action, metaclass=ABCMeta):
     @staticmethod
-    def _books(reverse: bool = False) -> list[CookBook]:
+    def _books(reverse: bool = False) -> List[CookBook]:
         identity = kernel.identify()
 
         # shared
-        core_books: list[CookBook] = [
+        core_books: List[CookBook] = [
             config.BinCookBook(),
             config.ShCookBook(),
             config.BashCookBook(),
@@ -55,8 +55,8 @@ class PrefAction(Action, metaclass=ABCMeta):
             config.NodeCookBook(),
         ]
 
-        pre_books: list[CookBook] = []
-        post_books: list[CookBook] = []
+        pre_books: List[CookBook] = []
+        post_books: List[CookBook] = []
 
         # linux
         if identity.is_linux():
@@ -122,7 +122,7 @@ class PrefLinkAction(PrefAction):
 
         return self.perform(books)
 
-    def perform(self, books: list[CookBook]):
+    def perform(self, books: List[CookBook]):
         identity = kernel.identify()
 
         for i, book in enumerate(books, start=1):
@@ -239,7 +239,7 @@ class PrefUnlinkAction(PrefAction):
 
         return self.perform(books)
 
-    def perform(self, books: list[CookBook]):
+    def perform(self, books: List[CookBook]):
         identity = kernel.identify()
 
         for i, book in enumerate(books, start=1):
@@ -348,7 +348,7 @@ class PrefListAction(PrefAction):
         identity = kernel.identify()
         books = self._books()
 
-        chains: list[PrefChain] = []
+        chains: List[PrefChain] = []
 
         for book in books:
             for recipe in book.recipes:
@@ -409,12 +409,12 @@ class PrefListAction(PrefAction):
         return self._stream.isatty()
 
     @staticmethod
-    def __resolve(chain: PrefChain) -> tuple[Path, Path]:
+    def __resolve(chain: PrefChain) -> Tuple[Path, Path]:
         cwd = Path.cwd()
 
         return (
-            chain.src.relative_to(cwd) if chain.src.is_relative_to(cwd) else chain.src,
-            chain.dst if chain.dst.exists() else Path('(null)')
+            chain.resolve_src(cwd),
+            chain.resolve_dst(),
         )
 
     @staticmethod
@@ -447,8 +447,8 @@ class PrefCleanupAction(PrefAction):
         books = self._books()
         return self.perform(books)
 
-    def perform(self, books: list[CookBook]):
-        candidates: list[Path] = []
+    def perform(self, books: List[CookBook]):
+        candidates: List[Path] = []
 
         for book in books:
             if book.private:
@@ -456,7 +456,7 @@ class PrefCleanupAction(PrefAction):
 
             candidates += [x.dst.expanduser() for x in book.recipes]
 
-        found: list[Path] = []
+        found: List[Path] = []
 
         for path in sorted(candidates):
             message = f'Scanning {path}'
@@ -471,7 +471,7 @@ class PrefCleanupAction(PrefAction):
         return
 
     @staticmethod
-    def __scan(path: Path) -> list[Path]:
+    def __scan(path: Path) -> List[Path]:
         if path.is_symlink() and not path.exists():
             return [path]
 

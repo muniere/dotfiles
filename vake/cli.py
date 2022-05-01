@@ -6,6 +6,7 @@ from abc import abstractmethod
 from argparse import ArgumentParser, ArgumentError, Namespace
 from dataclasses import dataclass
 from pathlib import Path
+from typing import List
 
 from . import _
 from . import kernel
@@ -71,7 +72,7 @@ class ListCommand(Command):
     def run(self):
         identity = kernel.identify()
 
-        actions: list[Action] = [
+        actions: List[Action] = [
             PrefListAction(
                 color=PrefListColorOption(self.color),
                 style=PrefListStyleOption.LONG if self.long else PrefListStyleOption.SHORT,
@@ -318,7 +319,8 @@ class CompletionCommand(Command):
             filename=str(src),
             input_encoding='utf-8',
             output_encoding='utf-8',
-            bytestring_passthrough=True,
+            # TODO: uncomment after upgraded to python 3.9
+            # bytestring_passthrough=True,
         )
 
         rendered = template.render(
@@ -347,7 +349,10 @@ class CommandParser:
     __delegate: ArgumentParser
 
     def __init__(self):
-        parser = ArgumentParser(exit_on_error=False)
+        parser = ArgumentParser(
+            # TODO: uncomment after upgraded to python 3.9
+            # exit_on_error=False
+        )
         subparsers = parser.add_subparsers()
         ListCommand.Factory.register(subparsers)
         LinkCommand.Factory.register(subparsers)
@@ -375,7 +380,7 @@ class CommandParser:
         return self.__delegate._optionals._group_actions
         # pylint: enable=protected-access
 
-    def parse(self, args: list[str]) -> Command:
+    def parse(self, args: List[str]) -> Command:
         args = self.__delegate.parse_args(args)
 
         if hasattr(args, 'factory'):
@@ -391,7 +396,7 @@ class CommandParser:
         return self.__delegate.format_help()
 
 
-def run(args: list[str]) -> None:
+def run(args: List[str]) -> None:
     timber.bootstrap()
 
     parser = CommandParser()
