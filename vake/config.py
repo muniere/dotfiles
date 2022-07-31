@@ -421,7 +421,7 @@ class BrewCookBook(CookBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
-                src='Brewfile',
+                src='homebrew/Brewfile',
                 dst='~/.config/homebrew/Brewfile',
             ),
         ]
