@@ -1,5 +1,5 @@
 # =====
-# Shell
+# shell
 # =====
 export LC_ALL=C
 export LANG=en_US.UTF-8
@@ -13,58 +13,6 @@ if [ -n "$XDG_DATA_HOME" ]; then
 fi
 
 # =====
-# Python
-# =====
-export PYTHONDONTWRITEBYTECODE=1
-export PIPENV_VENV_IN_PROJECT=true
-
-if [ -n "$XDG_CONFIG_HOME" ]; then
-  export IPYTHONDIR="$XDG_CONFIG_HOME/ipython"
-fi
-
-# =====
-# Ruby / Gem
-# =====
-if [ -n "$XDG_CACHE_HOME" ]; then
-  export GEM_SPEC_CACHE="$XDG_CACHE_HOME/gem"
-fi
-
-# =====
-# Ruby / Bundler
-# =====
-if [ -n "$XDG_CACHE_HOME" ]; then
-  export BUNDLE_USER_CACHE="$XDG_CACHE_HOME/bundle"
-fi
-if [ -n "$XDG_CONFIG_HOME" ]; then
-  export BUNDLE_USER_CONFIG="$XDG_CONFIG_HOME/bundle/config"
-fi
-if [ -n "$XDG_DATA_HOME" ]; then
-  export BUNDLE_USER_PLUGIN="$XDG_DATA_HOME/bundle/plugin"
-fi
-
-# =====
-# Flutter
-# =====
-if [ -n "$XDG_CACHE_HOME" ]; then
-  export PUB_CACHE="$XDG_CACHE_HOME/pub"
-
-  if [ -d $PUB_CACHE/bin ]; then
-    addpath $PUB_CACHE/bin
-  fi
-fi
-
-# =====
-# Rust
-# =====
-if [ -n "$XDG_CACHE_HOME" ]; then
-  export CARGO_HOME="$XDG_CACHE_HOME/cargo"
-
-  if [ -d $CARGO_HOME/bin ]; then
-    addpath $CARGO_HOME/bin
-  fi
-fi
-
-# =====
 # asdf
 # =====
 if [ -n "$XDG_CONFIG_HOME" ]; then
@@ -73,6 +21,14 @@ fi
 if [ -n "$XDG_DATA_HOME" ]; then
   export ASDF_DATA_DIR="$XDG_DATA_HOME/asdf"
 fi
+
+# =====
+# gibo
+# =====
+if [ -n "$XDG_CACHE_HOME" ]; then
+  export GIBO_BOILERPLATES="$XDG_CACHE_HOME/gibo"
+fi
+
 
 # =====
 # fzf
@@ -146,11 +102,35 @@ if (which fzf &> /dev/null); then
   }
 fi
 
+
 # =====
-# gibo
+# Python
+# =====
+export PYTHONDONTWRITEBYTECODE=1
+export PIPENV_VENV_IN_PROJECT=true
+
+if [ -n "$XDG_CONFIG_HOME" ]; then
+  export IPYTHONDIR="$XDG_CONFIG_HOME/ipython"
+fi
+
+# =====
+# Ruby / Gem
 # =====
 if [ -n "$XDG_CACHE_HOME" ]; then
-  export GIBO_BOILERPLATES="$XDG_CACHE_HOME/gibo"
+  export GEM_SPEC_CACHE="$XDG_CACHE_HOME/gem"
+fi
+
+# =====
+# Ruby / Bundler
+# =====
+if [ -n "$XDG_CACHE_HOME" ]; then
+  export BUNDLE_USER_CACHE="$XDG_CACHE_HOME/bundle"
+fi
+if [ -n "$XDG_CONFIG_HOME" ]; then
+  export BUNDLE_USER_CONFIG="$XDG_CONFIG_HOME/bundle/config"
+fi
+if [ -n "$XDG_DATA_HOME" ]; then
+  export BUNDLE_USER_PLUGIN="$XDG_DATA_HOME/bundle/plugin"
 fi
 
 # =====
@@ -233,6 +213,28 @@ elif type compctl &>/dev/null; then
     IFS="$si"
   }
   compctl -K _npm_completion npm
+fi
+
+# =====
+# Dart / Flutter
+# =====
+if [ -n "$XDG_CACHE_HOME" ]; then
+  export PUB_CACHE="$XDG_CACHE_HOME/pub"
+
+  if [ -d $PUB_CACHE/bin ]; then
+    addpath $PUB_CACHE/bin
+  fi
+fi
+
+# =====
+# Rust
+# =====
+if [ -n "$XDG_CACHE_HOME" ]; then
+  export CARGO_HOME="$XDG_CACHE_HOME/cargo"
+
+  if [ -d $CARGO_HOME/bin ]; then
+    addpath $CARGO_HOME/bin
+  fi
 fi
 
 # =====
