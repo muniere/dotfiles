@@ -51,6 +51,14 @@ if [ -n "$XDG_CACHE_HOME" ]; then
 fi
 
 # =====
+# Rust
+# =====
+if [ -n "$XDG_CACHE_HOME" ]; then
+  export CARGO_HOME="$XDG_CACHE_HOME/cargo"
+  addpath "$CARGO_HOME/bin"
+fi
+
+# =====
 # asdf
 # =====
 if (which asdf &> /dev/null); then

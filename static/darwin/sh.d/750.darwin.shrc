@@ -108,13 +108,6 @@ if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
 fi
 
 # =====
-# Rust
-# =====
-if [ -d $HOME/.cargo ] ; then
-  addpath "$HOME/.cargo/bin"
-fi
-
-# =====
 # Tomcat
 # =====
 if [ -d /usr/local/opt/tomcat/libexec ]; then
