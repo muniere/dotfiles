@@ -298,10 +298,6 @@ class VimCookBook(CookBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
-                src='vimrc',
-                dst='~/.vimrc'
-            ),
-            PrefRecipe.create(
                 src='vim/',
                 dst='~/.vim',
             ),
