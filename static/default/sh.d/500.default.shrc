@@ -47,7 +47,10 @@ fi
 # =====
 if [ -n "$XDG_CACHE_HOME" ]; then
   export PUB_CACHE="$XDG_CACHE_HOME/pub"
-  addpath $PUB_CACHE/bin
+
+  if [ -d $PUB_CACHE/bin ]; then
+    addpath $PUB_CACHE/bin
+  fi
 fi
 
 # =====
@@ -55,7 +58,10 @@ fi
 # =====
 if [ -n "$XDG_CACHE_HOME" ]; then
   export CARGO_HOME="$XDG_CACHE_HOME/cargo"
-  addpath "$CARGO_HOME/bin"
+
+  if [ -d $CARGO_HOME/bin ]; then
+    addpath $CARGO_HOME/bin
+  fi
 fi
 
 # =====
