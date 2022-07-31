@@ -1,8 +1,8 @@
 from pathlib import Path
 
 
-def static() -> Path:
-    return Path('./static')
+def recipe() -> Path:
+    return Path('./recipe')
 
 
 def snippet() -> Path:

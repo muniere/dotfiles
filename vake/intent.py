@@ -132,8 +132,8 @@ class PrefLinkAction(PrefAction):
                 if recipe.src.is_absolute():
                     chains = recipe.expand()
                 else:
-                    chains = recipe.expand(src_prefix=Path(locate.static(), identity.value)) + \
-                             recipe.expand(src_prefix=Path(locate.static(), 'default'))
+                    chains = recipe.expand(src_prefix=Path(locate.recipe(), identity.value)) + \
+                             recipe.expand(src_prefix=Path(locate.recipe(), 'default'))
 
                 for chain in chains:
                     self.__link(chain)
@@ -255,8 +255,8 @@ class PrefUnlinkAction(PrefAction):
                 if recipe.src.is_absolute():
                     chains = recipe.expand()
                 else:
-                    chains = recipe.expand(src_prefix=Path(locate.static(), identity.value)) + \
-                             recipe.expand(src_prefix=Path(locate.static(), 'default'))
+                    chains = recipe.expand(src_prefix=Path(locate.recipe(), identity.value)) + \
+                             recipe.expand(src_prefix=Path(locate.recipe(), 'default'))
 
                 for chain in chains:
                     self.__unlink(chain)
@@ -355,8 +355,8 @@ class PrefListAction(PrefAction):
                 if recipe.src.is_absolute():
                     chains += recipe.expand()
                 else:
-                    chains += recipe.expand(src_prefix=Path(locate.static(), identity.value))
-                    chains += recipe.expand(src_prefix=Path(locate.static(), 'default'))
+                    chains += recipe.expand(src_prefix=Path(locate.recipe(), identity.value))
+                    chains += recipe.expand(src_prefix=Path(locate.recipe(), 'default'))
 
         chains.sort(key=lambda x: x.dst)
         lines = [self.__line(x) for x in chains if self._test(x.src)]
