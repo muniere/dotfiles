@@ -448,7 +448,7 @@ class XcodeCookBook(CookBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             *PrefRecipe.glob(
-                src='Xcode/',
+                src='cask/Xcode/',
                 dst='~/Library/Developer/Xcode',
             )
         ]
@@ -463,11 +463,11 @@ class IntelliJIdeaCookBook(CookBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             *PrefRecipe.glob(
-                src='IntelliJIdea/',
+                src='cask/IntelliJIdea/',
                 dst='~/Library/Preferences/IntelliJIdea*',
             ),
             *PrefRecipe.glob(
-                src='IntelliJIdea/',
+                src='cask/IntelliJIdea/',
                 dst='~/Library/ApplicationSupport/JetBrains/IntelliJIdea*',
             ),
         ]
@@ -482,11 +482,11 @@ class AndroidStudioCookBook(CookBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             *PrefRecipe.glob(
-                src='AndroidStudio/',
+                src='cask/AndroidStudio/',
                 dst='~/Library/Preferences/AndroidStudio*',
             ),
             *PrefRecipe.glob(
-                src='AndroidStudio/',
+                src='cask/AndroidStudio/',
                 dst='~/Library/ApplicationSupport/Google/AndroidStudio*',
             ),
         ]
@@ -501,11 +501,11 @@ class AppCodeCookBook(CookBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             *PrefRecipe.glob(
-                src='AppCode/',
+                src='cask/AppCode/',
                 dst='~/Library/Preferences/AppCode*',
             ),
             *PrefRecipe.glob(
-                src='AppCode/',
+                src='cask/AppCode/',
                 dst='~/Library/ApplicationSupport/JetBrains/AppCode*',
             ),
         ]
@@ -520,11 +520,11 @@ class RubyMineCookBook(CookBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             *PrefRecipe.glob(
-                src='RubyMine/',
+                src='cask/RubyMine/',
                 dst='~/Library/Preferences/RubyMine*',
             ),
             *PrefRecipe.glob(
-                src='RubyMine/',
+                src='cask/RubyMine/',
                 dst='~/Library/ApplicationSupport/JetBrains/RubyMine*',
             ),
         ]
@@ -539,11 +539,11 @@ class GoLandCookBook(CookBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             *PrefRecipe.glob(
-                src='GoLand/',
+                src='cask/GoLand/',
                 dst='~/Library/Preferences/GoLand*',
             ),
             *PrefRecipe.glob(
-                src='GoLand/',
+                src='cask/GoLand/',
                 dst='~/Library/ApplicationSupport/JetBrains/GoLand*',
             ),
         ]
@@ -558,11 +558,11 @@ class CLionCookBook(CookBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             *PrefRecipe.glob(
-                src='CLion/',
+                src='cask/CLion/',
                 dst='~/Library/Preferences/CLion*',
             ),
             *PrefRecipe.glob(
-                src='CLion/',
+                src='cask/CLion/',
                 dst='~/Library/ApplicationSupport/JetBrains/CLion*',
             ),
         ]
@@ -577,11 +577,11 @@ class RiderCookBook(CookBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             *PrefRecipe.glob(
-                src='Rider/',
+                src='cask/Rider/',
                 dst='~/Library/Preferences/Rider*',
             ),
             *PrefRecipe.glob(
-                src='Rider/',
+                src='cask/Rider/',
                 dst='~/Library/ApplicationSupport/JetBrains/Rider*',
             ),
         ]
