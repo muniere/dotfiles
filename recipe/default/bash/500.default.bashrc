@@ -46,15 +46,6 @@ function __color3 {
 }
 
 # =====
-# Bash : Completion
-# =====
-if [ -d $HOME/.bash_completion.d ] && [ -n "$(ls $HOME/.bash_completion.d)" ]; then
-  for comp in $(ls $HOME/.bash_completion.d/*); do
-    . $comp
-  done
-fi
-
-# =====
 # Bash : Prompt
 # =====
 if (type __git_ps1 &> /dev/null); then
@@ -70,6 +61,12 @@ set completion-ignore-case on
 # =====
 # Bash : History
 # =====
+if [ -n "$XDG_CONFIG_HOME" ]; then
+  export HISTFILE=$XDG_CONFIG_HOME/bash/.bash_history
+else
+  export HISTFILE=$HOME/.config/bash/.bash_history
+fi
+
 export HISTCONTROL=erasedups:ignoreboth
 export HISTSIZE=10000
 export HISTTIMEFORMAT='%Y/%m/%d %T:$ '

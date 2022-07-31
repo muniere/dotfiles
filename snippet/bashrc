@@ -1,1 +1,1 @@
-[ -f $HOME/.bash.d/bashrc ] && source ~/.bash.d/bashrc
+if [ -f $HOME/.config/bash/config.bashrc ]; then source ~/.config/bash/config.bashrc; fi

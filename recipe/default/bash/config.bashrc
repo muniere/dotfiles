@@ -4,7 +4,7 @@ fi
 if [ -f /etc/bashrc ]; then
   . /etc/bashrc
 fi
-for conf in `ls -d $HOME/.bash.d/*.bashrc`; do
+for conf in `ls -d $HOME/.config/bash/*.*.bashrc`; do
   . $conf
 done
 

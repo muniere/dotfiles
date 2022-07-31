@@ -191,12 +191,8 @@ class BashCookBook(CookBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
-                src='bash.d/',
-                dst='~/.bash.d'
-            ),
-            PrefRecipe.create(
-                src='bash_completion.d/',
-                dst='~/.bash_completion.d'
+                src='bash/',
+                dst='~/.config/bash'
             ),
             PrefRecipe.create(
                 src='/Applications/Docker.app/Contents/Resources/etc/docker.bash-completion',
@@ -206,14 +202,6 @@ class BashCookBook(CookBook):
                 src='/Applications/Docker.app/Contents/Resources/etc/docker-compose.bash-completion',
                 dst='/usr/local/etc/bash_completion.d/docker-compose'
             ),
-            PrefRecipe.create(
-                src='/Applications/Docker.app/Contents/Resources/etc/docker.zsh-completion',
-                dst='/usr/local/share/zsh/site-functions/_docker'
-            ),
-            PrefRecipe.create(
-                src='/Applications/Docker.app/Contents/Resources/etc/docker-compose.zsh-completion',
-                dst='/usr/local/share/zsh/site-functions/_docker-compose'
-            ),
         ]
 
     @property
@@ -222,10 +210,6 @@ class BashCookBook(CookBook):
             SnipRecipe.create(
                 src='bashrc',
                 dst='~/.bashrc'
-            ),
-            SnipRecipe.create(
-                src='bash_profile',
-                dst='~/.bash_profile'
             ),
         ]
 
@@ -241,6 +225,14 @@ class ZshCookBook(CookBook):
             PrefRecipe.create(
                 src='zsh-site-functions/',
                 dst='~/.local/share/zsh/site-functions',
+            ),
+            PrefRecipe.create(
+                src='/Applications/Docker.app/Contents/Resources/etc/docker.zsh-completion',
+                dst='/usr/local/share/zsh/site-functions/_docker'
+            ),
+            PrefRecipe.create(
+                src='/Applications/Docker.app/Contents/Resources/etc/docker-compose.zsh-completion',
+                dst='/usr/local/share/zsh/site-functions/_docker-compose'
             ),
         ]
 
