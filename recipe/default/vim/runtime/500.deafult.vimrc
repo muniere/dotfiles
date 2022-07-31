@@ -107,6 +107,14 @@ autocmd Filetype * set formatoptions-=r
 autocmd Filetype * set formatoptions-=o
 
 """
+" Info
+"""
+if !has('nvim') 
+  set viminfofile=$XDG_CACHE_HOME/vim/viminfo 
+endif
+
+
+"""
 " Keymaps
 """
 
