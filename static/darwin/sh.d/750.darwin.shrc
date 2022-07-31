@@ -41,27 +41,6 @@ if [ -n "$XDG_CACHE_HOME" ]; then
 fi
 
 # =====
-# Flutter
-# =====
-if [ -n "$XDG_CACHE_HOME" ]; then
-  export PUB_CACHE="$XDG_CACHE_HOME/pub"
-fi
-
-if [ -d /usr/local/opt/flutter/bin/cache/dart-sdk/bin/ ]; then
-  addpath /usr/local/opt/flutter/bin /usr/local/opt/flutter/bin/cache/dart-sdk/bin
-elif [ -d /usr/local/opt/flutter ]; then
-  addpath /usr/local/opt/flutter/bin
-fi
-
-if [ -d $PUB_CACHE/bin ]; then
-  addpath $PUB_CACHE/bin
-fi
-
-if (which fvm &> /dev/null); then
-  export FVM_HOME=$HOME/.fvm
-fi
-
-# =====
 # Git
 # =====
 if [ -d /usr/local/share/git-core/contrib/diff-highlight/ ]; then

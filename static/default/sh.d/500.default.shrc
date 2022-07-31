@@ -47,6 +47,14 @@ if [ -n "$XDG_DATA_HOME" ]; then
 fi
 
 # =====
+# Flutter
+# =====
+if [ -n "$XDG_CACHE_HOME" ]; then
+  export PUB_CACHE="$XDG_CACHE_HOME/pub"
+  addpath $PUB_CACHE/bin
+fi
+
+# =====
 # asdf
 # =====
 if (which asdf &> /dev/null); then
