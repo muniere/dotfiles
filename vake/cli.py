@@ -305,7 +305,7 @@ class CompletionCommand(Command):
 
     @property
     def dst(self) -> Path:
-        return Path('static/default/zsh-completions/_xake')
+        return Path('recipe/default/zsh-site-functions/_xake')
 
     def run(self) -> None:
         # pylint: disable=import-outside-toplevel

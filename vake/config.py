@@ -235,16 +235,12 @@ class ZshCookBook(CookBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
-                src='zsh.d/',
-                dst='~/.zsh.d',
+                src='zsh/',
+                dst='~/.config/zsh',
             ),
             PrefRecipe.create(
-                src='zsh-completions/',
-                dst='~/.zsh-completions'
-            ),
-            PrefRecipe.create(
-                src='/usr/local/library/Contributions/brew_zsh_completion.zsh',
-                dst='~/.zsh-completions/_brew'
+                src='zsh-site-functions/',
+                dst='~/.local/share/zsh/site-functions',
             ),
         ]
 
@@ -252,12 +248,8 @@ class ZshCookBook(CookBook):
     def snippets(self) -> List[SnipRecipe]:
         return [
             SnipRecipe.create(
-                src='zshrc',
-                dst='~/.zshrc'
-            ),
-            SnipRecipe.create(
-                src='zshprofile',
-                dst='~/.zshprofile'
+                src='zshenv',
+                dst='~/.zshenv'
             ),
         ]
 

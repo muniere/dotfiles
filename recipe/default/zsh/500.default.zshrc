@@ -49,8 +49,8 @@ function sudo() {
 # =====
 # Zsh : Completion
 # =====
-if [ -d ~/.zsh-completions ]; then
-  addfpath ~/.zsh-completions
+if [ -d $XDG_DATA_HOME/zsh/site-functions ]; then
+  addfpath $XDG_DATA_HOME/zsh/site-functions
 fi
 
 autoload -Uz colors; colors
@@ -100,7 +100,6 @@ RPROMPT='%1(v|%F{magenta}%1v%f|)'
 # =====
 # Zsh : History
 # =====
-HISTFILE=~/.zsh_history
 HISTSIZE=100000
 SAVEHIST=100000
 setopt hist_ignore_dups
