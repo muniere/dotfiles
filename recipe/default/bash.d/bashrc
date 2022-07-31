@@ -1,5 +1,5 @@
-if [ -f $HOME/.sh.d/shrc ]; then
-  . $HOME/.sh.d/shrc
+if [ -f $HOME/.config/sh/config ]; then
+  . $HOME/.config/sh/config
 fi
 if [ -f /etc/bashrc ]; then
   . /etc/bashrc

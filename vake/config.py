@@ -180,17 +180,8 @@ class ShCookBook(CookBook):
     def recipes(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
-                src='sh.d/',
-                dst='~/.sh.d'
-            ),
-        ]
-
-    @property
-    def snippets(self) -> List[SnipRecipe]:
-        return [
-            SnipRecipe.create(
-                src='shrc/',
-                dst='~/.shrc'
+                src='sh/',
+                dst='~/.config/sh'
             ),
         ]
 
