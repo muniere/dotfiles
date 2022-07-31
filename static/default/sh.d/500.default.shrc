@@ -235,4 +235,11 @@ elif type compctl &>/dev/null; then
   compctl -K _npm_completion npm
 fi
 
+# =====
+# MySQL
+# =====
+if [ -n "$XDG_DATA_HOME" ]; then
+  export MYSQL_HISTFILE="$XDG_DATA_HOME/mysql/history"
+fi
+
 # vim: ft=sh sw=2 ts=2 sts=2
