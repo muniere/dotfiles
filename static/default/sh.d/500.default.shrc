@@ -61,13 +61,11 @@ fi
 # =====
 # asdf
 # =====
-if (which asdf &> /dev/null); then
-  if [ -n "$XDG_CONFIG_HOME" ]; then
-    export ASDF_CONFIG_FILE="$XDG_CONFIG_HOME/asdf/config"
-  fi
-  if [ -n "$XDG_DATA_HOME" ]; then
-    export ASDF_DATA_DIR="$XDG_DATA_HOME/asdf"
-  fi
+if [ -n "$XDG_CONFIG_HOME" ]; then
+  export ASDF_CONFIG_FILE="$XDG_CONFIG_HOME/asdf/config"
+fi
+if [ -n "$XDG_DATA_HOME" ]; then
+  export ASDF_DATA_DIR="$XDG_DATA_HOME/asdf"
 fi
 
 # =====
