@@ -28,10 +28,6 @@ fi
 if [ -n "$XDG_CACHE_HOME" ]; then
   export GEM_SPEC_CACHE="$XDG_CACHE_HOME/gem"
 fi
-if [ -n "$XDG_DATA_HOME" ]; then
-  export GEM_HOME="$XDG_DATA_HOME/gem"
-  addpath $GEM_HOME/bin
-fi
 
 # =====
 # Ruby / Bundler
