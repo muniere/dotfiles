@@ -139,7 +139,9 @@ nnoremap tm :tabmove
 """
 " Explore
 """
-let g:netrw_liststyle=1
+" tree style with fixed width
+let g:netrw_liststyle=3
+let g:netrw_winsize=-30
 let g:netrw_banner=0
 let g:netrw_preview=1
 let g:netrw_timefmt="%Y/%m/%d(%a) %H:%M:%S"
@@ -148,26 +150,29 @@ let g:netrw_list_hide= '.*\.swp$,\~$,\.orig$'
 let g:_netrw_open=0
 
 function! ToggleNetrw(focus)
-  if ! g:_netrw_open
+  if g:_netrw_open
+    " close
+    let i = bufnr("$")
+
+    while (i >= 1)
+      if (getbufvar(i, "&filetype") == "netrw")
+        silent exe "bwipeout " . i
+      endif
+
+      let i-=1
+    endwhile
+
+    let g:_netrw_open=0
+  else
+    " open
     let g:_netrw_open=1
+
     if a:focus
-      silent Explore %:p:h
+      silent Lexplore %:p:h
     else
-      silent Explore 
+      silent Lexplore 
     endif
-    return
   endif
-
-  let i = bufnr("$")
-
-  while (i >= 1)
-    if (getbufvar(i, "&filetype") == "netrw")
-      silent exe "bwipeout " . i
-    endif
-    let i-=1
-  endwhile
-
-  let g:_netrw_open=0
 endfunction
 
 nnoremap <silent> <C-e><C-e> :call ToggleNetrw(0)<CR>
