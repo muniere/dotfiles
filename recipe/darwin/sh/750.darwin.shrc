@@ -63,13 +63,6 @@ fi
 export HOMEBREW_CASK_OPTS="--appdir=/Applications"
 
 # =====
-# Maven
-# =====
-if [ -d /usr/local/opt/maven/libexec ]; then
-  export MAVEN_HOME="/usr/local/opt/maven/libexec"
-fi
-
-# =====
 # MySQL
 # =====
 if ! (which mysql &> /dev/null) && [ -d /usr/local/opt/mysql ]; then
@@ -105,13 +98,6 @@ fi
 if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
     export WORKON_HOME=$HOME/.virtualenvs
     source /usr/local/bin/virtualenvwrapper.sh
-fi
-
-# =====
-# Tomcat
-# =====
-if [ -d /usr/local/opt/tomcat/libexec ]; then
-  export CATALINA_HOME="/usr/local/opt/tomcat/libexec"
 fi
 
 # vim: ft=sh sw=2 ts=2 sts=2

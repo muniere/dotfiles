@@ -237,6 +237,13 @@ if [ -n "$XDG_CACHE_HOME" ]; then
   fi
 fi
 
+# ===
+# Gradle
+# ===
+if [ -n "$XDG_DATA_HOME" ]; then
+  export GRADLE_USER_HOME="$XDG_DATA_HOME/gradle"
+fi
+
 # =====
 # MySQL
 # =====

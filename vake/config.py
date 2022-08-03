@@ -376,7 +376,7 @@ class GradleCookBook(CookBook):
         return [
             PrefRecipe.create(
                 src='gradle',
-                dst='~/.gradle',
+                dst='~/.local/share/gradle',
             ),
         ]
 
