@@ -63,6 +63,14 @@ fi
 export HOMEBREW_CASK_OPTS="--appdir=/Applications"
 
 # =====
+# Mint
+# =====
+if [ -n "$XDG_CACHE_HOME" ]; then
+  export MINT_PATH="$XDG_CACHE_HOME/mint"
+  export MINT_LINK_PATH="$MINT_PATH/bin"
+fi
+
+# =====
 # MySQL
 # =====
 if ! (which mysql &> /dev/null) && [ -d /usr/local/opt/mysql ]; then
