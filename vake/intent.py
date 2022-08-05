@@ -88,14 +88,14 @@ class PrefAction(Action, metaclass=ABCMeta):
             return list(books)
 
     @staticmethod
-    def _test(path: Path):
+    def _blacklist(path: Path):
         blacklist = ['*.swp', '*.bak', '.DS_Store', '.keep', '.gitkeep']
 
         for pattern in blacklist:
             if path.match(pattern):
-                return False
+                return True
 
-        return True
+        return False
 
 
 @dataclass(frozen=True)
@@ -107,7 +107,7 @@ class PrefLinkAction(PrefAction):
     noop: bool = field(default_factory=lambda: False)
 
     def run(self):
-        books = [it for it in self._books(reverse=False) if self.__test(it)]
+        books = [it for it in self._books(reverse=False) if self.__contains(it)]
 
         aliases = set().union(*[book.aliases for book in books])
         illegals = [it for it in self.intents if it not in aliases]
@@ -147,14 +147,14 @@ class PrefLinkAction(PrefAction):
             if self.activate:
                 book.activate(logger=self.logger, noop=self.noop)
 
-    def __test(self, book: CookBook) -> bool:
+    def __contains(self, book: CookBook) -> bool:
         if self.intents:
             return bool(book.aliases.intersection(self.intents))
         else:
             return True
 
     def __link(self, chain: PrefChain) -> bool:
-        if not self._test(chain.src):
+        if self._blacklist(chain.src):
             self.logger.debug(f'File ignored: {chain.src}')
             return False
 
@@ -195,7 +195,7 @@ class PrefLinkAction(PrefAction):
         return True
 
     def __enable(self, chain: SnipChain) -> bool:
-        if not self._test(chain.src):
+        if self._blacklist(chain.src):
             self.logger.debug(f'File ignored: {chain.src}')
             return False
 
@@ -233,7 +233,7 @@ class PrefUnlinkAction(PrefAction):
     noop: bool = field(default_factory=lambda: False)
 
     def run(self):
-        books = [it for it in self._books(reverse=False) if self.__test(it)]
+        books = [it for it in self._books(reverse=False) if self.__contains(it)]
 
         aliases = set().union(*[book.aliases for book in books])
         illegals = [it for it in self.intents if it not in aliases]
@@ -275,14 +275,14 @@ class PrefUnlinkAction(PrefAction):
 
         return
 
-    def __test(self, book: CookBook) -> bool:
+    def __contains(self, book: CookBook) -> bool:
         if self.intents:
             return bool(book.aliases.intersection(self.intents))
         else:
             return True
 
     def __unlink(self, chain: PrefChain) -> bool:
-        if not self._test(chain.src):
+        if self._blacklist(chain.src):
             self.logger.debug(f'File is not target: {chain.src}')
             return False
 
@@ -306,7 +306,7 @@ class PrefUnlinkAction(PrefAction):
         return True
 
     def __disable(self, chain: SnipChain) -> bool:
-        if not self._test(chain.src):
+        if self._blacklist(chain.src):
             self.logger.debug(f'File is not target: {chain.src}')
             return False
 
@@ -371,7 +371,7 @@ class PrefListAction(PrefAction):
                     chains += pref.expand(src_prefix=Path(locate.recipe(), 'default'))
 
         chains.sort(key=lambda x: x.dst)
-        lines = [self.__format(x) for x in chains if self._test(x.src)]
+        lines = [self.__format(x) for x in chains if not self._blacklist(x.src)]
 
         self.stream.writelines(lines)
         return
@@ -437,7 +437,7 @@ class PrefCleanupAction(PrefAction):
     noop: bool = field(default_factory=lambda: False)
 
     def run(self):
-        books = [it for it in self._books(reverse=False) if self.__test(it)]
+        books = [it for it in self._books(reverse=False) if self.__contains(it)]
 
         aliases = set().union(*[book.aliases for book in books])
         illegals = [it for it in self.intents if it not in aliases]
@@ -469,7 +469,7 @@ class PrefCleanupAction(PrefAction):
 
         return
 
-    def __test(self, book: CookBook) -> bool:
+    def __contains(self, book: CookBook) -> bool:
         if self.intents:
             return bool(book.aliases.intersection(self.intents))
         else:
