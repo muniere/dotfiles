@@ -5,7 +5,7 @@ from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from pathlib import Path
-from typing import TextIO, List, Tuple
+from typing import TextIO, List
 
 from . import config
 from . import kernel
@@ -371,45 +371,38 @@ class PrefListAction(PrefAction):
                     chains += pref.expand(src_prefix=Path(locate.recipe(), 'default'))
 
         chains.sort(key=lambda x: x.dst)
-        lines = [self.__line(x) for x in chains if self._test(x.src)]
+        lines = [self.__format(x) for x in chains if self._test(x.src)]
 
         self.stream.writelines(lines)
         return
 
-    def __line(self, chain: PrefChain) -> str:
-        if self.__colorful():
-            return self.__line_colored(chain)
-        else:
-            return self.__line_plain(chain)
-
-    def __line_colored(self, chain: PrefChain) -> str:
+    def __format(self, chain: PrefChain) -> str:
         sep = self.SEP
         end = self.END
+        cwd = Path.cwd()
 
-        src, dst = self.__resolve(chain)
-        color = self.__color_for(dst)
+        src = chain.resolve_src(cwd)
+        dst = chain.resolve_dst()
 
-        if self.style == PrefListStyleOption.LONG:
-            return sep.join([color.decorate(dst), str(src)]) + end
+        if self.__colorful():
+            color = self.__color_for(dst)
 
-        if self.style == PrefListStyleOption.SHORT:
+            if self.style == PrefListStyleOption.LONG:
+                return sep.join([color.decorate(dst), str(src)]) + end
+
+            if self.style == PrefListStyleOption.SHORT:
+                return color.decorate(dst) + end
+
             return color.decorate(dst) + end
 
-        return color.decorate(dst) + end
+        else:
+            if self.style == PrefListStyleOption.LONG:
+                return sep.join([str(dst), str(src)]) + end
 
-    def __line_plain(self, chain: PrefChain) -> str:
-        sep = self.SEP
-        end = self.END
+            if self.style == PrefListStyleOption.SHORT:
+                return str(dst) + end
 
-        src, dst = self.__resolve(chain)
-
-        if self.style == PrefListStyleOption.LONG:
-            return sep.join([str(dst), str(src)]) + end
-
-        if self.style == PrefListStyleOption.SHORT:
             return str(dst) + end
-
-        return str(dst) + end
 
     def __colorful(self) -> bool:
         if self.color == PrefListColorOption.ALWAYS:
@@ -419,15 +412,6 @@ class PrefListAction(PrefAction):
             return False
 
         return self.stream.isatty()
-
-    @staticmethod
-    def __resolve(chain: PrefChain) -> Tuple[Path, Path]:
-        cwd = Path.cwd()
-
-        return (
-            chain.resolve_src(cwd),
-            chain.resolve_dst(),
-        )
 
     @staticmethod
     def __color_for(path: Path) -> Color:
