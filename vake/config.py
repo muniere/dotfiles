@@ -274,13 +274,22 @@ class VimCookBook(CookBook):
         return [
             PrefRecipe.create(
                 src='vim/',
-                dst='~/.vim',
+                dst='~/.config/vim',
+            ),
+        ]
+
+    @property
+    def snippets(self) -> List[SnipRecipe]:
+        return [
+            SnipRecipe.create(
+                src='vimrc',
+                dst='~/.vimrc'
             ),
         ]
 
     def activate(self, logger: Lumber = Lumber.noop(), noop: bool = False):
         url = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-        out = '~/.vim/autoload/plug.vim'
+        out = '~/.config/vim/autoload/plug.vim'
 
         shell.call(
             cmd=f'sh -c "curl -fSL -o {out} --create-dirs {url}"',
