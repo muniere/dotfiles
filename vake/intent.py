@@ -11,7 +11,7 @@ from . import config
 from . import kernel
 from . import locate
 from .box import TernaryBox
-from .config import PrefChain, CookBook, SnipRecipe
+from .config import PrefChain, CookBook, SnipChain
 from .timber import Lumber
 from .tty import Color
 
@@ -125,18 +125,24 @@ class PrefLinkAction(PrefAction):
         for i, book in enumerate(books, start=1):
             self.logger.mark(f"{book.name} Launched ({i:02}/{len(books):02})".ljust(80), bold=True)
 
-            for recipe in book.recipes:
-                if recipe.src.is_absolute():
-                    chains = recipe.expand()
+            for pref in book.prefs:
+                if pref.src.is_absolute():
+                    pref_chains = pref.expand()
                 else:
-                    chains = recipe.expand(src_prefix=Path(locate.recipe(), identity.value)) + \
-                             recipe.expand(src_prefix=Path(locate.recipe(), 'default'))
+                    pref_chains = pref.expand(src_prefix=Path(locate.recipe(), identity.value)) + \
+                                  pref.expand(src_prefix=Path(locate.recipe(), 'default'))
 
-                for chain in chains:
+                for chain in pref_chains:
                     self.__link(chain)
 
-            for snippet in book.snippets:
-                self.__enable(snippet)
+            for snip in book.snips:
+                if snip.src.is_absolute():
+                    snip_chains = snip.expand()
+                else:
+                    snip_chains = snip.expand(src_prefix=Path(locate.snippet()))
+
+                for chain in snip_chains:
+                    self.__enable(chain)
 
             if self.activate:
                 book.activate(logger=self.logger, noop=self.noop)
@@ -188,22 +194,23 @@ class PrefLinkAction(PrefAction):
         dst.symlink_to(src)
         return True
 
-    def __enable(self, snippet: SnipRecipe) -> bool:
-        src = Path(locate.snippet(), snippet.src).resolve()
-        dst = Path(snippet.dst).expanduser()
-
-        if not src.exists():
-            self.logger.info(f'File not found: {snippet.src}')
+    def __enable(self, chain: SnipChain) -> bool:
+        if not self._test(chain.src):
+            self.logger.debug(f'File ignored: {chain.src}')
             return False
 
-        src_str = src.read_text(encoding='utf-8').strip()
-        dst_str = dst.read_text(encoding='utf-8').strip() if dst.exists() else ''
+        if not chain.src.exists():
+            self.logger.info(f'File not found: {chain.src}')
+            return False
+
+        src_str = chain.src.read_text(encoding='utf-8').strip()
+        dst_str = chain.dst.read_text(encoding='utf-8').strip() if chain.dst.exists() else ''
 
         if src_str in dst_str:
-            self.logger.info(f'Snippet already enabled: {dst}')
+            self.logger.info(f'Snippet already enabled in file: {chain.dst}')
             return False
 
-        self.logger.info(f'Enable snippet: {src}')
+        self.logger.info(f'Enable snippet: {chain.src} >> {chain.dst}')
 
         if self.noop:
             return False
@@ -213,7 +220,7 @@ class PrefLinkAction(PrefAction):
             none=lambda: src_str + os.linesep,
         )
 
-        dst.write_text(new_str, encoding='utf-8')
+        chain.dst.write_text(new_str, encoding='utf-8')
         return True
 
 
@@ -247,17 +254,23 @@ class PrefUnlinkAction(PrefAction):
             if self.deactivate:
                 book.deactivate(logger=self.logger, noop=self.noop)
 
-            for snippet in book.snippets:
-                self.__disable(snippet)
-
-            for recipe in book.recipes:
-                if recipe.src.is_absolute():
-                    chains = recipe.expand()
+            for snip in book.snips:
+                if snip.src.is_absolute():
+                    snip_chains = snip.expand()
                 else:
-                    chains = recipe.expand(src_prefix=Path(locate.recipe(), identity.value)) + \
-                             recipe.expand(src_prefix=Path(locate.recipe(), 'default'))
+                    snip_chains = snip.expand(src_prefix=Path(locate.snippet()))
 
-                for chain in chains:
+                for chain in snip_chains:
+                    self.__disable(chain)
+
+            for pref in book.prefs:
+                if pref.src.is_absolute():
+                    pref_chains = pref.expand()
+                else:
+                    pref_chains = pref.expand(src_prefix=Path(locate.recipe(), identity.value)) + \
+                                  pref.expand(src_prefix=Path(locate.recipe(), 'default'))
+
+                for chain in pref_chains:
                     self.__unlink(chain)
 
         return
@@ -292,33 +305,34 @@ class PrefUnlinkAction(PrefAction):
         path.unlink(missing_ok=True)
         return True
 
-    def __disable(self, snippet: SnipRecipe) -> bool:
-        src = Path(locate.snippet(), snippet.src).resolve()
-        dst = Path(snippet.dst).expanduser()
-
-        if not src.exists():
-            self.logger.info(f'File not found: {src}')
+    def __disable(self, chain: SnipChain) -> bool:
+        if not self._test(chain.src):
+            self.logger.debug(f'File is not target: {chain.src}')
             return False
 
-        if not dst.exists():
-            self.logger.info(f'File not found: {dst}')
+        if not chain.src.exists():
+            self.logger.info(f'File not found: {chain.src}')
             return False
 
-        src_str = src.read_text(encoding='utf-8').strip()
-        dst_str = dst.read_text(encoding='utf-8')
+        if not chain.dst.exists():
+            self.logger.info(f'File not found: {chain.dst}')
+            return False
+
+        src_str = chain.src.read_text(encoding='utf-8').strip()
+        dst_str = chain.dst.read_text(encoding='utf-8')
 
         if src_str not in dst_str:
-            self.logger.info(f'Snippet already disabled: {dst}')
+            self.logger.info(f'Snippet already disabled in file: {chain.dst}')
             return False
 
-        self.logger.info(f'Disable snippet: {src}')
+        self.logger.info(f'Disable snippet: {chain.src} << {chain.dst}')
 
         if self.noop:
             return False
 
         pattern = re.escape(src_str) + os.linesep + '*'
         new_str = re.sub(pattern, '', dst_str)
-        dst.write_text(new_str, encoding='utf-8')
+        chain.dst.write_text(new_str, encoding='utf-8')
         return True
 
 
@@ -349,12 +363,12 @@ class PrefListAction(PrefAction):
         chains: List[PrefChain] = []
 
         for book in books:
-            for recipe in book.recipes:
-                if recipe.src.is_absolute():
-                    chains += recipe.expand()
+            for pref in book.prefs:
+                if pref.src.is_absolute():
+                    chains += pref.expand()
                 else:
-                    chains += recipe.expand(src_prefix=Path(locate.recipe(), identity.value))
-                    chains += recipe.expand(src_prefix=Path(locate.recipe(), 'default'))
+                    chains += pref.expand(src_prefix=Path(locate.recipe(), identity.value))
+                    chains += pref.expand(src_prefix=Path(locate.recipe(), 'default'))
 
         chains.sort(key=lambda x: x.dst)
         lines = [self.__line(x) for x in chains if self._test(x.src)]
@@ -455,7 +469,7 @@ class PrefCleanupAction(PrefAction):
             if book.private:
                 continue
 
-            candidates += [x.dst.expanduser() for x in book.recipes]
+            candidates += [x.dst.expanduser() for x in book.prefs]
 
         found: List[Path] = []
 

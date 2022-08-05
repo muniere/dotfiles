@@ -10,7 +10,8 @@ from .timber import Lumber
 
 __all__ = [
     'PrefChain', 'PrefRecipe',
-    'SnipRecipe', 'CookBook',
+    'SnipChain', 'SnipRecipe',
+    'CookBook',
     'BinCookBook',
     'ShCookBook',
     'BashCookBook',
@@ -106,6 +107,24 @@ class PrefRecipe:
         ]
 
 
+@dataclass(frozen=True)
+class SnipChain:
+    src: Path
+    dst: Path
+
+    def resolve_src(self, *other):
+        try:
+            return self.src.relative_to(*other)
+        except ValueError:
+            return self.src
+
+    def resolve_dst(self):
+        if self.dst.exists():
+            return self.dst
+        else:
+            return Path('(null)')
+
+
 @dataclass
 class SnipRecipe:
     src: Path
@@ -114,6 +133,41 @@ class SnipRecipe:
     @staticmethod
     def create(src: str, dst: str) -> 'SnipRecipe':
         return SnipRecipe(src=Path(src), dst=Path(dst))
+
+    def expand(self, src_prefix: Path = Path(), dst_prefix: Path = Path()) -> List[SnipChain]:
+        # resolve
+        ex_src = self.src.expanduser()
+        abs_src = TernaryBox(ex_src.is_absolute()).fold(
+            some=lambda: Path(ex_src),
+            none=lambda: Path(src_prefix, ex_src).resolve(),
+        )
+
+        ex_dst = self.dst.expanduser()
+        abs_dst = TernaryBox(ex_dst.is_absolute()).fold(
+            some=lambda: Path(ex_dst),
+            none=lambda: Path(dst_prefix, ex_dst).resolve(),
+        )
+
+        # guard : none
+        if not abs_src.exists():
+            return []
+
+        # expand : file
+        if abs_src.is_file():
+            return [
+                SnipChain(src=abs_src, dst=abs_dst)
+            ]
+
+        # expand
+        abs_dir = abs_src
+
+        return [
+            SnipChain(
+                src=abs_file,
+                dst=Path(abs_dst, abs_file.relative_to(abs_dir)),
+            )
+            for abs_file in [x for x in abs_dir.glob('**/*') if x.is_file()]
+        ]
 
 
 class CookBook(metaclass=ABCMeta):
@@ -128,11 +182,11 @@ class CookBook(metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def recipes(self) -> List[PrefRecipe]:
+    def prefs(self) -> List[PrefRecipe]:
         raise NotImplementedError()
 
     @property
-    def snippets(self) -> List[SnipRecipe]:
+    def snips(self) -> List[SnipRecipe]:
         return []
 
     @property
@@ -175,7 +229,7 @@ class BinCookBook(CookBook):
         return {'bin'}
 
     @property
-    def recipes(self) -> List[PrefRecipe]:
+    def prefs(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
                 src='bin/',
@@ -190,7 +244,7 @@ class ShCookBook(CookBook):
         return {'sh'}
 
     @property
-    def recipes(self) -> List[PrefRecipe]:
+    def prefs(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
                 src='sh/',
@@ -205,7 +259,7 @@ class BashCookBook(CookBook):
         return {'bash'}
 
     @property
-    def recipes(self) -> List[PrefRecipe]:
+    def prefs(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
                 src='bash/',
@@ -222,7 +276,7 @@ class BashCookBook(CookBook):
         ]
 
     @property
-    def snippets(self) -> List[SnipRecipe]:
+    def snips(self) -> List[SnipRecipe]:
         return [
             SnipRecipe.create(
                 src='bashrc',
@@ -237,7 +291,7 @@ class ZshCookBook(CookBook):
         return {'zsh'}
 
     @property
-    def recipes(self) -> List[PrefRecipe]:
+    def prefs(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
                 src='zsh/',
@@ -258,7 +312,7 @@ class ZshCookBook(CookBook):
         ]
 
     @property
-    def snippets(self) -> List[SnipRecipe]:
+    def snips(self) -> List[SnipRecipe]:
         return [
             SnipRecipe.create(
                 src='zshenv',
@@ -295,7 +349,7 @@ class VimCookBook(CookBook):
         return {'vim'}
 
     @property
-    def recipes(self) -> List[PrefRecipe]:
+    def prefs(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
                 src='vim/',
@@ -304,7 +358,7 @@ class VimCookBook(CookBook):
         ]
 
     @property
-    def snippets(self) -> List[SnipRecipe]:
+    def snips(self) -> List[SnipRecipe]:
         return [
             SnipRecipe.create(
                 src='vimrc',
@@ -343,7 +397,7 @@ class GitCookBook(CookBook):
         return {'git'}
 
     @property
-    def recipes(self) -> List[PrefRecipe]:
+    def prefs(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
                 src='git/',
@@ -370,7 +424,7 @@ class GitHubCookBook(CookBook):
         return {'github'}
 
     @property
-    def recipes(self) -> List[PrefRecipe]:
+    def prefs(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
                 src='gh/',
@@ -385,7 +439,7 @@ class AsdfCookBook(CookBook):
         return {'asdf'}
 
     @property
-    def recipes(self) -> List[PrefRecipe]:
+    def prefs(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
                 src='asdf/',
@@ -400,7 +454,7 @@ class TmuxCookBook(CookBook):
         return {'tmux'}
 
     @property
-    def recipes(self) -> List[PrefRecipe]:
+    def prefs(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
                 src='tmux/',
@@ -415,7 +469,7 @@ class RangerCookBook(CookBook):
         return {'ranger'}
 
     @property
-    def recipes(self) -> List[PrefRecipe]:
+    def prefs(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
                 src='ranger/',
@@ -430,7 +484,7 @@ class GradleCookBook(CookBook):
         return {'gradle'}
 
     @property
-    def recipes(self) -> List[PrefRecipe]:
+    def prefs(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
                 src='gradle',
@@ -449,7 +503,7 @@ class RubyCookBook(CookBook):
         return {'ruby'}
 
     @property
-    def recipes(self) -> List[PrefRecipe]:
+    def prefs(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
                 src='bundle/',
@@ -464,7 +518,7 @@ class NodeCookBook(CookBook):
         return {'node'}
 
     @property
-    def recipes(self) -> List[PrefRecipe]:
+    def prefs(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
                 src='npm/',
@@ -487,7 +541,7 @@ class BrewCookBook(CookBook):
         return {'brew'}
 
     @property
-    def recipes(self) -> List[PrefRecipe]:
+    def prefs(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
                 src='homebrew/Brewfile',
@@ -518,7 +572,7 @@ class XcodeCookBook(CookBook):
         return {'xcode'}
 
     @property
-    def recipes(self) -> List[PrefRecipe]:
+    def prefs(self) -> List[PrefRecipe]:
         return [
             *PrefRecipe.glob(
                 src='cask/Xcode/',
@@ -537,7 +591,7 @@ class IntelliJIdeaCookBook(CookBook):
         return {'intellij'}
 
     @property
-    def recipes(self) -> List[PrefRecipe]:
+    def prefs(self) -> List[PrefRecipe]:
         return [
             *PrefRecipe.glob(
                 src='cask/IntelliJIdea/',
@@ -560,7 +614,7 @@ class AndroidStudioCookBook(CookBook):
         return {'android-studio'}
 
     @property
-    def recipes(self) -> List[PrefRecipe]:
+    def prefs(self) -> List[PrefRecipe]:
         return [
             *PrefRecipe.glob(
                 src='cask/AndroidStudio/',
@@ -583,7 +637,7 @@ class AppCodeCookBook(CookBook):
         return {'appcode'}
 
     @property
-    def recipes(self) -> List[PrefRecipe]:
+    def prefs(self) -> List[PrefRecipe]:
         return [
             *PrefRecipe.glob(
                 src='cask/AppCode/',
@@ -606,7 +660,7 @@ class RubyMineCookBook(CookBook):
         return {'rubymine'}
 
     @property
-    def recipes(self) -> List[PrefRecipe]:
+    def prefs(self) -> List[PrefRecipe]:
         return [
             *PrefRecipe.glob(
                 src='cask/RubyMine/',
@@ -629,7 +683,7 @@ class GoLandCookBook(CookBook):
         return {'goland'}
 
     @property
-    def recipes(self) -> List[PrefRecipe]:
+    def prefs(self) -> List[PrefRecipe]:
         return [
             *PrefRecipe.glob(
                 src='cask/GoLand/',
@@ -652,7 +706,7 @@ class CLionCookBook(CookBook):
         return {'clion'}
 
     @property
-    def recipes(self) -> List[PrefRecipe]:
+    def prefs(self) -> List[PrefRecipe]:
         return [
             *PrefRecipe.glob(
                 src='cask/CLion/',
@@ -675,7 +729,7 @@ class RiderCookBook(CookBook):
         return {'rider'}
 
     @property
-    def recipes(self) -> List[PrefRecipe]:
+    def prefs(self) -> List[PrefRecipe]:
         return [
             *PrefRecipe.glob(
                 src='cask/Rider/',
