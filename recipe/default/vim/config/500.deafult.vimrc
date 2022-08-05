@@ -194,26 +194,6 @@ nnoremap <silent> <C-e><C-f> :call ToggleNetrw(1)<CR>
 inoremap <silent> <C-e><C-f> <ESC>:call ToggleNetrw(1)<CR>
 
 """
-" Completion
-"""
-" https://gist.github.com/maxboisvert/a63e96a67d0a83d71e9f49af73e71d93
-set completeopt=menu,menuone,noinsert
-
-inoremap <expr> <Tab> pumvisible() ? "\<C-Y>" : "\<Tab>"
-
-autocmd InsertCharPre * call AutoComplete()
-function! AutoComplete()
-    if v:char =~ '\K'
-        \ && getline('.')[col('.') - 4] !~ '\K'
-        \ && getline('.')[col('.') - 3] =~ '\K'
-        \ && getline('.')[col('.') - 2] =~ '\K' " last char
-        \ && getline('.')[col('.') - 1] !~ '\K'
-
-        call feedkeys("\<C-N>", 't')
-    end
-endfun
-
-"""
 " Plugins
 """
 
@@ -221,8 +201,16 @@ call plug#begin($XDG_CONFIG_HOME.'/vim/plugged')
 Plug 'vim-scripts/sudo.vim'
 Plug 'vim-scripts/surround.vim'
 Plug 'editorconfig/editorconfig-vim'
+
 Plug 'itchyny/lightline.vim'
+
 Plug 'ctrlpvim/ctrlp.vim'
+
+Plug 'vim-denops/denops.vim'
+Plug 'Shougo/ddc.vim'
+Plug 'Shougo/ddc-around'
+Plug 'Shougo/ddc-matcher_head'
+Plug 'Shougo/ddc-sorter_rank'
 call plug#end()
 
 autocmd VimEnter * if len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
@@ -241,6 +229,23 @@ inoremap <silent> <C-x><C-f> <ESC>:CtrlP .<CR>
 nnoremap <silent> <C-x><C-b> :CtrlPBuffer<CR>
 inoremap <silent> <C-x><C-b> <ESC>:CtrlPBuffer<CR>
 
+" == ddc
+call ddc#custom#patch_global('sources', ['around'])
+
+call ddc#custom#patch_global('sourceOptions', {
+      \ '_': {
+      \   'matchers': ['matcher_head'],
+      \   'sorters': ['sorter_rank']},
+      \ })
+
+inoremap <silent><expr> <TAB>
+\ ddc#map#pum_visible() ? '<C-n>' :
+\ (col('.') <= 1 <Bar><Bar> getline('.')[col('.') - 2] =~# '\s') ?
+\ '<TAB>' : ddc#map#manual_complete()
+
+inoremap <expr><S-TAB>  ddc#map#pum_visible() ? '<C-p>' : '<C-h>'
+
+call ddc#enable()
 
 """
 " Appearance
