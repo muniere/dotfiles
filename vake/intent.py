@@ -100,13 +100,19 @@ class PrefAction(Action, metaclass=ABCMeta):
 
 @dataclass(frozen=True)
 class PrefLinkAction(PrefAction):
+    intents: List[str] = field(default_factory=lambda: [])
     logger: Lumber = field(default_factory=lambda: Lumber.noop())
     cleanup: bool = field(default_factory=lambda: True)
     activate: bool = field(default_factory=lambda: True)
     noop: bool = field(default_factory=lambda: False)
 
     def run(self):
-        books = self._books(reverse=False)
+        books = [it for it in self._books(reverse=False) if self.__test(it)]
+
+        aliases = set().union(*[book.aliases for book in books])
+        illegals = [it for it in self.intents if it not in aliases]
+        if illegals:
+            self.logger.warn(f'Intents not supported: {", ".join(illegals)}')
 
         if self.cleanup:
             PrefCleanupAction(logger=self.logger, noop=self.noop).perform(books)
@@ -117,7 +123,7 @@ class PrefLinkAction(PrefAction):
         identity = kernel.identify()
 
         for i, book in enumerate(books, start=1):
-            self.logger.mark(f"{book.name} Launched ({i:02}/{len(books)})".ljust(80), bold=True)
+            self.logger.mark(f"{book.name} Launched ({i:02}/{len(books):02})".ljust(80), bold=True)
 
             for recipe in book.recipes:
                 if recipe.src.is_absolute():
@@ -134,6 +140,12 @@ class PrefLinkAction(PrefAction):
 
             if self.activate:
                 book.activate(logger=self.logger, noop=self.noop)
+
+    def __test(self, book: CookBook) -> bool:
+        if self.intents:
+            return bool(book.aliases.intersection(self.intents))
+        else:
+            return True
 
     def __link(self, chain: PrefChain) -> bool:
         if not self._test(chain.src):
@@ -207,13 +219,19 @@ class PrefLinkAction(PrefAction):
 
 @dataclass(frozen=True)
 class PrefUnlinkAction(PrefAction):
+    intents: List[str] = field(default_factory=lambda: [])
     logger: Lumber = field(default_factory=lambda: Lumber.noop())
     cleanup: bool = field(default_factory=lambda: True)
     deactivate: bool = field(default_factory=lambda: True)
     noop: bool = field(default_factory=lambda: False)
 
     def run(self):
-        books = self._books(reverse=True)
+        books = [it for it in self._books(reverse=False) if self.__test(it)]
+
+        aliases = set().union(*[book.aliases for book in books])
+        illegals = [it for it in self.intents if it not in aliases]
+        if illegals:
+            self.logger.warn(f'Intents not supported: {", ".join(illegals)}')
 
         if self.cleanup:
             PrefCleanupAction(logger=self.logger, noop=self.noop).perform(books)
@@ -243,6 +261,12 @@ class PrefUnlinkAction(PrefAction):
                     self.__unlink(chain)
 
         return
+
+    def __test(self, book: CookBook) -> bool:
+        if self.intents:
+            return bool(book.aliases.intersection(self.intents))
+        else:
+            return True
 
     def __unlink(self, chain: PrefChain) -> bool:
         if not self._test(chain.src):
@@ -410,11 +434,18 @@ class PrefListAction(PrefAction):
 
 @dataclass(frozen=True)
 class PrefCleanupAction(PrefAction):
+    intents: List[str] = field(default_factory=lambda: [])
     logger: Lumber = field(default_factory=lambda: Lumber.noop())
     noop: bool = field(default_factory=lambda: False)
 
     def run(self):
-        books = self._books()
+        books = [it for it in self._books(reverse=False) if self.__test(it)]
+
+        aliases = set().union(*[book.aliases for book in books])
+        illegals = [it for it in self.intents if it not in aliases]
+        if illegals:
+            self.logger.warn(f'Intents not supported: {", ".join(illegals)}')
+
         return self.perform(books)
 
     def perform(self, books: List[CookBook]):
@@ -439,6 +470,12 @@ class PrefCleanupAction(PrefAction):
             self.__rm(path)
 
         return
+
+    def __test(self, book: CookBook) -> bool:
+        if self.intents:
+            return bool(book.aliases.intersection(self.intents))
+        else:
+            return True
 
     @staticmethod
     def __scan(path: Path) -> List[Path]:

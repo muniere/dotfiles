@@ -111,6 +111,7 @@ class ListCommand(Command):
 class LinkCommand(Command):
     NAME = 'link'
 
+    intents: [str]
     cleanup: bool
     activate: bool
     dry_run: bool
@@ -118,6 +119,7 @@ class LinkCommand(Command):
 
     def run(self):
         action = PrefLinkAction(
+            intents=self.intents[:],
             logger=self._logger(verbose=self.verbose),
             cleanup=self.cleanup,
             activate=self.activate,
@@ -157,9 +159,16 @@ class LinkCommand(Command):
                 action='store_true',
                 help='Show verbose messages'
             )
+            child.add_argument(
+                'intent',
+                action='store',
+                nargs='*',
+                help='Intents to link'
+            )
 
         def create(self, args: Namespace) -> Command:
             return LinkCommand(
+                intents=args.intent,
                 cleanup=not args.skip_cleanup,
                 activate=not args.skip_activate,
                 dry_run=args.dry_run,
@@ -171,6 +180,7 @@ class LinkCommand(Command):
 class UnlinkCommand(Command):
     NAME = 'unlink'
 
+    intents: List[str]
     cleanup: bool
     deactivate: bool
     dry_run: bool
@@ -178,6 +188,7 @@ class UnlinkCommand(Command):
 
     def run(self) -> None:
         action = PrefUnlinkAction(
+            intents=self.intents[:],
             logger=self._logger(verbose=self.verbose),
             cleanup=self.cleanup,
             deactivate=self.deactivate,
@@ -217,9 +228,16 @@ class UnlinkCommand(Command):
                 action='store_true',
                 help='Show verbose messages'
             )
+            child.add_argument(
+                'intent',
+                action='store',
+                nargs='*',
+                help='Intents to unlink'
+            )
 
         def create(self, args: Namespace) -> Command:
             return UnlinkCommand(
+                intents=args.intent,
                 cleanup=not args.skip_cleanup,
                 deactivate=not args.skip_deactivate,
                 dry_run=args.dry_run,
@@ -231,11 +249,13 @@ class UnlinkCommand(Command):
 class CleanupCommand(Command):
     NAME = 'cleanup'
 
+    intents: List[str]
     dry_run: bool
     verbose: bool
 
     def run(self) -> None:
         action = PrefCleanupAction(
+            intents=self.intents[:],
             logger=self._logger(verbose=self.verbose),
             noop=self.dry_run,
         )
@@ -261,9 +281,16 @@ class CleanupCommand(Command):
                 action='store_true',
                 help='Show verbose messages'
             )
+            child.add_argument(
+                'intent',
+                action='store',
+                nargs='*',
+                help='Intents to cleanup'
+            )
 
         def create(self, args: Namespace) -> Command:
             return CleanupCommand(
+                intents=args.intent,
                 dry_run=args.dry_run,
                 verbose=args.verbose,
             )
