@@ -2,7 +2,7 @@ import glob
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List
+from typing import List, Set
 
 from . import shell
 from .box import TernaryBox
@@ -123,6 +123,11 @@ class CookBook(metaclass=ABCMeta):
 
     @property
     @abstractmethod
+    def aliases(self) -> Set[str]:
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
     def recipes(self) -> List[PrefRecipe]:
         raise NotImplementedError()
 
@@ -166,6 +171,10 @@ class CookBook(metaclass=ABCMeta):
 # ==
 class BinCookBook(CookBook):
     @property
+    def aliases(self) -> Set[str]:
+        return {'bin'}
+
+    @property
     def recipes(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
@@ -177,6 +186,10 @@ class BinCookBook(CookBook):
 
 class ShCookBook(CookBook):
     @property
+    def aliases(self) -> Set[str]:
+        return {'sh'}
+
+    @property
     def recipes(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
@@ -187,6 +200,10 @@ class ShCookBook(CookBook):
 
 
 class BashCookBook(CookBook):
+    @property
+    def aliases(self) -> Set[str]:
+        return {'bash'}
+
     @property
     def recipes(self) -> List[PrefRecipe]:
         return [
@@ -215,6 +232,10 @@ class BashCookBook(CookBook):
 
 
 class ZshCookBook(CookBook):
+    @property
+    def aliases(self) -> Set[str]:
+        return {'zsh'}
+
     @property
     def recipes(self) -> List[PrefRecipe]:
         return [
@@ -270,6 +291,10 @@ class ZshCookBook(CookBook):
 
 class VimCookBook(CookBook):
     @property
+    def aliases(self) -> Set[str]:
+        return {'vim'}
+
+    @property
     def recipes(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
@@ -314,6 +339,10 @@ class VimCookBook(CookBook):
 
 class GitCookBook(CookBook):
     @property
+    def aliases(self) -> Set[str]:
+        return {'git'}
+
+    @property
     def recipes(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
@@ -337,6 +366,10 @@ class GitCookBook(CookBook):
 
 class GitHubCookBook(CookBook):
     @property
+    def aliases(self) -> Set[str]:
+        return {'github'}
+
+    @property
     def recipes(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
@@ -347,6 +380,10 @@ class GitHubCookBook(CookBook):
 
 
 class AsdfCookBook(CookBook):
+    @property
+    def aliases(self) -> Set[str]:
+        return {'asdf'}
+
     @property
     def recipes(self) -> List[PrefRecipe]:
         return [
@@ -359,6 +396,10 @@ class AsdfCookBook(CookBook):
 
 class TmuxCookBook(CookBook):
     @property
+    def aliases(self) -> Set[str]:
+        return {'tmux'}
+
+    @property
     def recipes(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
@@ -370,6 +411,10 @@ class TmuxCookBook(CookBook):
 
 class RangerCookBook(CookBook):
     @property
+    def aliases(self) -> Set[str]:
+        return {'ranger'}
+
+    @property
     def recipes(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
@@ -380,6 +425,10 @@ class RangerCookBook(CookBook):
 
 
 class GradleCookBook(CookBook):
+    @property
+    def aliases(self) -> Set[str]:
+        return {'gradle'}
+
     @property
     def recipes(self) -> List[PrefRecipe]:
         return [
@@ -396,6 +445,10 @@ class GradleCookBook(CookBook):
 
 class RubyCookBook(CookBook):
     @property
+    def aliases(self) -> Set[str]:
+        return {'ruby'}
+
+    @property
     def recipes(self) -> List[PrefRecipe]:
         return [
             PrefRecipe.create(
@@ -406,6 +459,10 @@ class RubyCookBook(CookBook):
 
 
 class NodeCookBook(CookBook):
+    @property
+    def aliases(self) -> Set[str]:
+        return {'node'}
+
     @property
     def recipes(self) -> List[PrefRecipe]:
         return [
@@ -425,6 +482,9 @@ class NodeCookBook(CookBook):
 
 
 class BrewCookBook(CookBook):
+    @property
+    def aliases(self) -> Set[str]:
+        return {'brew'}
 
     @property
     def recipes(self) -> List[PrefRecipe]:
@@ -454,6 +514,10 @@ class BrewCookBook(CookBook):
 
 class XcodeCookBook(CookBook):
     @property
+    def aliases(self) -> Set[str]:
+        return {'xcode'}
+
+    @property
     def recipes(self) -> List[PrefRecipe]:
         return [
             *PrefRecipe.glob(
@@ -468,6 +532,10 @@ class XcodeCookBook(CookBook):
 
 
 class IntelliJIdeaCookBook(CookBook):
+    @property
+    def aliases(self) -> Set[str]:
+        return {'intellij'}
+
     @property
     def recipes(self) -> List[PrefRecipe]:
         return [
@@ -488,6 +556,10 @@ class IntelliJIdeaCookBook(CookBook):
 
 class AndroidStudioCookBook(CookBook):
     @property
+    def aliases(self) -> Set[str]:
+        return {'android-studio'}
+
+    @property
     def recipes(self) -> List[PrefRecipe]:
         return [
             *PrefRecipe.glob(
@@ -506,6 +578,10 @@ class AndroidStudioCookBook(CookBook):
 
 
 class AppCodeCookBook(CookBook):
+    @property
+    def aliases(self) -> Set[str]:
+        return {'appcode'}
+
     @property
     def recipes(self) -> List[PrefRecipe]:
         return [
@@ -526,6 +602,10 @@ class AppCodeCookBook(CookBook):
 
 class RubyMineCookBook(CookBook):
     @property
+    def aliases(self) -> Set[str]:
+        return {'rubymine'}
+
+    @property
     def recipes(self) -> List[PrefRecipe]:
         return [
             *PrefRecipe.glob(
@@ -544,6 +624,10 @@ class RubyMineCookBook(CookBook):
 
 
 class GoLandCookBook(CookBook):
+    @property
+    def aliases(self) -> Set[str]:
+        return {'goland'}
+
     @property
     def recipes(self) -> List[PrefRecipe]:
         return [
@@ -564,6 +648,10 @@ class GoLandCookBook(CookBook):
 
 class CLionCookBook(CookBook):
     @property
+    def aliases(self) -> Set[str]:
+        return {'clion'}
+
+    @property
     def recipes(self) -> List[PrefRecipe]:
         return [
             *PrefRecipe.glob(
@@ -582,6 +670,10 @@ class CLionCookBook(CookBook):
 
 
 class RiderCookBook(CookBook):
+    @property
+    def aliases(self) -> Set[str]:
+        return {'rider'}
+
     @property
     def recipes(self) -> List[PrefRecipe]:
         return [
