@@ -3,6 +3,19 @@ from typing import Callable, TypeVar, Optional, Generic
 T = TypeVar('T')  # pylint: disable=invalid-name
 
 
+class BoolBox:
+    value: bool
+
+    def __init__(self, value: bool):
+        self.value = value
+
+    def fold(self, truthy: Callable[[], T], falsy: Callable[[], T]) -> T:
+        if self.value:
+            return truthy()
+        else:
+            return falsy()
+
+
 class TernaryBox:
     value: any
 

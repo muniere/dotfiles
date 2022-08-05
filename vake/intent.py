@@ -2,6 +2,7 @@ import os
 import re
 import sys
 from abc import ABCMeta, abstractmethod
+from dataclasses import dataclass, field
 from enum import Enum, auto
 from pathlib import Path
 from typing import TextIO, List, Tuple
@@ -97,28 +98,18 @@ class PrefAction(Action, metaclass=ABCMeta):
         return True
 
 
+@dataclass(frozen=True)
 class PrefLinkAction(PrefAction):
-    _cleanup: bool
-    _activate: bool
-    _logger: Lumber
-    _noop: bool
-
-    def __init__(self,
-                 cleanup: bool = True,
-                 activate: bool = True,
-                 logger: Lumber = Lumber.noop(),
-                 noop: bool = False):
-        self._cleanup = cleanup
-        self._activate = activate
-        self._logger = logger
-        self._noop = noop
-        return
+    logger: Lumber = field(default_factory=lambda: Lumber.noop())
+    cleanup: bool = field(default_factory=lambda: True)
+    activate: bool = field(default_factory=lambda: True)
+    noop: bool = field(default_factory=lambda: False)
 
     def run(self):
         books = self._books(reverse=False)
 
-        if self._cleanup:
-            PrefCleanupAction(logger=self._logger, noop=self._noop).perform(books)
+        if self.cleanup:
+            PrefCleanupAction(logger=self.logger, noop=self.noop).perform(books)
 
         return self.perform(books)
 
@@ -126,7 +117,7 @@ class PrefLinkAction(PrefAction):
         identity = kernel.identify()
 
         for i, book in enumerate(books, start=1):
-            self._logger.mark(f"{book.name} Launched ({i:02}/{len(books)})".ljust(80), bold=True)
+            self.logger.mark(f"{book.name} Launched ({i:02}/{len(books)})".ljust(80), bold=True)
 
             for recipe in book.recipes:
                 if recipe.src.is_absolute():
@@ -141,24 +132,24 @@ class PrefLinkAction(PrefAction):
             for snippet in book.snippets:
                 self.__enable(snippet)
 
-            if self._activate:
-                book.activate(logger=self._logger, noop=self._noop)
+            if self.activate:
+                book.activate(logger=self.logger, noop=self.noop)
 
     def __link(self, chain: PrefChain) -> bool:
         if not self._test(chain.src):
-            self._logger.debug(f'File ignored: {chain.src}')
+            self.logger.debug(f'File ignored: {chain.src}')
             return False
 
         if not chain.src.exists():
-            self._logger.info(f'File not found: {chain.src}')
+            self.logger.info(f'File not found: {chain.src}')
             return False
 
         if chain.dst.is_symlink():
-            self._logger.info(f'Symlink already exists: {chain.dst}')
+            self.logger.info(f'Symlink already exists: {chain.dst}')
             return False
 
         if chain.dst.is_file():
-            self._logger.info(f'File already exists: {chain.dst}')
+            self.logger.info(f'File already exists: {chain.dst}')
             return False
 
         if not chain.dst.parent.is_dir():
@@ -168,18 +159,18 @@ class PrefLinkAction(PrefAction):
         return True
 
     def __mkdir(self, path: Path) -> bool:
-        self._logger.trace(f'mkdir -p {path}')
+        self.logger.trace(f'mkdir -p {path}')
 
-        if self._noop:
+        if self.noop:
             return False
 
         path.mkdir(parents=True, exist_ok=True)
         return True
 
     def __symlink(self, src: Path, dst: Path) -> bool:
-        self._logger.trace(f'ln -s -f {src} {dst}')
+        self.logger.trace(f'ln -s -f {src} {dst}')
 
-        if self._noop:
+        if self.noop:
             return False
 
         dst.symlink_to(src)
@@ -190,19 +181,19 @@ class PrefLinkAction(PrefAction):
         dst = Path(snippet.dst).expanduser()
 
         if not src.exists():
-            self._logger.info(f'File not found: {snippet.src}')
+            self.logger.info(f'File not found: {snippet.src}')
             return False
 
         src_str = src.read_text(encoding='utf-8').strip()
         dst_str = dst.read_text(encoding='utf-8').strip() if dst.exists() else ''
 
         if src_str in dst_str:
-            self._logger.info(f'Snippet already enabled: {dst}')
+            self.logger.info(f'Snippet already enabled: {dst}')
             return False
 
-        self._logger.info(f'Enable snippet: {src}')
+        self.logger.info(f'Enable snippet: {src}')
 
-        if self._noop:
+        if self.noop:
             return False
 
         new_str = TernaryBox(len(dst_str)).fold(
@@ -214,28 +205,18 @@ class PrefLinkAction(PrefAction):
         return True
 
 
+@dataclass(frozen=True)
 class PrefUnlinkAction(PrefAction):
-    _cleanup: bool
-    _deactivate: bool
-    _logger: Lumber
-    _noop: bool
-
-    def __init__(self,
-                 cleanup: bool = True,
-                 deactivate: bool = True,
-                 logger: Lumber = Lumber.noop(),
-                 noop: bool = False):
-        self._cleanup = cleanup
-        self._deactivate = deactivate
-        self._logger = logger
-        self._noop = noop
-        return
+    logger: Lumber = field(default_factory=lambda: Lumber.noop())
+    cleanup: bool = field(default_factory=lambda: True)
+    deactivate: bool = field(default_factory=lambda: True)
+    noop: bool = field(default_factory=lambda: False)
 
     def run(self):
         books = self._books(reverse=True)
 
-        if self._cleanup:
-            PrefCleanupAction(logger=self._logger, noop=self._noop).perform(books)
+        if self.cleanup:
+            PrefCleanupAction(logger=self.logger, noop=self.noop).perform(books)
 
         return self.perform(books)
 
@@ -243,10 +224,10 @@ class PrefUnlinkAction(PrefAction):
         identity = kernel.identify()
 
         for i, book in enumerate(books, start=1):
-            self._logger.mark(f"{book.name} Launched ({i:02}/{len(books)})".ljust(80), bold=True)
+            self.logger.mark(f"{book.name} Launched ({i:02}/{len(books)})".ljust(80), bold=True)
 
-            if self._deactivate:
-                book.deactivate(logger=self._logger, noop=self._noop)
+            if self.deactivate:
+                book.deactivate(logger=self.logger, noop=self.noop)
 
             for snippet in book.snippets:
                 self.__disable(snippet)
@@ -265,23 +246,23 @@ class PrefUnlinkAction(PrefAction):
 
     def __unlink(self, chain: PrefChain) -> bool:
         if not self._test(chain.src):
-            self._logger.debug(f'File is not target: {chain.src}')
+            self.logger.debug(f'File is not target: {chain.src}')
             return False
 
         if not chain.src.exists():
-            self._logger.info(f'File not found: {chain.src}')
+            self.logger.info(f'File not found: {chain.src}')
             return False
 
         if not chain.dst.exists() and not chain.dst.is_symlink():
-            self._logger.info(f'File already removed: {chain.dst}')
+            self.logger.info(f'File already removed: {chain.dst}')
             return True
 
         return self.__rm(chain.dst)
 
     def __rm(self, path: Path) -> bool:
-        self._logger.trace(f'rm -f {path}')
+        self.logger.trace(f'rm -f {path}')
 
-        if self._noop:
+        if self.noop:
             return False
 
         path.unlink(missing_ok=True)
@@ -292,23 +273,23 @@ class PrefUnlinkAction(PrefAction):
         dst = Path(snippet.dst).expanduser()
 
         if not src.exists():
-            self._logger.info(f'File not found: {src}')
+            self.logger.info(f'File not found: {src}')
             return False
 
         if not dst.exists():
-            self._logger.info(f'File not found: {dst}')
+            self.logger.info(f'File not found: {dst}')
             return False
 
         src_str = src.read_text(encoding='utf-8').strip()
         dst_str = dst.read_text(encoding='utf-8')
 
         if src_str not in dst_str:
-            self._logger.info(f'Snippet already disabled: {dst}')
+            self.logger.info(f'Snippet already disabled: {dst}')
             return False
 
-        self._logger.info(f'Disable snippet: {src}')
+        self.logger.info(f'Disable snippet: {src}')
 
-        if self._noop:
+        if self.noop:
             return False
 
         pattern = re.escape(src_str) + os.linesep + '*'
@@ -328,21 +309,14 @@ class PrefListStyleOption(Enum):
     LONG = auto()
 
 
+@dataclass(frozen=True)
 class PrefListAction(PrefAction):
-    _stream: TextIO
-    _color: PrefListColorOption
-    _style: PrefListStyleOption
+    stream: TextIO = field(default_factory=lambda: sys.stdout)
+    color: PrefListColorOption = field(default_factory=lambda: PrefListColorOption.AUTO)
+    style: PrefListStyleOption = field(default_factory=lambda: PrefListStyleOption.SHORT)
 
     SEP = ' -> '
     END = os.linesep
-
-    def __init__(self,
-                 stream: TextIO = sys.stdout,
-                 color: PrefListColorOption = PrefListColorOption.AUTO,
-                 style: PrefListStyleOption = PrefListStyleOption.SHORT):
-        self._stream = stream
-        self._color = color
-        self._style = style
 
     def run(self):
         identity = kernel.identify()
@@ -361,7 +335,7 @@ class PrefListAction(PrefAction):
         chains.sort(key=lambda x: x.dst)
         lines = [self.__line(x) for x in chains if self._test(x.src)]
 
-        self._stream.writelines(lines)
+        self.stream.writelines(lines)
         return
 
     def __line(self, chain: PrefChain) -> str:
@@ -377,10 +351,10 @@ class PrefListAction(PrefAction):
         src, dst = self.__resolve(chain)
         color = self.__color_for(dst)
 
-        if self._style == PrefListStyleOption.LONG:
+        if self.style == PrefListStyleOption.LONG:
             return sep.join([color.decorate(dst), str(src)]) + end
 
-        if self._style == PrefListStyleOption.SHORT:
+        if self.style == PrefListStyleOption.SHORT:
             return color.decorate(dst) + end
 
         return color.decorate(dst) + end
@@ -391,22 +365,22 @@ class PrefListAction(PrefAction):
 
         src, dst = self.__resolve(chain)
 
-        if self._style == PrefListStyleOption.LONG:
+        if self.style == PrefListStyleOption.LONG:
             return sep.join([str(dst), str(src)]) + end
 
-        if self._style == PrefListStyleOption.SHORT:
+        if self.style == PrefListStyleOption.SHORT:
             return str(dst) + end
 
         return str(dst) + end
 
     def __colorful(self) -> bool:
-        if self._color == PrefListColorOption.ALWAYS:
+        if self.color == PrefListColorOption.ALWAYS:
             return True
 
-        if self._color == PrefListColorOption.NEVER:
+        if self.color == PrefListColorOption.NEVER:
             return False
 
-        return self._stream.isatty()
+        return self.stream.isatty()
 
     @staticmethod
     def __resolve(chain: PrefChain) -> Tuple[Path, Path]:
@@ -434,14 +408,10 @@ class PrefListAction(PrefAction):
         return Color.RESET
 
 
+@dataclass(frozen=True)
 class PrefCleanupAction(PrefAction):
-    _logger: Lumber
-    _noop: bool
-
-    def __init__(self, logger: Lumber = Lumber.noop(), noop: bool = False):
-        self._logger = logger
-        self._noop = noop
-        return
+    logger: Lumber = field(default_factory=lambda: Lumber.noop())
+    noop: bool = field(default_factory=lambda: False)
 
     def run(self):
         books = self._books()
@@ -460,11 +430,11 @@ class PrefCleanupAction(PrefAction):
 
         for path in sorted(candidates):
             message = f'Scanning {path}'
-            self._logger.debug(f'{message}...\r', terminate=False)
+            self.logger.debug(f'{message}...\r', terminate=False)
             found += self.__scan(path)
-            self._logger.debug(f'{message}... Done')
+            self.logger.debug(f'{message}... Done')
 
-        self._logger.debug(f'Found {len(found)} broken symlinks')
+        self.logger.debug(f'Found {len(found)} broken symlinks')
         for path in found:
             self.__rm(path)
 
@@ -491,9 +461,9 @@ class PrefCleanupAction(PrefAction):
         return []
 
     def __rm(self, path: Path) -> bool:
-        self._logger.trace(f'rm -f {path}')
+        self.logger.trace(f'rm -f {path}')
 
-        if self._noop:
+        if self.noop:
             return False
 
         path.unlink(missing_ok=True)

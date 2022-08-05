@@ -8,10 +8,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List
 
-from . import kernel
 from . import timber
-from .box import TernaryBox
-from .intent import Action, PrefListColorOption, PrefListStyleOption
+from .box import BoolBox, TernaryBox
+from .intent import PrefListColorOption, PrefListStyleOption
 from .intent import PrefLinkAction, PrefUnlinkAction, PrefCleanupAction, PrefListAction
 from .timber import Level, TaggedFormatter, StreamHandler, Lumber
 
@@ -70,24 +69,14 @@ class ListCommand(Command):
     color: str
 
     def run(self):
-        identity = kernel.identify()
-
-        actions: List[Action] = [
-            PrefListAction(
-                color=PrefListColorOption(self.color),
-                style=PrefListStyleOption.LONG if self.long else PrefListStyleOption.SHORT,
-            ),
-        ]
-
-        if identity.is_linux():
-            actions += []
-
-        if identity.is_darwin():
-            actions += []
-
-        for action in actions:
-            action.run()
-
+        action = PrefListAction(
+            color=PrefListColorOption(self.color),
+            style=BoolBox(self.long).fold(
+                truthy=lambda: PrefListStyleOption.LONG,
+                falsy=lambda: PrefListStyleOption.SHORT
+            )
+        )
+        action.run()
         return
 
     class Factory(Command.Factory):
@@ -128,18 +117,13 @@ class LinkCommand(Command):
     verbose: bool
 
     def run(self):
-        cleanup = self.cleanup
-        activate = self.activate
-        noop = self.dry_run
-        logger = self._logger(verbose=self.verbose)
-
-        actions = [
-            PrefLinkAction(cleanup=cleanup, activate=activate, noop=noop, logger=logger),
-        ]
-
-        for action in actions:
-            action.run()
-
+        action = PrefLinkAction(
+            logger=self._logger(verbose=self.verbose),
+            cleanup=self.cleanup,
+            activate=self.activate,
+            noop=self.dry_run,
+        )
+        action.run()
         return
 
     class Factory(Command.Factory):
@@ -193,18 +177,13 @@ class UnlinkCommand(Command):
     verbose: bool
 
     def run(self) -> None:
-        cleanup = self.cleanup
-        deactivate = self.deactivate
-        noop = self.dry_run
-        logger = self._logger(verbose=self.verbose)
-
-        actions = [
-            PrefUnlinkAction(cleanup=cleanup, deactivate=deactivate, noop=noop, logger=logger),
-        ]
-
-        for action in actions:
-            action.run()
-
+        action = PrefUnlinkAction(
+            logger=self._logger(verbose=self.verbose),
+            cleanup=self.cleanup,
+            deactivate=self.deactivate,
+            noop=self.dry_run,
+        )
+        action.run()
         return
 
     class Factory(Command.Factory):
@@ -256,16 +235,11 @@ class CleanupCommand(Command):
     verbose: bool
 
     def run(self) -> None:
-        noop = self.dry_run
-        logger = self._logger(verbose=self.verbose)
-
-        actions = [
-            PrefCleanupAction(noop=noop, logger=logger),
-        ]
-
-        for action in actions:
-            action.run()
-
+        action = PrefCleanupAction(
+            logger=self._logger(verbose=self.verbose),
+            noop=self.dry_run,
+        )
+        action.run()
         return
 
     class Factory(Command.Factory):
