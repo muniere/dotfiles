@@ -193,27 +193,9 @@ inoremap <silent> <C-e><C-e> <ESC>:call ToggleNetrw(0)<CR>
 nnoremap <silent> <C-e><C-f> :call ToggleNetrw(1)<CR>
 inoremap <silent> <C-e><C-f> <ESC>:call ToggleNetrw(1)<CR>
 
-
 """
-" Plugins
+" Completion
 """
-
-call plug#begin($XDG_CONFIG_HOME.'/vim/plugged')
-
-" == Appearance
-Plug 'itchyny/lightline.vim'
-
-let g:lightline = { 
-  \ 'active'  : { 'left': [['mode'], ['relativepath'], ['modified']] },
-  \ 'inactive': { 'left': [['mode'], ['relativepath'], ['modified']] }
-  \ }
-
-" == Text Editing
-Plug 'vim-scripts/surround.vim'
-
-Plug 'editorconfig/editorconfig-vim'
-
-" == Completion
 " https://gist.github.com/maxboisvert/a63e96a67d0a83d71e9f49af73e71d93
 set completeopt=menu,menuone,noinsert
 
@@ -231,27 +213,34 @@ function! AutoComplete()
     end
 endfun
 
-" == File System
+"""
+" Plugins
+"""
+
+call plug#begin($XDG_CONFIG_HOME.'/vim/plugged')
 Plug 'vim-scripts/sudo.vim'
-
-" == Fuzzy Finder
+Plug 'vim-scripts/surround.vim'
+Plug 'editorconfig/editorconfig-vim'
+Plug 'itchyny/lightline.vim'
 Plug 'ctrlpvim/ctrlp.vim'
-
-nnoremap <silent> <C-x><C-f> :CtrlP .<CR>
-inoremap <silent> <C-x><C-f> <ESC>:CtrlP .<CR>
-nnoremap <silent> <C-x><C-b> :CtrlPBuffer<CR>
-inoremap <silent> <C-x><C-b> <ESC>:CtrlPBuffer<CR>
-
-if executable('ag')
-  let g:ctrlp_use_caching=0
-  let g:ctrlp_user_command='ag %s -i --nocolor --nogroup -g ""'
-endif
-
 call plug#end()
 
 autocmd VimEnter * if len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
   \| PlugInstall --sync | source $MYVIMRC
 \| endif
+
+" == lightline
+let g:lightline = { 
+  \ 'active'  : { 'left': [['mode'], ['relativepath'], ['modified']] },
+  \ 'inactive': { 'left': [['mode'], ['relativepath'], ['modified']] }
+  \ }
+
+" == ctrlp
+nnoremap <silent> <C-x><C-f> :CtrlP .<CR>
+inoremap <silent> <C-x><C-f> <ESC>:CtrlP .<CR>
+nnoremap <silent> <C-x><C-b> :CtrlPBuffer<CR>
+inoremap <silent> <C-x><C-b> <ESC>:CtrlPBuffer<CR>
+
 
 """
 " Appearance
