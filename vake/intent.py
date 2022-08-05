@@ -233,7 +233,7 @@ class PrefUnlinkAction(PrefAction):
     noop: bool = field(default_factory=lambda: False)
 
     def run(self):
-        books = [it for it in self._books(reverse=False) if self.__contains(it)]
+        books = [it for it in self._books(reverse=True) if self.__contains(it)]
 
         aliases = set().union(*[book.aliases for book in books])
         illegals = [it for it in self.intents if it not in aliases]
