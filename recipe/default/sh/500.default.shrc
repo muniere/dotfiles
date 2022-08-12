@@ -111,6 +111,10 @@ export PIPENV_VENV_IN_PROJECT=true
 
 if [ -n "$XDG_CONFIG_HOME" ]; then
   export IPYTHONDIR="$XDG_CONFIG_HOME/ipython"
+
+  if [ -f $XDG_CONFIG_HOME/python/startup.py ]; then
+    export PYTHONSTARTUP="$XDG_CONFIG_HOME/python/startup.py"
+  fi
 fi
 
 # =====

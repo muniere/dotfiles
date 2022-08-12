@@ -497,6 +497,21 @@ class GradleCookBook(CookBook):
         return True
 
 
+class PythonCookBook(CookBook):
+    @property
+    def aliases(self) -> Set[str]:
+        return {'python'}
+
+    @property
+    def prefs(self) -> List[PrefRecipe]:
+        return [
+            PrefRecipe.create(
+                src='python/',
+                dst='~/.config/python'
+            ),
+        ]
+
+
 class RubyCookBook(CookBook):
     @property
     def aliases(self) -> Set[str]:
