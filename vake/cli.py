@@ -111,7 +111,7 @@ class ListCommand(Command):
 class LinkCommand(Command):
     NAME = 'link'
 
-    intents: [str]
+    intents: List[str]
     cleanup: bool
     activate: bool
     dry_run: bool
