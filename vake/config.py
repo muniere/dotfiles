@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import List, Set
 
 from . import shell
+from . import xdglib
 from .box import TernaryBox
 from .timber import Lumber
 
@@ -231,9 +232,9 @@ class BinCookBook(CookBook):
     @property
     def prefs(self) -> List[PrefRecipe]:
         return [
-            PrefRecipe.create(
-                src='bin/',
-                dst='~/.local/bin'
+            PrefRecipe(
+                src=Path('bin/'),
+                dst=xdglib.bin_()
             ),
         ]
 
@@ -246,9 +247,9 @@ class ShCookBook(CookBook):
     @property
     def prefs(self) -> List[PrefRecipe]:
         return [
-            PrefRecipe.create(
-                src='sh/',
-                dst='~/.config/sh'
+            PrefRecipe(
+                src=Path('sh/'),
+                dst=xdglib.config('sh/')
             ),
         ]
 
@@ -261,17 +262,17 @@ class BashCookBook(CookBook):
     @property
     def prefs(self) -> List[PrefRecipe]:
         return [
-            PrefRecipe.create(
-                src='bash/',
-                dst='~/.config/bash'
+            PrefRecipe(
+                src=Path('bash/'),
+                dst=xdglib.config('bash/')
             ),
-            PrefRecipe.create(
-                src='/Applications/Docker.app/Contents/Resources/etc/docker.bash-completion',
-                dst='/usr/local/etc/bash_completion.d/docker'
+            PrefRecipe(
+                src=Path('/Applications/Docker.app/Contents/Resources/etc/docker.bash-completion'),
+                dst=Path('/usr/local/etc/bash_completion.d/docker')
             ),
-            PrefRecipe.create(
-                src='/Applications/Docker.app/Contents/Resources/etc/docker-compose.bash-completion',
-                dst='/usr/local/etc/bash_completion.d/docker-compose'
+            PrefRecipe(
+                src=Path('/Applications/Docker.app/Contents/Resources/etc/docker-compose.bash-completion'),
+                dst=Path('/usr/local/etc/bash_completion.d/docker-compose')
             ),
         ]
 
@@ -293,21 +294,21 @@ class ZshCookBook(CookBook):
     @property
     def prefs(self) -> List[PrefRecipe]:
         return [
-            PrefRecipe.create(
-                src='zsh/',
-                dst='~/.config/zsh',
+            PrefRecipe(
+                src=Path('zsh/'),
+                dst=xdglib.config('zsh/'),
             ),
-            PrefRecipe.create(
-                src='zsh-site-functions/',
-                dst='~/.local/share/zsh/site-functions',
+            PrefRecipe(
+                src=Path('zsh-site-functions/'),
+                dst=xdglib.data('zsh/site-functions/')
             ),
-            PrefRecipe.create(
-                src='/Applications/Docker.app/Contents/Resources/etc/docker.zsh-completion',
-                dst='/usr/local/share/zsh/site-functions/_docker'
+            PrefRecipe(
+                src=Path('/Applications/Docker.app/Contents/Resources/etc/docker.zsh-completion'),
+                dst=Path('/usr/local/share/zsh/site-functions/_docker')
             ),
-            PrefRecipe.create(
-                src='/Applications/Docker.app/Contents/Resources/etc/docker-compose.zsh-completion',
-                dst='/usr/local/share/zsh/site-functions/_docker-compose'
+            PrefRecipe(
+                src=Path('/Applications/Docker.app/Contents/Resources/etc/docker-compose.zsh-completion'),
+                dst=Path('/usr/local/share/zsh/site-functions/_docker-compose')
             ),
         ]
 
@@ -351,9 +352,9 @@ class VimCookBook(CookBook):
     @property
     def prefs(self) -> List[PrefRecipe]:
         return [
-            PrefRecipe.create(
-                src='vim/',
-                dst='~/.config/vim',
+            PrefRecipe(
+                src=Path('vim/'),
+                dst=xdglib.config('vim/'),
             ),
         ]
 
@@ -368,7 +369,7 @@ class VimCookBook(CookBook):
 
     def activate(self, logger: Lumber = Lumber.noop(), noop: bool = False):
         url = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-        out = '~/.config/vim/autoload/plug.vim'
+        out = xdglib.config('vim/autoload/plug.vim')
 
         shell.call(
             cmd=f'sh -c "curl -fSL -o {out} --create-dirs {url}"',
@@ -399,18 +400,18 @@ class GitCookBook(CookBook):
     @property
     def prefs(self) -> List[PrefRecipe]:
         return [
-            PrefRecipe.create(
-                src='git/',
-                dst='~/.config/git'
+            PrefRecipe(
+                src=Path('git/'),
+                dst=xdglib.config('git/')
             ),
-            PrefRecipe.create(
-                src='tig/',
-                dst='~/.config/tig'
+            PrefRecipe(
+                src=Path('tig/'),
+                dst=xdglib.config('tig/')
             ),
         ]
 
     def activate(self, logger: Lumber = Lumber.noop(), noop: bool = False):
-        hist = Path('~/.local/share/tig/history').expanduser()
+        hist = xdglib.config('tig/history')
 
         if not hist.parent.is_dir():
             self._mkdir(hist.parent, logger=logger, noop=noop)
@@ -426,9 +427,9 @@ class GitHubCookBook(CookBook):
     @property
     def prefs(self) -> List[PrefRecipe]:
         return [
-            PrefRecipe.create(
-                src='gh/',
-                dst='~/.local/share/gh'
+            PrefRecipe(
+                src=Path('gh/'),
+                dst=xdglib.data('gh/')
             ),
         ]
 
@@ -441,9 +442,9 @@ class AsdfCookBook(CookBook):
     @property
     def prefs(self) -> List[PrefRecipe]:
         return [
-            PrefRecipe.create(
-                src='asdf/',
-                dst='~/.config/asdf'
+            PrefRecipe(
+                src=Path('asdf/'),
+                dst=xdglib.config('asdf/')
             ),
         ]
 
@@ -456,9 +457,9 @@ class TmuxCookBook(CookBook):
     @property
     def prefs(self) -> List[PrefRecipe]:
         return [
-            PrefRecipe.create(
-                src='tmux/',
-                dst='~/.config/tmux'
+            PrefRecipe(
+                src=Path('tmux/'),
+                dst=xdglib.config('tmux/')
             ),
         ]
 
@@ -471,9 +472,9 @@ class RangerCookBook(CookBook):
     @property
     def prefs(self) -> List[PrefRecipe]:
         return [
-            PrefRecipe.create(
-                src='ranger/',
-                dst='~/.config/ranger'
+            PrefRecipe(
+                src=Path('ranger/'),
+                dst=xdglib.config('ranger/')
             ),
         ]
 
@@ -486,9 +487,9 @@ class GradleCookBook(CookBook):
     @property
     def prefs(self) -> List[PrefRecipe]:
         return [
-            PrefRecipe.create(
-                src='gradle',
-                dst='~/.local/share/gradle',
+            PrefRecipe(
+                src=Path('gradle'),
+                dst=xdglib.data('gradle/'),
             ),
         ]
 
@@ -505,9 +506,9 @@ class PythonCookBook(CookBook):
     @property
     def prefs(self) -> List[PrefRecipe]:
         return [
-            PrefRecipe.create(
-                src='python/',
-                dst='~/.config/python'
+            PrefRecipe(
+                src=Path('python/'),
+                dst=xdglib.config('python/')
             ),
         ]
 
@@ -520,9 +521,9 @@ class RubyCookBook(CookBook):
     @property
     def prefs(self) -> List[PrefRecipe]:
         return [
-            PrefRecipe.create(
-                src='bundle/',
-                dst='~/.config/bundle'
+            PrefRecipe(
+                src=Path('bundle/'),
+                dst=xdglib.config('bundle/')
             ),
         ]
 
@@ -535,9 +536,9 @@ class NodeCookBook(CookBook):
     @property
     def prefs(self) -> List[PrefRecipe]:
         return [
-            PrefRecipe.create(
-                src='npm/',
-                dst='~/.config/npm'
+            PrefRecipe(
+                src=Path('npm/'),
+                dst=xdglib.config('npm/')
             ),
         ]
 
@@ -558,9 +559,9 @@ class BrewCookBook(CookBook):
     @property
     def prefs(self) -> List[PrefRecipe]:
         return [
-            PrefRecipe.create(
-                src='homebrew/Brewfile',
-                dst='~/.config/homebrew/Brewfile',
+            PrefRecipe(
+                src=Path('homebrew/Brewfile'),
+                dst=xdglib.config('homebrew/Brewfile'),
             ),
         ]
 
@@ -573,7 +574,7 @@ class BrewCookBook(CookBook):
             return
 
         shell.call(
-            cmd='brew bundle install --file ~/.config/homebrew/Brewfile --no-lock',
+            cmd=f'brew bundle install --file {xdglib.config("homebrew/Brewfile")} --no-lock',
             logger=logger,
             noop=noop,
         )
