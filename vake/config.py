@@ -597,13 +597,18 @@ class BrewCookBook(CookBook):
             ),
         ]
 
-    # noinspection PyBroadException
     def activate(self, logger: Lumber = Lumber.noop(), noop: bool = False):
         try:
             shell.which('brew')
         except shell.SubprocessError:
-            logger.warn('skip bundle. command not found: brew')
-            return
+            logger.info('Homebrew not installed yet, so now install.')
+
+            # see https://brew.sh/
+            shell.call(
+                cmd='/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"',
+                logger=logger,
+                noop=noop,
+            )
 
         shell.call(
             cmd=f'brew bundle install --file {xdglib.config("homebrew/Brewfile")} --no-lock',
