@@ -253,6 +253,38 @@ class ShCookBook(CookBook):
             ),
         ]
 
+    def activate(self, logger: Lumber = Lumber.noop(), noop: bool = False):
+        shell.call(
+            cmd=f'mkdir -p -m 755 {xdglib.bin_()}',
+            logger=logger,
+            noop=noop,
+        )
+        shell.call(
+            cmd=f'mkdir -p -m 755 {xdglib.cache()}',
+            logger=logger,
+            noop=noop,
+        )
+        shell.call(
+            cmd=f'mkdir -p -m 755 {xdglib.config()}',
+            logger=logger,
+            noop=noop,
+        )
+        shell.call(
+            cmd=f'mkdir -p -m 755 {xdglib.data()}',
+            logger=logger,
+            noop=noop,
+        )
+        shell.call(
+            cmd=f'mkdir -p -m 755 {xdglib.state()}',
+            logger=logger,
+            noop=noop,
+        )
+        shell.call(
+            cmd=f'mkdir -p -m 700 {xdglib.runtime()}',
+            logger=logger,
+            noop=noop,
+        )
+
 
 class BashCookBook(CookBook):
     @property
