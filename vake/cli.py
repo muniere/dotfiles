@@ -1,8 +1,7 @@
-import abc
 import argparse
 import builtins
 import sys
-from abc import abstractmethod
+from abc import abstractmethod, ABCMeta
 from argparse import ArgumentParser, ArgumentError, Namespace
 from dataclasses import dataclass
 from pathlib import Path
@@ -10,8 +9,8 @@ from typing import List
 
 from . import timber
 from .box import BoolBox, TernaryBox
-from .intent import PrefListColorOption, PrefListStyleOption
 from .intent import PrefLinkAction, PrefUnlinkAction, PrefCleanupAction, PrefListAction
+from .intent import PrefListColorOption, PrefListStyleOption
 from .timber import Level, TaggedFormatter, StreamHandler, Lumber
 
 __all__ = [
@@ -19,7 +18,7 @@ __all__ = [
 ]
 
 
-class Command(metaclass=abc.ABCMeta):
+class Command(metaclass=ABCMeta):
     @abstractmethod
     def run(self):
         raise NotImplementedError()
@@ -48,7 +47,7 @@ class Command(metaclass=abc.ABCMeta):
 
         return logger
 
-    class Factory(metaclass=abc.ABCMeta):
+    class Factory(metaclass=ABCMeta):
 
         # noinspection PyUnresolvedReferences,PyProtectedMember
         @classmethod
