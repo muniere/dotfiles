@@ -24,7 +24,7 @@ def state(*other: Union[str, Path]) -> Path:
 
 
 def runtime(*other: Union[str, Path]) -> Path:
-    return __factory('XDG_RUNTIME_HOME', '~/.run', *other)
+    return __factory('XDG_RUNTIME_HOME', '~/.local/run', *other)
 
 
 def __factory(key: str, default: str, *other: Union[str, Path]):
