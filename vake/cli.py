@@ -7,8 +7,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List
 
+from . import flow
 from . import timber
-from .box import BoolBox, TernaryBox
 from .intent import PrefLinkAction, PrefUnlinkAction, PrefCleanupAction, PrefListAction
 from .intent import PrefListColorOption, PrefListStyleOption
 from .timber import Level, TaggedFormatter, StreamHandler, Lumber
@@ -27,14 +27,16 @@ class Command(metaclass=ABCMeta):
     def _logger(verbose: bool) -> Lumber:
         stream = sys.stdout
 
-        level = TernaryBox(verbose).fold(
-            some=lambda: Level.DEBUG,
-            none=lambda: Level.TRACE
+        level = flow.branch(
+            value=verbose,
+            truthy=lambda: Level.DEBUG,
+            falsy=lambda: Level.TRACE
         )
 
-        formatter = TernaryBox(stream.isatty()).fold(
-            some=lambda: TaggedFormatter.colored(),
-            none=lambda: TaggedFormatter.default(),
+        formatter = flow.branch(
+            value=stream.isatty(),
+            truthy=lambda: TaggedFormatter.colored(),
+            falsy=lambda: TaggedFormatter.default(),
         )
 
         handler = StreamHandler(stream=stream)
@@ -70,7 +72,8 @@ class ListCommand(Command):
     def run(self):
         action = PrefListAction(
             color=PrefListColorOption(self.color),
-            style=BoolBox(self.long).fold(
+            style=flow.branch(
+                value=self.long,
                 truthy=lambda: PrefListStyleOption.LONG,
                 falsy=lambda: PrefListStyleOption.SHORT
             )

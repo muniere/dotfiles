@@ -8,9 +8,9 @@ from pathlib import Path
 from typing import TextIO, List
 
 from . import config
+from . import flow
 from . import kernel
 from . import locate
-from .box import TernaryBox
 from .config import PrefChain, CookBook, SnipChain
 from .timber import Lumber
 from .tty import Color
@@ -216,9 +216,10 @@ class PrefLinkAction(PrefAction):
         if self.noop:
             return False
 
-        new_str = TernaryBox(len(dst_str)).fold(
-            some=lambda: dst_str + os.linesep + src_str + os.linesep,
-            none=lambda: src_str + os.linesep,
+        new_str = flow.branch(
+            value=dst_str,
+            truthy=lambda: dst_str + os.linesep + src_str + os.linesep,
+            falsy=lambda: src_str + os.linesep,
         )
 
         chain.dst.write_text(new_str, encoding='utf-8')

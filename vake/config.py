@@ -4,9 +4,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Set
 
+from . import flow
 from . import shell
 from . import xdglib
-from .box import TernaryBox
 from .timber import Lumber
 
 __all__ = [
@@ -75,15 +75,17 @@ class PrefRecipe:
     def expand(self, src_prefix: Path = Path(), dst_prefix: Path = Path()) -> List[PrefChain]:
         # resolve
         ex_src = self.src.expanduser()
-        abs_src = TernaryBox(ex_src.is_absolute()).fold(
-            some=lambda: Path(ex_src),
-            none=lambda: Path(src_prefix, ex_src).resolve(),
+        abs_src = flow.branch(
+            value=ex_src.is_absolute(),
+            truthy=lambda: Path(ex_src),
+            falsy=lambda: Path(src_prefix, ex_src).resolve(),
         )
 
         ex_dst = self.dst.expanduser()
-        abs_dst = TernaryBox(ex_dst.is_absolute()).fold(
-            some=lambda: Path(ex_dst),
-            none=lambda: Path(dst_prefix, ex_dst).resolve(),
+        abs_dst = flow.branch(
+            value=ex_dst.is_absolute(),
+            truthy=lambda: Path(ex_dst),
+            falsy=lambda: Path(dst_prefix, ex_dst).resolve(),
         )
 
         # guard : none
@@ -138,15 +140,17 @@ class SnipRecipe:
     def expand(self, src_prefix: Path = Path(), dst_prefix: Path = Path()) -> List[SnipChain]:
         # resolve
         ex_src = self.src.expanduser()
-        abs_src = TernaryBox(ex_src.is_absolute()).fold(
-            some=lambda: Path(ex_src),
-            none=lambda: Path(src_prefix, ex_src).resolve(),
+        abs_src = flow.branch(
+            value=ex_src.is_absolute(),
+            truthy=lambda: Path(ex_src),
+            falsy=lambda: Path(src_prefix, ex_src).resolve(),
         )
 
         ex_dst = self.dst.expanduser()
-        abs_dst = TernaryBox(ex_dst.is_absolute()).fold(
-            some=lambda: Path(ex_dst),
-            none=lambda: Path(dst_prefix, ex_dst).resolve(),
+        abs_dst = flow.branch(
+            value=ex_dst.is_absolute(),
+            truthy=lambda: Path(ex_dst),
+            falsy=lambda: Path(dst_prefix, ex_dst).resolve(),
         )
 
         # guard : none
