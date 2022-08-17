@@ -5,7 +5,7 @@ from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import TextIO, List
+from typing import TextIO, List, cast
 
 from . import config
 from . import flow
@@ -130,8 +130,10 @@ class PrefLinkAction(PrefAction):
                 if pref.src.is_absolute():
                     pref_chains = pref.expand()
                 else:
-                    pref_chains = pref.expand(src_prefix=Path(locate.recipe(), identity.value)) + \
-                                  pref.expand(src_prefix=Path(locate.recipe(), 'default'))
+                    pref_chains = [
+                        *pref.expand(src_prefix=Path(locate.recipe(), cast(str, identity.value))),
+                        *pref.expand(src_prefix=Path(locate.recipe(), 'default')),
+                    ]
 
                 for chain in pref_chains:
                     self.__link(chain)
@@ -269,8 +271,10 @@ class PrefUnlinkAction(PrefAction):
                 if pref.src.is_absolute():
                     pref_chains = pref.expand()
                 else:
-                    pref_chains = pref.expand(src_prefix=Path(locate.recipe(), identity.value)) + \
-                                  pref.expand(src_prefix=Path(locate.recipe(), 'default'))
+                    pref_chains = [
+                        *pref.expand(src_prefix=Path(locate.recipe(), cast(str, identity.value))),
+                        *pref.expand(src_prefix=Path(locate.recipe(), 'default')),
+                    ]
 
                 for chain in pref_chains:
                     self.__unlink(chain)
@@ -369,7 +373,7 @@ class PrefListAction(PrefAction):
                 if pref.src.is_absolute():
                     chains += pref.expand()
                 else:
-                    chains += pref.expand(src_prefix=Path(locate.recipe(), identity.value))
+                    chains += pref.expand(src_prefix=Path(locate.recipe(), cast(str, identity.value)))
                     chains += pref.expand(src_prefix=Path(locate.recipe(), 'default'))
 
         chains.sort(key=lambda x: x.dst)

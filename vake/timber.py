@@ -2,7 +2,7 @@ import logging
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional, Dict
+from typing import Optional, Dict, cast
 
 from .tty import Color
 
@@ -92,7 +92,7 @@ class StreamHandler(logging.StreamHandler):
         # pylint: enable=broad-except
 
     def set_level(self, level: Level):
-        self.setLevel(level.value)
+        self.setLevel(cast(int, level.value))
 
     def set_formatter(self, formatter: TaggedFormatter):
         self.setFormatter(formatter)
@@ -168,7 +168,7 @@ class DefaultLumber(Lumber):
         self._delegate.log(Level.TRACE.value, msg, extra={'terminate': terminate, 'bold': bold})
 
     def set_level(self, level: Level):
-        self._delegate.setLevel(level.value)
+        self._delegate.setLevel(cast(int, level.value))
 
     def add_handler(self, handler: logging.Handler):
         self._delegate.addHandler(handler)
