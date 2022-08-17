@@ -3,7 +3,7 @@ import re
 import sys
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
-from enum import Enum, auto
+from enum import Enum
 from pathlib import Path
 from typing import TextIO, List
 
@@ -345,8 +345,8 @@ class PrefListColorOption(Enum):
 
 
 class PrefListStyleOption(Enum):
-    SHORT = auto()
-    LONG = auto()
+    SHORT = 'short'
+    LONG = 'long'
 
 
 @dataclass(frozen=True)
