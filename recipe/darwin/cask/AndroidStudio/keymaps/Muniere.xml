@@ -11,5 +11,8 @@
     <keyboard-shortcut first-keystroke="shift meta f9" />
   </action>
   <action id="MakeModule" />
+  <action id="ShowPopupMenu">
+    <keyboard-shortcut first-keystroke="ctrl alt enter" />
+  </action>
   <action id="TypeHierarchy" />
 </keymap>
