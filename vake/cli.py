@@ -326,14 +326,15 @@ class CompletionCommand(Command):
             # bytestring_passthrough=True,
         )
 
-        rendered = template.render(
+        rendered_b = template.render(
             options=parser.options,
             actions=parser.actions,
         )
+        rendered_s = rendered_b.decode('utf-8')
 
-        dst.write_text(rendered, encoding='utf-8')
+        dst.write_text(rendered_s, encoding='utf-8')
 
-        sys.stdout.write(rendered)
+        sys.stdout.write(rendered_s)
         return
 
     class Factory(Command.Factory):
