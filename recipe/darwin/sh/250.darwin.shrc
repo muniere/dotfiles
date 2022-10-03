@@ -7,4 +7,8 @@ if [ -d /opt/homebrew/bin ]; then
   addpath /opt/homebrew/bin
 fi
 
+if (which brew &> /dev/null); then
+  export BREW_PREFIX=$(brew --prefix)
+fi
+
 # vim: ft=sh sw=2 ts=2 sts=2

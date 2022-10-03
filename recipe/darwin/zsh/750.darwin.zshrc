@@ -2,7 +2,7 @@
 # asdf : Completion
 # =====
 if (which asdf &> /dev/null); then
-  source /usr/local/opt/asdf/asdf.sh
+  source $BREW_PREFIX/opt/asdf/asdf.sh
 fi
 
 # =====
@@ -16,8 +16,8 @@ fi
 # =====
 # Tig : Completion
 # =====
-if [ -f /usr/local/opt/tig/etc/bash_completion.d/tig-completion.bash ]; then
-  . /usr/local/opt/tig/etc/bash_completion.d/tig-completion.bash 
+if [ -f $BREW_PREFIX/opt/tig/etc/bash_completion.d/tig-completion.bash ]; then
+  . $BREW_PREFIX/opt/tig/etc/bash_completion.d/tig-completion.bash 
 fi
 
 
