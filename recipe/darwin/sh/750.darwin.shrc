@@ -58,11 +58,6 @@ if [ -d /usr/local/opt/go ]; then
 fi
 
 # =====
-# Homebrew
-# =====
-export HOMEBREW_CASK_OPTS="--appdir=/Applications"
-
-# =====
 # Mint
 # =====
 if [ -n "$XDG_CACHE_HOME" ]; then

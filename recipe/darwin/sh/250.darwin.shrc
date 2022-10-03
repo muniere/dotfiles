@@ -1,1 +1,10 @@
+# ===
+# Homebrew
+# ===
+export HOMEBREW_CASK_OPTS="--appdir=/Applications"
+
+if [ -d /opt/homebrew/bin ]; then
+  addpath /opt/homebrew/bin
+fi
+
 # vim: ft=sh sw=2 ts=2 sts=2
