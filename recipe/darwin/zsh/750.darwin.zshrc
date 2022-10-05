@@ -13,12 +13,4 @@ if [ -d $BREW_PREFIX/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/ ]; then
   source "$BREW_PREFIX/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.zsh.inc"
 fi
 
-# =====
-# Tig : Completion
-# =====
-if [ -f $BREW_PREFIX/opt/tig/etc/bash_completion.d/tig-completion.bash ]; then
-  . $BREW_PREFIX/opt/tig/etc/bash_completion.d/tig-completion.bash 
-fi
-
-
 # vim: ft=zsh sw=2 ts=2 sts=2
