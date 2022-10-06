@@ -304,11 +304,11 @@ class BashCookBook(CookBook):
             ),
             PrefRecipe(
                 src=Path('/Applications/Docker.app/Contents/Resources/etc/docker.bash-completion'),
-                dst=Path('/usr/local/etc/bash_completion.d/docker')
+                dst=xdglib.data('bash/bash_completion.d/docker')
             ),
             PrefRecipe(
                 src=Path('/Applications/Docker.app/Contents/Resources/etc/docker-compose.bash-completion'),
-                dst=Path('/usr/local/etc/bash_completion.d/docker-compose')
+                dst=xdglib.data('bash/bash_completion.d/docker-compose')
             ),
         ]
 
@@ -340,11 +340,11 @@ class ZshCookBook(CookBook):
             ),
             PrefRecipe(
                 src=Path('/Applications/Docker.app/Contents/Resources/etc/docker.zsh-completion'),
-                dst=Path('/usr/local/share/zsh/site-functions/_docker')
+                dst=xdglib.data('zsh/site-functions/_docker')
             ),
             PrefRecipe(
                 src=Path('/Applications/Docker.app/Contents/Resources/etc/docker-compose.zsh-completion'),
-                dst=Path('/usr/local/share/zsh/site-functions/_docker-compose')
+                dst=xdglib.data('zsh/site-functions/_docker-compose')
             ),
         ]
 

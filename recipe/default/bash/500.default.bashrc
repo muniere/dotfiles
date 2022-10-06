@@ -45,6 +45,15 @@ function __color3 {
   fi
 }
 
+# ====
+# Bash : Completion
+# ====
+if [ -d $XDG_DATA_HOME/bash/bash_completion.d ]; then
+  for f in $XDG_DATA_HOME/bash/bash_completion.d/*; do
+    source $f
+  done
+fi
+
 # =====
 # Bash : Prompt
 # =====
