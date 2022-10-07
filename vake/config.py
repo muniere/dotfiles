@@ -2,9 +2,11 @@ import glob
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Set
+from typing import List, Set, cast
 
 from . import flow
+from . import kernel
+from . import locate
 from . import shell
 from . import xdglib
 from .timber import Lumber
@@ -594,12 +596,7 @@ class BrewCookBook(CookBook):
 
     @property
     def prefs(self) -> List[PrefRecipe]:
-        return [
-            PrefRecipe(
-                src=Path('homebrew/Brewfile'),
-                dst=xdglib.config('homebrew/Brewfile'),
-            ),
-        ]
+        return []
 
     def activate(self, logger: Lumber = Lumber.noop(), noop: bool = False):
         try:
@@ -614,8 +611,13 @@ class BrewCookBook(CookBook):
                 noop=noop,
             )
 
+        identity = kernel.identify()
+
+        dir = Path(locate.recipe(), cast(str, identity.value))
+        src = Path('homebrew/Brewfile')
+
         shell.call(
-            cmd=f'brew bundle install --file {xdglib.config("homebrew/Brewfile")} --no-lock',
+            cmd=f'brew bundle install --file {Path(dir, src).absolute()} --no-lock',
             logger=logger,
             noop=noop,
         )
