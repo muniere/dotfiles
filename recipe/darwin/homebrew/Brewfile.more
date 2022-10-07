@@ -1,0 +1,3 @@
+brew "aacgain"
+brew "ffmpeg"
+brew "imagemagick"

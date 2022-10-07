@@ -68,7 +68,7 @@ class PrefAction(Action, metaclass=ABCMeta):
         # darwin
         if identity.is_darwin():
             pre_books += [
-                config.BrewCookBook(),
+                config.BrewCoreCookBook(),
             ]
             post_books += [
                 config.XcodeCookBook(),
@@ -80,6 +80,12 @@ class PrefAction(Action, metaclass=ABCMeta):
                 config.CLionCookBook(),
                 config.RiderCookBook(),
             ]
+
+            # uncomment following lines to install more kegs
+            #
+            # post_books += [
+            #     config.BrewMoreCookBook(),
+            # ]
 
         books = pre_books + core_books + post_books
 
