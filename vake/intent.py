@@ -108,7 +108,7 @@ class PrefLinkAction(PrefAction):
     noop: bool = field(default_factory=lambda: False)
 
     def run(self):
-        books = [it for it in self._books(reverse=False) if self.__contains(it)]
+        books = [it for it in self._books(reverse=False) if self.__test(it)]
 
         aliases = set().union(*[book.aliases for book in books])
         illegals = [it for it in self.intents if it not in aliases]
@@ -150,7 +150,7 @@ class PrefLinkAction(PrefAction):
             if self.activate:
                 book.activate(logger=self.logger, noop=self.noop)
 
-    def __contains(self, book: CookBook) -> bool:
+    def __test(self, book: CookBook) -> bool:
         if self.intents:
             return bool(book.aliases.intersection(self.intents))
         else:
@@ -237,7 +237,7 @@ class PrefUnlinkAction(PrefAction):
     noop: bool = field(default_factory=lambda: False)
 
     def run(self):
-        books = [it for it in self._books(reverse=True) if self.__contains(it)]
+        books = [it for it in self._books(reverse=True) if self.__test(it)]
 
         aliases = set().union(*[book.aliases for book in books])
         illegals = [it for it in self.intents if it not in aliases]
@@ -281,7 +281,7 @@ class PrefUnlinkAction(PrefAction):
 
         return
 
-    def __contains(self, book: CookBook) -> bool:
+    def __test(self, book: CookBook) -> bool:
         if self.intents:
             return bool(book.aliases.intersection(self.intents))
         else:
@@ -443,7 +443,7 @@ class PrefCleanupAction(PrefAction):
     noop: bool = field(default_factory=lambda: False)
 
     def run(self):
-        books = [it for it in self._books(reverse=False) if self.__contains(it)]
+        books = [it for it in self._books(reverse=False) if self.__test(it)]
 
         aliases = set().union(*[book.aliases for book in books])
         illegals = [it for it in self.intents if it not in aliases]
@@ -475,7 +475,7 @@ class PrefCleanupAction(PrefAction):
 
         return
 
-    def __contains(self, book: CookBook) -> bool:
+    def __test(self, book: CookBook) -> bool:
         if self.intents:
             return bool(book.aliases.intersection(self.intents))
         else:
