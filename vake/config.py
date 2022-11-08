@@ -2,11 +2,9 @@ import glob
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Set, cast
+from typing import List, Set
 
 from . import flow
-from . import kernel
-from . import locate
 from . import shell
 from . import xdglib
 from .timber import Lumber
@@ -24,7 +22,6 @@ __all__ = [
     'AsdfCookBook',
     'TmuxCookBook',
     'GradleCookBook',
-    'BrewCoreCookBook', 'BrewMoreCookBook',
     'XcodeCookBook',
     'IntelliJIdeaCookBook',
     'AndroidStudioCookBook',
@@ -588,64 +585,6 @@ class NodeCookBook(CookBook):
 
         self._touch(hist, logger=logger, noop=noop)
 
-
-class BrewCoreCookBook(CookBook):
-    @property
-    def aliases(self) -> Set[str]:
-        return {'brew-core'}
-
-    @property
-    def prefs(self) -> List[PrefRecipe]:
-        return []
-
-    def activate(self, logger: Lumber = Lumber.noop(), noop: bool = False):
-        try:
-            shell.which('brew')
-        except shell.SubprocessError:
-            logger.info('Homebrew not installed yet, so now install.')
-
-            # see https://brew.sh/
-            shell.call(
-                cmd='/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"',
-                logger=logger,
-                noop=noop,
-            )
-
-        identity = kernel.identify()
-
-        dir = Path(locate.recipe(), cast(str, identity.value))
-        src = Path('homebrew/Brewfile.core')
-
-        shell.call(
-            cmd=f'brew bundle install --file {Path(dir, src).absolute()} --no-lock',
-            logger=logger,
-            noop=noop,
-        )
-
-        return
-
-class BrewMoreCookBook(CookBook):
-    @property
-    def aliases(self) -> Set[str]:
-        return {'brew-more'}
-
-    @property
-    def prefs(self) -> List[PrefRecipe]:
-        return []
-
-    def activate(self, logger: Lumber = Lumber.noop(), noop: bool = False):
-        identity = kernel.identify()
-
-        dir = Path(locate.recipe(), cast(str, identity.value))
-        src = Path('homebrew/Brewfile.more')
-
-        shell.call(
-            cmd=f'brew bundle install --file {Path(dir, src).absolute()} --no-lock',
-            logger=logger,
-            noop=noop,
-        )
-
-        return
 
 class XcodeCookBook(CookBook):
     @property

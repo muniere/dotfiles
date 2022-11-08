@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+function pre-link() {
+case "$OSTYPE" in
+    darwin*)
+        # https://brew.sh
+        if !(which brew &> /dev/null); then
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        fi
+
+        # https://github.com/Homebrew/homebrew-bundle
+        brew bundle install --file recipe/darwin/homebrew/Brewfile.core
+        ;;
+
+    *) ;;
+esac
+}
+
+function post-link() {
+case "$OSTYPE" in
+    darwin*)
+        # https://github.com/Homebrew/homebrew-bundle
+        brew bundle install --file recipe/darwin/homebrew/Brewfile.more
+        ;;
+
+    *) ;;
+esac
+}
+
+# pre-conditions
+if ! [ -f xake ] ||  ! [ -x xake ]; then
+    echo "xake not found. abort."  >&2;
+    exit 1;
+fi
+
+pre-link
+
+# default action: link
+./xake link
+
+post-link
