@@ -90,14 +90,6 @@ fi
 # =====
 # Python
 # =====
-if [ -e $HOMEBREW_PREFIX/opt/python@3.8/ ]; then
-  addpath "$HOMEBREW_PREFIX/opt/python@3.8/bin"
-fi
-
-if [ -e $HOMEBREW_PREFIX/opt/python@3.9/ ]; then
-  addpath "$HOMEBREW_PREFIX/opt/python@3.9/bin"
-fi
-
 if [ -f $HOMEBREW_PREFIX/bin/virtualenvwrapper.sh ]; then
     export WORKON_HOME=$HOME/.virtualenvs
     source $HOMEBREW_PREFIX/bin/virtualenvwrapper.sh
