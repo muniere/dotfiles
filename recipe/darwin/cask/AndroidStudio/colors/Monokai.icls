@@ -23,9 +23,11 @@
     <option name="GUTTER_BACKGROUND" value="272822" />
     <option name="HTML_TAG_TREE_LEVEL0" value="0" />
     <option name="INDENT_GUIDE" value="373737" />
+    <option name="INFORMATION_HINT" value="313131" />
     <option name="LOOKUP_COLOR" value="" />
     <option name="METHOD_SEPARATORS_COLOR" value="5b5a4e" />
     <option name="MODIFIED_LINES_COLOR" value="415f69" />
+    <option name="RECENT_LOCATIONS_SELECTION" value="313131" />
     <option name="RECURSIVE_CALL_ATTRIBUTES" value="574300" />
     <option name="RIGHT_MARGIN_COLOR" value="323232" />
     <option name="SELECTED_INDENT_GUIDE" value="505050" />
@@ -73,6 +75,11 @@
     <option name="CLASS_NAME_ATTRIBUTES">
       <value>
         <option name="FONT_TYPE" value="1" />
+      </value>
+    </option>
+    <option name="CODE_LENS_BORDER_COLOR">
+      <value>
+        <option name="EFFECT_COLOR" value="656565" />
       </value>
     </option>
     <option name="CONSOLE_BLUE_OUTPUT">
@@ -228,6 +235,12 @@
     <option name="DEFAULT_DOC_COMMENT_TAG">
       <value>
         <option name="FOREGROUND" value="cfbfad" />
+      </value>
+    </option>
+    <option name="DEFAULT_DOC_COMMENT_TAG_VALUE">
+      <value>
+        <option name="FOREGROUND" value="d6a980" />
+        <option name="FONT_TYPE" value="3" />
       </value>
     </option>
     <option name="DEFAULT_DOC_MARKUP">
@@ -482,6 +495,12 @@
         <option name="FOREGROUND" value="ffffff" />
       </value>
     </option>
+    <option name="INLAY_DEFAULT">
+      <value>
+        <option name="FOREGROUND" value="2b2b2b" />
+        <option name="BACKGROUND" value="ededed" />
+      </value>
+    </option>
     <option name="INLINE_PARAMETER_HINT">
       <value>
         <option name="FOREGROUND" value="7a7a7a" />
@@ -507,8 +526,18 @@
         <option name="FOREGROUND" value="9876aa" />
       </value>
     </option>
+    <option name="KOTLIN_SMART_CAST_RECEIVER">
+      <value>
+        <option name="FOREGROUND" value="dbffdb" />
+      </value>
+    </option>
     <option name="KOTLIN_SMART_CAST_VALUE">
       <value />
+    </option>
+    <option name="KOTLIN_SMART_CONSTANT">
+      <value>
+        <option name="FOREGROUND" value="dbffdb" />
+      </value>
     </option>
     <option name="LOGCAT_DEBUG_OUTPUT">
       <value>
