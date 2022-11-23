@@ -188,16 +188,6 @@ export const TmuxCookBook = new CookBook({
   ],
 });
 
-export const RangerCookBook = new CookBook({
-  name: "RangerCookBook",
-  prefs: [
-    new PrefRecipe({
-      src: "ranger/",
-      dst: HomeLayout.config().join("ranger/"),
-    }),
-  ],
-});
-
 export const DockerCookBook = new CookBook({
   name: "DockerCookBook",
   prefs: [
