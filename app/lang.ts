@@ -28,7 +28,10 @@ export abstract class Result<T> {
     }
   }
 
-  static runOr<T>(fn: () => T, options: { fallback?: () => T } = {}): T | undefined {
+  static runOr<T>(
+    fn: () => T,
+    options: { fallback?: () => T } = {},
+  ): T | undefined {
     try {
       const result = fn();
       return result;
@@ -46,7 +49,10 @@ export abstract class Result<T> {
     }
   }
 
-  static async runAsyncOr<T>(fn: () => Promise<T>, options: { fallback?: () => T } = {}): Promise<T | undefined> {
+  static async runAsyncOr<T>(
+    fn: () => Promise<T>,
+    options: { fallback?: () => T } = {},
+  ): Promise<T | undefined> {
     try {
       const result = await fn();
       return result;

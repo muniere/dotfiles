@@ -35,7 +35,9 @@ export class Path {
     return Deno.lstatSync(this.value);
   }
 
-  async *walk(options: fs.WalkOptions = {}): AsyncIterableIterator<fs.WalkEntry> {
+  async *walk(
+    options: fs.WalkOptions = {},
+  ): AsyncIterableIterator<fs.WalkEntry> {
     for await (const entry of fs.walk(this.value, options)) {
       yield entry;
 

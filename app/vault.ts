@@ -188,23 +188,25 @@ export const TmuxCookBook = new CookBook({
   ],
 });
 
+const DockerResDir = new Path("/Applications/Docker.app/Contents/Resources");
+
 export const DockerCookBook = new CookBook({
   name: "DockerCookBook",
   prefs: [
     new PrefRecipe({
-      src: "/Applications/Docker.app/Contents/Resources/etc/docker.bash-completion",
+      src: DockerResDir.join("etc/docker.bash-completion"),
       dst: HomeLayout.data().join("bash/bash_completion.d/docker"),
     }),
     new PrefRecipe({
-      src: "/Applications/Docker.app/Contents/Resources/etc/docker-compose.bash-completion",
+      src: DockerResDir.join("etc/docker-compose.bash-completion"),
       dst: HomeLayout.data().join("bash/bash_completion.d/docker-compose"),
     }),
     new PrefRecipe({
-      src: "/Applications/Docker.app/Contents/Resources/etc/docker.zsh-completion",
+      src: DockerResDir.join("etc/docker.zsh-completion"),
       dst: HomeLayout.data().join("zsh/site-functions/_docker"),
     }),
     new PrefRecipe({
-      src: "/Applications/Docker.app/Contents/Resources/etc/docker-compose.zsh-completion",
+      src: DockerResDir.join("etc/docker-compose.zsh-completion"),
       dst: HomeLayout.data().join("zsh/site-functions/_docker-compose"),
     }),
   ],

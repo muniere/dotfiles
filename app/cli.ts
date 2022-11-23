@@ -1,4 +1,8 @@
-import { Command, CompletionsCommand, EnumType } from "https://deno.land/x/cliffy@v0.25.4/command/mod.ts";
+import {
+  Command,
+  CompletionsCommand,
+  EnumType,
+} from "https://deno.land/x/cliffy@v0.25.4/command/mod.ts";
 
 import { LogLevel, LogPalette, Lumber, StreamLumber } from "./logging.ts";
 
@@ -13,7 +17,9 @@ const listCommand = new Command()
   .description("List links")
   .type("colorMode", ColorMode)
   .option("-l, --long", "Show in long format")
-  .option("--color <mode:colorMode>", "Choose colorize style", { default: "auto" as const })
+  .option("--color <mode:colorMode>", "Choose colorize style", {
+    default: "auto" as const,
+  })
   .action((options) => {
     action.list({
       long: options.long ?? false,

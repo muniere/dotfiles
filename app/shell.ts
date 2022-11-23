@@ -7,10 +7,12 @@ import { Path } from "./path.ts";
 // =====
 // General
 // =====
-export type CallOptions = Pick<Deno.RunOptions, "cwd" | "env" | "stdout" | "stderr"> & {
-  dryRun?: boolean;
-  logger?: Lumber;
-};
+export type CallOptions =
+  & Pick<Deno.RunOptions, "cwd" | "env" | "stdout" | "stderr">
+  & {
+    dryRun?: boolean;
+    logger?: Lumber;
+  };
 
 export function call(
   cmd: string[],
@@ -128,7 +130,11 @@ export async function mkdirp(
   }
 }
 
-export async function symlink(src: Path, dst: Path, options: CallOptions = {}): Promise<Deno.ProcessStatus> {
+export async function symlink(
+  src: Path,
+  dst: Path,
+  options: CallOptions = {},
+): Promise<Deno.ProcessStatus> {
   const cmd = ["ln"]
     .concat(["-s"])
     .concat(["-f"])
@@ -161,7 +167,11 @@ export type CopyOptions = {
   overwrite?: boolean;
 };
 
-export async function cp(src: Path, dst: Path, options: CallOptions & CopyOptions = {}): Promise<Deno.ProcessStatus> {
+export async function cp(
+  src: Path,
+  dst: Path,
+  options: CallOptions & CopyOptions = {},
+): Promise<Deno.ProcessStatus> {
   if (options.overwrite == false) {
     const stat = await Result.runAsyncOr(() => dst.stat());
     if (stat) {
@@ -197,7 +207,10 @@ export async function cp(src: Path, dst: Path, options: CallOptions & CopyOption
   }
 }
 
-export async function rm(path: Path, options: CallOptions = {}): Promise<Deno.ProcessStatus> {
+export async function rm(
+  path: Path,
+  options: CallOptions = {},
+): Promise<Deno.ProcessStatus> {
   const cmd = ["rm"]
     .concat(["-f"])
     .concat([path.toString()]);
@@ -218,7 +231,10 @@ export async function rm(path: Path, options: CallOptions = {}): Promise<Deno.Pr
   };
 }
 
-export async function touch(path: Path, options: CallOptions = {}): Promise<Deno.ProcessStatus> {
+export async function touch(
+  path: Path,
+  options: CallOptions = {},
+): Promise<Deno.ProcessStatus> {
   options.logger?.trace(`touch ${path}`);
 
   if (options.dryRun) {
@@ -249,13 +265,20 @@ export type CurlOptions = {
   output?: Path | URL | string;
 };
 
-export function curl(url: URL | string, options: CallOptions & CurlOptions = {}): Promise<Deno.ProcessStatus> {
+export function curl(
+  url: URL | string,
+  options: CallOptions & CurlOptions = {},
+): Promise<Deno.ProcessStatus> {
   return call(
     ["curl"]
       .concat(options.fail != false ? ["-f"] : [])
       .concat(options.showError != false ? ["-S"] : [])
       .concat(options.location != false ? ["-L"] : [])
-      .concat(options.output ? ["--create-dirs", "-o", options.output.toString()] : [])
+      .concat(
+        options.output
+          ? ["--create-dirs", "-o", options.output.toString()]
+          : [],
+      )
       .concat(url.toString()),
     options,
   );

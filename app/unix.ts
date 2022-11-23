@@ -1,6 +1,6 @@
 import * as shell from "./shell.ts";
 
-export type Platform = "ubuntu" | "darwin" | "default"
+export type Platform = "ubuntu" | "darwin" | "default";
 
 export async function identify(): Promise<Platform> {
   const result = await shell.capture(["uname", "-a"]);

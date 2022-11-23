@@ -68,9 +68,11 @@ abstract class Action<Context> {
     recipe: RecipeBase<Chain>,
     options: { prefix?: Path } = {},
   ): Chain[] {
+    const prefix = options.prefix ?? new Path();
+
     const src = recipe.src.isAbsolute
       ? new Path(recipe.src.expandHome())
-      : new Path(options.prefix ?? new Path(), recipe.src.expandHome()).toAbsolute();
+      : new Path(prefix, recipe.src.expandHome()).toAbsolute();
 
     const dst = recipe.dst.expandHome().toAbsolute();
 
@@ -144,11 +146,17 @@ class ListAction extends Action<ListContext> {
         return this.travarseSync(recipe);
       }
       if (platform == "default") {
-        return this.travarseSync(recipe, { prefix: ResLayout.recipe().join(platform) });
+        return this.travarseSync(recipe, {
+          prefix: ResLayout.recipe().join(platform),
+        });
       }
       return [
-        ...this.travarseSync(recipe, { prefix: ResLayout.recipe().join(platform) }),
-        ...this.travarseSync(recipe, { prefix: ResLayout.recipe().join("default") }),
+        ...this.travarseSync(recipe, {
+          prefix: ResLayout.recipe().join(platform),
+        }),
+        ...this.travarseSync(recipe, {
+          prefix: ResLayout.recipe().join("default"),
+        }),
       ];
     });
 
@@ -229,7 +237,8 @@ class LinkAction extends Action<LinkContext> {
     }
 
     for (const [i, book] of books.entries()) {
-      this.context.logger?.mark(sprintf("%s Launched (%02d/%02d)", book.name, i + 1, books.length), { bold: true });
+      const message = sprintf("%s Launched (%02d/%02d)", book.name, i + 1, books.length);
+      this.context.logger?.mark(message, { bold: true });
 
       for (const recipe of book.prefs) {
         await this.linkPref(recipe);
@@ -256,11 +265,17 @@ class LinkAction extends Action<LinkContext> {
         return this.travarseSync(recipe);
       }
       if (identity == "default") {
-        return this.travarseSync(recipe, { prefix: ResLayout.recipe().join(identity) });
+        return this.travarseSync(recipe, {
+          prefix: ResLayout.recipe().join(identity),
+        });
       }
       return [
-        ...this.travarseSync(recipe, { prefix: ResLayout.recipe().join(identity) }),
-        ...this.travarseSync(recipe, { prefix: ResLayout.recipe().join("default") }),
+        ...this.travarseSync(recipe, {
+          prefix: ResLayout.recipe().join(identity),
+        }),
+        ...this.travarseSync(recipe, {
+          prefix: ResLayout.recipe().join("default"),
+        }),
       ];
     });
 
@@ -321,11 +336,13 @@ class LinkAction extends Action<LinkContext> {
         continue;
       }
 
-      const srcText = await Deno.readTextFile(chain.src.toString()).then((text) => text.trim());
+      const srcText = (await Deno.readTextFile(chain.src.toString())).trim();
       const dstText = await Result.runAsyncOr(() => Deno.readTextFile(chain.dst.toString()));
 
       if (dstText && dstText.includes(srcText)) {
-        this.context.logger?.info(`Snippet already enabled in file: ${chain.dst}`);
+        this.context.logger?.info(
+          `Snippet already enabled in file: ${chain.dst}`,
+        );
         continue;
       }
 
@@ -386,7 +403,8 @@ class UnlinkAction extends Action<UnlinkContext> {
     }
 
     for (const [i, book] of books.entries()) {
-      this.context.logger?.mark(sprintf("%s Launched (%02d/%02d)", book.name, i + 1, books.length), { bold: true });
+      const message = sprintf("%s Launched (%02d/%02d)", book.name, i + 1, books.length);
+      this.context.logger?.mark(message, { bold: true });
 
       if (this.context.deactivate) {
         await this.deactivate(book);
@@ -413,11 +431,17 @@ class UnlinkAction extends Action<UnlinkContext> {
         return this.travarseSync(recipe);
       }
       if (identity == "default") {
-        return this.travarseSync(recipe, { prefix: ResLayout.recipe().join(identity) });
+        return this.travarseSync(recipe, {
+          prefix: ResLayout.recipe().join(identity),
+        });
       }
       return [
-        ...this.travarseSync(recipe, { prefix: ResLayout.recipe().join(identity) }),
-        ...this.travarseSync(recipe, { prefix: ResLayout.recipe().join("default") }),
+        ...this.travarseSync(recipe, {
+          prefix: ResLayout.recipe().join(identity),
+        }),
+        ...this.travarseSync(recipe, {
+          prefix: ResLayout.recipe().join("default"),
+        }),
       ];
     });
 
@@ -477,11 +501,15 @@ class UnlinkAction extends Action<UnlinkContext> {
 
       const srcText = await Deno.readTextFile(chain.src.toString());
       if (dstText && !dstText.includes(srcText)) {
-        this.context.logger?.info(`Snippet already disabled in file: ${chain.dst}`);
+        this.context.logger?.info(
+          `Snippet already disabled in file: ${chain.dst}`,
+        );
         continue;
       }
 
-      this.context.logger?.info(`Disable snippet: ${chain.src} << ${chain.dst}`);
+      this.context.logger?.info(
+        `Disable snippet: ${chain.src} << ${chain.dst}`,
+      );
 
       if (this.context.dryRun) {
         continue;
