@@ -7,7 +7,7 @@ import { Path } from "./path.ts";
 // =====
 // General
 // =====
-export type CallOptions = Pick<Deno.RunOptions, "env" | "stdout" | "stderr"> & {
+export type CallOptions = Pick<Deno.RunOptions, "cwd" | "env" | "stdout" | "stderr"> & {
   dryRun?: boolean;
   logger?: Lumber;
 };
@@ -16,8 +16,9 @@ export function call(
   cmd: string[],
   options: CallOptions = {},
 ): Promise<Deno.ProcessStatus> {
+  const cd = options.cwd ? ["cd", options.cwd, "&&"] : [];
   const env = Object.entries(options.env ?? {}).map(([k, v]) => `${k}=${v}`);
-  options.logger?.trace([...env, ...cmd].join(" "));
+  options.logger?.trace([...cd, ...env, ...cmd].join(" "));
 
   if (options.dryRun == true) {
     return Promise.resolve({
@@ -28,6 +29,7 @@ export function call(
 
   const proc = Deno.run({
     cmd: cmd,
+    cwd: options.cwd,
     env: options.env,
     stdout: options.stdout,
     stderr: options.stderr,
