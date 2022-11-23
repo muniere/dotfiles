@@ -90,32 +90,21 @@ export const ZshCookBook = new CookBook({
     }),
   ],
   activate: async (options: shell.CallOptions) => {
-    const url = "https://git.io/zinit-install";
-    const path = await Deno.makeTempFile();
+    const url = "https://github.com/zsh-users/zsh-syntax-highlighting.git";
+    const dir = HomeLayout.data().join("zsh-syntax-highlighting");
 
-    await shell.curl(url, {
-      ...options,
-      output: path,
-    });
-
-    await shell.call(["bash", path], {
-      env: {
-        "NO_EMOJI": "1",
-        "NO_EDIT": "1",
-        "NO_TUTORIAL": "1",
-      },
-      dryRun: options.dryRun,
-      logger: options.logger,
-    });
-
-    try {
-      await shell.which("zsh");
-    } catch {
-      options.logger?.warn("skip updating zsh plugins. command not found: zsh");
-      return;
+    const stat = await Result.runAsyncOr(() => dir.lstat());
+    if (stat) {
+      await shell.call(["git", "-C", dir.toString(), "pull", "-v"], {
+        dryRun: options.dryRun,
+        logger: options.logger,
+      });
+    } else {
+      await shell.call(["git", "clone", url, dir.toString(), "-v"], {
+        dryRun: options.dryRun,
+        logger: options.logger,
+      });
     }
-
-    await shell.call(["zsh", "-i", "-c", "zinit update --all"], options);
   },
 });
 
