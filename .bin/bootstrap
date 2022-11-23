@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+
+function bundle-core() {
+case "$OSTYPE" in
+    darwin*)
+        # https://brew.sh
+        if !(which brew &> /dev/null); then
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+            # for intel chip
+            if [ -x /usr/local/bin/brew ]; then
+                eval "$(/usr/local/bin/brew shellenv)"
+            fi
+
+            # for apple chip
+            if [ -x /opt/homebrew/bin/brew ]; then
+                eval "$(/opt/homebrew/bin/brew shellenv)"
+            fi
+        fi
+
+        # https://github.com/Homebrew/homebrew-bundle
+        brew bundle install --file recipe/darwin/homebrew/Brewfile.core
+        ;;
+
+    *) ;;
+esac
+}
+
+function bundle-more() {
+case "$OSTYPE" in
+    darwin*)
+        # https://github.com/Homebrew/homebrew-bundle
+        brew bundle install --file recipe/darwin/homebrew/Brewfile.more
+        ;;
+
+    *) ;;
+esac
+}
+
+# pre-conditions
+if ! [ -f xake ] ||  ! [ -x xake ]; then
+    echo "xake not found. abort."  >&2
+    exit 1
+fi
+
+# bootstrap
+set -x
+
+bundle-core
+
+if ! (which deno &> /dev/null); then
+    echo "deno not found. abort." >&2
+    exit 1
+fi
+
+./xake link
+
+bundle-more

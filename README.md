@@ -26,4 +26,9 @@ Each task has following options:
 
 # status
 ./xake list
+
+# completion
+./xake completion bash
+./xake completion zsh
+./xake completion fish
 ```

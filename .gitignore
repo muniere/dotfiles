@@ -193,4 +193,5 @@ fabric.properties
 
 ### Others
 .vscode
+*.lock
 *.lock.json
