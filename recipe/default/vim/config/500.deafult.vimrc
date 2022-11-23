@@ -196,6 +196,17 @@ inoremap <silent> <C-e><C-f> <ESC>:call ToggleNetrw(1)<CR>
 """
 " Plugins
 """
+function! PlugLoaded(name)
+  if !has_key(g:plugs, a:name)
+    return 0
+  endif
+
+  " remove trailing slash to match with &rtp;
+  " paths in &rtp don't contain trailing slash.
+  let l:plug_path=substitute(g:plugs[a:name].dir, '/$', '', '')
+
+  return isdirectory(l:plug_path) && stridx(&rtp, l:plug_path) >= 0
+endfunction
 
 call plug#begin($XDG_CONFIG_HOME.'/vim/plugged')
 Plug 'vim-scripts/sudo.vim'
@@ -231,24 +242,26 @@ nnoremap <silent> <C-x><C-b> :CtrlPBuffer<CR>
 inoremap <silent> <C-x><C-b> <ESC>:CtrlPBuffer<CR>
 
 " == ddc
-call ddc#custom#patch_global('ui', 'native')
-
-call ddc#custom#patch_global('sources', ['around'])
-
-call ddc#custom#patch_global('sourceOptions', {
-      \ '_': {
-      \   'matchers': ['matcher_head'],
-      \   'sorters': ['sorter_rank']},
-      \ })
-
-inoremap <silent><expr> <TAB>
-\ pumvisible() ? '<C-n>' :
-\ (col('.') <= 1 <Bar><Bar> getline('.')[col('.') - 2] =~# '\s') ?
-\ '<TAB>' : ddc#map#manuoal_complete()
-
-inoremap <expr><S-TAB>  pumvisible() ? '<C-p>' : '<C-h>'
-
-call ddc#enable()
+if PlugLoaded('ddc.vim')
+  call ddc#custom#patch_global('ui', 'native')
+  
+  call ddc#custom#patch_global('sources', ['around'])
+  
+  call ddc#custom#patch_global('sourceOptions', {
+        \ '_': {
+        \   'matchers': ['matcher_head'],
+        \   'sorters': ['sorter_rank']},
+        \ })
+  
+  inoremap <silent><expr> <TAB>
+        \ pumvisible() ? '<C-n>' :
+        \ (col('.') <= 1 <Bar><Bar> getline('.')[col('.') - 2] =~# '\s') ?
+        \ '<TAB>' : ddc#map#manuoal_complete()
+  
+  inoremap <expr><S-TAB>  pumvisible() ? '<C-p>' : '<C-h>'
+  
+  call ddc#enable()
+endif
 
 """
 " Appearance
