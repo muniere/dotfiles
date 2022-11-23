@@ -211,6 +211,7 @@ Plug 'Shougo/ddc.vim'
 Plug 'Shougo/ddc-around'
 Plug 'Shougo/ddc-matcher_head'
 Plug 'Shougo/ddc-sorter_rank'
+Plug 'Shougo/ddc-ui-native'
 call plug#end()
 
 autocmd VimEnter * if len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
@@ -230,6 +231,8 @@ nnoremap <silent> <C-x><C-b> :CtrlPBuffer<CR>
 inoremap <silent> <C-x><C-b> <ESC>:CtrlPBuffer<CR>
 
 " == ddc
+call ddc#custom#patch_global('ui', 'native')
+
 call ddc#custom#patch_global('sources', ['around'])
 
 call ddc#custom#patch_global('sourceOptions', {
@@ -239,11 +242,11 @@ call ddc#custom#patch_global('sourceOptions', {
       \ })
 
 inoremap <silent><expr> <TAB>
-\ ddc#map#pum_visible() ? '<C-n>' :
+\ pumvisible() ? '<C-n>' :
 \ (col('.') <= 1 <Bar><Bar> getline('.')[col('.') - 2] =~# '\s') ?
-\ '<TAB>' : ddc#map#manual_complete()
+\ '<TAB>' : ddc#map#manuoal_complete()
 
-inoremap <expr><S-TAB>  ddc#map#pum_visible() ? '<C-p>' : '<C-h>'
+inoremap <expr><S-TAB>  pumvisible() ? '<C-p>' : '<C-h>'
 
 call ddc#enable()
 
