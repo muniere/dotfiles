@@ -153,6 +153,7 @@ class ListAction extends Action<ListContext> {
     });
 
     const lines = chains
+      .filter((chain) => this.allows(chain.src))
       .toSorted((a, b) => a.dst < b.dst ? -1 : 1)
       .map((chain) => this.format(chain));
 
