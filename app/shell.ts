@@ -1,7 +1,7 @@
 import * as fs from "https://deno.land/std@0.163.0/fs/mod.ts";
 import { Result } from "./lang.ts";
 
-import { Lumber } from "./logging.ts";
+import { Logger } from "./logging.ts";
 import { Path } from "./path.ts";
 
 // =====
@@ -11,7 +11,7 @@ export type CallOptions =
   & Pick<Deno.RunOptions, "cwd" | "env" | "stdout" | "stderr">
   & {
     dryRun?: boolean;
-    logger?: Lumber;
+    logger?: Logger;
   };
 
 export function call(
@@ -42,7 +42,7 @@ export function call(
 
 // capture does not support dry-run
 export type CaptureOptions = Pick<Deno.RunOptions, "env"> & {
-  logger?: Lumber;
+  logger?: Logger;
 };
 
 export type CaptureStatus = Deno.ProcessStatus & {

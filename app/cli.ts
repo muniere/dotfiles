@@ -1,10 +1,6 @@
-import {
-  Command,
-  CompletionsCommand,
-  EnumType,
-} from "https://deno.land/x/cliffy@v0.25.4/command/mod.ts";
+import { Command, CompletionsCommand, EnumType } from "https://deno.land/x/cliffy@v0.25.4/command/mod.ts";
 
-import { LogLevel, LogPalette, Lumber, StreamLumber } from "./logging.ts";
+import { Logger, LogLevel } from "./logging.ts";
 
 import * as action from "./action.ts";
 
@@ -87,17 +83,10 @@ const completionCommand = new CompletionsCommand();
 // =====
 // Shared
 // =====
-function _logger(options: {
-  verbose?: boolean;
-} = {}): Lumber {
-  const logger = new StreamLumber({
-    stream: Deno.stdout,
-    palette: LogPalette.default(),
+function _logger(options: { verbose?: boolean } = {}): Logger {
+  return new Logger({
+    level: options.verbose == true ? LogLevel.DEBUG : LogLevel.TRACE,
   });
-
-  logger.level = options.verbose == true ? LogLevel.DEBUG : LogLevel.TRACE;
-
-  return logger;
 }
 
 // =====

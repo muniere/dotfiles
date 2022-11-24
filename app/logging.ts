@@ -57,8 +57,41 @@ export type LogOptions = {
   async?: boolean;
 };
 
-export abstract class Lumber {
-  abstract log(message: string, level: LogLevel, options: LogOptions): void;
+export class Logger {
+  level: LogLevel;
+
+  private readonly stream: LogStream;
+  private readonly palette: LogPalette;
+
+  private static readonly encoder: TextEncoder = new TextEncoder();
+  private static readonly terminator = "\n";
+
+  constructor(nargs: {
+    level: LogLevel;
+    stream?: LogStream;
+    palette?: LogPalette;
+  }) {
+    this.level = nargs.level ?? LogLevel.DEBUG;
+    this.stream = nargs.stream ?? Deno.stdout;
+    this.palette = nargs.palette ?? LogPalette.default();
+  }
+
+  log(message: string, level: LogLevel, options: LogOptions = {}): void {
+    if (level.value < this.level.value) {
+      return;
+    }
+
+    const terminator = options.term == false ? "" : Logger.terminator;
+    const plainMessage = `[${level.label.padEnd(5)}] ${message}${terminator}`;
+    const coloredMessage = this.palette.get(level).apply(plainMessage, options);
+    const bytes = Logger.encoder.encode(coloredMessage);
+
+    if (options.async == true) {
+      streams.writeAll(this.stream, bytes);
+    } else {
+      streams.writeAllSync(this.stream, bytes);
+    }
+  }
 
   debug(message: string, options: LogOptions = {}): void {
     this.log(message, LogLevel.DEBUG, options);
@@ -77,47 +110,5 @@ export abstract class Lumber {
   }
   error(message: string, options: LogOptions = {}): void {
     this.log(message, LogLevel.ERROR, options);
-  }
-}
-
-export class StreamLumber extends Lumber {
-  level: LogLevel = LogLevel.DEBUG;
-
-  private readonly stream: LogStream;
-  private readonly palette: LogPalette;
-
-  private static readonly encoder: TextEncoder = new TextEncoder();
-  private static readonly terminator = "\n";
-
-  constructor(nargs: {
-    stream?: LogStream;
-    palette?: LogPalette;
-  } = {}) {
-    super();
-    this.stream = nargs.stream ?? Deno.stdout;
-    this.palette = nargs.palette ?? LogPalette.default();
-  }
-
-  log(message: string, level: LogLevel, options: LogOptions = {}): void {
-    if (level.value < this.level.value) {
-      return;
-    }
-
-    const terminator = options.term == false ? "" : StreamLumber.terminator;
-    const plainMessage = `[${level.label.padEnd(5)}] ${message}${terminator}`;
-    const coloredMessage = this.palette.get(level).apply(plainMessage, options);
-    const bytes = StreamLumber.encoder.encode(coloredMessage);
-
-    if (options.async == true) {
-      streams.writeAll(this.stream, bytes);
-    } else {
-      streams.writeAllSync(this.stream, bytes);
-    }
-  }
-}
-
-export class NoopLumber extends Lumber {
-  log(_message: string, _level: LogLevel, _options: LogOptions = {}): void {
-    // do nothign
   }
 }

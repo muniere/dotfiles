@@ -3,7 +3,7 @@ import * as streams from "https://deno.land/std@0.163.0/streams/mod.ts";
 
 import { Result, run } from "./lang.ts";
 import { ResLayout } from "./layout.ts";
-import { LogStream, Lumber } from "./logging.ts";
+import { LogStream, Logger } from "./logging.ts";
 import { Path, PathFilter } from "./path.ts";
 import { ChainBase, CookBook, PrefChain, PrefRecipe, RecipeBase, SnipRecipe } from "./schema.ts";
 import { Color } from "./tty.ts";
@@ -120,7 +120,7 @@ export type ListContext = {
   long: boolean;
   color: ColorMode;
   stream: LogStream;
-  logger?: Lumber;
+  logger?: Logger;
 };
 
 class ListAction extends Action<ListContext> {
@@ -216,7 +216,7 @@ export type LinkContext = {
   cleanup: boolean;
   activate: boolean;
   dryRun: boolean;
-  logger?: Lumber;
+  logger?: Logger;
 };
 
 class LinkAction extends Action<LinkContext> {
@@ -382,7 +382,7 @@ export type UnlinkContext = {
   cleanup: boolean;
   deactivate: boolean;
   dryRun: boolean;
-  logger?: Lumber;
+  logger?: Logger;
 };
 
 class UnlinkAction extends Action<UnlinkContext> {
@@ -535,7 +535,7 @@ export function cleanup(context: CleanupContext): Promise<void> {
 }
 export type CleanupContext = {
   dryRun: boolean;
-  logger?: Lumber;
+  logger?: Logger;
 };
 
 class CleanupAction extends Action<CleanupContext> {
