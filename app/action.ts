@@ -3,9 +3,16 @@ import * as streams from "https://deno.land/std@0.163.0/streams/mod.ts";
 
 import { Result, run } from "./lang.ts";
 import { ResLayout } from "./layout.ts";
-import { LogStream, Logger } from "./logging.ts";
+import { Logger, LogStream } from "./logging.ts";
 import { Path, PathFilter } from "./path.ts";
-import { ChainBase, CookBook, PrefChain, PrefRecipe, RecipeBase, SnipRecipe } from "./schema.ts";
+import {
+  ChainBase,
+  CookBook,
+  PrefChain,
+  PrefRecipe,
+  RecipeBase,
+  SnipRecipe,
+} from "./schema.ts";
 import { Color } from "./tty.ts";
 
 import * as shell from "./shell.ts";
@@ -29,6 +36,10 @@ abstract class Action<Context> {
     "**/.keep",
     "**/.gitkeep",
   ]);
+
+  protected recipes(options: { platform?: unix.Platform } = {}): PrefRecipe[] {
+    return this.books(options).flatMap((book) => book.prefs);
+  }
 
   protected books(options: { platform?: unix.Platform } = {}): CookBook[] {
     const books = [
@@ -139,8 +150,7 @@ class ListAction extends Action<ListContext> {
   override async run(): Promise<void> {
     const platform = await unix.identify();
 
-    const recipes = this.books({ platform: platform }).flatMap((book) => book.prefs);
-
+    const recipes = this.recipes({ platform: platform });
     const chains = recipes.flatMap((recipe) => {
       if (recipe.src.isAbsolute) {
         return this.travarseSync(recipe);
@@ -179,7 +189,9 @@ class ListAction extends Action<ListContext> {
       })
       : undefined;
 
-    const dst = color ? color.apply(chain.dst.toString()) : chain.dst.toString();
+    const dst = color
+      ? color.apply(chain.dst.toString())
+      : chain.dst.toString();
     const src = chain.src.toString();
 
     switch (this.context.long) {
@@ -237,7 +249,8 @@ class LinkAction extends Action<LinkContext> {
     }
 
     for (const [i, book] of books.entries()) {
-      const message = sprintf("%s Launched (%02d/%02d)", book.name, i + 1, books.length);
+      const format = "%s Launched (%02d/%02d)";
+      const message = sprintf(format, book.name, i + 1, books.length);
       this.context.logger?.mark(message, { bold: true });
 
       for (const recipe of book.prefs) {
@@ -258,20 +271,20 @@ class LinkAction extends Action<LinkContext> {
   }
 
   private async linkPref(recipe: PrefRecipe): Promise<void> {
-    const identity = await unix.identify();
+    const platform = await unix.identify();
 
     const chains = run(() => {
       if (recipe.src.isAbsolute) {
         return this.travarseSync(recipe);
       }
-      if (identity == "default") {
+      if (platform == "default") {
         return this.travarseSync(recipe, {
-          prefix: ResLayout.recipe().join(identity),
+          prefix: ResLayout.recipe().join(platform),
         });
       }
       return [
         ...this.travarseSync(recipe, {
-          prefix: ResLayout.recipe().join(identity),
+          prefix: ResLayout.recipe().join(platform),
         }),
         ...this.travarseSync(recipe, {
           prefix: ResLayout.recipe().join("default"),
@@ -337,7 +350,9 @@ class LinkAction extends Action<LinkContext> {
       }
 
       const srcText = (await Deno.readTextFile(chain.src.toString())).trim();
-      const dstText = await Result.runAsyncOr(() => Deno.readTextFile(chain.dst.toString()));
+      const dstText = await Result.runAsyncOr(
+        () => Deno.readTextFile(chain.dst.toString()),
+      );
 
       if (dstText && dstText.includes(srcText)) {
         this.context.logger?.info(
@@ -403,7 +418,8 @@ class UnlinkAction extends Action<UnlinkContext> {
     }
 
     for (const [i, book] of books.entries()) {
-      const message = sprintf("%s Launched (%02d/%02d)", book.name, i + 1, books.length);
+      const format = "%s Launched (%02d/%02d)";
+      const message = sprintf(format, book.name, i + 1, books.length);
       this.context.logger?.mark(message, { bold: true });
 
       if (this.context.deactivate) {
@@ -424,20 +440,20 @@ class UnlinkAction extends Action<UnlinkContext> {
   }
 
   private async unlinkPref(recipe: PrefRecipe): Promise<void> {
-    const identity = await unix.identify();
+    const platform = await unix.identify();
 
     const chains = run(() => {
       if (recipe.src.isAbsolute) {
         return this.travarseSync(recipe);
       }
-      if (identity == "default") {
+      if (platform == "default") {
         return this.travarseSync(recipe, {
-          prefix: ResLayout.recipe().join(identity),
+          prefix: ResLayout.recipe().join(platform),
         });
       }
       return [
         ...this.travarseSync(recipe, {
-          prefix: ResLayout.recipe().join(identity),
+          prefix: ResLayout.recipe().join(platform),
         }),
         ...this.travarseSync(recipe, {
           prefix: ResLayout.recipe().join("default"),
@@ -493,7 +509,9 @@ class UnlinkAction extends Action<UnlinkContext> {
         this.context.logger?.info(`File not found: ${chain.dst}`);
         continue;
       }
-      const dstText = await Result.runAsyncOr(() => Deno.readTextFile(chain.dst.toString()));
+      const dstText = await Result.runAsyncOr(
+        () => Deno.readTextFile(chain.dst.toString()),
+      );
       if (!dstText) {
         this.context.logger?.info(`Fiel is empty: ${chain.dst}`);
         continue;

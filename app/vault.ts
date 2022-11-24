@@ -123,7 +123,8 @@ export const VimCookBook = new CookBook({
     }),
   ],
   activate: async (options: shell.CallOptions) => {
-    const url = "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim";
+    const url =
+      "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim";
     const path = HomeLayout.config().join("vim/autoload/plug.vim");
 
     await shell.curl(url, {
