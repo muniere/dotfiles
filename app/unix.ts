@@ -1,10 +1,15 @@
-import * as shell from "./shell.ts";
-
 export type Platform = "ubuntu" | "darwin" | "default";
 
+const decoder = new TextDecoder();
+
 export async function identify(): Promise<Platform> {
-  const result = await shell.capture(["uname", "-a"]);
-  const name = result.stdout.trim().toLowerCase();
+  const output = await Deno.run({
+    cmd: ["uname", "-a"],
+    stdout: "piped",
+    stderr: "piped",
+  }).output();
+
+  const name = decoder.decode(output).trim().toLowerCase();
 
   if (name.includes("ubuntu")) {
     return "ubuntu";

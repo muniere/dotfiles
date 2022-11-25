@@ -40,41 +40,6 @@ export function call(
   return proc.status();
 }
 
-// capture does not support dry-run
-export type CaptureOptions = Pick<Deno.RunOptions, "env"> & {
-  logger?: Logger;
-};
-
-export type CaptureStatus = Deno.ProcessStatus & {
-  stdout: string;
-  stderr: string;
-};
-
-export async function capture(
-  cmd: string[],
-  options: CaptureOptions = {},
-): Promise<CaptureStatus> {
-  options.logger?.trace(cmd.join(" "));
-
-  const proc = Deno.run({
-    cmd: cmd,
-    env: options.env,
-    stdout: "piped",
-    stderr: "piped",
-  });
-
-  const status = await proc.status();
-  const stdout = await proc.output();
-  const stderr = await proc.stderrOutput();
-  const decoder = new TextDecoder();
-
-  return {
-    ...status,
-    stdout: decoder.decode(stdout),
-    stderr: decoder.decode(stderr),
-  };
-}
-
 // =====
 // Short-hand
 // =====
