@@ -18,7 +18,7 @@ export const HomeCookBook = new CookBook({
     ];
 
     for (const dir of dirs) {
-      await shell.mkdirp(dir.path, { ...options, mode: dir.mode });
+      await shell.mkdir(dir.path, { ...options, mode: dir.mode });
     }
   },
 });
@@ -152,7 +152,7 @@ export const GitCookBook = new CookBook({
 
     const stat = Result.runAsyncOr(() => dir.stat());
     if (!stat) {
-      await shell.mkdirp(dir, options);
+      await shell.mkdir(dir, options);
     }
 
     shell.touch(file, options);
@@ -261,7 +261,7 @@ export const NodeCookBook = new CookBook({
 
     const stat = Result.runAsyncOr(() => dir.stat());
     if (!stat) {
-      await shell.mkdirp(dir, options);
+      await shell.mkdir(dir, options);
     }
 
     shell.touch(file, options);

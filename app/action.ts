@@ -315,7 +315,7 @@ class LinkAction extends Action<LinkContext> {
       const dir = chain.dst.dirname();
       const dirStat = await Result.runAsyncOr(() => dir.lstat());
       if (!dirStat || dirStat.isDirectory) {
-        await shell.mkdirp(dir, this.shellOptions);
+        await shell.mkdir(dir, this.shellOptions);
       }
 
       switch (chain.options?.kind ?? "link") {
