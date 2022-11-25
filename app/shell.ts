@@ -43,21 +43,6 @@ export function call(
 // =====
 // Short-hand
 // =====
-export async function which(command: string): Promise<Deno.ProcessStatus> {
-  const proc = Deno.run({
-    cmd: ["which", command],
-    stdout: "null",
-    stderr: "null",
-  });
-
-  const status = await proc.status();
-  if (!status.success) {
-    throw new Error();
-  }
-
-  return status;
-}
-
 export async function mkdirp(
   path: Path,
   options: CallOptions & Deno.MkdirOptions = {},
