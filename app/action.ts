@@ -569,10 +569,10 @@ class CleanupAction extends Action<CleanupContext> {
 
     const books = this.books({ platform: platform });
 
-    return this.perform(books);
+    return this.perform(books, { force: true });
   }
 
-  async perform(books: CookBook[]): Promise<void> {
+  async perform(books: CookBook[], options: { force?: boolean} = {}): Promise<void> {
     const banner = "Scanning broken symlinks";
     this.context.logger?.info(`${banner}...\r`, { term: false });
 
@@ -584,7 +584,7 @@ class CleanupAction extends Action<CleanupContext> {
     for (const spec of specs) {
       const path = spec.dst.expandHome();
 
-      if (spec.options?.autoclean == false) {
+      if (spec.options?.autoclean == false && options.force != true) {
         this.context.logger?.debug(`Skipping ${path}`);
         continue;
       }
