@@ -574,7 +574,7 @@ class CleanupAction extends Action<CleanupContext> {
     if (found.length > 0) {
       this.context.logger?.info(`Found ${found.length} broken symlinks`);
     } else {
-      this.context.logger?.debug(`Found ${found.length} broken symlinks`);
+      this.context.logger?.info(`No broken symlinks were found`);
     }
 
     for (const path of found) {
