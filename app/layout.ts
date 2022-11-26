@@ -35,11 +35,11 @@ export class HomeLayout {
 export class ResLayout {
   private constructor() {}
 
-  static recipe(): Path {
-    return new Path("./recipe");
+  static pref(): Path {
+    return new Path("./pref");
   }
 
-  static snippet(): Path {
-    return new Path("./snippet");
+  static snip(): Path {
+    return new Path("./snip");
   }
 }

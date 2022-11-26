@@ -157,15 +157,15 @@ class ListAction extends Action<ListContext> {
       }
       if (platform == "default") {
         return this.travarseSync(spec, {
-          prefix: ResLayout.recipe().join(platform),
+          prefix: ResLayout.pref().join(platform),
         });
       }
       return [
         ...this.travarseSync(spec, {
-          prefix: ResLayout.recipe().join(platform),
+          prefix: ResLayout.pref().join(platform),
         }),
         ...this.travarseSync(spec, {
-          prefix: ResLayout.recipe().join("default"),
+          prefix: ResLayout.pref().join("default"),
         }),
       ];
     });
@@ -279,15 +279,15 @@ class LinkAction extends Action<LinkContext> {
       }
       if (platform == "default") {
         return this.travarseSync(spec, {
-          prefix: ResLayout.recipe().join(platform),
+          prefix: ResLayout.pref().join(platform),
         });
       }
       return [
         ...this.travarseSync(spec, {
-          prefix: ResLayout.recipe().join(platform),
+          prefix: ResLayout.pref().join(platform),
         }),
         ...this.travarseSync(spec, {
-          prefix: ResLayout.recipe().join("default"),
+          prefix: ResLayout.pref().join("default"),
         }),
       ];
     });
@@ -334,7 +334,7 @@ class LinkAction extends Action<LinkContext> {
       if (spec.src.isAbsolute) {
         return this.travarseSync(spec);
       } else {
-        return this.travarseSync(spec, { prefix: ResLayout.snippet() });
+        return this.travarseSync(spec, { prefix: ResLayout.snip() });
       }
     });
 
@@ -448,15 +448,15 @@ class UnlinkAction extends Action<UnlinkContext> {
       }
       if (platform == "default") {
         return this.travarseSync(spec, {
-          prefix: ResLayout.recipe().join(platform),
+          prefix: ResLayout.pref().join(platform),
         });
       }
       return [
         ...this.travarseSync(spec, {
-          prefix: ResLayout.recipe().join(platform),
+          prefix: ResLayout.pref().join(platform),
         }),
         ...this.travarseSync(spec, {
-          prefix: ResLayout.recipe().join("default"),
+          prefix: ResLayout.pref().join("default"),
         }),
       ];
     });
@@ -490,7 +490,7 @@ class UnlinkAction extends Action<UnlinkContext> {
       if (spec.src.isAbsolute) {
         return this.travarseSync(spec);
       } else {
-        return this.travarseSync(spec, { prefix: ResLayout.snippet() });
+        return this.travarseSync(spec, { prefix: ResLayout.snip() });
       }
     });
 
