@@ -335,7 +335,7 @@ export const AndroidStudioCookBook = new CookBook({
   prefs: [
     ...PrefSpec.glob({
       src: "cask/AndroidStudio/colors/",
-      dst: "~/Library/Preferences/AndroidStudio*/colors/",
+      dst: "~/Library/ApplicationSupport/Google/AndroidStudio*/colors/",
     }),
     ...PrefSpec.glob({
       src: "cask/AndroidStudio/keymaps/",
