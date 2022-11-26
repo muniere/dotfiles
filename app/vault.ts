@@ -272,10 +272,12 @@ export const XcodeCookBook = new CookBook({
   name: "XcodeCookBook",
   prefs: [
     new PrefSpec({
-      src: "cask/Xcode/",
-      dst: "~/Library/Developer/Xcode/",
-    }, {
-      autoclean: false,
+      src: "cask/Xcode/UserData/FontAndColorThemes/",
+      dst: "~/Library/Developer/Xcode/UserData/FontAndColorThemes/",
+    }),
+    new PrefSpec({
+      src: "cask/Xcode/UserData/KeyBindings/",
+      dst: "~/Library/Developer/Xcode/UserData/KeyBindings/",
     }),
   ],
   platforms: ["darwin"],
@@ -285,16 +287,12 @@ export const IntelliJCookBook = new CookBook({
   name: "IntelliJCookBook",
   prefs: [
     ...PrefSpec.glob({
-      src: "cask/IntelliJIdea/",
-      dst: "~/Library/Preferences/IntelliJIdea*",
-    }, {
-      autoclean: false,
+      src: "cask/IntelliJIdea/colors/",
+      dst: "~/Library/ApplicationSupport/JetBrains/IntelliJIdea*/colors/",
     }),
     ...PrefSpec.glob({
-      src: "cask/IntelliJIdea/",
-      dst: "~/Library/ApplicationSupport/JetBrains/IntelliJIdea*",
-    }, {
-      autoclean: false,
+      src: "cask/IntelliJIdea/colors/keymaps/",
+      dst: "~/Library/ApplicationSupport/JetBrains/IntelliJIdea*/keymaps/",
     }),
   ],
   platforms: ["darwin"],
@@ -304,16 +302,12 @@ export const AndroidStudioCookBook = new CookBook({
   name: "AndroidStudioCookBook",
   prefs: [
     ...PrefSpec.glob({
-      src: "cask/AndroidStudio/",
-      dst: "~/Library/Preferences/AndroidStudio*",
-    }, {
-      autoclean: false,
+      src: "cask/AndroidStudio/colors/",
+      dst: "~/Library/Preferences/AndroidStudio*/colors/",
     }),
     ...PrefSpec.glob({
-      src: "cask/AndroidStudio/",
-      dst: "~/Library/ApplicationSupport/Google/AndroidStudio*",
-    }, {
-      autoclean: false,
+      src: "cask/AndroidStudio/keymaps/",
+      dst: "~/Library/ApplicationSupport/Google/AndroidStudio*/keymaps/",
     }),
   ],
   platforms: ["darwin"],
@@ -323,14 +317,14 @@ export const AppCodeCookBook = new CookBook({
   name: "AppCodeCookBook",
   prefs: [
     ...PrefSpec.glob({
-      src: "cask/AppCode/",
-      dst: "~/Library/Preferences/AppCode*",
+      src: "cask/AppCode/colors/",
+      dst: "~/Library/ApplicationSupport/JetBrains/AppCode*/colors/",
     }, {
       autoclean: false,
     }),
     ...PrefSpec.glob({
-      src: "cask/AppCode/",
-      dst: "~/Library/ApplicationSupport/JetBrains/AppCode*",
+      src: "cask/AppCode/keymaps/",
+      dst: "~/Library/ApplicationSupport/JetBrains/AppCode*/keymaps/",
     }, {
       autoclean: false,
     }),
@@ -342,16 +336,8 @@ export const RubyMineCookBook = new CookBook({
   name: "RubyMineCookBook",
   prefs: [
     ...PrefSpec.glob({
-      src: "cask/RubyMine/",
-      dst: "~/Library/Preferences/RubyMine*",
-    }, {
-      autoclean: false,
-    }),
-    ...PrefSpec.glob({
-      src: "cask/RubyMine/",
-      dst: "~/Library/ApplicationSupport/JetBrains/RubyMine*",
-    }, {
-      autoclean: false,
+      src: "cask/RubyMine/colors/",
+      dst: "~/Library/ApplicationSupport/JetBrains/RubyMine*/colors/",
     }),
   ],
   platforms: ["darwin"],
@@ -361,12 +347,8 @@ export const GoLandCookBook = new CookBook({
   name: "GoLandCookBook",
   prefs: [
     ...PrefSpec.glob({
-      src: "cask/GoLand/",
-      dst: "~/Library/Preferences/GoLand*",
-    }),
-    ...PrefSpec.glob({
-      src: "cask/GoLand/",
-      dst: "~/Library/ApplicationSupport/JetBrains/GoLand*",
+      src: "cask/GoLand/colors/",
+      dst: "~/Library/ApplicationSupport/JetBrains/GoLand*/colors/",
     }),
   ],
   platforms: ["darwin"],
@@ -376,12 +358,8 @@ export const CLionCookBook = new CookBook({
   name: "CLionCookBook",
   prefs: [
     ...PrefSpec.glob({
-      src: "cask/CLion/",
-      dst: "~/Library/Preferences/CLion*",
-    }),
-    ...PrefSpec.glob({
-      src: "cask/CLion/",
-      dst: "~/Library/ApplicationSupport/JetBrains/CLion*",
+      src: "cask/CLion/colors/",
+      dst: "~/Library/ApplicationSupport/JetBrains/CLion*/colors/",
     }),
   ],
   platforms: ["darwin"],
@@ -391,16 +369,8 @@ export const RiderCookBook = new CookBook({
   name: "RiderCookBook",
   prefs: [
     ...PrefSpec.glob({
-      src: "cask/Rider/",
-      dst: "~/Library/Preferences/Rider*",
-    }, {
-      autoclean: false,
-    }),
-    ...PrefSpec.glob({
-      src: "cask/Rider/",
-      dst: "~/Library/ApplicationSupport/JetBrains/Rider*",
-    }, {
-      autoclean: false,
+      src: "cask/Rider/Colors/",
+      dst: "~/Library/ApplicationSupport/JetBrains/Rider*/Colors/",
     }),
   ],
   platforms: ["darwin"],
