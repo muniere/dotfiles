@@ -10,7 +10,7 @@ export const HomeCookBook = new CookBook({
   tmpls: [
     new TmplSpec({
       src: "_.shrc",
-      dst: HomeLayout.config().join("sh/000._.shrc"),
+      dst: HomeLayout.config().join("sh/_.shrc"),
     }, {
       values: {
         cache: HomeLayout.bin().transHome(),
