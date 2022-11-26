@@ -10,6 +10,7 @@ import {
   CookBook,
   PrefChain,
   PrefSpec,
+  SnipChain,
   SnipSpec,
   SpecBase,
 } from "./schema.ts";
@@ -37,8 +38,12 @@ abstract class Action<Context> {
     "**/.gitkeep",
   ]);
 
-  protected prefSpecs(options: { platform?: unix.Platform } = {}): PrefSpec[] {
-    return this.books(options).flatMap((book) => book.prefs);
+  protected prefChains(
+    options: { platform?: unix.Platform } = {},
+  ): PrefChain[] {
+    return this.books(options)
+      .flatMap((book) => book.prefs)
+      .flatMap((pref) => this.inflatePrefSpecSync(pref, options));
   }
 
   protected books(options: { platform?: unix.Platform } = {}): CookBook[] {
@@ -69,6 +74,43 @@ abstract class Action<Context> {
     }
 
     return books.filter((book) => book.supports(platform));
+  }
+
+  protected inflatePrefSpecSync(
+    spec: PrefSpec,
+    options: { platform?: unix.Platform } = {},
+  ): PrefChain[] {
+    const platform = options.platform ?? "default";
+
+    if (spec.src.isAbsolute) {
+      return this.travarseSync(spec);
+    }
+    switch (platform) {
+      case "default":
+        return this.travarseSync(spec, {
+          prefix: ResLayout.pref().join(platform),
+        });
+      case "darwin":
+      case "ubuntu":
+        return [
+          ...this.travarseSync(spec, {
+            prefix: ResLayout.pref().join(platform),
+          }),
+          ...this.travarseSync(spec, {
+            prefix: ResLayout.pref().join("default"),
+          }),
+        ];
+    }
+  }
+
+  protected inflateSnipSpecSync(
+    spec: SnipSpec,
+  ): SnipChain[] {
+    if (spec.src.isAbsolute) {
+      return this.travarseSync(spec);
+    } else {
+      return this.travarseSync(spec, { prefix: ResLayout.snip() });
+    }
   }
 
   protected travarseSync<Chain extends ChainBase>(
@@ -145,26 +187,7 @@ class ListAction extends Action<ListContext> {
 
   override async run(): Promise<void> {
     const platform = await unix.identify();
-
-    const specs = this.prefSpecs({ platform: platform });
-    const chains = specs.flatMap((spec) => {
-      if (spec.src.isAbsolute) {
-        return this.travarseSync(spec);
-      }
-      if (platform == "default") {
-        return this.travarseSync(spec, {
-          prefix: ResLayout.pref().join(platform),
-        });
-      }
-      return [
-        ...this.travarseSync(spec, {
-          prefix: ResLayout.pref().join(platform),
-        }),
-        ...this.travarseSync(spec, {
-          prefix: ResLayout.pref().join("default"),
-        }),
-      ];
-    });
+    const chains = this.prefChains({ platform: platform });
 
     const lines = chains
       .filter((chain) => this.allows(chain.src))
@@ -268,25 +291,7 @@ class LinkAction extends Action<LinkContext> {
 
   private async linkPref(spec: PrefSpec): Promise<void> {
     const platform = await unix.identify();
-
-    const chains = run(() => {
-      if (spec.src.isAbsolute) {
-        return this.travarseSync(spec);
-      }
-      if (platform == "default") {
-        return this.travarseSync(spec, {
-          prefix: ResLayout.pref().join(platform),
-        });
-      }
-      return [
-        ...this.travarseSync(spec, {
-          prefix: ResLayout.pref().join(platform),
-        }),
-        ...this.travarseSync(spec, {
-          prefix: ResLayout.pref().join("default"),
-        }),
-      ];
-    });
+    const chains = this.inflatePrefSpecSync(spec, { platform: platform });
 
     for (const chain of chains) {
       if (!this.allows(chain.src)) {
@@ -326,13 +331,7 @@ class LinkAction extends Action<LinkContext> {
   }
 
   private async enableSnip(spec: SnipSpec): Promise<void> {
-    const chains = run(() => {
-      if (spec.src.isAbsolute) {
-        return this.travarseSync(spec);
-      } else {
-        return this.travarseSync(spec, { prefix: ResLayout.snip() });
-      }
-    });
+    const chains = this.inflateSnipSpecSync(spec);
 
     for (const chain of chains) {
       if (!this.allows(chain.src)) {
@@ -437,25 +436,7 @@ class UnlinkAction extends Action<UnlinkContext> {
 
   private async unlinkPref(spec: PrefSpec): Promise<void> {
     const platform = await unix.identify();
-
-    const chains = run(() => {
-      if (spec.src.isAbsolute) {
-        return this.travarseSync(spec);
-      }
-      if (platform == "default") {
-        return this.travarseSync(spec, {
-          prefix: ResLayout.pref().join(platform),
-        });
-      }
-      return [
-        ...this.travarseSync(spec, {
-          prefix: ResLayout.pref().join(platform),
-        }),
-        ...this.travarseSync(spec, {
-          prefix: ResLayout.pref().join("default"),
-        }),
-      ];
-    });
+    const chains = this.inflatePrefSpecSync(spec, { platform: platform });
 
     for (const chain of chains) {
       if (!this.allows(chain.src)) {
@@ -482,13 +463,7 @@ class UnlinkAction extends Action<UnlinkContext> {
   }
 
   private async disableSnip(spec: SnipSpec): Promise<void> {
-    const chains = run(() => {
-      if (spec.src.isAbsolute) {
-        return this.travarseSync(spec);
-      } else {
-        return this.travarseSync(spec, { prefix: ResLayout.snip() });
-      }
-    });
+    const chains = this.inflateSnipSpecSync(spec);
 
     for (const chain of chains) {
       if (!this.allows(chain.src)) {
@@ -568,7 +543,10 @@ class CleanupAction extends Action<CleanupContext> {
     return this.perform(books, { force: true });
   }
 
-  async perform(books: CookBook[], options: { force?: boolean} = {}): Promise<void> {
+  async perform(
+    books: CookBook[],
+    options: { force?: boolean } = {},
+  ): Promise<void> {
     const banner = "Scanning broken symlinks";
     this.context.logger?.info(`${banner}...\r`, { term: false });
 
