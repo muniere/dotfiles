@@ -94,3 +94,44 @@ class Failure<T> extends Result<T> {
 export function run<T>(fn: () => T): T {
   return fn();
 }
+
+export interface Functor<T> {
+  perform(value: T): T;
+}
+
+type FunctorLike<T> = (value: T) => T;
+
+class FunctorAdapter<T> implements Functor<T> {
+  constructor(private fn: FunctorLike<T>) {}
+
+  perform(value: T): T {
+    return this.fn(value);
+  }
+}
+
+export class Pipeline<T> implements Functor<T> {
+  private functors: Functor<T>[];
+
+  constructor(...functors: Functor<T>[]) {
+    this.functors = [...functors];
+  }
+
+  static perform<T>(value: T, ...functions: FunctorLike<T>[]): T {
+    return Pipeline.of(...functions).perform(value);
+  }
+
+  static of<T>(...functions: FunctorLike<T>[]): Pipeline<T> {
+    return new Pipeline(...functions.map((fn) => new FunctorAdapter(fn)));
+  }
+
+  concat(...functions: FunctorLike<T>[]): Pipeline<T> {
+    return new Pipeline(
+      ...this.functors,
+      ...functions.map((fn) => new FunctorAdapter(fn)),
+    );
+  }
+
+  perform(value: T): T {
+    return this.functors.reduce((acc, fn) => fn.perform(acc), value);
+  }
+}

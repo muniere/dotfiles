@@ -1,8 +1,9 @@
 import { sprintf } from "https://deno.land/std@0.163.0/fmt/printf.ts";
+import * as colors from "https://deno.land/std@0.163.0/fmt/colors.ts";
 import * as streams from "https://deno.land/std@0.163.0/streams/mod.ts";
 import * as Eta from "https://deno.land/x/eta@v1.12.3/mod.ts";
 
-import { Result, run } from "./lang.ts";
+import { Pipeline, Result, run } from "./lang.ts";
 import { ResLayout } from "./layout.ts";
 import { Logger, LogStream } from "./logging.ts";
 import { Path, PathFilter } from "./path.ts";
@@ -17,7 +18,6 @@ import {
   TmplChain,
   TmplSpec,
 } from "./schema.ts";
-import { Color } from "./tty.ts";
 
 import * as shell from "./shell.ts";
 import * as unix from "./unix.ts";
@@ -214,12 +214,16 @@ class ListAction extends Action<ListContext> {
     {
       const chains = this.prefChains({ platform: platform });
 
-      const header = Color.YELLOW.apply("[[ Preferences ]]", { bold: true });
+      const header = Pipeline.perform(
+        "[[ Preferences ]]",
+        colors.yellow,
+        colors.bold,
+      );
 
       const lines = chains
         .filter((chain) => this.test(chain.src))
         .toSorted((a, b) => a.dst < b.dst ? -1 : 1)
-        .map((chain) => this.format(chain, { separator: " -> "}));
+        .map((chain) => this.format(chain, { separator: " -> " }));
 
       const bytes = encoder.encode([header, ...lines].join("\n") + "\n");
 
@@ -232,12 +236,16 @@ class ListAction extends Action<ListContext> {
     {
       const chains = this.tmplChains({ platform: platform });
 
-      const header = Color.YELLOW.apply("[[ Templates ]]", { bold: true });
+      const header = Pipeline.perform(
+        "[[ Templates ]]",
+        colors.yellow,
+        colors.bold,
+      );
 
       const lines = chains
         .filter((chain) => this.test(chain.src))
         .toSorted((a, b) => a.dst < b.dst ? -1 : 1)
-        .map((chain) => this.format(chain, { separator: " <- "}));
+        .map((chain) => this.format(chain, { separator: " <- " }));
 
       const bytes = encoder.encode([header, ...lines].join("\n") + "\n");
 
@@ -246,16 +254,17 @@ class ListAction extends Action<ListContext> {
   }
 
   private format(chain: ChainBase, options: { separator: string }): string {
-    const color = this.colored
+    const decorate = this.colored
       ? Result.run(() => chain.dst.lstatSync()).fold({
-        onSuccess: (stat) => this.color(stat),
-        onFailure: (_) => Color.RED,
+        onSuccess: (stat) => this.decoration(stat),
+        onFailure: (_) => Pipeline.of(colors.red),
       })
       : undefined;
 
-    const dst = color
-      ? color.apply(chain.dst.toString())
+    const dst = decorate
+      ? decorate.perform(chain.dst.toString())
       : chain.dst.toString();
+
     const src = chain.src.toString();
 
     switch (this.context.long) {
@@ -267,17 +276,17 @@ class ListAction extends Action<ListContext> {
     }
   }
 
-  private color(stat: Deno.FileInfo): Color {
+  private decoration(stat: Deno.FileInfo): Pipeline<string> {
     if (stat.isSymlink) {
-      return Color.MAGENTA;
+      return Pipeline.of(colors.magenta);
     }
     if (stat.isDirectory) {
-      return Color.BLUE;
+      return Pipeline.of(colors.blue);
     }
     if (stat.isFile) {
-      return Color.RESET;
+      return Pipeline.of(colors.reset);
     }
-    return Color.RESET;
+    return Pipeline.of(colors.reset);
   }
 }
 

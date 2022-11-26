@@ -1,6 +1,6 @@
 import * as streams from "https://deno.land/std@0.163.0/streams/mod.ts";
-
-import { Color } from "./tty.ts";
+import * as colors from "https://deno.land/std@0.163.0/fmt/colors.ts";
+import { Pipeline } from "./lang.ts";
 
 export type LogStream =
   & Deno.Writer
@@ -30,24 +30,24 @@ export class LogLevel {
 
 export class LogPalette {
   constructor(
-    private readonly values: Map<LogLevel, Color>,
+    private readonly values: Map<LogLevel, Pipeline<string>>,
   ) {}
 
   static default(): LogPalette {
     return new LogPalette(
       new Map([
-        [LogLevel.DEBUG, Color.GREEN],
-        [LogLevel.TRACE, Color.MAGENTA],
-        [LogLevel.MARK, Color.WHITE],
-        [LogLevel.INFO, Color.CYAN],
-        [LogLevel.WARN, Color.YELLOW],
-        [LogLevel.ERROR, Color.RED],
+        [LogLevel.DEBUG, Pipeline.of(colors.green)],
+        [LogLevel.TRACE, Pipeline.of(colors.magenta)],
+        [LogLevel.MARK, Pipeline.of(colors.white)],
+        [LogLevel.INFO, Pipeline.of(colors.cyan)],
+        [LogLevel.WARN, Pipeline.of(colors.yellow)],
+        [LogLevel.ERROR, Pipeline.of(colors.red)],
       ]),
     );
   }
 
-  get(level: LogLevel): Color {
-    return this.values.get(level) ?? Color.RESET;
+  get(level: LogLevel): Pipeline<string> {
+    return this.values.get(level) ?? Pipeline.of(colors.reset);
   }
 }
 
@@ -81,9 +81,13 @@ export class Logger {
       return;
     }
 
+    const decorate = options.bold
+      ? this.palette.get(level).concat(colors.bold)
+      : this.palette.get(level);
+
     const terminator = options.term == false ? "" : Logger.terminator;
     const plainMessage = `[${level.label.padEnd(5)}] ${message}${terminator}`;
-    const coloredMessage = this.palette.get(level).apply(plainMessage, options);
+    const coloredMessage = decorate.perform(plainMessage);
     const bytes = Logger.encoder.encode(coloredMessage);
 
     if (options.async == true) {
