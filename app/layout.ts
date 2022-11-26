@@ -4,31 +4,27 @@ export class HomeLayout {
   private constructor() {}
 
   static bin(): Path {
-    return HomeLayout.env("XDG_BIN_HOME", "~/.local/bin");
+    return new Path("~/.local/bin").expandHome();
   }
 
   static cache(): Path {
-    return HomeLayout.env("XDG_CACHE_HOME", "~/.cache");
+    return new Path("~/.cache").expandHome();
   }
 
   static config(): Path {
-    return HomeLayout.env("XDG_CONFIG_HOME", "~/.config");
+    return new Path("~/.config").expandHome();
   }
 
   static data(): Path {
-    return HomeLayout.env("XDG_DATA_HOME", "~/.local/share");
+    return new Path("~/.local/share").expandHome();
   }
 
   static state(): Path {
-    return HomeLayout.env("XDG_STATE_HOME", "~/.local/state");
+    return new Path("~/.local/state").expandHome();
   }
 
   static runtime(): Path {
-    return HomeLayout.env("XDG_RUNTIME_HOME", "~/.local/run");
-  }
-
-  private static env(key: string, orElse: string): Path {
-    return new Path(Deno.env.get(key) ?? orElse).expandHome();
+    return new Path("~/.local/run").expandHome();
   }
 }
 

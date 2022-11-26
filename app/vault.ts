@@ -1,13 +1,16 @@
+import * as Eta from "https://deno.land/x/eta@v1.12.3/mod.ts";
+
 import { CookBook, PrefSpec, SnipSpec } from "./schema.ts";
 import { HomeLayout } from "./layout.ts";
 import { Result } from "./lang.ts";
+import { Path } from "./path.ts";
 
 import * as shell from "./shell.ts";
-import { Path } from "./path.ts";
 
 export const HomeCookBook = new CookBook({
   name: "HomeCookBook",
   activate: async (options: shell.CallOptions) => {
+    // Directories
     const dirs = [
       { path: HomeLayout.bin(), mode: 0o755 },
       { path: HomeLayout.cache(), mode: 0o755 },
@@ -20,6 +23,35 @@ export const HomeCookBook = new CookBook({
     for (const dir of dirs) {
       await shell.mkdir(dir.path, { ...options, mode: dir.mode });
     }
+
+    // XDG variables
+    const path = HomeLayout.config().join("sh/000._.shrc");
+    const stat = await Result.runAsyncOr(() => path.stat());
+    if (stat) {
+      options.logger?.info(`File already created: ${path}`);
+      return;
+    }
+
+    const template = await Deno.readTextFile("tmpl/_.shrc");
+    const values = {
+      cache: HomeLayout.bin().transHome(),
+      config: HomeLayout.config().transHome(),
+      data: HomeLayout.data().transHome(),
+      state: HomeLayout.state().transHome(),
+      runtime:HomeLayout.runtime().transHome()
+    };
+
+    const content = Eta.render(template, values) as string;
+
+    await shell.mkdir(path.dirname(), options);
+
+    options.logger?.info(`Create a file ${path} with content:\n${content}`);
+
+    if (options.dryRun == true) {
+      return;
+    }
+
+    await Deno.writeTextFile(path.toFileUrl(), content);
   },
 });
 

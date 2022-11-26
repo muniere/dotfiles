@@ -130,6 +130,14 @@ export class Path {
     return new Path(this.value.replace(home, "~"));
   }
 
+  transHome(): Path {
+    const home = Deno.env.get("HOME");
+    if (!home) {
+      return this;
+    }
+    return new Path(this.value.replace(home, "$HOME"));
+  }
+
   match(regexp: string | RegExp): RegExpMatchArray | null {
     return this.value.match(regexp);
   }
