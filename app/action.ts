@@ -151,8 +151,8 @@ abstract class Action<Context> {
       );
   }
 
-  protected allows(path: Path): boolean {
-    return Action.filter.allow(path);
+  protected test(path: Path): boolean {
+    return Action.filter.test(path);
   }
 }
 
@@ -190,7 +190,7 @@ class ListAction extends Action<ListContext> {
     const chains = this.prefChains({ platform: platform });
 
     const lines = chains
-      .filter((chain) => this.allows(chain.src))
+      .filter((chain) => this.test(chain.src))
       .toSorted((a, b) => a.dst < b.dst ? -1 : 1)
       .map((chain) => this.format(chain));
 
@@ -294,7 +294,7 @@ class LinkAction extends Action<LinkContext> {
     const chains = this.inflatePrefSpecSync(spec, { platform: platform });
 
     for (const chain of chains) {
-      if (!this.allows(chain.src)) {
+      if (!this.test(chain.src)) {
         this.context.logger?.debug(`File ignored: ${chain.src}`);
         continue;
       }
@@ -334,7 +334,7 @@ class LinkAction extends Action<LinkContext> {
     const chains = this.inflateSnipSpecSync(spec);
 
     for (const chain of chains) {
-      if (!this.allows(chain.src)) {
+      if (!this.test(chain.src)) {
         this.context.logger?.debug(`File ignored: ${chain.src}`);
         continue;
       }
@@ -439,7 +439,7 @@ class UnlinkAction extends Action<UnlinkContext> {
     const chains = this.inflatePrefSpecSync(spec, { platform: platform });
 
     for (const chain of chains) {
-      if (!this.allows(chain.src)) {
+      if (!this.test(chain.src)) {
         this.context.logger?.debug(`File ignored: ${chain.src}`);
         continue;
       }
@@ -466,7 +466,7 @@ class UnlinkAction extends Action<UnlinkContext> {
     const chains = this.inflateSnipSpecSync(spec);
 
     for (const chain of chains) {
-      if (!this.allows(chain.src)) {
+      if (!this.test(chain.src)) {
         this.context.logger?.debug(`File ignored: ${chain.src}`);
         continue;
       }

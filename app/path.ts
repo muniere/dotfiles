@@ -181,7 +181,7 @@ export class PathFilter {
     return this.glob({ blacklist: globs });
   }
 
-  allow(path: PathLike): boolean {
+  test(path: PathLike): boolean {
     if (this.whitelist.some((regexp) => path.match(regexp))) {
       return true;
     }
