@@ -61,10 +61,6 @@ abstract class Action<Context> {
       vault.XcodeCookBook,
       vault.IntelliJCookBook,
       vault.AndroidStudioCookBook,
-      vault.AppCodeCookBook,
-      vault.RubyMineCookBook,
-      vault.GoLandCookBook,
-      vault.RiderCookBook,
     ];
 
     const platform = options.platform;
