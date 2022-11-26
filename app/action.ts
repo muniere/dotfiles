@@ -49,6 +49,14 @@ abstract class Action<Context> {
       .flatMap((pref) => this.inflatePrefSpecSync(pref, options));
   }
 
+  protected tmplChains(
+    options: { platform?: unix.Platform } = {},
+  ): TmplChain[] {
+    return this.books(options)
+      .flatMap((book) => book.tmpls)
+      .flatMap((pref) => this.inflateTmplSpecSync(pref));
+  }
+
   protected books(options: { platform?: unix.Platform } = {}): CookBook[] {
     const books = [
       vault.HomeCookBook,
@@ -200,20 +208,44 @@ class ListAction extends Action<ListContext> {
 
   override async run(): Promise<void> {
     const platform = await unix.identify();
-    const chains = this.prefChains({ platform: platform });
-
-    const lines = chains
-      .filter((chain) => this.test(chain.src))
-      .toSorted((a, b) => a.dst < b.dst ? -1 : 1)
-      .map((chain) => this.format(chain));
-
     const encoder = new TextEncoder();
-    const bytes = encoder.encode(lines.join("\n") + "\n");
 
-    await streams.writeAll(this.context.stream, bytes);
+    // pref
+    {
+      const chains = this.prefChains({ platform: platform });
+
+      const header = Color.YELLOW.apply("[[ Preferences ]]", { bold: true });
+
+      const lines = chains
+        .filter((chain) => this.test(chain.src))
+        .toSorted((a, b) => a.dst < b.dst ? -1 : 1)
+        .map((chain) => this.format(chain, { separator: " -> "}));
+
+      const bytes = encoder.encode([header, ...lines].join("\n") + "\n");
+
+      await streams.writeAll(this.context.stream, bytes);
+    }
+
+    await streams.writeAll(this.context.stream, encoder.encode("\n"));
+
+    // tmpl
+    {
+      const chains = this.tmplChains({ platform: platform });
+
+      const header = Color.YELLOW.apply("[[ Templates ]]", { bold: true });
+
+      const lines = chains
+        .filter((chain) => this.test(chain.src))
+        .toSorted((a, b) => a.dst < b.dst ? -1 : 1)
+        .map((chain) => this.format(chain, { separator: " <- "}));
+
+      const bytes = encoder.encode([header, ...lines].join("\n") + "\n");
+
+      await streams.writeAll(this.context.stream, bytes);
+    }
   }
 
-  private format(chain: PrefChain): string {
+  private format(chain: ChainBase, options: { separator: string }): string {
     const color = this.colored
       ? Result.run(() => chain.dst.lstatSync()).fold({
         onSuccess: (stat) => this.color(stat),
@@ -228,7 +260,7 @@ class ListAction extends Action<ListContext> {
 
     switch (this.context.long) {
       case true:
-        return [dst, src].join(" -> ");
+        return [dst, src].join(options.separator);
 
       case false:
         return dst;
