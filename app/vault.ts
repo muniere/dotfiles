@@ -1,4 +1,4 @@
-import { CookBook, PrefRecipe, SnipRecipe } from "./schema.ts";
+import { CookBook, PrefSpec, SnipSpec } from "./schema.ts";
 import { HomeLayout } from "./layout.ts";
 import { Result } from "./lang.ts";
 
@@ -38,7 +38,7 @@ export const LibraryCookBook = new CookBook({
 export const BinCookBook = new CookBook({
   name: "BinCookBook",
   prefs: [
-    new PrefRecipe({
+    new PrefSpec({
       src: "bin/",
       dst: HomeLayout.bin(),
     }),
@@ -48,7 +48,7 @@ export const BinCookBook = new CookBook({
 export const ShCookBook = new CookBook({
   name: "ShCookBook",
   prefs: [
-    new PrefRecipe({
+    new PrefSpec({
       src: "sh/",
       dst: HomeLayout.config().join("sh/"),
     }),
@@ -58,13 +58,13 @@ export const ShCookBook = new CookBook({
 export const BashCookBook = new CookBook({
   name: "BashCookBook",
   prefs: [
-    new PrefRecipe({
+    new PrefSpec({
       src: "bash/",
       dst: HomeLayout.config().join("bash/"),
     }),
   ],
   snips: [
-    new SnipRecipe({
+    new SnipSpec({
       src: "bashrc",
       dst: "~/.bashrc",
     }),
@@ -74,17 +74,17 @@ export const BashCookBook = new CookBook({
 export const ZshCookBook = new CookBook({
   name: "ZshCookBook",
   prefs: [
-    new PrefRecipe({
+    new PrefSpec({
       src: "zsh/",
       dst: HomeLayout.config().join("zsh/"),
     }),
-    new PrefRecipe({
+    new PrefSpec({
       src: "zsh-site-functions/",
       dst: HomeLayout.data().join("zsh/site-functions/"),
     }),
   ],
   snips: [
-    new SnipRecipe({
+    new SnipSpec({
       src: "zshenv",
       dst: "~/.zshenv",
     }),
@@ -111,13 +111,13 @@ export const ZshCookBook = new CookBook({
 export const VimCookBook = new CookBook({
   name: "VimCookBook",
   prefs: [
-    new PrefRecipe({
+    new PrefSpec({
       src: "vim/",
       dst: HomeLayout.config().join("vim/"),
     }),
   ],
   snips: [
-    new SnipRecipe({
+    new SnipSpec({
       src: "vimrc",
       dst: "~/.vimrc",
     }),
@@ -137,11 +137,11 @@ export const VimCookBook = new CookBook({
 export const GitCookBook = new CookBook({
   name: "GitCookBook",
   prefs: [
-    new PrefRecipe({
+    new PrefSpec({
       src: "git/",
       dst: HomeLayout.config().join("git/"),
     }),
-    new PrefRecipe({
+    new PrefSpec({
       src: "tig/",
       dst: HomeLayout.config().join("tig/"),
     }),
@@ -162,7 +162,7 @@ export const GitCookBook = new CookBook({
 export const GitHubCookBook = new CookBook({
   name: "GitHubCookBook",
   prefs: [
-    new PrefRecipe({
+    new PrefSpec({
       src: "gh/",
       dst: HomeLayout.data().join("gh/"),
     }),
@@ -172,7 +172,7 @@ export const GitHubCookBook = new CookBook({
 export const AsdfCookBook = new CookBook({
   name: "AsdfCookBook",
   prefs: [
-    new PrefRecipe({
+    new PrefSpec({
       src: "asdf/",
       dst: HomeLayout.config().join("asdf/"),
     }),
@@ -182,7 +182,7 @@ export const AsdfCookBook = new CookBook({
 export const TmuxCookBook = new CookBook({
   name: "TmuxCookBook",
   prefs: [
-    new PrefRecipe({
+    new PrefSpec({
       src: "tmux/",
       dst: HomeLayout.config().join("tmux/"),
     }),
@@ -194,19 +194,19 @@ const DockerResDir = new Path("/Applications/Docker.app/Contents/Resources");
 export const DockerCookBook = new CookBook({
   name: "DockerCookBook",
   prefs: [
-    new PrefRecipe({
+    new PrefSpec({
       src: DockerResDir.join("etc/docker.bash-completion"),
       dst: HomeLayout.data().join("bash/bash_completion.d/docker"),
     }),
-    new PrefRecipe({
+    new PrefSpec({
       src: DockerResDir.join("etc/docker-compose.bash-completion"),
       dst: HomeLayout.data().join("bash/bash_completion.d/docker-compose"),
     }),
-    new PrefRecipe({
+    new PrefSpec({
       src: DockerResDir.join("etc/docker.zsh-completion"),
       dst: HomeLayout.data().join("zsh/site-functions/_docker"),
     }),
-    new PrefRecipe({
+    new PrefSpec({
       src: DockerResDir.join("etc/docker-compose.zsh-completion"),
       dst: HomeLayout.data().join("zsh/site-functions/_docker-compose"),
     }),
@@ -217,7 +217,7 @@ export const DockerCookBook = new CookBook({
 export const GradleCookBook = new CookBook({
   name: "GradleCookBook",
   prefs: [
-    new PrefRecipe({
+    new PrefSpec({
       src: "gradle/gradle.properties",
       dst: HomeLayout.data().join("gradle/gradle.properties"),
     }, {
@@ -230,7 +230,7 @@ export const GradleCookBook = new CookBook({
 export const PythonCookBook = new CookBook({
   name: "PythonCookBook",
   prefs: [
-    new PrefRecipe({
+    new PrefSpec({
       src: "python/",
       dst: HomeLayout.config().join("python/"),
     }),
@@ -240,7 +240,7 @@ export const PythonCookBook = new CookBook({
 export const RubyCookBook = new CookBook({
   name: "RubyCookBook",
   prefs: [
-    new PrefRecipe({
+    new PrefSpec({
       src: "bundle/",
       dst: HomeLayout.config().join("bundle/"),
     }),
@@ -250,7 +250,7 @@ export const RubyCookBook = new CookBook({
 export const NodeCookBook = new CookBook({
   name: "NodeCookBook",
   prefs: [
-    new PrefRecipe({
+    new PrefSpec({
       src: "npm/",
       dst: HomeLayout.config().join("npm/"),
     }),
@@ -271,7 +271,7 @@ export const NodeCookBook = new CookBook({
 export const XcodeCookBook = new CookBook({
   name: "XcodeCookBook",
   prefs: [
-    new PrefRecipe({
+    new PrefSpec({
       src: "cask/Xcode/",
       dst: "~/Library/Developer/Xcode/",
     }, {
@@ -284,13 +284,13 @@ export const XcodeCookBook = new CookBook({
 export const IntelliJCookBook = new CookBook({
   name: "IntelliJCookBook",
   prefs: [
-    ...PrefRecipe.glob({
+    ...PrefSpec.glob({
       src: "cask/IntelliJIdea/",
       dst: "~/Library/Preferences/IntelliJIdea*",
     }, {
       autoclean: false,
     }),
-    ...PrefRecipe.glob({
+    ...PrefSpec.glob({
       src: "cask/IntelliJIdea/",
       dst: "~/Library/ApplicationSupport/JetBrains/IntelliJIdea*",
     }, {
@@ -303,13 +303,13 @@ export const IntelliJCookBook = new CookBook({
 export const AndroidStudioCookBook = new CookBook({
   name: "AndroidStudioCookBook",
   prefs: [
-    ...PrefRecipe.glob({
+    ...PrefSpec.glob({
       src: "cask/AndroidStudio/",
       dst: "~/Library/Preferences/AndroidStudio*",
     }, {
       autoclean: false,
     }),
-    ...PrefRecipe.glob({
+    ...PrefSpec.glob({
       src: "cask/AndroidStudio/",
       dst: "~/Library/ApplicationSupport/Google/AndroidStudio*",
     }, {
@@ -322,13 +322,13 @@ export const AndroidStudioCookBook = new CookBook({
 export const AppCodeCookBook = new CookBook({
   name: "AppCodeCookBook",
   prefs: [
-    ...PrefRecipe.glob({
+    ...PrefSpec.glob({
       src: "cask/AppCode/",
       dst: "~/Library/Preferences/AppCode*",
     }, {
       autoclean: false,
     }),
-    ...PrefRecipe.glob({
+    ...PrefSpec.glob({
       src: "cask/AppCode/",
       dst: "~/Library/ApplicationSupport/JetBrains/AppCode*",
     }, {
@@ -341,13 +341,13 @@ export const AppCodeCookBook = new CookBook({
 export const RubyMineCookBook = new CookBook({
   name: "RubyMineCookBook",
   prefs: [
-    ...PrefRecipe.glob({
+    ...PrefSpec.glob({
       src: "cask/RubyMine/",
       dst: "~/Library/Preferences/RubyMine*",
     }, {
       autoclean: false,
     }),
-    ...PrefRecipe.glob({
+    ...PrefSpec.glob({
       src: "cask/RubyMine/",
       dst: "~/Library/ApplicationSupport/JetBrains/RubyMine*",
     }, {
@@ -360,11 +360,11 @@ export const RubyMineCookBook = new CookBook({
 export const GoLandCookBook = new CookBook({
   name: "GoLandCookBook",
   prefs: [
-    ...PrefRecipe.glob({
+    ...PrefSpec.glob({
       src: "cask/GoLand/",
       dst: "~/Library/Preferences/GoLand*",
     }),
-    ...PrefRecipe.glob({
+    ...PrefSpec.glob({
       src: "cask/GoLand/",
       dst: "~/Library/ApplicationSupport/JetBrains/GoLand*",
     }),
@@ -375,11 +375,11 @@ export const GoLandCookBook = new CookBook({
 export const CLionCookBook = new CookBook({
   name: "CLionCookBook",
   prefs: [
-    ...PrefRecipe.glob({
+    ...PrefSpec.glob({
       src: "cask/CLion/",
       dst: "~/Library/Preferences/CLion*",
     }),
-    ...PrefRecipe.glob({
+    ...PrefSpec.glob({
       src: "cask/CLion/",
       dst: "~/Library/ApplicationSupport/JetBrains/CLion*",
     }),
@@ -390,13 +390,13 @@ export const CLionCookBook = new CookBook({
 export const RiderCookBook = new CookBook({
   name: "RiderCookBook",
   prefs: [
-    ...PrefRecipe.glob({
+    ...PrefSpec.glob({
       src: "cask/Rider/",
       dst: "~/Library/Preferences/Rider*",
     }, {
       autoclean: false,
     }),
-    ...PrefRecipe.glob({
+    ...PrefSpec.glob({
       src: "cask/Rider/",
       dst: "~/Library/ApplicationSupport/JetBrains/Rider*",
     }, {

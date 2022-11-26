@@ -23,7 +23,7 @@ export abstract class ChainBase {
   }
 }
 
-export abstract class RecipeBase<Chain extends ChainBase> {
+export abstract class SpecBase<Chain extends ChainBase> {
   readonly src: Path;
   readonly dst: Path;
 
@@ -55,23 +55,23 @@ export class PrefChain extends ChainBase {
   }
 }
 
-export type PrefRecipeOptions = PrefLinkOptions & {
+export type PrefSpecOptions = PrefLinkOptions & {
   autoclean?: boolean;
 };
 
-export class PrefRecipe extends RecipeBase<PrefChain> {
-  readonly options?: PrefRecipeOptions;
+export class PrefSpec extends SpecBase<PrefChain> {
+  readonly options?: PrefSpecOptions;
 
-  constructor(bind: PathBind, options?: PrefRecipeOptions) {
+  constructor(bind: PathBind, options?: PrefSpecOptions) {
     super(bind);
     this.options = options;
   }
 
-  static glob(bind: PathBind, options?: PrefRecipeOptions): PrefRecipe[] {
+  static glob(bind: PathBind, options?: PrefSpecOptions): PrefSpec[] {
     const pattern = new Path(bind.dst).expandHome().toString();
 
     return [...fs.expandGlobSync(pattern)].map((entry) =>
-      new PrefRecipe({
+      new PrefSpec({
         src: new Path(bind.src),
         dst: new Path(entry.path).expandHome(),
       }, options)
@@ -92,7 +92,7 @@ export class SnipChain extends ChainBase {
   }
 }
 
-export class SnipRecipe extends RecipeBase<SnipChain> {
+export class SnipSpec extends SpecBase<SnipChain> {
   override chain(bind: PathBind): SnipChain {
     return new SnipChain(bind);
   }
@@ -105,16 +105,16 @@ export type CookBookCallback = (options: shell.CallOptions) => Promise<void>;
 
 export class CookBook {
   private _name: string;
-  private _prefs: PrefRecipe[];
-  private _snips: SnipRecipe[];
+  private _prefs: PrefSpec[];
+  private _snips: SnipSpec[];
   private _platforms: Platform[] | undefined;
   private _activate: CookBookCallback | undefined;
   private _deactivate: CookBookCallback | undefined;
 
   constructor(nargs: {
     name: string;
-    prefs?: PrefRecipe[];
-    snips?: SnipRecipe[];
+    prefs?: PrefSpec[];
+    snips?: SnipSpec[];
     platforms?: Platform[];
     activate?: CookBookCallback;
     deactivate?: CookBookCallback;
@@ -131,11 +131,11 @@ export class CookBook {
     return this._name;
   }
 
-  get prefs(): PrefRecipe[] {
+  get prefs(): PrefSpec[] {
     return this._prefs;
   }
 
-  get snips(): SnipRecipe[] {
+  get snips(): SnipSpec[] {
     return this._snips;
   }
 

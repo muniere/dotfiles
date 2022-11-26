@@ -9,9 +9,9 @@ import {
   ChainBase,
   CookBook,
   PrefChain,
-  PrefRecipe,
-  RecipeBase,
-  SnipRecipe,
+  PrefSpec,
+  SnipSpec,
+  SpecBase,
 } from "./schema.ts";
 import { Color } from "./tty.ts";
 
@@ -37,7 +37,7 @@ abstract class Action<Context> {
     "**/.gitkeep",
   ]);
 
-  protected recipes(options: { platform?: unix.Platform } = {}): PrefRecipe[] {
+  protected prefSpecs(options: { platform?: unix.Platform } = {}): PrefSpec[] {
     return this.books(options).flatMap((book) => book.prefs);
   }
 
@@ -76,16 +76,16 @@ abstract class Action<Context> {
   }
 
   protected travarseSync<Chain extends ChainBase>(
-    recipe: RecipeBase<Chain>,
+    spec: SpecBase<Chain>,
     options: { prefix?: Path } = {},
   ): Chain[] {
     const prefix = options.prefix ?? new Path();
 
-    const src = recipe.src.isAbsolute
-      ? new Path(recipe.src.expandHome())
-      : new Path(prefix, recipe.src.expandHome()).toAbsolute();
+    const src = spec.src.isAbsolute
+      ? new Path(spec.src.expandHome())
+      : new Path(prefix, spec.src.expandHome()).toAbsolute();
 
-    const dst = recipe.dst.expandHome().toAbsolute();
+    const dst = spec.dst.expandHome().toAbsolute();
 
     const stat = Result.run(() => src.lstatSync()).value;
 
@@ -95,7 +95,7 @@ abstract class Action<Context> {
 
     if (stat.isFile) {
       return [
-        recipe.chain({
+        spec.chain({
           src: src,
           dst: dst,
         }),
@@ -106,7 +106,7 @@ abstract class Action<Context> {
       .filter((entry) => entry.isFile)
       .map((entry) => new Path(entry.path))
       .map((path) =>
-        recipe.chain({
+        spec.chain({
           src: path,
           dst: new Path(dst, path.relative(src)),
         })
@@ -150,21 +150,21 @@ class ListAction extends Action<ListContext> {
   override async run(): Promise<void> {
     const platform = await unix.identify();
 
-    const recipes = this.recipes({ platform: platform });
-    const chains = recipes.flatMap((recipe) => {
-      if (recipe.src.isAbsolute) {
-        return this.travarseSync(recipe);
+    const specs = this.prefSpecs({ platform: platform });
+    const chains = specs.flatMap((spec) => {
+      if (spec.src.isAbsolute) {
+        return this.travarseSync(spec);
       }
       if (platform == "default") {
-        return this.travarseSync(recipe, {
+        return this.travarseSync(spec, {
           prefix: ResLayout.recipe().join(platform),
         });
       }
       return [
-        ...this.travarseSync(recipe, {
+        ...this.travarseSync(spec, {
           prefix: ResLayout.recipe().join(platform),
         }),
-        ...this.travarseSync(recipe, {
+        ...this.travarseSync(spec, {
           prefix: ResLayout.recipe().join("default"),
         }),
       ];
@@ -253,11 +253,11 @@ class LinkAction extends Action<LinkContext> {
       const message = sprintf(format, book.name, i + 1, books.length);
       this.context.logger?.mark(message, { bold: true });
 
-      for (const recipe of book.prefs) {
-        await this.linkPref(recipe);
+      for (const spec of book.prefs) {
+        await this.linkPref(spec);
       }
-      for (const recipe of book.snips) {
-        await this.enableSnip(recipe);
+      for (const spec of book.snips) {
+        await this.enableSnip(spec);
       }
       if (this.context.activate) {
         await this.activate(book);
@@ -270,23 +270,23 @@ class LinkAction extends Action<LinkContext> {
     return action.perform(books);
   }
 
-  private async linkPref(recipe: PrefRecipe): Promise<void> {
+  private async linkPref(spec: PrefSpec): Promise<void> {
     const platform = await unix.identify();
 
     const chains = run(() => {
-      if (recipe.src.isAbsolute) {
-        return this.travarseSync(recipe);
+      if (spec.src.isAbsolute) {
+        return this.travarseSync(spec);
       }
       if (platform == "default") {
-        return this.travarseSync(recipe, {
+        return this.travarseSync(spec, {
           prefix: ResLayout.recipe().join(platform),
         });
       }
       return [
-        ...this.travarseSync(recipe, {
+        ...this.travarseSync(spec, {
           prefix: ResLayout.recipe().join(platform),
         }),
-        ...this.travarseSync(recipe, {
+        ...this.travarseSync(spec, {
           prefix: ResLayout.recipe().join("default"),
         }),
       ];
@@ -329,12 +329,12 @@ class LinkAction extends Action<LinkContext> {
     }
   }
 
-  private async enableSnip(recipe: SnipRecipe): Promise<void> {
+  private async enableSnip(spec: SnipSpec): Promise<void> {
     const chains = run(() => {
-      if (recipe.src.isAbsolute) {
-        return this.travarseSync(recipe);
+      if (spec.src.isAbsolute) {
+        return this.travarseSync(spec);
       } else {
-        return this.travarseSync(recipe, { prefix: ResLayout.snippet() });
+        return this.travarseSync(spec, { prefix: ResLayout.snippet() });
       }
     });
 
@@ -425,11 +425,11 @@ class UnlinkAction extends Action<UnlinkContext> {
       if (this.context.deactivate) {
         await this.deactivate(book);
       }
-      for (const recipe of book.snips) {
-        await this.disableSnip(recipe);
+      for (const spec of book.snips) {
+        await this.disableSnip(spec);
       }
-      for (const recipe of book.prefs) {
-        await this.unlinkPref(recipe);
+      for (const spec of book.prefs) {
+        await this.unlinkPref(spec);
       }
     }
   }
@@ -439,23 +439,23 @@ class UnlinkAction extends Action<UnlinkContext> {
     return action.perform(books);
   }
 
-  private async unlinkPref(recipe: PrefRecipe): Promise<void> {
+  private async unlinkPref(spec: PrefSpec): Promise<void> {
     const platform = await unix.identify();
 
     const chains = run(() => {
-      if (recipe.src.isAbsolute) {
-        return this.travarseSync(recipe);
+      if (spec.src.isAbsolute) {
+        return this.travarseSync(spec);
       }
       if (platform == "default") {
-        return this.travarseSync(recipe, {
+        return this.travarseSync(spec, {
           prefix: ResLayout.recipe().join(platform),
         });
       }
       return [
-        ...this.travarseSync(recipe, {
+        ...this.travarseSync(spec, {
           prefix: ResLayout.recipe().join(platform),
         }),
-        ...this.travarseSync(recipe, {
+        ...this.travarseSync(spec, {
           prefix: ResLayout.recipe().join("default"),
         }),
       ];
@@ -485,12 +485,12 @@ class UnlinkAction extends Action<UnlinkContext> {
     }
   }
 
-  private async disableSnip(recipe: SnipRecipe): Promise<void> {
+  private async disableSnip(spec: SnipSpec): Promise<void> {
     const chains = run(() => {
-      if (recipe.src.isAbsolute) {
-        return this.travarseSync(recipe);
+      if (spec.src.isAbsolute) {
+        return this.travarseSync(spec);
       } else {
-        return this.travarseSync(recipe, { prefix: ResLayout.snippet() });
+        return this.travarseSync(spec, { prefix: ResLayout.snippet() });
       }
     });
 
@@ -576,15 +576,15 @@ class CleanupAction extends Action<CleanupContext> {
     const banner = "Scanning broken symlinks";
     this.context.logger?.info(`${banner}...\r`, { term: false });
 
-    const recipes = books
+    const specs = books
       .flatMap((book) => book.prefs)
       .toSorted((a, b) => a.dst.expandHome() < b.dst.expandHome() ? -1 : 1);
 
     const found: Path[] = [];
-    for (const recipe of recipes) {
-      const path = recipe.dst.expandHome();
+    for (const spec of specs) {
+      const path = spec.dst.expandHome();
 
-      if (recipe.options?.autoclean == false) {
+      if (spec.options?.autoclean == false) {
         this.context.logger?.debug(`Skipping ${path}`);
         continue;
       }
