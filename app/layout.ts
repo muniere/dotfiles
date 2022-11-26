@@ -38,4 +38,8 @@ export class ResLayout {
   static snip(): Path {
     return new Path("./snip");
   }
+
+  static tmpl(): Path {
+    return new Path("./tmpl");
+  }
 }

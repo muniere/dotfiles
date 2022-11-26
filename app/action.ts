@@ -1,5 +1,6 @@
 import { sprintf } from "https://deno.land/std@0.163.0/fmt/printf.ts";
 import * as streams from "https://deno.land/std@0.163.0/streams/mod.ts";
+import * as Eta from "https://deno.land/x/eta@v1.12.3/mod.ts";
 
 import { Result, run } from "./lang.ts";
 import { ResLayout } from "./layout.ts";
@@ -13,6 +14,8 @@ import {
   SnipChain,
   SnipSpec,
   SpecBase,
+  TmplChain,
+  TmplSpec,
 } from "./schema.ts";
 import { Color } from "./tty.ts";
 
@@ -110,6 +113,16 @@ abstract class Action<Context> {
       return this.travarseSync(spec);
     } else {
       return this.travarseSync(spec, { prefix: ResLayout.snip() });
+    }
+  }
+
+  protected inflateTmplSpecSync(
+    spec: TmplSpec,
+  ): TmplChain[] {
+    if (spec.src.isAbsolute) {
+      return this.travarseSync(spec);
+    } else {
+      return this.travarseSync(spec, { prefix: ResLayout.tmpl() });
     }
   }
 
@@ -275,11 +288,14 @@ class LinkAction extends Action<LinkContext> {
       for (const spec of book.prefs) {
         await this.linkPref(spec);
       }
+      if (this.context.activate) {
+        await this.activate(book);
+      }
       for (const spec of book.snips) {
         await this.enableSnip(spec);
       }
-      if (this.context.activate) {
-        await this.activate(book);
+      for (const spec of book.tmpls) {
+        await this.forgeTmpl(spec);
       }
     }
   }
@@ -376,6 +392,34 @@ class LinkAction extends Action<LinkContext> {
     }
   }
 
+  private async forgeTmpl(spec: TmplSpec): Promise<void> {
+    const chains = this.inflateTmplSpecSync(spec);
+
+    for (const chain of chains) {
+      const stat = await Result.runAsyncOr(() => chain.dst.stat());
+      if (stat) {
+        this.context.logger?.info(`File already created: ${chain.dst}`);
+        return;
+      }
+
+      const template = await Deno.readTextFile(chain.src.toFileUrl());
+      const values = chain.options?.values ?? {};
+      const content = Eta.render(template, values) as string;
+
+      await shell.mkdir(chain.dst.dirname(), this.shellOptions);
+
+      this.context.logger?.info(
+        `Create a file ${chain.dst} with content:\n${content}`,
+      );
+
+      if (this.shellOptions.dryRun == true) {
+        return;
+      }
+
+      await Deno.writeTextFile(chain.dst.toFileUrl(), content);
+    }
+  }
+
   private async activate(book: CookBook): Promise<void> {
     await book.activate(this.shellOptions);
   }
@@ -417,11 +461,11 @@ class UnlinkAction extends Action<UnlinkContext> {
       const message = sprintf(format, book.name, i + 1, books.length);
       this.context.logger?.mark(message, { bold: true });
 
-      if (this.context.deactivate) {
-        await this.deactivate(book);
-      }
       for (const spec of book.snips) {
         await this.disableSnip(spec);
+      }
+      if (this.context.deactivate) {
+        await this.deactivate(book);
       }
       for (const spec of book.prefs) {
         await this.unlinkPref(spec);
