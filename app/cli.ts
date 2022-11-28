@@ -1,6 +1,5 @@
 import {
   Command,
-  CompletionsCommand,
   EnumType,
 } from "https://deno.land/x/cliffy@v0.25.4/command/mod.ts";
 
@@ -80,11 +79,6 @@ const cleanupCommand = new Command()
   });
 
 // =====
-// Completion
-// =====
-const completionCommand = new CompletionsCommand();
-
-// =====
 // Shared
 // =====
 function _logger(options: { verbose?: boolean } = {}): Logger {
@@ -102,8 +96,7 @@ async function main(args: string[]) {
     .command("list", listCommand)
     .command("link", linkCommand)
     .command("unlink", unlinkCommand)
-    .command("cleanup", cleanupCommand)
-    .command("completion", completionCommand);
+    .command("cleanup", cleanupCommand);
 
   const context = await root.parse(args);
 

@@ -8,9 +8,6 @@
         "list": "deno run --allow-run --allow-read --allow-write --allow-env app/cli.ts list",
         "link": "deno run --allow-run --allow-read --allow-write --allow-env app/cli.ts link",
         "unlink": "deno run --allow-run --allow-read --allow-write --allow-env app/cli.ts unlink",
-        "cleanup": "deno run --allow-run --allow-read --allow-write --allow-env app/cli.ts cleanup",
-        "completion:bash": "deno run --allow-run --allow-read --allow-write --allow-env app/cli.ts completion bash",
-        "completion:zsh": "deno run --allow-run --allow-read --allow-write --allow-env app/cli.ts completion zsh",
-        "completion:fish": "deno run --allow-run --allow-read --allow-write --allow-env app/cli.ts completion fish"
+        "cleanup": "deno run --allow-run --allow-read --allow-write --allow-env app/cli.ts cleanup"
     }
 }

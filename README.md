@@ -26,9 +26,4 @@ deno task unlink
 
 # status
 deno task list
-
-# completion
-deno task completion:bash
-deno task completion:zsh
-deno task completion:fish
 ```
