@@ -13,7 +13,7 @@ export const HomeCookBook = new CookBook({
       dst: HomeLayout.config().join("sh/_.shrc"),
     }, {
       values: {
-        cache: HomeLayout.bin().transHome(),
+        cache: HomeLayout.cache().transHome(),
         config: HomeLayout.config().transHome(),
         data: HomeLayout.data().transHome(),
         state: HomeLayout.state().transHome(),
