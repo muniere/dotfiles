@@ -208,7 +208,7 @@ function! PlugLoaded(name)
   return isdirectory(l:plug_path) && stridx(&rtp, l:plug_path) >= 0
 endfunction
 
-call plug#begin($XDG_CONFIG_HOME.'/vim/plugged')
+call plug#begin($XDG_DATA_HOME.'/vim/plugged')
 Plug 'vim-scripts/sudo.vim'
 Plug 'vim-scripts/surround.vim'
 Plug 'editorconfig/editorconfig-vim'
