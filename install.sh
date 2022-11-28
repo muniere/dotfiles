@@ -4,7 +4,7 @@ function bundle-core() {
 case "$OSTYPE" in
     darwin*)
         # https://brew.sh
-        if !(which brew &> /dev/null); then
+        if ! (which brew &> /dev/null); then
             /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
             # for intel chip
@@ -37,15 +37,10 @@ case "$OSTYPE" in
 esac
 }
 
-# bootstrap
-set -x
+# main
+set -euxv
 
 bundle-core
-
-if ! (which deno &> /dev/null); then
-    echo "deno not found. abort." >&2
-    exit 1
-fi
 
 deno task link
 

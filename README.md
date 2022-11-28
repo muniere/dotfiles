@@ -6,8 +6,8 @@
 # clone
 $ git clone https://github.com/muniere/dotfiles.git
 
-# link dotfiles and binfiles
-$ make bootstrap
+# instal dependencies and link
+$ bash install.sh
 ```
 
 ## Tasks
