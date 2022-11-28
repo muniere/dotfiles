@@ -1,7 +1,4 @@
-if [ -f $HOME/.config/sh/_.shrc ]; then
-  . $HOME/.config/sh/_.shrc
-fi
-for conf in `ls -d $HOME/.config/sh/*.*.shrc`; do
+for conf in `ls -d $SH_DOTDIR/*.*.shrc`; do
   . $conf
 done
 

@@ -458,7 +458,7 @@ class LinkAction extends Action<LinkContext> {
       await shell.mkdir(chain.dst.dirname(), this.shellOptions);
 
       this.context.logger?.info(
-        `Create a file ${chain.dst} with content:\n${content}`,
+        `Create a file ${chain.dst} with content:\n${content.trimEnd()}`,
       );
 
       if (this.shellOptions.dryRun == true) {

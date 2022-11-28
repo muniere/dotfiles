@@ -1,3 +1,1 @@
-if [ -f $HOME/.config/zsh/config.zshrc ]; then
-  source $HOME/.config/zsh/config.zshrc
-fi
+[ -f $ZSH_DOTDIR/config.zshrc ] && . $ZSH_DOTDIR/config.zshrc

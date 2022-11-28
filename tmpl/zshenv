@@ -6,3 +6,8 @@ export XDG_RUNTIME_DIR="<%= it.runtime %>"
 
 export XDG_CONFIG_DIRS="/etc/xdg"
 export XDG_DATA_DIRS="/usr/local/share:/usr/share"
+
+export SH_DOTDIR="$XDG_CONFIG_HOME/sh"
+export ZSH_DOTDIR="$XDG_CONFIG_HOME/zsh"
+
+export ZDOTDIR="$XDG_CONFIG_HOME/zsh"

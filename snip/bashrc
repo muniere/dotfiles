@@ -1,1 +1,0 @@
-[ -f $HOME/.config/bash/config.bashrc ] && . $HOME/.config/bash/config.bashrc

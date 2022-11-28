@@ -7,20 +7,6 @@ import * as shell from "./shell.ts";
 
 export const HomeCookBook = new CookBook({
   name: "HomeCookBook",
-  tmpls: [
-    new TmplSpec({
-      src: "_.shrc",
-      dst: HomeLayout.config().join("sh/_.shrc"),
-    }, {
-      values: {
-        cache: HomeLayout.cache().transHome(),
-        config: HomeLayout.config().transHome(),
-        data: HomeLayout.data().transHome(),
-        state: HomeLayout.state().transHome(),
-        runtime: HomeLayout.runtime().transHome(),
-      },
-    }),
-  ],
   activate: async (options: shell.CallOptions) => {
     const dirs = [
       { path: HomeLayout.bin(), mode: 0o755 },
@@ -77,10 +63,18 @@ export const BashCookBook = new CookBook({
       dst: HomeLayout.config().join("bash/"),
     }),
   ],
-  snips: [
-    new SnipSpec({
+  tmpls: [
+    new TmplSpec({
       src: "bashrc",
       dst: "~/.bashrc",
+    }, {
+      values: {
+        cache: HomeLayout.cache().transHome(),
+        config: HomeLayout.config().transHome(),
+        data: HomeLayout.data().transHome(),
+        state: HomeLayout.state().transHome(),
+        runtime: HomeLayout.runtime().transHome(),
+      },
     }),
   ],
 });
@@ -97,10 +91,18 @@ export const ZshCookBook = new CookBook({
       dst: HomeLayout.data().join("zsh/site-functions/"),
     }),
   ],
-  snips: [
-    new SnipSpec({
+  tmpls: [
+    new TmplSpec({
       src: "zshenv",
       dst: "~/.zshenv",
+    }, {
+      values: {
+        cache: HomeLayout.cache().transHome(),
+        config: HomeLayout.config().transHome(),
+        data: HomeLayout.data().transHome(),
+        state: HomeLayout.state().transHome(),
+        runtime: HomeLayout.runtime().transHome(),
+      },
     }),
   ],
   activate: async (options: shell.CallOptions) => {
