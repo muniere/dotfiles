@@ -37,12 +37,6 @@ case "$OSTYPE" in
 esac
 }
 
-# pre-conditions
-if ! [ -f xake ] ||  ! [ -x xake ]; then
-    echo "xake not found. abort."  >&2
-    exit 1
-fi
-
 # bootstrap
 set -x
 
@@ -53,6 +47,6 @@ if ! (which deno &> /dev/null); then
     exit 1
 fi
 
-./xake link
+deno task link
 
 bundle-more

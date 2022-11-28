@@ -19,16 +19,16 @@ Each task has following options:
 
 ```bash
 # link 
-./xake link
+deno task link
 
 # unlink
-./xake unlink
+deno task unlink
 
 # status
-./xake list
+deno task list
 
 # completion
-./xake completion bash
-./xake completion zsh
-./xake completion fish
+deno task completion:bash
+deno task completion:zsh
+deno task completion:fish
 ```
