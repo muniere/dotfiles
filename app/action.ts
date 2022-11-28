@@ -510,6 +510,9 @@ class UnlinkAction extends Action<UnlinkContext> {
       const message = sprintf(format, book.name, i + 1, books.length);
       this.context.logger?.mark(message, { bold: true });
 
+      for (const spec of book.tmpls) {
+        await this.recallTmpl(spec);
+      }
       for (const spec of book.snips) {
         await this.disableSnip(spec);
       }
@@ -601,6 +604,24 @@ class UnlinkAction extends Action<UnlinkContext> {
       const encoder = new TextEncoder();
 
       Deno.writeFile(chain.dst.toFileUrl(), encoder.encode(newText));
+    }
+  }
+
+  private async recallTmpl(spec: TmplSpec): Promise<void> {
+    const chains = this.inflateTmplSpecSync(spec);
+
+    for (const chain of chains) {
+      const stat = await Result.runAsyncOr(() => chain.dst.stat());
+      if (!stat) {
+        this.context.logger?.info(`File not found: ${chain.dst}`);
+        return;
+      }
+      if (!stat.isFile) {
+        this.context.logger?.info(`File is not normal file: ${chain.dst}`);
+        return;
+      }
+
+      await shell.rm(chain.dst, this.shellOptions);
     }
   }
 
