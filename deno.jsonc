@@ -1,4 +1,9 @@
 {
+    "fmt": {
+        "options": {
+            "lineWidth": 100
+        }
+    },
     "tasks": {
         "list": "deno run --allow-run --allow-read --allow-write --allow-env app/cli.ts list",
         "link": "deno run --allow-run --allow-read --allow-write --allow-env app/cli.ts link",

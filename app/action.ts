@@ -140,9 +140,13 @@ abstract class Action<Context> {
   ): Chain[] {
     const prefix = options.prefix ?? new Path();
 
-    const src = spec.src.isAbsolute
-      ? new Path(spec.src.expandHome())
-      : new Path(prefix, spec.src.expandHome()).toAbsolute();
+    const src = run(() => {
+      if (spec.src.isAbsolute) {
+        return new Path(spec.src.expandHome());
+      } else {
+        return new Path(prefix, spec.src.expandHome()).toAbsolute();
+      }
+    });
 
     const dst = spec.dst.expandHome().toAbsolute();
 
@@ -261,9 +265,13 @@ class ListAction extends Action<ListContext> {
       })
       : undefined;
 
-    const dst = decorate
-      ? decorate.perform(chain.dst.toString())
-      : chain.dst.toString();
+    const dst = run(() => {
+      if (decorate) {
+        return decorate.perform(chain.dst.toString());
+      } else {
+        return chain.dst.toString();
+      }
+    });
 
     const src = chain.src.toString();
 

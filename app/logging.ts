@@ -1,6 +1,6 @@
 import * as streams from "https://deno.land/std@0.163.0/streams/mod.ts";
 import * as colors from "https://deno.land/std@0.163.0/fmt/colors.ts";
-import { Pipeline } from "./lang.ts";
+import { Pipeline, run } from "./lang.ts";
 
 export type LogStream =
   & Deno.Writer
@@ -81,9 +81,13 @@ export class Logger {
       return;
     }
 
-    const decorate = options.bold
-      ? this.palette.get(level).concat(colors.bold)
-      : this.palette.get(level);
+    const decorate = run(() => {
+      if (options.bold) {
+        return this.palette.get(level).concat(colors.bold);
+      } else {
+        return this.palette.get(level);
+      }
+    });
 
     const terminator = options.term == false ? "" : Logger.terminator;
     const plainMessage = `[${level.label.padEnd(5)}] ${message}${terminator}`;
