@@ -8,6 +8,7 @@
         "list": "deno run --allow-run --allow-read --allow-write --allow-env app/cli.ts list",
         "link": "deno run --allow-run --allow-read --allow-write --allow-env app/cli.ts link",
         "unlink": "deno run --allow-run --allow-read --allow-write --allow-env app/cli.ts unlink",
+        "relink": "deno task unlink && deno task link",
         "cleanup": "deno run --allow-run --allow-read --allow-write --allow-env app/cli.ts cleanup"
     }
 }
