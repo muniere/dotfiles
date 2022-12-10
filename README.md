@@ -15,7 +15,7 @@ $ bash install.sh
 Each task has following options:
 
 - `-n`: dry-run
-- `-v`: verbose 
+- `-v`: verbose
 
 ```bash
 # link 
