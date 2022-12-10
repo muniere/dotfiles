@@ -1,7 +1,7 @@
 import { sprintf } from "deno/fmt/printf.ts";
 import * as colors from "deno/fmt/colors.ts";
 import * as streams from "deno/streams/mod.ts";
-import * as Eta from "eta/mod.ts";
+import * as eta from "eta/mod.ts";
 
 import { Pipeline, Result, run } from "./lang.ts";
 import { ResLayout } from "./layout.ts";
@@ -453,7 +453,7 @@ class LinkAction extends Action<LinkContext> {
 
       const template = await Deno.readTextFile(chain.src.toFileUrl());
       const values = chain.options?.values ?? {};
-      const content = Eta.render(template, values) as string;
+      const content = eta.render(template, values) as string;
 
       await shell.mkdir(chain.dst.dirname(), this.shellOptions);
 
