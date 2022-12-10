@@ -1,4 +1,4 @@
-import * as fs from "https://deno.land/std@0.163.0/fs/mod.ts";
+import * as fs from "deno/fs/mod.ts";
 
 import { Path, PathLike } from "./path.ts";
 import { Platform } from "./unix.ts";

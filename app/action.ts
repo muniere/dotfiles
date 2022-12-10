@@ -1,7 +1,7 @@
-import { sprintf } from "https://deno.land/std@0.163.0/fmt/printf.ts";
-import * as colors from "https://deno.land/std@0.163.0/fmt/colors.ts";
-import * as streams from "https://deno.land/std@0.163.0/streams/mod.ts";
-import * as Eta from "https://deno.land/x/eta@v1.12.3/mod.ts";
+import { sprintf } from "deno/fmt/printf.ts";
+import * as colors from "deno/fmt/colors.ts";
+import * as streams from "deno/streams/mod.ts";
+import * as Eta from "eta/mod.ts";
 
 import { Pipeline, Result, run } from "./lang.ts";
 import { ResLayout } from "./layout.ts";

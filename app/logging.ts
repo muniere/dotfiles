@@ -1,5 +1,6 @@
-import * as streams from "https://deno.land/std@0.163.0/streams/mod.ts";
-import * as colors from "https://deno.land/std@0.163.0/fmt/colors.ts";
+import * as streams from "deno/streams/mod.ts";
+import * as colors from "deno/fmt/colors.ts";
+
 import { Pipeline, run } from "./lang.ts";
 
 export type LogStream =
