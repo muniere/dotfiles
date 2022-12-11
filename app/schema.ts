@@ -84,21 +84,6 @@ export class PrefSpec extends SpecBase<PrefChain> {
 }
 
 // =====
-// Snippets
-// =====
-export class SnipChain extends ChainBase {
-  constructor(bind: PathBind) {
-    super(bind);
-  }
-}
-
-export class SnipSpec extends SpecBase<SnipChain> {
-  override chain(bind: PathBind): SnipChain {
-    return new SnipChain(bind);
-  }
-}
-
-// =====
 // Templates
 // =====
 export type TmplOptions = {
@@ -140,7 +125,6 @@ export type CookBookCallback = (options: shell.CallOptions) => Promise<void>;
 export class CookBook {
   private _name: string;
   private _prefs: PrefSpec[];
-  private _snips: SnipSpec[];
   private _tmpls: TmplSpec[];
   private _platforms: Platform[] | undefined;
   private _activate: CookBookCallback | undefined;
@@ -149,7 +133,6 @@ export class CookBook {
   constructor(nargs: {
     name: string;
     prefs?: PrefSpec[];
-    snips?: SnipSpec[];
     tmpls?: TmplSpec[];
     platforms?: Platform[];
     activate?: CookBookCallback;
@@ -157,7 +140,6 @@ export class CookBook {
   }) {
     this._name = nargs.name;
     this._prefs = [...(nargs.prefs ?? [])];
-    this._snips = [...(nargs.snips ?? [])];
     this._tmpls = [...(nargs.tmpls ?? [])];
     this._platforms = nargs.platforms;
     this._activate = nargs.activate;
@@ -170,10 +152,6 @@ export class CookBook {
 
   get prefs(): PrefSpec[] {
     return this._prefs;
-  }
-
-  get snips(): SnipSpec[] {
-    return this._snips;
   }
 
   get tmpls(): TmplSpec[] {

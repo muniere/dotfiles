@@ -12,8 +12,6 @@ import {
   CookBook,
   PrefChain,
   PrefSpec,
-  SnipChain,
-  SnipSpec,
   SpecBase,
   TmplChain,
   TmplSpec,
@@ -111,16 +109,6 @@ abstract class Action<Context> {
             prefix: ResLayout.pref().join("default"),
           }),
         ];
-    }
-  }
-
-  protected inflateSnipSpecSync(
-    spec: SnipSpec,
-  ): SnipChain[] {
-    if (spec.src.isAbsolute) {
-      return this.travarseSync(spec);
-    } else {
-      return this.travarseSync(spec, { prefix: ResLayout.snip() });
     }
   }
 
@@ -340,9 +328,6 @@ class LinkAction extends Action<LinkContext> {
       if (this.context.activate) {
         await this.activate(book);
       }
-      for (const spec of book.snips) {
-        await this.enableSnip(spec);
-      }
       for (const spec of book.tmpls) {
         await this.forgeTmpl(spec);
       }
@@ -392,52 +377,6 @@ class LinkAction extends Action<LinkContext> {
           await shell.cp(chain.src, chain.dst, this.shellOptions);
           break;
       }
-    }
-  }
-
-  private async enableSnip(spec: SnipSpec): Promise<void> {
-    const chains = this.inflateSnipSpecSync(spec);
-
-    for (const chain of chains) {
-      if (!this.test(chain.src)) {
-        this.context.logger?.debug(`File ignored: ${chain.src}`);
-        continue;
-      }
-      const srcStat = await Result.runAsyncOr(() => chain.src.lstat());
-      if (!srcStat) {
-        this.context.logger?.info(`File not found: ${chain.src}`);
-        continue;
-      }
-
-      const srcText = (await Deno.readTextFile(chain.src.toString())).trim();
-      const dstText = await Result.runAsyncOr(
-        () => Deno.readTextFile(chain.dst.toString()),
-      );
-
-      if (dstText && dstText.includes(srcText)) {
-        this.context.logger?.info(
-          `Snippet already enabled in file: ${chain.dst}`,
-        );
-        continue;
-      }
-
-      this.context.logger?.info(`Enable snippet: ${chain.src} >> ${chain.dst}`);
-
-      if (this.context.dryRun) {
-        continue;
-      }
-
-      const newText = run(() => {
-        if (dstText && dstText.trim().length > 0) {
-          return dstText.trim() + "\n" + srcText + "\n";
-        } else {
-          return srcText + "\n";
-        }
-      });
-
-      const encoder = new TextEncoder();
-
-      Deno.writeFile(chain.dst.toFileUrl(), encoder.encode(newText));
     }
   }
 
@@ -513,9 +452,6 @@ class UnlinkAction extends Action<UnlinkContext> {
       for (const spec of book.tmpls) {
         await this.recallTmpl(spec);
       }
-      for (const spec of book.snips) {
-        await this.disableSnip(spec);
-      }
       if (this.context.deactivate) {
         await this.deactivate(book);
       }
@@ -555,55 +491,6 @@ class UnlinkAction extends Action<UnlinkContext> {
       }
 
       await shell.rm(chain.dst, this.shellOptions);
-    }
-  }
-
-  private async disableSnip(spec: SnipSpec): Promise<void> {
-    const chains = this.inflateSnipSpecSync(spec);
-
-    for (const chain of chains) {
-      if (!this.test(chain.src)) {
-        this.context.logger?.debug(`File ignored: ${chain.src}`);
-        continue;
-      }
-      const srcStat = await Result.runAsyncOr(() => chain.src.lstat());
-      if (!srcStat) {
-        this.context.logger?.info(`File not found: ${chain.src}`);
-        continue;
-      }
-      const dstStat = await Result.runAsyncOr(() => chain.dst.lstat());
-      if (!dstStat) {
-        this.context.logger?.info(`File not found: ${chain.dst}`);
-        continue;
-      }
-      const dstText = await Result.runAsyncOr(
-        () => Deno.readTextFile(chain.dst.toString()),
-      );
-      if (!dstText) {
-        this.context.logger?.info(`Fiel is empty: ${chain.dst}`);
-        continue;
-      }
-
-      const srcText = await Deno.readTextFile(chain.src.toString());
-      if (dstText && !dstText.includes(srcText)) {
-        this.context.logger?.info(
-          `Snippet already disabled in file: ${chain.dst}`,
-        );
-        continue;
-      }
-
-      this.context.logger?.info(
-        `Disable snippet: ${chain.src} << ${chain.dst}`,
-      );
-
-      if (this.context.dryRun) {
-        continue;
-      }
-
-      const newText = dstText.replaceAll(srcText, "");
-      const encoder = new TextEncoder();
-
-      Deno.writeFile(chain.dst.toFileUrl(), encoder.encode(newText));
     }
   }
 
