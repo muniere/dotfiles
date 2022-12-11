@@ -56,3 +56,4 @@ Session.vim
 ### Others
 *.lock
 *.lock.json
+dist/
