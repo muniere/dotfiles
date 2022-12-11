@@ -1,4 +1,4 @@
-import { CookBook, PrefSpec, SnipSpec, TmplSpec } from "./schema.ts";
+import { CookBook, PrefSpec, TmplSpec } from "./schema.ts";
 import { HomeLayout } from "./layout.ts";
 import { Result } from "./lang.ts";
 import { Path } from "./path.ts";
@@ -132,8 +132,8 @@ export const VimCookBook = new CookBook({
       dst: HomeLayout.config().join("vim/"),
     }),
   ],
-  snips: [
-    new SnipSpec({
+  tmpls: [
+    new TmplSpec({
       src: "vimrc",
       dst: "~/.vimrc",
     }),
