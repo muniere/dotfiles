@@ -175,7 +175,8 @@ Plug 'lambdalisue/nerdfont.vim'
 Plug 'lambdalisue/fern.vim'
 Plug 'lambdalisue/fern-renderer-nerdfont.vim'
 
-Plug 'ctrlpvim/ctrlp.vim'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
 
 Plug 'vim-denops/denops.vim'
 Plug 'Shougo/ddc.vim'
@@ -213,11 +214,13 @@ endfunction
 
 autocmd FileType fern call s:FernInit()
 
-" == ctrlp
-nnoremap <silent> <C-x><C-f> :CtrlP .<CR>
-inoremap <silent> <C-x><C-f> <ESC>:CtrlP .<CR>
-nnoremap <silent> <C-x><C-b> :CtrlPBuffer<CR>
-inoremap <silent> <C-x><C-b> <ESC>:CtrlPBuffer<CR>
+" == fzf
+let g:fzf_preview_window = []
+
+nnoremap <silent> <C-x><C-f> :Files<CR>
+inoremap <silent> <C-x><C-f> <ESC>:Files<CR>
+nnoremap <silent> <C-x><C-b> :Buffers<CR>
+inoremap <silent> <C-x><C-b> <ESC>:Buffers<CR>
 
 " == ddc
 if PlugLoaded('ddc.vim')
