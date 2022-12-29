@@ -1,6 +1,7 @@
 tap "homebrew/bundle"
 tap "homebrew/cask"
 tap "homebrew/core"
+tap "homebrew/cask-fonts"
 tap "sanemat/font"
 
 brew "asdf"
@@ -37,3 +38,4 @@ brew "zsh"
 brew "zsh-completions"
 
 cask "temurin"
+cask "font-hack-nerd-font"

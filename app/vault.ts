@@ -2,6 +2,7 @@ import { CookBook, PrefSpec, TmplSpec } from "./schema.ts";
 import { HomeLayout } from "./layout.ts";
 import { Result } from "./lang.ts";
 import { Path } from "./path.ts";
+import { PlistBuddy } from "./plist.ts";
 
 import * as shell from "./shell.ts";
 
@@ -281,6 +282,36 @@ export const NodeCookBook = new CookBook({
 
     shell.touch(file, options);
   },
+});
+
+export const iTermCookBook = new CookBook({
+  name: "iTermCookBook",
+  prefs: [],
+  activate: async (options: shell.CallOptions) => {
+    const path = new Path("~/Library/Preferences/com.googlecode.iterm2.plist").expandHome();
+    
+    const stat = await Result.runAsyncOr(() => path.lstat());
+    if (!stat) {
+      options.logger?.info("iTerm 2 not installed yet. skip.")
+      return;
+    }
+
+    const buddy = new PlistBuddy({
+      path: path.expandHome(),
+    });
+
+    await buddy.setBoolean(
+      "New Bookmarks:0:Use Non-ASCII Font",
+      true,
+      options,
+    );
+    await buddy.setString(
+      "New Bookmarks:0:Non Ascii Font",
+      "HackNerdFontComplete-Regular 12",
+      options,
+    );
+  },
+  platforms: ["darwin"],
 });
 
 export const XcodeCookBook = new CookBook({

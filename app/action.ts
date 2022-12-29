@@ -72,6 +72,7 @@ abstract class Action<Context> {
       vault.PythonCookBook,
       vault.RubyCookBook,
       vault.NodeCookBook,
+      vault.iTermCookBook,
       vault.XcodeCookBook,
       vault.IntelliJCookBook,
       vault.AndroidStudioCookBook,
