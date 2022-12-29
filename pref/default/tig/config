@@ -16,4 +16,5 @@ bind main O !@gh inspect %(commit)
 bind diff O !@gh inspect %(commit)
 
 set diff-options = -m --first-parent
+set diff-highlight = true
 set main-view = id date author:maxwidth=25 commit-title:graph=yes,refs=yes
