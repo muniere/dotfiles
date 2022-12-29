@@ -1,16 +1,13 @@
 function addpath() {
-  # delete duplicated path
-  local args="$@"
+  # delete duplicate path
   local base=$PATH
-  for x in $args; do
+  for x in "$@"; do
     base=${base//$x/}
     base=${base//::/:}
   done
 
   # add new path
-  local ext="${args// /:}"
-
-  export PATH="$ext:$base"
+  export PATH="${*// /:}:$base"
 }
 
 # vim: ft=sh sw=2 ts=2 sts=2
