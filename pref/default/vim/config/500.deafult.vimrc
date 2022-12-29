@@ -150,50 +150,6 @@ nnoremap tp :tabprevious<CR>
 nnoremap tm :tabmove
 
 """
-" Explore
-"""
-" tree style with fixed width
-let g:netrw_liststyle=3
-let g:netrw_winsize=-30
-let g:netrw_banner=0
-let g:netrw_preview=1
-let g:netrw_timefmt="%Y/%m/%d(%a) %H:%M:%S"
-let g:netrw_list_hide= '.*\.swp$,\~$,\.orig$'
-
-let g:_netrw_open=0
-
-function! ToggleNetrw(focus)
-  if g:_netrw_open
-    " close
-    let i = bufnr("$")
-
-    while (i >= 1)
-      if (getbufvar(i, "&filetype") == "netrw")
-        silent exe "bwipeout " . i
-      endif
-
-      let i-=1
-    endwhile
-
-    let g:_netrw_open=0
-  else
-    " open
-    let g:_netrw_open=1
-
-    if a:focus
-      silent Lexplore %:p:h
-    else
-      silent Lexplore 
-    endif
-  endif
-endfunction
-
-nnoremap <silent> <C-e><C-e> :call ToggleNetrw(0)<CR>
-inoremap <silent> <C-e><C-e> <ESC>:call ToggleNetrw(0)<CR>
-nnoremap <silent> <C-e><C-f> :call ToggleNetrw(1)<CR>
-inoremap <silent> <C-e><C-f> <ESC>:call ToggleNetrw(1)<CR>
-
-"""
 " Plugins
 """
 function! PlugLoaded(name)
@@ -214,6 +170,10 @@ Plug 'vim-scripts/surround.vim'
 Plug 'editorconfig/editorconfig-vim'
 
 Plug 'itchyny/lightline.vim'
+Plug 'lambdalisue/nerdfont.vim'
+
+Plug 'lambdalisue/fern.vim'
+Plug 'lambdalisue/fern-renderer-nerdfont.vim'
 
 Plug 'ctrlpvim/ctrlp.vim'
 
@@ -234,6 +194,24 @@ let g:lightline = {
   \ 'active'  : { 'left': [['mode'], ['relativepath'], ['modified']] },
   \ 'inactive': { 'left': [['mode'], ['relativepath'], ['modified']] }
   \ }
+
+" == fern 
+let g:fern#renderer = 'nerdfont'
+let g:fern#default_hidden=1
+
+nnoremap <silent> <C-e><C-e> :Fern . -drawer -toggle<CR>
+inoremap <silent> <C-e><C-e> <ESC>:Fern . -drawer -toggle<CR>
+nnoremap <silent> <C-e><C-f> :Fern . -drawer -toggle -reveal=%<CR>
+inoremap <silent> <C-e><C-f> <ESC>:Fern . -drawer -toggle -reveal=%<CR>
+
+function! s:FernInit() abort
+  setlocal nonumber
+  setlocal norelativenumber
+
+  nmap <buffer> <Plug>(fern-action-open-or-enter) <Plug>(fern-action-open-or-expand)
+endfunction
+
+autocmd FileType fern call s:FernInit()
 
 " == ctrlp
 nnoremap <silent> <C-x><C-f> :CtrlP .<CR>

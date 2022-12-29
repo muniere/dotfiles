@@ -23,7 +23,7 @@ highlight DiffAdd       ctermfg=0   ctermbg=2   term=bold
 highlight DiffChange    ctermfg=0   ctermbg=3   term=bold 
 highlight DiffDelete    ctermfg=0   ctermbg=6   term=bold 
 highlight DiffText      ctermfg=0   ctermbg=7   term=reverse            cterm=bold 
-highlight SignColumn    ctermfg=4   ctermbg=248 term=standout 
+highlight SignColumn                ctermbg=0                           cterm=NONE
 highlight Conceal       ctermfg=7   ctermbg=242 
 highlight SpellBad                  ctermbg=224 term=reverse 
 highlight SpellCap                  ctermbg=81  term=reverse 
