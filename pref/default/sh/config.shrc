@@ -1,4 +1,4 @@
-for conf in `ls -d $SH_DOTDIR/*.*.shrc`; do
+for conf in `ls -d $SH_DOTDIR/conf.d/*.*.shrc`; do
   . $conf
 done
 

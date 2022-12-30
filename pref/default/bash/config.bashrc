@@ -4,7 +4,7 @@ fi
 if [ -f /etc/bashrc ]; then
   . /etc/bashrc
 fi
-for conf in `ls -d $BASH_DOTDIR/*.*.bashrc`; do
+for conf in `ls -d $BASH_DOTDIR/conf.d/*.*.bashrc`; do
   . $conf
 done
 
