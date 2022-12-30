@@ -1,8 +1,8 @@
 # =====
 # asdf : Completion
 # =====
-if (which asdf &> /dev/null); then
-  source $HOMEBREW_PREFIX/opt/asdf/asdf.sh
+if [ -f $HOMEBREW_PREFIX/opt/asdf/libexec/asdf.sh ]; then
+  source $HOMEBREW_PREFIX/opt/asdf/libexec/asdf.sh
 fi
 
 # =====
