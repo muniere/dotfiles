@@ -101,7 +101,6 @@ abstract class Action<Context> {
           prefix: ResLayout.pref().join(platform),
         });
       case "darwin":
-      case "ubuntu":
         return [
           ...this.travarseSync(spec, {
             prefix: ResLayout.pref().join(platform),

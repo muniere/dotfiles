@@ -1,4 +1,4 @@
-export type Platform = "ubuntu" | "darwin" | "default";
+export type Platform = "darwin" | "default";
 
 const decoder = new TextDecoder();
 
@@ -11,9 +11,6 @@ export async function identify(): Promise<Platform> {
 
   const name = decoder.decode(output).trim().toLowerCase();
 
-  if (name.includes("ubuntu")) {
-    return "ubuntu";
-  }
   if (name.includes("darwin")) {
     return "darwin";
   }
