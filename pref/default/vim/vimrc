@@ -137,15 +137,6 @@ nnoremap j gj
 nnoremap <Up> gk
 nnoremap <Down> gj
 
-" Tab utilization
-nnoremap tt :tabnew<CR>
-nnoremap td :tabclose<CR>
-nnoremap tl :tabnext<CR>
-nnoremap tn :tabnext<CR>
-nnoremap th :tabprevious<CR>
-nnoremap tp :tabprevious<CR>
-nnoremap tm :tabmove
-
 """
 " Plugins
 """
