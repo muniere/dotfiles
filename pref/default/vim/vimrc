@@ -25,9 +25,6 @@ if !has('nvim') | set viminfofile=$XDG_CACHE_HOME/vim/viminfo | endif
 " Features
 ""
 
-" Enable vim extended features
-set nocompatible
-
 " Default charset is utf-8
 set encoding=utf8
 
