@@ -150,6 +150,16 @@ export const VimCookBook = new CookBook({
   },
 });
 
+export const NeovimCookBook = new CookBook({
+  name: "NeovimCookBook",
+  prefs: [
+    new PrefSpec({
+      src: "nvim/",
+      dst: HomeLayout.config().join("nvim/"),
+    }),
+  ],
+});
+
 export const GitCookBook = new CookBook({
   name: "GitCookBook",
   prefs: [
