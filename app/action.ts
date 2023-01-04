@@ -67,6 +67,7 @@ abstract class Action<Context> {
       vault.NeovimCookBook,
       vault.GitCookBook,
       vault.GitHubCookBook,
+      vault.DockerCookBook,
       vault.AsdfCookBook,
       vault.TmuxCookBook,
       vault.GradleCookBook,
