@@ -37,6 +37,7 @@ brew "watch"
 brew "wget"
 brew "zsh"
 brew "zsh-completions"
+brew "zsh-syntax-highlighting"
 
 cask "temurin"
 cask "font-hack-nerd-font"

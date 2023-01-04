@@ -178,11 +178,4 @@ if (which git-delta &> /dev/null); then
   }
 fi
 
-# =====
-# Zsh : Syntax Highlighting
-# =====
-if [ -f $XDG_DATA_HOME/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
-  source "$XDG_DATA_HOME/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-fi
-
 # vim: ft=zsh sw=2 ts=2 sts=2

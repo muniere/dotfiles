@@ -106,23 +106,6 @@ export const ZshCookBook = new CookBook({
       },
     }),
   ],
-  activate: async (options: shell.CallOptions) => {
-    const url = "https://github.com/zsh-users/zsh-syntax-highlighting.git";
-    const dir = HomeLayout.data().join("zsh-syntax-highlighting");
-
-    const stat = await Result.runAsyncOr(() => dir.lstat());
-    if (stat) {
-      await shell.call(["git", "-C", dir.toString(), "pull", "-v"], {
-        dryRun: options.dryRun,
-        logger: options.logger,
-      });
-    } else {
-      await shell.call(["git", "clone", url, dir.toString(), "-v"], {
-        dryRun: options.dryRun,
-        logger: options.logger,
-      });
-    }
-  },
 });
 
 export const VimCookBook = new CookBook({
