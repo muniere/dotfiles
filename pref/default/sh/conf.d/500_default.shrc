@@ -7,6 +7,10 @@ export EDITOR=vim
 
 addpath $HOME/.local/bin /usr/local/bin /usr/local/sbin /usr/bin /bin /usr/sbin /sbin
 
+if (type envpath &> /dev/null); then
+  eval "$(envpath)"
+fi
+
 if [ -n "$XDG_DATA_HOME" ]; then
   export LESSHISTFILE="${XDG_DATA_HOME}/less/history"
   export LESSKEY="${XDG_DATA_HOME}/less/keys"

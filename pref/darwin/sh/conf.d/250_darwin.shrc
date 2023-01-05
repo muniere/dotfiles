@@ -3,12 +3,14 @@
 # ===
 export HOMEBREW_CASK_OPTS="--appdir=/Applications"
 
-if [ -x /usr/local/bin/brew ]; then
-  eval "$(/usr/local/bin/brew shellenv)"
-fi
+function envpath() {
+  if [ -x /usr/local/bin/brew ]; then
+    /usr/local/bin/brew shellenv
+  fi
 
-if [ -x /opt/homebrew/bin/brew ]; then
-  eval "$(/opt/homebrew/bin/brew shellenv)"
-fi
+  if [ -x /opt/homebrew/bin/brew ]; then
+    /opt/homebrew/bin/brew shellenv
+  fi
+}
 
 # vim: ft=sh sw=2 ts=2 sts=2
