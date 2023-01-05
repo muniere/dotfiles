@@ -1,5 +1,5 @@
 function addpath() {
-  argv=$@
+  argv=("$@")
 
   for ((i=${#argv[@]}; i > 0; i--)); do
     x=${argv[i]}
