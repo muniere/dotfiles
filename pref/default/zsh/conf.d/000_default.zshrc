@@ -1,7 +1,11 @@
 function addfpath() {
   argv=("$@")
 
-  for ((i=${#argv[@]}; i > 0; i--)); do
+  if [ -n "$ZSH_VERSION" ]; then
+    setopt localoptions ksharrays
+  fi
+
+  for ((i=${#argv[@]} - 1; i >= 0; i--)); do
     x=${argv[i]}
 
     if [[ ":$FPATH:" == *":$x:"* ]]; then
