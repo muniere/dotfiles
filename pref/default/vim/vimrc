@@ -153,6 +153,8 @@ function! PlugLoaded(name)
 endfunction
 
 call plug#begin($XDG_DATA_HOME.'/vim/plugged')
+Plug 'tomasr/molokai'
+
 Plug 'vim-scripts/sudo.vim'
 Plug 'vim-scripts/surround.vim'
 Plug 'editorconfig/editorconfig-vim'
@@ -235,6 +237,9 @@ endif
 """
 " Appearance
 """
-colorscheme muniere
+if PlugLoaded('molokai')
+  colorscheme molokai
+  hi def link gitcommitSummary Title
+endif
 
 " vim: ft=vim sw=2 ts=2 sts=2

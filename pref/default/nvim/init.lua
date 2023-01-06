@@ -185,6 +185,8 @@ local plug = {
 
 plug.begin(vim.env.XDG_DATA_HOME .. "/nvim/plugged")
 
+plug.call("tomasr/molokai")
+
 plug.call("vim-scripts/sudo.vim")
 plug.call("vim-scripts/surround.vim")
 plug.call("editorconfig/editorconfig-vim")
@@ -289,6 +291,8 @@ end
 -- Appearance
 --
 
-vim.cmd("colorscheme muniere")
+if plug.test("molokai") then
+  vim.cmd("colorscheme molokai")
+end
 
 -- vim: ft=lua ts=2 sts=2 sw=2
