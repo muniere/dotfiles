@@ -181,36 +181,42 @@ autocmd VimEnter * if len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
 \| endif
 
 " == lightline
-let g:lightline = { 
-  \ 'active'  : { 'left': [['mode'], ['relativepath'], ['modified']] },
-  \ 'inactive': { 'left': [['mode'], ['relativepath'], ['modified']] }
-  \ }
+if PlugLoaded('lightline.vim')
+  let g:lightline = { 
+    \ 'active'  : { 'left': [['mode'], ['relativepath'], ['modified']] },
+    \ 'inactive': { 'left': [['mode'], ['relativepath'], ['modified']] }
+    \ }
+endif
 
 " == fern 
-let g:fern#renderer = 'nerdfont'
-let g:fern#default_hidden=1
-
-nnoremap <silent> <C-e><C-e> :Fern . -drawer -toggle<CR>
-inoremap <silent> <C-e><C-e> <ESC>:Fern . -drawer -toggle<CR>
-nnoremap <silent> <C-e><C-f> :Fern . -drawer -toggle -reveal=%<CR>
-inoremap <silent> <C-e><C-f> <ESC>:Fern . -drawer -toggle -reveal=%<CR>
-
-function! s:FernInit() abort
-  setlocal nonumber
-  setlocal norelativenumber
-
-  nmap <buffer> <Plug>(fern-action-open-or-enter) <Plug>(fern-action-open-or-expand)
-endfunction
-
-autocmd FileType fern call s:FernInit()
+if PlugLoaded('fern.vim')
+  let g:fern#renderer = 'nerdfont'
+  let g:fern#default_hidden=1
+  
+  nnoremap <silent> <C-e><C-e> :Fern . -drawer -toggle<CR>
+  inoremap <silent> <C-e><C-e> <ESC>:Fern . -drawer -toggle<CR>
+  nnoremap <silent> <C-e><C-f> :Fern . -drawer -toggle -reveal=%<CR>
+  inoremap <silent> <C-e><C-f> <ESC>:Fern . -drawer -toggle -reveal=%<CR>
+  
+  function! s:FernInit() abort
+    setlocal nonumber
+    setlocal norelativenumber
+  
+    nmap <buffer> <Plug>(fern-action-open-or-enter) <Plug>(fern-action-open-or-expand)
+  endfunction
+  
+  autocmd FileType fern call s:FernInit()
+endif
 
 " == fzf
-let g:fzf_preview_window = []
-
-nnoremap <silent> <C-x><C-f> :Files<CR>
-inoremap <silent> <C-x><C-f> <ESC>:Files<CR>
-nnoremap <silent> <C-x><C-b> :Buffers<CR>
-inoremap <silent> <C-x><C-b> <ESC>:Buffers<CR>
+if PlugLoaded('fzf.vim')
+  let g:fzf_preview_window = []
+  
+  nnoremap <silent> <C-x><C-f> :Files<CR>
+  inoremap <silent> <C-x><C-f> <ESC>:Files<CR>
+  nnoremap <silent> <C-x><C-b> :Buffers<CR>
+  inoremap <silent> <C-x><C-b> <ESC>:Buffers<CR>
+endif
 
 " == ddc
 if PlugLoaded('ddc.vim')
