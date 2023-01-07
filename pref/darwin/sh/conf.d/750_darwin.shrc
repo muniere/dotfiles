@@ -54,7 +54,8 @@ if [ -d $HOMEBREW_PREFIX/opt/go ]; then
   export GOROOT=$HOMEBREW_PREFIX/opt/go/libexec
   export GOPATH=$HOME/Projects
 
-  addpath $GOPATH/bin $GOROOT/bin
+  addpath $GOROOT/bin
+  addpath $GOPATH/bin 
 fi
 
 # =====
