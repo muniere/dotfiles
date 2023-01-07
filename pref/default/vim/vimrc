@@ -245,7 +245,7 @@ endif
 """
 if PlugLoaded('molokai')
   colorscheme molokai
-  hi def link gitcommitSummary Title
+  highlight  def link gitcommitSummary Normal
 endif
 
 " vim: ft=vim sw=2 ts=2 sts=2

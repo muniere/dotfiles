@@ -293,6 +293,7 @@ end
 
 if plug.test("molokai") then
   vim.cmd("colorscheme molokai")
+  vim.cmd("highlight def link gitcommitSummary Normal")
 end
 
 -- vim: ft=lua ts=2 sts=2 sw=2
