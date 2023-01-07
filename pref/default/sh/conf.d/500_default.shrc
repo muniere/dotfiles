@@ -41,6 +41,7 @@ fi
 # fzf
 # =====
 if (which fzf &> /dev/null); then
+  export FZF_DEFAULT_COMMAND='rg --files --hidden --glob "!.git"'
   export FZF_DEFAULT_OPTS='--height 50% --border --reverse --bind ctrl-k:kill-line --bind ctrl-j:execute::'
 
   function fzf-file () {
