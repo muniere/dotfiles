@@ -2,8 +2,8 @@
 # Shell
 # =====
 
-# LC
-export LC_ALL=
+# Locale
+unset LC_ALL
 
 # PATH
 addpath $HOME/.local/bin

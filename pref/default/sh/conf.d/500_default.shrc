@@ -1,17 +1,4 @@
 # =====
-# shell
-# =====
-export LC_ALL=C
-export LANG=en_US.UTF-8
-export EDITOR=vim
-
-addpath $HOME/.local/bin /usr/local/bin /usr/local/sbin /usr/bin /bin /usr/sbin /sbin
-
-if (type envpath &> /dev/null); then
-  eval "$(envpath)"
-fi
-
-# =====
 # less
 # =====
 if [ -n "$XDG_DATA_HOME" ]; then
