@@ -1,11 +1,10 @@
 function addfpath() {
   local x=$1
-
-  if [[ ":$FPATH:" == *":$x:"* ]]; then
-    export FPATH="$x:${FPATH//:$x:/:}"
-  else
-    export FPATH="$x:$FPATH"
-  fi
+  local xs=":$FPATH:"
+  xs="${xs//:$x:/:}"
+  xs="${xs/#:/}"
+  xs="${xs/%:/}"
+  export FPATH="$x:$xs"
 }
 
 # vim: ft=sh sw=2 ts=2 sts=2

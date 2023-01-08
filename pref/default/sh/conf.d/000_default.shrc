@@ -1,11 +1,10 @@
 function addpath() {
   local x=$1
-
-  if [[ ":$PATH:" == *":$x:"* ]]; then
-    export PATH="$x:${PATH//:$x:/:}"
-  else
-    export PATH="$x:$PATH"
-  fi
+  local xs=":$PATH:"
+  xs="${xs//:$x:/:}"
+  xs="${xs/#:/}"
+  xs="${xs/%:/}"
+  export PATH="$x:$xs"
 }
 
 export LC_ALL=C
