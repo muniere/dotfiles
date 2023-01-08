@@ -367,7 +367,7 @@ class LinkAction extends Action<LinkContext> {
 
       const dir = chain.dst.dirname();
       const dirStat = await Result.runAsyncOr(() => dir.lstat());
-      if (!dirStat || dirStat.isDirectory) {
+      if (!dirStat) {
         await shell.mkdir(dir, this.shellOptions);
       }
 
@@ -386,8 +386,8 @@ class LinkAction extends Action<LinkContext> {
     const chains = this.inflateTmplSpecSync(spec);
 
     for (const chain of chains) {
-      const stat = await Result.runAsyncOr(() => chain.dst.stat());
-      if (stat) {
+      const dstStat = await Result.runAsyncOr(() => chain.dst.stat());
+      if (dstStat && dstStat.isFile) {
         this.context.logger?.info(`File already created: ${chain.dst}`);
         return;
       }
@@ -396,7 +396,10 @@ class LinkAction extends Action<LinkContext> {
       const values = chain.options?.values ?? {};
       const content = eta.render(template, values) as string;
 
-      await shell.mkdir(chain.dst.dirname(), this.shellOptions);
+      const dirStat = await Result.runAsyncOr(() => chain.dst.dirname().stat());
+      if (!dirStat) {
+        await shell.mkdir(chain.dst.dirname(), this.shellOptions);
+      }
 
       this.context.logger?.info(
         `Create a file ${chain.dst} with content:\n${content.trimEnd()}`,
