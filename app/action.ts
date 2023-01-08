@@ -320,8 +320,8 @@ class LinkAction extends Action<LinkContext> {
     }
 
     for (const [i, book] of books.entries()) {
-      const format = "%s Launched (%02d/%02d)";
-      const message = sprintf(format, book.name, i + 1, books.length);
+      const format = "(%02d/%02d) %s Launched";
+      const message = sprintf(format, i + 1, books.length, book.name);
       this.context.logger?.mark(message, { bold: true });
 
       for (const spec of book.prefs) {
@@ -447,8 +447,8 @@ class UnlinkAction extends Action<UnlinkContext> {
     }
 
     for (const [i, book] of books.entries()) {
-      const format = "%s Launched (%02d/%02d)";
-      const message = sprintf(format, book.name, i + 1, books.length);
+      const format = "(%02d/%02d) %s Launched";
+      const message = sprintf(format, i + 1, books.length, book.name);
       this.context.logger?.mark(message, { bold: true });
 
       for (const spec of book.tmpls) {
