@@ -19,6 +19,16 @@ export const HomeCookBook = new CookBook({
     ];
 
     for (const dir of dirs) {
+      const stat = await Result.runAsyncOr(() => dir.path.stat());
+      if (stat) {
+        if (stat.isDirectory) {
+          options.logger?.info(`Directory already exists: ${dir.path}`);
+        } else {
+          options.logger?.warn(`File already exists, not a directory: ${dir.path}`);
+        }
+        continue;
+      }
+
       await shell.mkdir(dir.path, { ...options, mode: dir.mode });
     }
   },
@@ -27,11 +37,20 @@ export const HomeCookBook = new CookBook({
 export const LibraryCookBook = new CookBook({
   name: "LibraryCookBook",
   activate: async (options: shell.CallOptions) => {
-    await shell.symlink(
-      new Path("~/Library/Application Support").expandHome(),
-      new Path("~/Library/ApplicationSupport").expandHome(),
-      options,
-    );
+    const src = new Path("~/Library/Application Support").expandHome();
+    const dst = new Path("~/Library/ApplicationSupport").expandHome();
+
+    const stat = await Result.runAsyncOr(() => dst.stat());
+    if (stat) {
+      if (stat.isDirectory) {
+        options.logger?.info(`Directory already exists: ${dst}`);
+      } else {
+        options.logger?.warn(`File already exists, not a directory: ${dst}`);
+      }
+      return;
+    }
+
+    await shell.symlink(src, dst, options);
   },
   platforms: ["darwin"],
 });
@@ -126,10 +145,13 @@ export const VimCookBook = new CookBook({
     const url = "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim";
     const path = HomeLayout.config().join("vim/autoload/plug.vim");
 
-    await shell.curl(url, {
-      ...options,
-      output: path,
-    });
+    const stat = await Result.runAsyncOr(() => path.stat());
+    if (stat) {
+      options.logger?.info(`File already exists: ${path}`);
+      return;
+    }
+
+    await shell.curl(url, { ...options, output: path });
   },
 });
 
@@ -159,12 +181,19 @@ export const GitCookBook = new CookBook({
     const dir = HomeLayout.data().join("tig");
     const file = dir.join("history");
 
-    const stat = Result.runAsyncOr(() => dir.stat());
-    if (!stat) {
+    const dstat = await Result.runAsyncOr(() => dir.stat());
+    if (dstat) {
+      // do nothing, and do not output logs
+    } else {
       await shell.mkdir(dir, options);
     }
 
-    shell.touch(file, options);
+    const fstat = await Result.runAsyncOr(() => file.stat());
+    if (fstat) {
+      options.logger?.info(`File already exists: ${file}`);
+    } else {
+      await shell.touch(file, options);
+    }
   },
 });
 
@@ -268,12 +297,19 @@ export const NodeCookBook = new CookBook({
     const dir = HomeLayout.data().join("node");
     const file = dir.join("history");
 
-    const stat = Result.runAsyncOr(() => dir.stat());
-    if (!stat) {
+    const dstat = await Result.runAsyncOr(() => dir.stat());
+    if (dstat) {
+      // do nothing, and do not output logs
+    } else {
       await shell.mkdir(dir, options);
     }
 
-    shell.touch(file, options);
+    const fstat = await Result.runAsyncOr(() => file.stat());
+    if (fstat) {
+      options.logger?.info(`File already exists: ${file}`);
+    } else {
+      await shell.touch(file, options);
+    }
   },
 });
 
@@ -282,10 +318,10 @@ export const iTermCookBook = new CookBook({
   prefs: [],
   activate: async (options: shell.CallOptions) => {
     const path = new Path("~/Library/Preferences/com.googlecode.iterm2.plist").expandHome();
-    
+
     const stat = await Result.runAsyncOr(() => path.lstat());
     if (!stat) {
-      options.logger?.info("iTerm 2 not installed yet. skip.")
+      options.logger?.info("iTerm 2 not installed yet. skip.");
       return;
     }
 
