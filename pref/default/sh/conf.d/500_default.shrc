@@ -2,8 +2,8 @@
 # less
 # =====
 if [ -n "$XDG_DATA_HOME" ]; then
-  export LESSHISTFILE="${XDG_DATA_HOME}/less/history"
-  export LESSKEY="${XDG_DATA_HOME}/less/keys"
+  export LESSHISTFILE="$XDG_DATA_HOME/less/history"
+  export LESSKEY="$XDG_DATA_HOME/less/keys"
 fi
 
 # =====
@@ -158,10 +158,7 @@ fi
 # =====
 if [ -n "$XDG_CACHE_HOME" ]; then
   export PUB_CACHE="$XDG_CACHE_HOME/pub"
-
-  if [ -d $PUB_CACHE/bin ]; then
-    addpath $PUB_CACHE/bin
-  fi
+  export PATH="$PUB_CACHE/bin:$PATH"
 fi
 
 # =====
@@ -169,10 +166,7 @@ fi
 # =====
 if [ -n "$XDG_CACHE_HOME" ]; then
   export CARGO_HOME="$XDG_CACHE_HOME/cargo"
-
-  if [ -d $CARGO_HOME/bin ]; then
-    addpath $CARGO_HOME/bin
-  fi
+  export PATH="$CARGO_HOME/bin:$PATH"
 fi
 
 # ===

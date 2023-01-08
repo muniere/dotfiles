@@ -6,7 +6,7 @@
 unset LC_ALL
 
 # PATH
-addpath $HOME/.local/bin
+export PATH="$HOME/.local/bin:$PATH"
 
 # ls
 alias ls="ls -Gv"
@@ -28,9 +28,9 @@ fi
 # =====
 # Android
 # =====
-if [ -d ${HOME}/Library/Android/sdk ]; then
-  addpath "${HOME}/Library/Android/sdk/platform-tools"
-  addpath "${HOME}/Library/Android/sdk/tools/bin"
+if [ -d $HOME/Library/Android/sdk ]; then
+  export PATH="$HOME/Library/Android/sdk/platform-tools:$PATH"
+  export PATH="$HOME/Library/Android/sdk/tools/bin:$PATH"
 fi
 
 # =====
@@ -44,7 +44,7 @@ fi
 # Git
 # =====
 if [ -d $HOMEBREW_PREFIX/share/git-core/contrib/diff-highlight/ ]; then
-  addpath $HOMEBREW_PREFIX/share/git-core/contrib/diff-highlight
+  export PATH="$HOMEBREW_PREFIX/share/git-core/contrib/diff-highlight:$PATH"
 fi
 
 # =====
@@ -54,8 +54,8 @@ if [ -d $HOMEBREW_PREFIX/opt/go ]; then
   export GOROOT=$HOMEBREW_PREFIX/opt/go/libexec
   export GOPATH=$HOME/Projects
 
-  addpath $GOROOT/bin
-  addpath $GOPATH/bin 
+  export PATH="$GOROOT/bin:$PATH"
+  export PATH="$GOPATH/bin:$PATH"
 fi
 
 # =====
@@ -70,15 +70,15 @@ fi
 # MySQL
 # =====
 if ! (which mysql &> /dev/null) && [ -d $HOMEBREW_PREFIX/opt/mysql ]; then
-  addpath "$HOMEBREW_PREFIX/opt/mysql/bin"
+  export PATH="$HOMEBREW_PREFIX/opt/mysql/bin:$PATH"
 fi
 
 if ! (which mysql &> /dev/null) && [ -d $HOMEBREW_PREFIX/opt/mysql@5.7 ]; then
-  addpath "$HOMEBREW_PREFIX/opt/mysql@5.7/bin"
+  export PATH="$HOMEBREW_PREFIX/opt/mysql@5.7/bin:$PATH"
 fi
 
 if ! (which mysql &> /dev/null) && [ -d $HOMEBREW_PREFIX/opt/mysql-client ]; then
-  addpath "$HOMEBREW_PREFIX/opt/mysql-client/bin"
+  export PATH="$HOMEBREW_PREFIX/opt/mysql-client/bin:$PATH"
 fi
 
 # =====
