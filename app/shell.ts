@@ -1,6 +1,16 @@
 import { Logger } from "./logging.ts";
 import { Path } from "./path.ts";
 
+const decoder = new TextDecoder();
+
+export type ProcessStatus = Deno.ProcessStatus;
+
+export type ProcessResult = {
+  status: ProcessStatus;
+  stdout: string;
+  stderr: string;
+};
+
 // =====
 // General
 // =====
@@ -14,7 +24,7 @@ export type CallOptions =
 export function call(
   cmd: string[],
   options: CallOptions = {},
-): Promise<Deno.ProcessStatus> {
+): Promise<ProcessStatus> {
   const cd = options.cwd ? ["cd", options.cwd, "&&"] : [];
   const env = Object.entries(options.env ?? {}).map(([k, v]) => `${k}=${v}`);
   options.logger?.trace([...cd, ...env, ...cmd].join(" "));
@@ -37,13 +47,42 @@ export function call(
   return proc.status();
 }
 
+export type CaptureOptions =
+  & Pick<Deno.RunOptions, "cwd" | "env">
+  & {
+    logger?: Logger;
+  };
+
+export async function capture(
+  cmd: string[],
+  options: CaptureOptions = {},
+): Promise<ProcessResult> {
+  const cd = options.cwd ? ["cd", options.cwd, "&&"] : [];
+  const env = Object.entries(options.env ?? {}).map(([k, v]) => `${k}=${v}`);
+  options.logger?.trace([...cd, ...env, ...cmd].join(" "));
+
+  const proc = Deno.run({
+    cmd: cmd,
+    cwd: options.cwd,
+    env: options.env,
+    stdout: "piped",
+    stderr: "piped",
+  });
+
+  const status = await proc.status();
+  const stdout = await proc.output().then((data) => decoder.decode(data));
+  const stderr = await proc.stderrOutput().then((data) => decoder.decode(data));
+
+  return { status, stdout, stderr };
+}
+
 // =====
 // Short-hand
 // =====
 export function mkdir(
   path: Path,
   options: CallOptions & Deno.MkdirOptions = {},
-): Promise<Deno.ProcessStatus> {
+): Promise<ProcessStatus> {
   return call(
     [
       "mkdir",
@@ -107,7 +146,7 @@ export type CurlOptions = {
 export function curl(
   url: URL | string,
   options: CallOptions & CurlOptions = {},
-): Promise<Deno.ProcessStatus> {
+): Promise<ProcessStatus> {
   return call(
     [
       "curl",

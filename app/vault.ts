@@ -329,16 +329,29 @@ export const iTermCookBook = new CookBook({
       path: path.expandHome(),
     });
 
-    await buddy.setBoolean(
-      "New Bookmarks:0:Use Non-ASCII Font",
-      true,
-      options,
-    );
-    await buddy.setString(
-      "New Bookmarks:0:Non Ascii Font",
-      "HackNerdFontComplete-Regular 12",
-      options,
-    );
+    {
+      const key = "New Bookmarks:0:Use Non-ASCII Font";
+      const value = true;
+
+      const result = await buddy.getBoolean(key);
+      if (result === value) {
+        options.logger?.info(`Nerd Font already enabled: ${value}`)
+      } else {
+        await buddy.setBoolean(key, value, options);
+      }
+    }
+
+    {
+      const key = "New Bookmarks:0:Non Ascii Font";
+      const value = "HackNerdFontComplete-Regular 12";
+
+      const result = await buddy.getString(key);
+      if (result === value) {
+        options.logger?.info(`Nerd Font already configured: ${value}`)
+      } else {
+        await buddy.setString(key, value, options);
+      }
+    }
   },
   platforms: ["darwin"],
 });

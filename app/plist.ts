@@ -11,25 +11,38 @@ export class PlistBuddy {
   }
 
   async exists(key: string): Promise<boolean> {
-    const options: shell.CallOptions = {
-      stdout: "piped",
-      stderr: "piped",
-    };
+    const result = await this.capture(`Print "${key}"`);
+    return result.status.success;
+  }
 
-    const result = await this.run(`Print "${key}"`, options);
-    return result.success;
+  async getBoolean(key: string): Promise<boolean | null> {
+    const result = await this.capture(`Print "${key}"`);
+    if (result.status.success) {
+      return result.stdout.trim() === "true";
+    } else {
+      return null;
+    }
+  }
+
+  async getString(key: string): Promise<string | null> {
+    const result = await this.capture(`Print "${key}"`);
+    if (result.status.success) {
+      return result.stdout.trim();
+    } else {
+      return null;
+    }
   }
 
   async setBoolean(
     key: string,
     value: boolean,
     options: shell.CallOptions = {},
-  ): Promise<Deno.ProcessStatus> {
+  ): Promise<shell.ProcessStatus> {
     const hit = await this.exists(key);
     if (hit) {
-      return this.run(`Set "${key}" ${value}`, options);
+      return this.call(`Set "${key}" ${value}`, options);
     } else {
-      return this.run(`Add "${key}" bool ${value}`, options);
+      return this.call(`Add "${key}" bool ${value}`, options);
     }
   }
 
@@ -37,17 +50,32 @@ export class PlistBuddy {
     key: string,
     value: string,
     options: shell.CallOptions = {},
-  ): Promise<Deno.ProcessStatus> {
+  ): Promise<shell.ProcessStatus> {
     const hit = await this.exists(key);
     if (hit) {
-      return this.run(`Set "${key}" ${value}`, options);
+      return this.call(`Set "${key}" ${value}`, options);
     } else {
-      return this.run(`Add "${key}" string "${value}"`, options);
+      return this.call(`Add "${key}" string "${value}"`, options);
     }
   }
 
-  private run(command: string, options: shell.CallOptions = {}): Promise<Deno.ProcessStatus> {
+  private call(
+    command: string,
+    options: shell.CallOptions = {},
+  ): Promise<shell.ProcessStatus> {
     return shell.call([
+      "/usr/libexec/PlistBuddy",
+      "-c",
+      command,
+      this.path.toAbsolute().toString(),
+    ], options);
+  }
+
+  private capture(
+    command: string,
+    options: shell.CaptureOptions = {},
+  ): Promise<shell.ProcessResult> {
+    return shell.capture([
       "/usr/libexec/PlistBuddy",
       "-c",
       command,
