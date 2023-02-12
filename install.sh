@@ -1,5 +1,22 @@
 #!/usr/bin/env bash
 
+# ===
+# Variables
+# ===
+GHQ_ROOT_DEFAULT="${HOME}/Projects/src"
+GHQ_ROOT="${GHQ_ROOT:-"${GHQ_ROOT_DEFAULT}"}"
+DOTFILES_DIR="${GHQ_ROOT}/github.com/muniere/dotfiles"
+DOTFILES_URL="https://github.com/muniere/dotfiles.git"
+
+# ===
+# Functions
+# ===
+function clone-repo() {
+if ! [ -d "${DOTFILES_DIR}" ]; then
+    git clone "${DOTFILES_URL}" "${DOTFILES_DIR}"
+fi
+}
+
 function bundle-core() {
 case "$OSTYPE" in
     darwin*)
@@ -37,11 +54,21 @@ case "$OSTYPE" in
 esac
 }
 
-# main
-set -euxv
+function link-files() {
+cd "${DOTFILES_DIR}" 
+deno task link
+cd -
+}
+
+# ===
+# Main
+# ===
+set -eux
+
+clone-repo
 
 bundle-core
 
-deno task link
+link-files
 
 bundle-more

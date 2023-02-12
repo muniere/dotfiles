@@ -3,11 +3,7 @@
 ## Get started
 
 ```bash
-# clone
-$ git clone https://github.com/muniere/dotfiles.git
-
-# instal dependencies and link
-$ bash install.sh
+$ /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/muniere/dotfiles/master/install.sh)"
 ```
 
 ## Tasks
