@@ -37,7 +37,7 @@ export class PlistBuddy {
     key: string,
     value: boolean,
     options: shell.CallOptions = {},
-  ): Promise<shell.ProcessStatus> {
+  ): Promise<shell.CommandStatus> {
     const hit = await this.exists(key);
     if (hit) {
       return this.call(`Set "${key}" ${value}`, options);
@@ -50,7 +50,7 @@ export class PlistBuddy {
     key: string,
     value: string,
     options: shell.CallOptions = {},
-  ): Promise<shell.ProcessStatus> {
+  ): Promise<shell.CommandStatus> {
     const hit = await this.exists(key);
     if (hit) {
       return this.call(`Set "${key}" ${value}`, options);
@@ -62,24 +62,20 @@ export class PlistBuddy {
   private call(
     command: string,
     options: shell.CallOptions = {},
-  ): Promise<shell.ProcessStatus> {
-    return shell.call([
-      "/usr/libexec/PlistBuddy",
-      "-c",
-      command,
-      this.path.toAbsolute().toString(),
-    ], options);
+  ): Promise<shell.CommandStatus> {
+    const cmd = "/usr/libexec/PlistBuddy";
+    const opts = ["-c", command];
+    const args = this.path.toAbsolute().toString();
+    return shell.call(cmd, [...opts, args], options);
   }
 
   private capture(
     command: string,
     options: shell.CaptureOptions = {},
-  ): Promise<shell.ProcessResult> {
-    return shell.capture([
-      "/usr/libexec/PlistBuddy",
-      "-c",
-      command,
-      this.path.toAbsolute().toString(),
-    ], options);
+  ): Promise<shell.CommandResult> {
+    const cmd = "/usr/libexec/PlistBuddy";
+    const opts = ["-c", command];
+    const args = this.path.toAbsolute().toString();
+    return shell.capture(cmd, [...opts, ...args], options);
   }
 }
