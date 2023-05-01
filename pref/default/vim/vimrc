@@ -138,6 +138,13 @@ nnoremap <Up> gk
 nnoremap <Down> gj
 
 """
+" Filetypes
+"""
+" Always reset position for git commit
+autocmd FileType gitcommit call setpos('.', [0, 1, 1, 0])
+
+
+"""
 " Plugins
 """
 function! PlugLoaded(name)
