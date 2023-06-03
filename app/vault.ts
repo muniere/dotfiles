@@ -335,7 +335,7 @@ export const iTermCookBook = new CookBook({
 
       const result = await buddy.getBoolean(key);
       if (result === value) {
-        options.logger?.info(`Nerd Font already enabled: ${value}`)
+        options.logger?.info(`Nerd Font already enabled: ${value}`);
       } else {
         await buddy.setBoolean(key, value, options);
       }
@@ -347,7 +347,7 @@ export const iTermCookBook = new CookBook({
 
       const result = await buddy.getString(key);
       if (result === value) {
-        options.logger?.info(`Nerd Font already configured: ${value}`)
+        options.logger?.info(`Nerd Font already configured: ${value}`);
       } else {
         await buddy.setString(key, value, options);
       }
