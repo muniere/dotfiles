@@ -87,7 +87,6 @@ export class PrefSpec extends SpecBase<PrefChain> {
 // Templates
 // =====
 export type TmplOptions = {
-  // deno-lint-ignore ban-types
   values?: object;
 };
 
