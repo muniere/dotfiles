@@ -178,4 +178,10 @@ if (which git-delta &> /dev/null); then
   }
 fi
 
+if (which git-graft &> /dev/null); then
+  function _git_graft() {
+    _git_rebase $@
+  }
+fi
+
 # vim: ft=zsh sw=2 ts=2 sts=2
