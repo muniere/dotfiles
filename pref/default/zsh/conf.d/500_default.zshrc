@@ -178,8 +178,8 @@ if (which git-delta &> /dev/null); then
   }
 fi
 
-if (which git-graft &> /dev/null); then
-  function _git_graft() {
+if (which git-lift &> /dev/null); then
+  function _git_lift() {
     _git_rebase $@
   }
 fi
