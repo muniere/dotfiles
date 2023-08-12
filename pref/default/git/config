@@ -1,6 +1,8 @@
 [user]
     name = Hiromune Ito
     email = muniere.fujiwara@gmail.com
+[init]
+    defaultBranch = main
 [push]
     default = current
 [core]
