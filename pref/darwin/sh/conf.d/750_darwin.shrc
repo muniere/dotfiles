@@ -96,4 +96,11 @@ if [ -f $HOMEBREW_PREFIX/bin/virtualenvwrapper.sh ]; then
     source $HOMEBREW_PREFIX/bin/virtualenvwrapper.sh
 fi
 
+# =====
+# Ruby
+# =====
+if [ -d $HOMEBREW_PREFIX/opt/ruby/bin ]; then
+  export PATH="$HOMEBREW_PREFIX/opt/ruby/bin:$PATH"
+fi
+
 # vim: ft=sh sw=2 ts=2 sts=2
