@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+org=$(gh repo view --json owner -q ".owner.login")
+repo=$(gh repo view --json name -q ".name")
+
+tag_name=$(
+    gh api \
+        -H "Accept: application/vnd.github+json" \
+        /repos/$org/$repo/releases/latest | jq -r .tag_name
+)
+
+gh api \
+    --method POST \
+    -H "Accept: application/vnd.github+json" \
+    /repos/$org/$repo/releases/generate-notes \
+    -f tag_name="fizzbuzz" \
+    -f target_commitish="develop" \
+    -f previous_tag_name="$tag_name" | jq -r .body
+
+# When use custom configuration
+#
+# gh api \
+#     --method POST \
+#     -H "Accept: application/vnd.github+json" \
+#     /repos/$org/$repo/releases/generate-notes \
+#     -f configuration_file_path=".github/release.yml" \
+#     -f tag_name="fizzbuzz" \
+#     -f target_commitish="develop" \
+#     -f previous_tag_name="$tag_name" | jq -r .body
