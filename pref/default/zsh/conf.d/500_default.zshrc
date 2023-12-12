@@ -4,20 +4,8 @@ bindkey -e
 # Zsh : Hooks
 # =====
 function zshaddhistory() { 
-  local line=${1%%$'\n'}
-  local cmd=${line%% *}
-
-  [[ ${#line} -ge 5 
-      && ${cmd} != (l) 
-      && ${cmd} != (ls) 
-      && ${cmd} != (la) 
-      && ${cmd} != (ll) 
-      && ${cmd} != (cd) 
-      && ${cmd} != (rm) 
-      && ${cmd} != (man) 
-      && ${cmd} != (git) 
-      && ${cmd} != (tig) 
-  ]]
+  emulate -L zsh
+  [[ $1 != ${~HISTORY_IGNORE} ]]
 } 
 
 function precmd() {
@@ -111,6 +99,7 @@ RPROMPT='%1(v|%F{magenta}%1v%f|)'
 # =====
 # Zsh : History
 # =====
+HISTORY_IGNORE='(l|ls|la|ll|cd|rm|man|git|tig|gh|which|type)'
 HISTSIZE=100000
 SAVEHIST=100000
 setopt hist_ignore_all_dups
