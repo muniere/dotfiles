@@ -113,6 +113,7 @@ RPROMPT='%1(v|%F{magenta}%1v%f|)'
 # =====
 HISTSIZE=100000
 SAVEHIST=100000
+setopt hist_ignore_all_dups
 setopt hist_ignore_dups
 setopt hist_ignore_space
 setopt hist_reduce_blanks
