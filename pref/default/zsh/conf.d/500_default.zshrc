@@ -7,7 +7,17 @@ function zshaddhistory() {
   local line=${1%%$'\n'}
   local cmd=${line%% *}
 
-  [[ ${cmd} != (l|l[sal]) && ${cmd} != (cd) && ${cmd} != (rm) ]]
+  [[ ${#line} -ge 5 
+      && ${cmd} != (l) 
+      && ${cmd} != (ls) 
+      && ${cmd} != (la) 
+      && ${cmd} != (ll) 
+      && ${cmd} != (cd) 
+      && ${cmd} != (rm) 
+      && ${cmd} != (man) 
+      && ${cmd} != (git) 
+      && ${cmd} != (tig) 
+  ]]
 } 
 
 function precmd() {
