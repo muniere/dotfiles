@@ -1,7 +1,11 @@
 {
-  "importMap": "imports.json",
   "fmt": {
     "lineWidth": 100
+  },
+  "imports": {
+    "cliffy/": "https://deno.land/x/cliffy@v0.25.4/",
+    "eta/": "https://deno.land/x/eta@v1.12.3/",
+    "deno/": "https://deno.land/std@0.167.0/"
   },
   "tasks": {
     "build": "deno compile --allow-run --allow-read --allow-write --allow-env --output dist/ app/cli.ts",
