@@ -5,19 +5,19 @@ import { Logger, LogLevel } from "./logging.ts";
 import * as action from "./action.ts";
 
 // =====
-// List
+// Status
 // =====
 const ColorMode = new EnumType(["auto", "always", "never"]);
 
-const listCommand = new Command()
-  .description("List links")
+const statusCommand = new Command()
+  .description("Show link status")
   .type("colorMode", ColorMode)
   .option("-l, --long", "Show in long format")
   .option("--color <mode:colorMode>", "Choose colorize style", {
     default: "auto" as const,
   })
   .action((options) => {
-    action.list({
+    action.status({
       long: options.long ?? false,
       color: options.color,
       stream: Deno.stdout,
@@ -90,7 +90,7 @@ function _logger(options: { verbose?: boolean } = {}): Logger {
 async function main(args: string[]) {
   const root = new Command()
     .name("xake")
-    .command("list", listCommand)
+    .command("status", statusCommand)
     .command("link", linkCommand)
     .command("unlink", unlinkCommand)
     .command("cleanup", cleanupCommand);

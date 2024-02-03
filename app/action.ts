@@ -172,22 +172,22 @@ abstract class Action<Context> {
 }
 
 // =====
-// List
+// Status
 // =====
-export function list(context: ListContext): Promise<void> {
-  return new ListAction(context).run();
+export function status(context: StatusContext): Promise<void> {
+  return new StatusAction(context).run();
 }
 
 export type ColorMode = "auto" | "always" | "never";
 
-export type ListContext = {
+export type StatusContext = {
   long: boolean;
   color: ColorMode;
   stream: LogStream;
   logger?: Logger;
 };
 
-class ListAction extends Action<ListContext> {
+class StatusAction extends Action<StatusContext> {
   private get colored(): boolean {
     switch (this.context.color) {
       case "always":

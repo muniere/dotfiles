@@ -8,8 +8,7 @@
     "deno/": "https://deno.land/std@0.167.0/"
   },
   "tasks": {
-    "build": "deno compile --allow-run --allow-read --allow-write --allow-env --output dist/ app/cli.ts",
-    "list": "deno run --allow-run --allow-read --allow-write --allow-env app/cli.ts list",
+    "status": "deno run --allow-run --allow-read --allow-write --allow-env app/cli.ts status",
     "link": "deno run --allow-run --allow-read --allow-write --allow-env app/cli.ts link",
     "unlink": "deno run --allow-run --allow-read --allow-write --allow-env app/cli.ts unlink",
     "relink": "deno task unlink && deno task link",
