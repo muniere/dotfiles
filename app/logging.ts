@@ -1,5 +1,5 @@
-import * as streams from "deno/streams/mod.ts";
-import * as colors from "deno/fmt/colors.ts";
+import * as io from "stdlib/io/mod.ts";
+import * as colors from "stdlib/fmt/colors.ts";
 
 import { Pipeline, run } from "./lang.ts";
 
@@ -96,9 +96,9 @@ export class Logger {
     const bytes = Logger.encoder.encode(coloredMessage);
 
     if (options.async == true) {
-      streams.writeAll(this.stream, bytes);
+      io.writeAll(this.stream, bytes);
     } else {
-      streams.writeAllSync(this.stream, bytes);
+      io.writeAllSync(this.stream, bytes);
     }
   }
 

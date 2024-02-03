@@ -1,5 +1,5 @@
-import * as path from "deno/path/mod.ts";
-import * as fs from "deno/fs/mod.ts";
+import * as path from "stdlib/path/mod.ts";
+import * as fs from "stdlib/fs/mod.ts";
 
 export type PathLike = Path | string;
 

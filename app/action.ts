@@ -1,6 +1,6 @@
-import { sprintf } from "deno/fmt/printf.ts";
-import * as colors from "deno/fmt/colors.ts";
-import * as streams from "deno/streams/mod.ts";
+import { sprintf } from "stdlib/fmt/printf.ts";
+import * as colors from "stdlib/fmt/colors.ts";
+import * as io from "stdlib/io/mod.ts";
 import * as eta from "eta/mod.ts";
 
 import { Pipeline, Result, run } from "./lang.ts";
@@ -221,10 +221,10 @@ class StatusAction extends Action<StatusContext> {
 
       const bytes = encoder.encode([header, ...lines].join("\n") + "\n");
 
-      await streams.writeAll(this.context.stream, bytes);
+      await io.writeAll(this.context.stream, bytes);
     }
 
-    await streams.writeAll(this.context.stream, encoder.encode("\n"));
+    await io.writeAll(this.context.stream, encoder.encode("\n"));
 
     // tmpl
     {
@@ -243,7 +243,7 @@ class StatusAction extends Action<StatusContext> {
 
       const bytes = encoder.encode([header, ...lines].join("\n") + "\n");
 
-      await streams.writeAll(this.context.stream, bytes);
+      await io.writeAll(this.context.stream, bytes);
     }
   }
 
