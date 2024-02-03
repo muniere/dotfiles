@@ -4,7 +4,10 @@
 # Variables
 # ===
 GHQ_ROOT_DEFAULT="${HOME}/Projects/src"
+GHQ_ROOT_CONFIG="$(git config --get ghq.root)"
+GHQ_ROOT="${GHQ_ROOT:-"${GHQ_ROOT_CONFIG}"}"
 GHQ_ROOT="${GHQ_ROOT:-"${GHQ_ROOT_DEFAULT}"}"
+GHQ_ROOT="${GHQ_ROOT/#\~/$HOME}"
 DOTFILES_DIR="${GHQ_ROOT}/github.com/muniere/dotfiles"
 DOTFILES_URL="https://github.com/muniere/dotfiles.git"
 
