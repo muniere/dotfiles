@@ -1,13 +1,7 @@
-import * as io from "stdlib/io/mod.ts";
 import * as colors from "stdlib/fmt/colors.ts";
 
 import { Pipeline, run } from "./lang.ts";
-
-export type LogStream =
-  & Deno.Writer
-  & Deno.WriterSync
-  & Deno.Closer
-  & { readonly rid: number };
+import { ConsoleFiber, Fiber } from "./io.ts";
 
 export class LogLevel {
   static readonly DEBUG = new LogLevel({ value: 10, label: "DEBUG" });
@@ -61,19 +55,19 @@ export type LogOptions = {
 export class Logger {
   level: LogLevel;
 
-  private readonly stream: LogStream;
+  private readonly fiber: Fiber;
   private readonly palette: LogPalette;
 
   private static readonly encoder: TextEncoder = new TextEncoder();
   private static readonly terminator = "\n";
 
   constructor(nargs: {
-    level: LogLevel;
-    stream?: LogStream;
+    level?: LogLevel;
+    fiber?: Fiber;
     palette?: LogPalette;
   }) {
     this.level = nargs.level ?? LogLevel.DEBUG;
-    this.stream = nargs.stream ?? Deno.stdout;
+    this.fiber = nargs.fiber ?? ConsoleFiber.instance;
     this.palette = nargs.palette ?? LogPalette.default();
   }
 
@@ -96,9 +90,9 @@ export class Logger {
     const bytes = Logger.encoder.encode(coloredMessage);
 
     if (options.async == true) {
-      io.writeAll(this.stream, bytes);
+      this.fiber.writeAll(bytes);
     } else {
-      io.writeAllSync(this.stream, bytes);
+      this.fiber.writeAllSync(bytes);
     }
   }
 

@@ -1,11 +1,10 @@
 import { sprintf } from "stdlib/fmt/printf.ts";
 import * as colors from "stdlib/fmt/colors.ts";
-import * as io from "stdlib/io/mod.ts";
 import * as eta from "eta/mod.ts";
 
 import { Pipeline, Result, run } from "./lang.ts";
 import { ResLayout } from "./layout.ts";
-import { Logger, LogStream } from "./logging.ts";
+import { Logger } from "./logging.ts";
 import { Path, PathFilter } from "./path.ts";
 import {
   ChainBase,
@@ -20,6 +19,7 @@ import {
 import * as shell from "./shell.ts";
 import * as unix from "./unix.ts";
 import * as vault from "./vault.ts";
+import { Fiber } from "./io.ts";
 
 // =====
 // Shared
@@ -183,7 +183,7 @@ export type ColorMode = "auto" | "always" | "never";
 export type StatusContext = {
   long: boolean;
   color: ColorMode;
-  stream: LogStream;
+  fiber: Fiber;
   logger?: Logger;
 };
 
@@ -195,7 +195,7 @@ class StatusAction extends Action<StatusContext> {
       case "never":
         return false;
       case "auto":
-        return Deno.isatty(this.context.stream.rid);
+        return this.context.fiber.isTerminal();
     }
     return false;
   }
@@ -221,10 +221,10 @@ class StatusAction extends Action<StatusContext> {
 
       const bytes = encoder.encode([header, ...lines].join("\n") + "\n");
 
-      await io.writeAll(this.context.stream, bytes);
+      await this.context.fiber.writeAll(bytes);
     }
 
-    await io.writeAll(this.context.stream, encoder.encode("\n"));
+    await this.context.fiber.writeAll(encoder.encode("\n"));
 
     // tmpl
     {
@@ -243,7 +243,7 @@ class StatusAction extends Action<StatusContext> {
 
       const bytes = encoder.encode([header, ...lines].join("\n") + "\n");
 
-      await io.writeAll(this.context.stream, bytes);
+      await this.context.fiber.writeAll(bytes);
     }
   }
 

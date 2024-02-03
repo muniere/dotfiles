@@ -3,6 +3,7 @@ import { Command, EnumType } from "cliffy/command/mod.ts";
 import { Logger, LogLevel } from "./logging.ts";
 
 import * as action from "./action.ts";
+import { ConsoleFiber } from "./io.ts";
 
 // =====
 // Status
@@ -20,7 +21,7 @@ const statusCommand = new Command()
     action.status({
       long: options.long ?? false,
       color: options.color,
-      stream: Deno.stdout,
+      fiber: ConsoleFiber.instance,
       logger: _logger(),
     });
   });
