@@ -1,6 +1,6 @@
 import { sprintf } from "stdlib/fmt/printf.ts";
 import * as colors from "stdlib/fmt/colors.ts";
-import * as eta from "eta/mod.ts";
+import { Eta } from "eta/src/index.ts";
 
 import { Pipeline, Result, run } from "./lang.ts";
 import { ResLayout } from "./layout.ts";
@@ -394,7 +394,7 @@ class LinkAction extends Action<LinkContext> {
 
       const template = await Deno.readTextFile(chain.src.toFileUrl());
       const values = chain.options?.values ?? {};
-      const content = eta.render(template, values) as string;
+      const content = new Eta().renderString(template, values);
 
       const dirStat = await Result.runAsyncOr(() => chain.dst.dirname().stat());
       if (!dirStat) {
