@@ -64,6 +64,11 @@
         <option name="FONT_TYPE" value="2" />
       </value>
     </option>
+    <option name="CONSOLE_BLACK_OUTPUT">
+      <value>
+        <option name="FOREGROUND" value="0" />
+      </value>
+    </option>
     <option name="CONSOLE_BLUE_OUTPUT">
       <value>
         <option name="FOREGROUND" value="5394ec" />
@@ -71,7 +76,7 @@
     </option>
     <option name="CONSOLE_CYAN_OUTPUT">
       <value>
-        <option name="FOREGROUND" value="6969" />
+        <option name="FOREGROUND" value="ffff" />
       </value>
     </option>
     <option name="CONSOLE_ERROR_OUTPUT">
@@ -79,9 +84,19 @@
         <option name="FOREGROUND" value="e6da74" />
       </value>
     </option>
+    <option name="CONSOLE_GRAY_OUTPUT">
+      <value>
+        <option name="FOREGROUND" value="a1a1a1" />
+      </value>
+    </option>
+    <option name="CONSOLE_GREEN_OUTPUT">
+      <value>
+        <option name="FOREGROUND" value="ff3a" />
+      </value>
+    </option>
     <option name="CONSOLE_MAGENTA_OUTPUT">
       <value>
-        <option name="FOREGROUND" value="983498" />
+        <option name="FOREGROUND" value="a1a1a1" />
       </value>
     </option>
     <option name="CONSOLE_NORMAL_OUTPUT">
@@ -92,7 +107,7 @@
     </option>
     <option name="CONSOLE_RED_OUTPUT">
       <value>
-        <option name="FOREGROUND" value="ff6b68" />
+        <option name="FOREGROUND" value="ff0000" />
       </value>
     </option>
     <option name="CONSOLE_SYSTEM_OUTPUT">
@@ -103,6 +118,11 @@
     <option name="CONSOLE_USER_INPUT">
       <value>
         <option name="FOREGROUND" value="74715e" />
+      </value>
+    </option>
+    <option name="CONSOLE_YELLOW_OUTPUT">
+      <value>
+        <option name="FOREGROUND" value="ffc400" />
       </value>
     </option>
     <option name="CONSTRUCTOR_DECLARATION_ATTRIBUTES">
