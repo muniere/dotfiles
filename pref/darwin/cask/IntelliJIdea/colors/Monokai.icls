@@ -508,6 +508,11 @@
         <option name="FOREGROUND" value="f6f6f6" />
       </value>
     </option>
+    <option name="JS.REGEXP">
+      <value>
+        <option name="FOREGROUND" value="ffc400" />
+      </value>
+    </option>
     <option name="KOTLIN_SMART_CAST_RECEIVER">
       <value />
     </option>
