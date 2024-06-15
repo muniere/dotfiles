@@ -117,6 +117,7 @@ setopt hist_save_no_dups
 setopt hist_reduce_blanks
 setopt extended_history
 setopt combining_chars
+setopt share_history
 
 autoload history-search-end
 zle -N history-beginning-search-backward-end history-search-end
