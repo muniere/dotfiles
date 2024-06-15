@@ -386,13 +386,10 @@ export const XcodeCookBook = new CookBook({
 export const IntelliJCookBook = new CookBook({
   name: "IntelliJCookBook",
   prefs: [
-    ...PrefSpec.glob({
-      src: "cask/IntelliJIdea/colors/",
-      dst: "~/Library/ApplicationSupport/JetBrains/IntelliJIdea*/colors/",
-    }),
-    ...PrefSpec.glob({
-      src: "cask/IntelliJIdea/colors/keymaps/",
-      dst: "~/Library/ApplicationSupport/JetBrains/IntelliJIdea*/keymaps/",
+    ...PrefSpec.globp({
+      src: "cask/IntelliJIdea/",
+      dst: "~/Library/ApplicationSupport/JetBrains/IntelliJIdea*",
+      children: ["colors/", "keymaps/"],
     }),
   ],
   platforms: ["darwin"],
@@ -401,13 +398,10 @@ export const IntelliJCookBook = new CookBook({
 export const AndroidStudioCookBook = new CookBook({
   name: "AndroidStudioCookBook",
   prefs: [
-    ...PrefSpec.glob({
-      src: "cask/AndroidStudio/colors/",
-      dst: "~/Library/ApplicationSupport/Google/AndroidStudio*/colors/",
-    }),
-    ...PrefSpec.glob({
-      src: "cask/AndroidStudio/keymaps/",
-      dst: "~/Library/ApplicationSupport/Google/AndroidStudio*/keymaps/",
+    ...PrefSpec.globp({
+      src: "cask/AndroidStudio/",
+      dst: "~/Library/ApplicationSupport/Google/AndroidStudio*",
+      children: ["colors/", "keymaps/"]
     }),
   ],
   platforms: ["darwin"],
