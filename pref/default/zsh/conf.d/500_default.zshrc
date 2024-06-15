@@ -5,7 +5,14 @@ bindkey -e
 # =====
 function zshaddhistory() { 
   emulate -L zsh
-  [[ $1 != ${~HISTORY_IGNORE} ]]
+
+  if [[ ${1%%$'\n'} =~ ${~HISTORY_IGNORE} ]]; then
+    # hit: return 1; DO NOT push to history
+    return 1
+  else 
+    # miss: return 0; DO push to history 
+    return 0
+  fi
 } 
 
 function precmd() {
@@ -99,7 +106,7 @@ RPROMPT='%1(v|%F{magenta}%1v%f|)'
 # =====
 # Zsh : History
 # =====
-HISTORY_IGNORE='(l|ls|la|ll|cd|rm|man|git|tig|gh|which|type)'
+HISTORY_IGNORE='^(l$|l |ls|la|ll|cd|rm|man|git|tig|gh|which|type)'
 HISTSIZE=100000
 SAVEHIST=100000
 setopt hist_ignore_all_dups
