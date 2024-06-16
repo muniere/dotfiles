@@ -35,6 +35,7 @@ brew "watch"
 brew "wget"
 brew "zsh"
 brew "zsh-completions"
+brew "zsh-autosuggestions"
 brew "zsh-syntax-highlighting"
 
 cask "temurin"
