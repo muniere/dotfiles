@@ -25,6 +25,7 @@ fi
 # =====
 if [ -f $HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]; then
   source $HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh 
+  ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 fi
 
 # vim: ft=zsh sw=2 ts=2 sts=2
