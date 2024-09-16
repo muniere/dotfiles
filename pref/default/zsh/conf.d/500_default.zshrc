@@ -110,7 +110,7 @@ RPROMPT='%1(v|%F{magenta}%1v%f|)'
 # =====
 # Zsh : History
 # =====
-HISTORY_IGNORE='^(l$|l |ls|la|ll|cd|rm|man|git|tig|gh|which|type)'
+HISTORY_IGNORE='^(l$|l |ls|la|ll|cd|rm|man|git|tig|gh|which|type)|^[0-9A-Za-z_-]+$'
 HISTSIZE=100000
 SAVEHIST=100000
 setopt hist_ignore_all_dups
