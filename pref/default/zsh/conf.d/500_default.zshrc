@@ -150,6 +150,7 @@ fi
 if (which fzf-file &> /dev/null); then
   zle -N fzf-file
   bindkey '^x^f' fzf-file
+  bindkey '^xf' fzf-file
 fi
 
 # <C-]>: src with ghq
@@ -162,12 +163,14 @@ fi
 if (which fzf-gitlog &> /dev/null); then
   zle -N fzf-gitlog
   bindkey '^x^l' fzf-gitlog
+  bindkey '^xl' fzf-gitlog
 fi
 
 # <C-[>: git branch
 if (which fzf-branch &> /dev/null); then
   zle -N fzf-branch
   bindkey '^x^b' fzf-branch
+  bindkey '^xb' fzf-branch
 fi
 
 # <C-r>: history
