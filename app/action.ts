@@ -96,26 +96,56 @@ abstract class Action<Context> {
     spec: PrefSpec,
     options: { platform?: unix.Platform } = {},
   ): PrefChain[] {
-    const platform = options.platform ?? "default";
-
     if (spec.src.isAbsolute) {
       return this.travarseSync(spec);
     }
-    switch (platform) {
-      case "default":
-        return this.travarseSync(spec, {
-          prefix: ResLayout.pref().join(platform),
-        });
-      case "darwin":
-        return [
-          ...this.travarseSync(spec, {
-            prefix: ResLayout.pref().join(platform),
-          }),
-          ...this.travarseSync(spec, {
-            prefix: ResLayout.pref().join("default"),
-          }),
-        ];
+
+    const platform = options.platform ?? "default";
+    const layout = spec.options?.layout ?? "by-platform";
+
+    switch (layout) {
+      case "by-platform":
+        switch (platform) {
+          case "default":
+            return this.travarseSync(spec, {
+              prefix: ResLayout.pref().join("default"),
+            });
+
+          case "darwin":
+            return [
+              ...this.travarseSync(spec, {
+                prefix: ResLayout.pref().join(platform),
+              }),
+              ...this.travarseSync(spec, {
+                prefix: ResLayout.pref().join("default"),
+              }),
+            ];
+        }
+        break;
+
+      case "by-component":
+        switch (platform) {
+          case "default":
+            return this.travarseSync(spec, {
+              prefix: ResLayout.pref(),
+              suffix: new Path(platform),
+            });
+          case "darwin":
+            return [
+              ...this.travarseSync(spec, {
+                prefix: ResLayout.pref(),
+                suffix: new Path(platform),
+              }),
+              ...this.travarseSync(spec, {
+                prefix: ResLayout.pref(),
+                suffix: new Path("default"),
+              }),
+            ];
+        }
+        break;
     }
+
+    return [];
   }
 
   protected inflateTmplSpecSync(
@@ -130,15 +160,19 @@ abstract class Action<Context> {
 
   protected travarseSync<Chain extends ChainBase>(
     spec: SpecBase<Chain>,
-    options: { prefix?: Path } = {},
+    options: {
+      prefix?: Path;
+      suffix?: Path;
+    } = {},
   ): Chain[] {
     const prefix = options.prefix ?? new Path();
+    const suffix = options.suffix ?? new Path();
 
     const src = run(() => {
       if (spec.src.isAbsolute) {
         return new Path(spec.src.expandHome());
       } else {
-        return new Path(prefix, spec.src.expandHome()).toAbsolute();
+        return new Path(prefix, spec.src.expandHome(), suffix).toAbsolute();
       }
     });
 
