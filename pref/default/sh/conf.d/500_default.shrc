@@ -98,6 +98,22 @@ if (which fzf &> /dev/null); then
 fi
 
 # ===
+# yazi
+# ===
+
+# https://yazi-rs.github.io/docs/quick-start
+if (which yazi &> /dev/null); then
+  function y() {
+    local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
+    yazi "$@" --cwd-file="$tmp"
+    if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+      builtin cd -- "$cwd"
+    fi
+    rm -f -- "$tmp"
+  }
+fi
+
+# ===
 # Git
 # ===
 alias t='tig'
