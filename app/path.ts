@@ -35,6 +35,10 @@ export class Path {
     return Deno.lstatSync(this.value);
   }
 
+  readDir(): AsyncIterable<Deno.DirEntry> {
+    return Deno.readDir(this.value);
+  }
+
   async *walk(
     options: fs.WalkOptions = {},
   ): AsyncIterableIterator<fs.WalkEntry> {
