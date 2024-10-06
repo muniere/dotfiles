@@ -185,6 +185,12 @@ export const GitCookBook = new CookBook({
       src: "git/",
       dst: HomeLayout.config().join("git/"),
     }),
+  ],
+});
+
+export const TigCookBook = new CookBook({
+  name: "TigCookBook",
+  prefs: [
     new PrefSpec({
       src: "tig/",
       dst: HomeLayout.config().join("tig/"),
