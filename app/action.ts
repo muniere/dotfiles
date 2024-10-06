@@ -75,7 +75,6 @@ abstract class Action<Context> {
       vault.TmuxCookBook,
       vault.GradleCookBook,
       vault.PythonCookBook,
-      vault.RubyCookBook,
       vault.NodeCookBook,
       vault.iTermCookBook,
       vault.XcodeCookBook,

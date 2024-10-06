@@ -335,16 +335,6 @@ export const PythonCookBook = new CookBook({
   ],
 });
 
-export const RubyCookBook = new CookBook({
-  name: "RubyCookBook",
-  prefs: [
-    new PrefSpec({
-      src: "bundle/",
-      dst: HomeLayout.config().join("bundle/"),
-    }),
-  ],
-});
-
 export const NodeCookBook = new CookBook({
   name: "NodeCookBook",
   prefs: [
