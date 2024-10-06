@@ -13,6 +13,7 @@ export { DockerCookBook } from "../vault/docker/vault.ts";
 export { GitCookBook } from "../vault/git/vault.ts";
 export { GitHubCookBook } from "../vault/gh/vault.ts";
 export { NeovimCookBook } from "../vault/nvim/vault.ts";
+export { NodeCookBook } from "../vault/node/vault.ts";
 export { PythonCookBook } from "../vault/python/vault.ts";
 export { ShCookBook } from "../vault/sh/vault.ts";
 export { TigCookBook } from "../vault/tig/vault.ts";
@@ -82,28 +83,6 @@ export const GradleCookBook = new CookBook({
       autoclean: false,
     }),
   ],
-});
-
-export const NodeCookBook = new CookBook({
-  name: "NodeCookBook",
-  activate: async (options: shell.CallOptions) => {
-    const dir = HomeLayout.data().join("node");
-    const file = dir.join("history");
-
-    const dstat = await Result.runAsyncOr(() => dir.stat());
-    if (dstat) {
-      // do nothing, and do not output logs
-    } else {
-      await shell.mkdir(dir, options);
-    }
-
-    const fstat = await Result.runAsyncOr(() => file.stat());
-    if (fstat) {
-      options.logger?.info(`File already exists: ${file}`);
-    } else {
-      await shell.touch(file, options);
-    }
-  },
 });
 
 export const iTermCookBook = new CookBook({
