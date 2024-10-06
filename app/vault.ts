@@ -5,6 +5,7 @@ import { CookBook, PrefSpec } from "../lib/schema.ts";
 
 import * as shell from "../lib/shell.ts";
 
+export { AndroidStudioCookBook } from "../vault/AndroidStudio/vault.ts";
 export { AsdfCookBook } from "../vault/asdf/vault.ts";
 export { BashCookBook } from "../vault/bash/vault.ts";
 export { BinCookBook } from "../vault/bin/vault.ts";
@@ -85,17 +86,4 @@ export const GradleCookBook = new CookBook({
       autoclean: false,
     }),
   ],
-});
-
-export const AndroidStudioCookBook = new CookBook({
-  name: "AndroidStudioCookBook",
-  prefs: [
-    ...PrefSpec.glob({
-      src: "cask/AndroidStudio/",
-      dst: "~/Library/ApplicationSupport/Google/AndroidStudio*",
-    }, {
-      autoclean: false,
-    }),
-  ],
-  platforms: ["darwin"],
 });
