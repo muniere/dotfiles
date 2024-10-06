@@ -20,7 +20,7 @@ import {
 import * as shell from "../lib/shell.ts";
 import * as unix from "../lib/unix.ts";
 
-import * as vault from "./vault.ts";
+import * as vault from "../vault/mod.ts";
 
 // =====
 // Shared
