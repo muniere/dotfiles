@@ -5,4 +5,5 @@
     <keyboard-shortcut first-keystroke="ctrl h" />
   </action>
   <action id="TypeHierarchy" />
+  <action id="copilot.disposeInlays" />
 </keymap>

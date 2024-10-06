@@ -21,4 +21,5 @@
   <action id="android.deploy.CodeSwap">
     <keyboard-shortcut first-keystroke="shift ctrl meta e" />
   </action>
+  <action id="copilot.disposeInlays" />
 </keymap>
