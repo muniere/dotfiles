@@ -42,4 +42,8 @@ export class ResLayout {
   static tmpl(): Path {
     return new Path("./tmpl");
   }
+
+  static vault(): Path {
+    return new Path("./vault");
+  }
 }
