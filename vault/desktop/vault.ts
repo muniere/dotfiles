@@ -1,5 +1,5 @@
 import { Result } from "../../lib/lang.ts";
-import { HomeLayout } from "../../lib/layout.ts";
+import { HomeLayout, ResLayout } from "../../lib/layout.ts";
 import { Path } from "../../lib/path.ts";
 import { CookBook } from "../../lib/schema.ts";
 
@@ -7,6 +7,7 @@ import * as shell from "../../lib/shell.ts";
 
 export const HomeCookBook = new CookBook({
   name: "HomeCookBook",
+  container: ResLayout.vault().join("desktop/"),
   activate: async (options: shell.CallOptions) => {
     const dirs = [
       { path: HomeLayout.bin(), mode: 0o755 },
@@ -35,6 +36,7 @@ export const HomeCookBook = new CookBook({
 
 export const LibraryCookBook = new CookBook({
   name: "LibraryCookBook",
+  container: ResLayout.vault().join("desktop/"),
   activate: async (options: shell.CallOptions) => {
     const src = new Path("~/Library/Application Support").expandHome();
     const dst = new Path("~/Library/ApplicationSupport").expandHome();

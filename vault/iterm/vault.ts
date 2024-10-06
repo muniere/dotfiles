@@ -1,4 +1,5 @@
 import { Result } from "../../lib/lang.ts";
+import { ResLayout } from "../../lib/layout.ts";
 import { Path } from "../../lib/path.ts";
 import { PlistBuddy } from "../../lib/plist.ts";
 import { CookBook } from "../../lib/schema.ts";
@@ -7,6 +8,7 @@ import * as shell from "../../lib/shell.ts";
 
 export const iTermCookBook = new CookBook({
   name: "iTermCookBook",
+  container: ResLayout.vault().join("iterm/"),
   activate: async (options: shell.CallOptions) => {
     const path = new Path("~/Library/Preferences/com.googlecode.iterm2.plist").expandHome();
 

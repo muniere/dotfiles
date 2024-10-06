@@ -136,18 +136,18 @@ export type CookBookCallback = (options: shell.CallOptions) => Promise<void>;
 
 export class CookBook {
   private _name: string;
+  private _container: Path;
   private _prefs: PrefSpec[];
   private _tmpls: TmplSpec[];
-  private _container: Path | undefined;
   private _platforms: Platform[] | undefined;
   private _activate: CookBookCallback | undefined;
   private _deactivate: CookBookCallback | undefined;
 
   constructor(nargs: {
     name: string;
+    container: Path;
     prefs?: PrefSpec[];
     tmpls?: TmplSpec[];
-    container?: Path;
     platforms?: Platform[];
     activate?: CookBookCallback;
     deactivate?: CookBookCallback;
@@ -173,7 +173,7 @@ export class CookBook {
     return this._tmpls;
   }
 
-  get container(): Path | undefined {
+  get container(): Path {
     return this._container;
   }
 

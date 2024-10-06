@@ -1,4 +1,4 @@
-import { HomeLayout } from "../../lib/layout.ts";
+import { HomeLayout, ResLayout } from "../../lib/layout.ts";
 import { Path } from "../../lib/path.ts";
 import { CookBook, PrefSpec } from "../../lib/schema.ts";
 
@@ -6,6 +6,7 @@ const DockerResDir = new Path("/Applications/Docker.app/Contents/Resources");
 
 export const DockerCookBook = new CookBook({
   name: "DockerCookBook",
+  container: ResLayout.vault().join("docker/"),
   prefs: [
     new PrefSpec({
       src: DockerResDir.join("etc/docker.bash-completion"),
