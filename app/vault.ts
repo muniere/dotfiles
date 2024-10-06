@@ -11,6 +11,7 @@ export { BashCookBook } from "../vault/bash/vault.ts";
 export { GitCookBook } from "../vault/git/vault.ts";
 export { GitHubCookBook } from "../vault/gh/vault.ts";
 export { NeovimCookBook } from "../vault/nvim/vault.ts";
+export { ShCookBook } from "../vault/sh/vault.ts";
 export { TigCookBook } from "../vault/tig/vault.ts";
 export { TmuxCookBook } from "../vault/tmux/vault.ts";
 export { VimCookBook } from "../vault/vim/vault.ts";
@@ -73,16 +74,6 @@ export const BinCookBook = new CookBook({
     new PrefSpec({
       src: "bin/",
       dst: HomeLayout.bin(),
-    }),
-  ],
-});
-
-export const ShCookBook = new CookBook({
-  name: "ShCookBook",
-  prefs: [
-    new PrefSpec({
-      src: "sh/",
-      dst: HomeLayout.config().join("sh/"),
     }),
   ],
 });
