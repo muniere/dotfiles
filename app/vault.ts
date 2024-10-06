@@ -8,6 +8,7 @@ import * as shell from "../lib/shell.ts";
 
 export { AsdfCookBook } from "../vault/asdf/vault.ts";
 export { BashCookBook } from "../vault/bash/vault.ts";
+export { BinCookBook } from "../vault/bin/vault.ts";
 export { GitCookBook } from "../vault/git/vault.ts";
 export { GitHubCookBook } from "../vault/gh/vault.ts";
 export { NeovimCookBook } from "../vault/nvim/vault.ts";
@@ -67,16 +68,6 @@ export const LibraryCookBook = new CookBook({
     await shell.symlink(src, dst, options);
   },
   platforms: ["darwin"],
-});
-
-export const BinCookBook = new CookBook({
-  name: "BinCookBook",
-  prefs: [
-    new PrefSpec({
-      src: "bin/",
-      dst: HomeLayout.bin(),
-    }),
-  ],
 });
 
 const DockerResDir = new Path("/Applications/Docker.app/Contents/Resources");
