@@ -1,10 +1,11 @@
-import { CookBook, PrefSpec, TmplSpec } from "./schema.ts";
-import { HomeLayout } from "./layout.ts";
-import { Result } from "./lang.ts";
-import { Path } from "./path.ts";
-import { PlistBuddy } from "./plist.ts";
+import { Result } from "../lib/lang.ts";
+import { Path } from "../lib/path.ts";
+import { PlistBuddy } from "../lib/plist.ts";
+import { CookBook, PrefSpec, TmplSpec } from "../lib/schema.ts";
 
-import * as shell from "./shell.ts";
+import * as shell from "../lib/shell.ts";
+
+import { HomeLayout } from "./layout.ts";
 
 export const HomeCookBook = new CookBook({
   name: "HomeCookBook",

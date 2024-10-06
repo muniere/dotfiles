@@ -1,4 +1,4 @@
-import { Path } from "./path.ts";
+import { Path } from "../lib/path.ts";
 
 export class HomeLayout {
   private constructor() {}

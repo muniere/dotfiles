@@ -1,9 +1,9 @@
 import { Command, EnumType } from "cliffy/command/mod.ts";
 
-import { Logger, LogLevel } from "./logging.ts";
+import { Logger, LogLevel } from "../lib/logging.ts";
+import { ConsoleFiber } from "../lib/io.ts";
 
 import * as action from "./action.ts";
-import { ConsoleFiber } from "./io.ts";
 
 // =====
 // Status
