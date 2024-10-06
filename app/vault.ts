@@ -9,6 +9,7 @@ import * as shell from "../lib/shell.ts";
 export { AsdfCookBook } from "../vault/asdf/vault.ts";
 export { BashCookBook } from "../vault/bash/vault.ts";
 export { BinCookBook } from "../vault/bin/vault.ts";
+export { DockerCookBook } from "../vault/docker/vault.ts";
 export { GitCookBook } from "../vault/git/vault.ts";
 export { GitHubCookBook } from "../vault/gh/vault.ts";
 export { NeovimCookBook } from "../vault/nvim/vault.ts";
@@ -67,31 +68,6 @@ export const LibraryCookBook = new CookBook({
 
     await shell.symlink(src, dst, options);
   },
-  platforms: ["darwin"],
-});
-
-const DockerResDir = new Path("/Applications/Docker.app/Contents/Resources");
-
-export const DockerCookBook = new CookBook({
-  name: "DockerCookBook",
-  prefs: [
-    new PrefSpec({
-      src: DockerResDir.join("etc/docker.bash-completion"),
-      dst: HomeLayout.data().join("bash/bash_completion.d/docker"),
-    }),
-    new PrefSpec({
-      src: DockerResDir.join("etc/docker-compose.bash-completion"),
-      dst: HomeLayout.data().join("bash/bash_completion.d/docker-compose"),
-    }),
-    new PrefSpec({
-      src: DockerResDir.join("etc/docker.zsh-completion"),
-      dst: HomeLayout.data().join("zsh/site-functions/_docker"),
-    }),
-    new PrefSpec({
-      src: DockerResDir.join("etc/docker-compose.zsh-completion"),
-      dst: HomeLayout.data().join("zsh/site-functions/_docker-compose"),
-    }),
-  ],
   platforms: ["darwin"],
 });
 
