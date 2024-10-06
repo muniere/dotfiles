@@ -39,55 +39,15 @@ export class Path {
     return Deno.readDir(this.value);
   }
 
-  async *walk(
-    options: fs.WalkOptions = {},
-  ): AsyncIterableIterator<fs.WalkEntry> {
+  async *walk(options: fs.WalkOptions = {}): AsyncIterableIterator<fs.WalkEntry> {
     for await (const entry of fs.walk(this.value, options)) {
       yield entry;
-
-      // HACK: here yields symlink manually under directories;
-      ///      `fs.walk()` never yields symlinks under directory when passed `{ followSymlink: false }`,
-      //
-      //       - https://github.com/denoland/deno_std/issues/1359
-      //       - https://github.com/denoland/deno_std/blob/0.163.0/fs/walk.ts#L107
-      //
-      // NOTE: here can't keep order of `Deno.readDir()` by this hacky fallback;
-      //       symlinks are yielded prior to other files or directories
-      if (!options.followSymlinks && entry.isDirectory) {
-        for await (const child of Deno.readDir(entry.path)) {
-          if (child.isSymlink) {
-            yield {
-              path: path.join(entry.path, child.name),
-              ...child,
-            };
-          }
-        }
-      }
     }
   }
 
   *walkSync(options: fs.WalkOptions = {}): IterableIterator<fs.WalkEntry> {
     for (const entry of fs.walkSync(this.value, options)) {
       yield entry;
-
-      // HACK: here yields symlink manually under directories;
-      ///      `fs.walkSync()` never yields symlinks under directory when passed `{ followSymlink: false }`,
-      //
-      //       - https://github.com/denoland/deno_std/issues/1359
-      //       - https://github.com/denoland/deno_std/blob/0.163.0/fs/walk.ts#L170
-      //
-      // NOTE: here can't keep order of `Deno.readDir()` by this hacky fallback;
-      //       symlinks are yielded prior to other files or directories
-      if (!options.followSymlinks && entry.isDirectory) {
-        for (const child of Deno.readDirSync(entry.path)) {
-          if (child.isSymlink) {
-            yield {
-              path: path.join(entry.path, child.name),
-              ...child,
-            };
-          }
-        }
-      }
     }
   }
 
