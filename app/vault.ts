@@ -416,12 +416,10 @@ export const XcodeCookBook = new CookBook({
   name: "XcodeCookBook",
   prefs: [
     new PrefSpec({
-      src: "cask/Xcode/UserData/FontAndColorThemes/",
-      dst: "~/Library/Developer/Xcode/UserData/FontAndColorThemes/",
-    }),
-    new PrefSpec({
-      src: "cask/Xcode/UserData/KeyBindings/",
-      dst: "~/Library/Developer/Xcode/UserData/KeyBindings/",
+      src: "cask/Xcode/UserData/",
+      dst: "~/Library/Developer/Xcode/UserData/",
+    }, {
+      autoclean: false,
     }),
   ],
   platforms: ["darwin"],
@@ -430,10 +428,11 @@ export const XcodeCookBook = new CookBook({
 export const IntelliJCookBook = new CookBook({
   name: "IntelliJCookBook",
   prefs: [
-    ...PrefSpec.globp({
+    ...PrefSpec.glob({
       src: "cask/IntelliJIdea/",
       dst: "~/Library/ApplicationSupport/JetBrains/IntelliJIdea*",
-      children: ["colors/", "keymaps/"],
+    }, {
+      autoclean: false,
     }),
   ],
   platforms: ["darwin"],
@@ -442,10 +441,11 @@ export const IntelliJCookBook = new CookBook({
 export const AndroidStudioCookBook = new CookBook({
   name: "AndroidStudioCookBook",
   prefs: [
-    ...PrefSpec.globp({
+    ...PrefSpec.glob({
       src: "cask/AndroidStudio/",
       dst: "~/Library/ApplicationSupport/Google/AndroidStudio*",
-      children: ["colors/", "keymaps/"],
+    }, {
+      autoclean: false,
     }),
   ],
   platforms: ["darwin"],
