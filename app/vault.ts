@@ -1,7 +1,7 @@
 import { Result } from "../lib/lang.ts";
 import { HomeLayout } from "../lib/layout.ts";
 import { Path } from "../lib/path.ts";
-import { CookBook, PrefSpec } from "../lib/schema.ts";
+import { CookBook } from "../lib/schema.ts";
 
 import * as shell from "../lib/shell.ts";
 
@@ -12,6 +12,7 @@ export { BinCookBook } from "../vault/bin/vault.ts";
 export { DockerCookBook } from "../vault/docker/vault.ts";
 export { GitCookBook } from "../vault/git/vault.ts";
 export { GitHubCookBook } from "../vault/gh/vault.ts";
+export { GradleCookBook } from "../vault/gradle/vault.ts";
 export { iTermCookBook } from "../vault/iterm/vault.ts";
 export { IntelliJIdeaCookBook } from "../vault/IntelliJIdea/vault.ts";
 export { NeovimCookBook } from "../vault/nvim/vault.ts";
@@ -73,17 +74,4 @@ export const LibraryCookBook = new CookBook({
     await shell.symlink(src, dst, options);
   },
   platforms: ["darwin"],
-});
-
-export const GradleCookBook = new CookBook({
-  name: "GradleCookBook",
-  prefs: [
-    new PrefSpec({
-      src: "gradle/gradle.properties",
-      dst: HomeLayout.data().join("gradle/gradle.properties"),
-    }, {
-      kind: "copy",
-      autoclean: false,
-    }),
-  ],
 });
