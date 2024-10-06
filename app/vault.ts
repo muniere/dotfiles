@@ -20,6 +20,7 @@ export { TigCookBook } from "../vault/tig/vault.ts";
 export { TmuxCookBook } from "../vault/tmux/vault.ts";
 export { VimCookBook } from "../vault/vim/vault.ts";
 export { YaziCookBook } from "../vault/yazi/vault.ts";
+export { XcodeCookBook } from "../vault/Xcode/vault.ts";
 export { ZshCookBook } from "../vault/zsh/vault.ts";
 export { ZshSiteFunctionsCookBook } from "../vault/zsh-site-functions/vault.ts";
 
@@ -83,19 +84,6 @@ export const GradleCookBook = new CookBook({
       autoclean: false,
     }),
   ],
-});
-
-export const XcodeCookBook = new CookBook({
-  name: "XcodeCookBook",
-  prefs: [
-    new PrefSpec({
-      src: "cask/Xcode/UserData/",
-      dst: "~/Library/Developer/Xcode/UserData/",
-    }, {
-      autoclean: false,
-    }),
-  ],
-  platforms: ["darwin"],
 });
 
 export const IntelliJCookBook = new CookBook({
