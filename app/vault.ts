@@ -2,11 +2,12 @@ import { Result } from "../lib/lang.ts";
 import { HomeLayout } from "../lib/layout.ts";
 import { Path } from "../lib/path.ts";
 import { PlistBuddy } from "../lib/plist.ts";
-import { CookBook, PrefSpec, TmplSpec } from "../lib/schema.ts";
+import { CookBook, PrefSpec } from "../lib/schema.ts";
 
 import * as shell from "../lib/shell.ts";
 
 export { AsdfCookBook } from "../vault/asdf/vault.ts";
+export { BashCookBook } from "../vault/bash/vault.ts";
 export { GitCookBook } from "../vault/git/vault.ts";
 export { GitHubCookBook } from "../vault/gh/vault.ts";
 export { NeovimCookBook } from "../vault/nvim/vault.ts";
@@ -82,30 +83,6 @@ export const ShCookBook = new CookBook({
     new PrefSpec({
       src: "sh/",
       dst: HomeLayout.config().join("sh/"),
-    }),
-  ],
-});
-
-export const BashCookBook = new CookBook({
-  name: "BashCookBook",
-  prefs: [
-    new PrefSpec({
-      src: "bash/",
-      dst: HomeLayout.config().join("bash/"),
-    }),
-  ],
-  tmpls: [
-    new TmplSpec({
-      src: "bashrc",
-      dst: "~/.bashrc",
-    }, {
-      values: {
-        cache: HomeLayout.cache().transHome(),
-        config: HomeLayout.config().transHome(),
-        data: HomeLayout.data().transHome(),
-        state: HomeLayout.state().transHome(),
-        runtime: HomeLayout.runtime().transHome(),
-      },
     }),
   ],
 });
