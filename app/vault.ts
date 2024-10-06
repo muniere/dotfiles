@@ -10,6 +10,7 @@ export { AsdfCookBook } from "../vault/asdf/vault.ts";
 export { GitCookBook } from "../vault/git/vault.ts";
 export { GitHubCookBook } from "../vault/gh/vault.ts";
 export { TigCookBook } from "../vault/tig/vault.ts";
+export { TmuxCookBook } from "../vault/tmux/vault.ts";
 
 export const HomeCookBook = new CookBook({
   name: "HomeCookBook",
@@ -233,16 +234,6 @@ export const YaziCookBook = new CookBook({
       }
     }
   },
-});
-
-export const TmuxCookBook = new CookBook({
-  name: "TmuxCookBook",
-  prefs: [
-    new PrefSpec({
-      src: "tmux/",
-      dst: HomeLayout.config().join("tmux/"),
-    }),
-  ],
 });
 
 const DockerResDir = new Path("/Applications/Docker.app/Contents/Resources");
