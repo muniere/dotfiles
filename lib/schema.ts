@@ -78,6 +78,19 @@ export class PrefSpec extends SpecBase<PrefChain> {
     );
   }
 
+  static globp(bind: PathBind & { children: string[] }, options?: PrefSpecOptions): PrefSpec[] {
+    const pattern = new Path(bind.dst).expandHome().toString();
+
+    return [...fs.expandGlobSync(pattern)].flatMap(
+      (entry) =>
+        bind.children.map((path) =>
+          new PrefSpec({
+            src: new Path(bind.src, path),
+            dst: new Path(entry.path, path).expandHome(),
+          }, options)
+        ),
+    );
+  }
   override chain(bind: PathBind): PrefChain {
     return new PrefChain(bind, this.options);
   }
