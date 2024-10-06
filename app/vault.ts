@@ -6,6 +6,8 @@ import { CookBook, PrefSpec, TmplSpec } from "../lib/schema.ts";
 
 import * as shell from "../lib/shell.ts";
 
+export { GitCookBook } from "../vault/git/vault.ts";
+
 export const HomeCookBook = new CookBook({
   name: "HomeCookBook",
   activate: async (options: shell.CallOptions) => {
@@ -181,16 +183,6 @@ export const NeovimCookBook = new CookBook({
 
     await shell.curl(url, { ...options, output: path });
   },
-});
-
-export const GitCookBook = new CookBook({
-  name: "GitCookBook",
-  prefs: [
-    new PrefSpec({
-      src: "git/",
-      dst: HomeLayout.config().join("git/"),
-    }),
-  ],
 });
 
 export const TigCookBook = new CookBook({
