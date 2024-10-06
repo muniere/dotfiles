@@ -12,6 +12,7 @@ export { GitHubCookBook } from "../vault/gh/vault.ts";
 export { NeovimCookBook } from "../vault/nvim/vault.ts";
 export { TigCookBook } from "../vault/tig/vault.ts";
 export { TmuxCookBook } from "../vault/tmux/vault.ts";
+export { VimCookBook } from "../vault/vim/vault.ts";
 
 export const HomeCookBook = new CookBook({
   name: "HomeCookBook",
@@ -138,34 +139,6 @@ export const ZshSiteFunctionsCookBook = new CookBook({
       dst: HomeLayout.data().join("zsh/site-functions/"),
     }),
   ],
-});
-
-export const VimCookBook = new CookBook({
-  name: "VimCookBook",
-  prefs: [
-    new PrefSpec({
-      src: "vim/",
-      dst: HomeLayout.config().join("vim/"),
-    }),
-  ],
-  tmpls: [
-    new TmplSpec({
-      src: "vimrc",
-      dst: "~/.vimrc",
-    }),
-  ],
-  activate: async (options: shell.CallOptions) => {
-    const url = "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim";
-    const path = HomeLayout.config().join("vim/autoload/plug.vim");
-
-    const stat = await Result.runAsyncOr(() => path.stat());
-    if (stat) {
-      options.logger?.info(`File already exists: ${path}`);
-      return;
-    }
-
-    await shell.curl(url, { ...options, output: path });
-  },
 });
 
 export const YaziCookBook = new CookBook({
