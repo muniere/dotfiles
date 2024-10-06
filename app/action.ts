@@ -91,7 +91,7 @@ abstract class Action<Context> {
       return this.travarseSync(spec);
     }
 
-    const container = options.container ?? ResLayout.pref();
+    const container = options.container ?? ResLayout.vault();
     const platform = options.platform ?? "default";
 
     switch (platform) {

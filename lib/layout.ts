@@ -31,10 +31,6 @@ export class HomeLayout {
 export class ResLayout {
   private constructor() {}
 
-  static pref(): Path {
-    return new Path("./pref");
-  }
-
   static snip(): Path {
     return new Path("./snip");
   }
