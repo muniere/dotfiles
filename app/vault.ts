@@ -11,6 +11,7 @@ export { BashCookBook } from "../vault/bash/vault.ts";
 export { GitCookBook } from "../vault/git/vault.ts";
 export { GitHubCookBook } from "../vault/gh/vault.ts";
 export { NeovimCookBook } from "../vault/nvim/vault.ts";
+export { PythonCookBook } from "../vault/python/vault.ts";
 export { ShCookBook } from "../vault/sh/vault.ts";
 export { TigCookBook } from "../vault/tig/vault.ts";
 export { TmuxCookBook } from "../vault/tmux/vault.ts";
@@ -112,16 +113,6 @@ export const GradleCookBook = new CookBook({
     }, {
       kind: "copy",
       autoclean: false,
-    }),
-  ],
-});
-
-export const PythonCookBook = new CookBook({
-  name: "PythonCookBook",
-  prefs: [
-    new PrefSpec({
-      src: "python/",
-      dst: HomeLayout.config().join("python/"),
     }),
   ],
 });
