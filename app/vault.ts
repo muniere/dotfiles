@@ -13,6 +13,7 @@ export { NeovimCookBook } from "../vault/nvim/vault.ts";
 export { TigCookBook } from "../vault/tig/vault.ts";
 export { TmuxCookBook } from "../vault/tmux/vault.ts";
 export { VimCookBook } from "../vault/vim/vault.ts";
+export { YaziCookBook } from "../vault/yazi/vault.ts";
 
 export const HomeCookBook = new CookBook({
   name: "HomeCookBook",
@@ -139,53 +140,6 @@ export const ZshSiteFunctionsCookBook = new CookBook({
       dst: HomeLayout.data().join("zsh/site-functions/"),
     }),
   ],
-});
-
-export const YaziCookBook = new CookBook({
-  name: "YaziCookBook",
-  prefs: [
-    new PrefSpec({
-      src: "yazi/",
-      dst: HomeLayout.config().join("yazi/"),
-    }),
-  ],
-  activate: async (options: shell.CallOptions) => {
-    const dir = HomeLayout.config().join("yazi/plugins");
-
-    const dstat = await Result.runAsyncOr(() => dir.stat());
-    if (dstat) {
-      // do nothing, and do not output logs
-    } else {
-      await shell.mkdir(dir, options);
-    }
-
-    const packages = [
-      // https://github.com/yazi-rs/plugins/tree/main/full-border.yazi
-      {
-        name: "full-border",
-        src: "yazi-rs/plugins:full-border",
-        dest: "full-border.yazi",
-      },
-    ];
-
-    const which = await shell.capture("which", ["ya"]);
-    const cmd = which.stdout.trim();
-    if (which.status.code !== 0 || !cmd) {
-      options.logger?.warn("yazi not found on PATH yet. skip.");
-      return;
-    }
-
-    const entries = await Array.fromAsync(dir.readDir());
-    const installed = new Set(entries.map((it) => it.name));
-
-    for (const pkg of packages) {
-      if (installed.has(pkg.dest)) {
-        options.logger?.info(`Plugin already installed: ${pkg.name}`);
-      } else {
-        await shell.call(cmd, ["pack", "-a", pkg.src], options);
-      }
-    }
-  },
 });
 
 const DockerResDir = new Path("/Applications/Docker.app/Contents/Resources");
