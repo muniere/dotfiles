@@ -337,12 +337,6 @@ export const PythonCookBook = new CookBook({
 
 export const NodeCookBook = new CookBook({
   name: "NodeCookBook",
-  prefs: [
-    new PrefSpec({
-      src: "npm/",
-      dst: HomeLayout.config().join("npm/"),
-    }),
-  ],
   activate: async (options: shell.CallOptions) => {
     const dir = HomeLayout.data().join("node");
     const file = dir.join("history");
