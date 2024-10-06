@@ -1,11 +1,10 @@
 import { Result } from "../lib/lang.ts";
+import { HomeLayout } from "../lib/layout.ts";
 import { Path } from "../lib/path.ts";
 import { PlistBuddy } from "../lib/plist.ts";
 import { CookBook, PrefSpec, TmplSpec } from "../lib/schema.ts";
 
 import * as shell from "../lib/shell.ts";
-
-import { HomeLayout } from "./layout.ts";
 
 export const HomeCookBook = new CookBook({
   name: "HomeCookBook",

@@ -4,6 +4,7 @@ import { Eta } from "eta/src/index.ts";
 
 import { Fiber } from "../lib/io.ts";
 import { Pipeline, Result, run } from "../lib/lang.ts";
+import { ResLayout } from "../lib/layout.ts";
 import { Logger } from "../lib/logging.ts";
 import { Path, PathFilter } from "../lib/path.ts";
 import {
@@ -18,8 +19,6 @@ import {
 
 import * as shell from "../lib/shell.ts";
 import * as unix from "../lib/unix.ts";
-
-import { ResLayout } from "./layout.ts";
 
 import * as vault from "./vault.ts";
 
