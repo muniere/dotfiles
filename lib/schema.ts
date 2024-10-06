@@ -128,6 +128,7 @@ export class CookBook {
   private _name: string;
   private _prefs: PrefSpec[];
   private _tmpls: TmplSpec[];
+  private _container: Path | undefined;
   private _platforms: Platform[] | undefined;
   private _activate: CookBookCallback | undefined;
   private _deactivate: CookBookCallback | undefined;
@@ -136,6 +137,7 @@ export class CookBook {
     name: string;
     prefs?: PrefSpec[];
     tmpls?: TmplSpec[];
+    container?: Path;
     platforms?: Platform[];
     activate?: CookBookCallback;
     deactivate?: CookBookCallback;
@@ -143,6 +145,7 @@ export class CookBook {
     this._name = nargs.name;
     this._prefs = [...(nargs.prefs ?? [])];
     this._tmpls = [...(nargs.tmpls ?? [])];
+    this._container = nargs.container;
     this._platforms = nargs.platforms;
     this._activate = nargs.activate;
     this._deactivate = nargs.deactivate;
@@ -158,6 +161,10 @@ export class CookBook {
 
   get tmpls(): TmplSpec[] {
     return this._tmpls;
+  }
+
+  get container(): Path | undefined {
+    return this._container;
   }
 
   supports(platform: Platform): boolean {

@@ -41,23 +41,11 @@ abstract class Action<Context> {
     "**/.gitkeep",
   ]);
 
-  protected prefChains(
-    options: { platform?: unix.Platform } = {},
-  ): PrefChain[] {
-    return this.books(options)
-      .flatMap((book) => book.prefs)
-      .flatMap((pref) => this.inflatePrefSpecSync(pref, options));
-  }
-
-  protected tmplChains(
-    options: { platform?: unix.Platform } = {},
-  ): TmplChain[] {
-    return this.books(options)
-      .flatMap((book) => book.tmpls)
-      .flatMap((pref) => this.inflateTmplSpecSync(pref));
-  }
-
-  protected books(options: { platform?: unix.Platform } = {}): CookBook[] {
+  protected books(
+    options: {
+      platform?: unix.Platform;
+    } = {},
+  ): CookBook[] {
     const books = [
       vault.HomeCookBook,
       vault.LibraryCookBook,
@@ -94,12 +82,16 @@ abstract class Action<Context> {
 
   protected inflatePrefSpecSync(
     spec: PrefSpec,
-    options: { platform?: unix.Platform } = {},
+    options: {
+      container?: Path;
+      platform?: unix.Platform;
+    } = {},
   ): PrefChain[] {
     if (spec.src.isAbsolute) {
       return this.travarseSync(spec);
     }
 
+    const container = options.container ?? ResLayout.pref();
     const platform = options.platform ?? "default";
     const layout = spec.options?.layout ?? "by-platform";
 
@@ -108,16 +100,16 @@ abstract class Action<Context> {
         switch (platform) {
           case "default":
             return this.travarseSync(spec, {
-              prefix: ResLayout.pref().join("default"),
+              prefix: container.join("default"),
             });
 
           case "darwin":
             return [
               ...this.travarseSync(spec, {
-                prefix: ResLayout.pref().join(platform),
+                prefix: container.join(platform),
               }),
               ...this.travarseSync(spec, {
-                prefix: ResLayout.pref().join("default"),
+                prefix: container.join("default"),
               }),
             ];
         }
@@ -127,17 +119,17 @@ abstract class Action<Context> {
         switch (platform) {
           case "default":
             return this.travarseSync(spec, {
-              prefix: ResLayout.pref(),
+              prefix: container,
               suffix: new Path(platform),
             });
           case "darwin":
             return [
               ...this.travarseSync(spec, {
-                prefix: ResLayout.pref(),
+                prefix: container,
                 suffix: new Path(platform),
               }),
               ...this.travarseSync(spec, {
-                prefix: ResLayout.pref(),
+                prefix: container,
                 suffix: new Path("default"),
               }),
             ];
@@ -244,7 +236,7 @@ class StatusAction extends Action<StatusContext> {
 
     // pref
     {
-      const chains = this.prefChains({ platform: platform });
+      const chains = this.inflatePrefChainSync({ platform: platform });
 
       const header = Pipeline.perform(
         "[[ Preferences ]]",
@@ -266,7 +258,7 @@ class StatusAction extends Action<StatusContext> {
 
     // tmpl
     {
-      const chains = this.tmplChains({ platform: platform });
+      const chains = this.inflateTmplChainSync({ platform: platform });
 
       const header = Pipeline.perform(
         "[[ Templates ]]",
@@ -283,6 +275,34 @@ class StatusAction extends Action<StatusContext> {
 
       await this.context.fiber.writeAll(bytes);
     }
+  }
+
+  private inflatePrefChainSync(
+    options: {
+      platform?: unix.Platform;
+    } = {},
+  ): PrefChain[] {
+    return this.books(options).flatMap((book) => {
+      return book.prefs.flatMap((pref) => {
+        return this.inflatePrefSpecSync(pref, {
+          container: book.container,
+          platform: options.platform,
+        });
+      });
+    });
+  }
+
+  private inflateTmplChainSync(
+    options: {
+      container?: Path;
+      platform?: unix.Platform;
+    } = {},
+  ): TmplChain[] {
+    return this.books(options).flatMap((book) => {
+      return book.tmpls.flatMap((tmpl) => {
+        return this.inflateTmplSpecSync(tmpl);
+      });
+    });
   }
 
   private format(chain: ChainBase, options: { separator: string }): string {
@@ -363,7 +383,10 @@ class LinkAction extends Action<LinkContext> {
       this.context.logger?.mark(message, { bold: true });
 
       for (const spec of book.prefs) {
-        await this.linkPref(spec);
+        await this.linkPref(spec, {
+          container: book.container,
+          platform: platform,
+        });
       }
       if (this.context.activate) {
         await this.activate(book);
@@ -379,9 +402,14 @@ class LinkAction extends Action<LinkContext> {
     return action.perform(books);
   }
 
-  private async linkPref(spec: PrefSpec): Promise<void> {
-    const platform = await unix.identify();
-    const chains = this.inflatePrefSpecSync(spec, { platform: platform });
+  private async linkPref(
+    spec: PrefSpec,
+    options: {
+      container?: Path;
+      platform?: unix.Platform;
+    } = {},
+  ): Promise<void> {
+    const chains = this.inflatePrefSpecSync(spec, options);
 
     for (const chain of chains) {
       if (!this.test(chain.src)) {
@@ -499,7 +527,10 @@ class UnlinkAction extends Action<UnlinkContext> {
         await this.deactivate(book);
       }
       for (const spec of book.prefs) {
-        await this.unlinkPref(spec);
+        await this.unlinkPref(spec, {
+          container: book.container,
+          platform: platform,
+        });
       }
     }
   }
@@ -509,9 +540,14 @@ class UnlinkAction extends Action<UnlinkContext> {
     return action.perform(books);
   }
 
-  private async unlinkPref(spec: PrefSpec): Promise<void> {
-    const platform = await unix.identify();
-    const chains = this.inflatePrefSpecSync(spec, { platform: platform });
+  private async unlinkPref(
+    spec: PrefSpec,
+    options: {
+      container?: Path;
+      platform?: unix.Platform;
+    } = {},
+  ): Promise<void> {
+    const chains = this.inflatePrefSpecSync(spec, options);
 
     for (const chain of chains) {
       if (!this.test(chain.src)) {
