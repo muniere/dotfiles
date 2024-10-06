@@ -31,14 +31,6 @@ export class HomeLayout {
 export class ResLayout {
   private constructor() {}
 
-  static snip(): Path {
-    return new Path("./snip");
-  }
-
-  static tmpl(): Path {
-    return new Path("./tmpl");
-  }
-
   static vault(): Path {
     return new Path("./vault");
   }

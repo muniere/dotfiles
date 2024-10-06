@@ -114,12 +114,19 @@ abstract class Action<Context> {
 
   protected inflateTmplSpecSync(
     spec: TmplSpec,
+    options: {
+      container?: Path;
+    } = {},
   ): TmplChain[] {
     if (spec.src.isAbsolute) {
       return this.travarseSync(spec);
-    } else {
-      return this.travarseSync(spec, { prefix: ResLayout.tmpl() });
-    }
+    } 
+
+    const container = options.container ?? new Path();
+
+    return this.travarseSync(spec, { 
+      prefix: container.join("template"), 
+    });
   }
 
   protected travarseSync<Chain extends ChainBase>(
@@ -362,7 +369,9 @@ class LinkAction extends Action<LinkContext> {
         await this.activate(book);
       }
       for (const spec of book.tmpls) {
-        await this.forgeTmpl(spec);
+        await this.forgeTmpl(spec, {
+          container: book.container,
+        });
       }
     }
   }
@@ -418,8 +427,13 @@ class LinkAction extends Action<LinkContext> {
     }
   }
 
-  private async forgeTmpl(spec: TmplSpec): Promise<void> {
-    const chains = this.inflateTmplSpecSync(spec);
+  private async forgeTmpl(
+    spec: TmplSpec,
+    options: {
+      container?: Path;
+    } = {},
+  ): Promise<void> {
+    const chains = this.inflateTmplSpecSync(spec, options);
 
     for (const chain of chains) {
       const dstStat = await Result.runAsyncOr(() => chain.dst.stat());
@@ -491,7 +505,9 @@ class UnlinkAction extends Action<UnlinkContext> {
       this.context.logger?.mark(message, { bold: true });
 
       for (const spec of book.tmpls) {
-        await this.recallTmpl(spec);
+        await this.recallTmpl(spec, {
+          container: book.container,
+        });
       }
       if (this.context.deactivate) {
         await this.deactivate(book);
@@ -543,8 +559,13 @@ class UnlinkAction extends Action<UnlinkContext> {
     }
   }
 
-  private async recallTmpl(spec: TmplSpec): Promise<void> {
-    const chains = this.inflateTmplSpecSync(spec);
+  private async recallTmpl(
+    spec: TmplSpec,
+    options: {
+      container?: Path;
+    } = {},
+  ): Promise<void> {
+    const chains = this.inflateTmplSpecSync(spec, options);
 
     for (const chain of chains) {
       const stat = await Result.runAsyncOr(() => chain.dst.stat());
