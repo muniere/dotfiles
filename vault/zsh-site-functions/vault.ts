@@ -3,13 +3,11 @@ import { CookBook, PrefSpec } from "../../lib/schema.ts";
 
 export const ZshSiteFunctionsCookBook = new CookBook({
   name: "ZshSiteFunctionsCookBook",
+  container: ResLayout.vault().join("zsh-site-functions/"),
   prefs: [
     new PrefSpec({
-      src: "zsh-site-functions/",
+      src: ".",
       dst: HomeLayout.data().join("zsh/site-functions/"),
-    }, {
-      layout: "by-component",
     }),
   ],
-  container: ResLayout.vault(),
 });

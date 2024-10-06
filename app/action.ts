@@ -93,51 +93,23 @@ abstract class Action<Context> {
 
     const container = options.container ?? ResLayout.pref();
     const platform = options.platform ?? "default";
-    const layout = spec.options?.layout ?? "by-platform";
 
-    switch (layout) {
-      case "by-platform":
-        switch (platform) {
-          case "default":
-            return this.travarseSync(spec, {
-              prefix: container.join("default"),
-            });
+    switch (platform) {
+      case "default":
+        return this.travarseSync(spec, {
+          prefix: container.join("default"),
+        });
 
-          case "darwin":
-            return [
-              ...this.travarseSync(spec, {
-                prefix: container.join(platform),
-              }),
-              ...this.travarseSync(spec, {
-                prefix: container.join("default"),
-              }),
-            ];
-        }
-        break;
-
-      case "by-component":
-        switch (platform) {
-          case "default":
-            return this.travarseSync(spec, {
-              prefix: container,
-              suffix: new Path(platform),
-            });
-          case "darwin":
-            return [
-              ...this.travarseSync(spec, {
-                prefix: container,
-                suffix: new Path(platform),
-              }),
-              ...this.travarseSync(spec, {
-                prefix: container,
-                suffix: new Path("default"),
-              }),
-            ];
-        }
-        break;
+      case "darwin":
+        return [
+          ...this.travarseSync(spec, {
+            prefix: container.join(platform),
+          }),
+          ...this.travarseSync(spec, {
+            prefix: container.join("default"),
+          }),
+        ];
     }
-
-    return [];
   }
 
   protected inflateTmplSpecSync(
@@ -154,17 +126,15 @@ abstract class Action<Context> {
     spec: SpecBase<Chain>,
     options: {
       prefix?: Path;
-      suffix?: Path;
     } = {},
   ): Chain[] {
     const prefix = options.prefix ?? new Path();
-    const suffix = options.suffix ?? new Path();
 
     const src = run(() => {
       if (spec.src.isAbsolute) {
         return new Path(spec.src.expandHome());
       } else {
-        return new Path(prefix, spec.src.expandHome(), suffix).toAbsolute();
+        return new Path(prefix, spec.src.expandHome()).toAbsolute();
       }
     });
 

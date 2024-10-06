@@ -1,5 +1,5 @@
 import { Result } from "../../lib/lang.ts";
-import { HomeLayout, ResLayout } from "../../lib/layout.ts";
+import { HomeLayout } from "../../lib/layout.ts";
 import { CookBook } from "../../lib/schema.ts";
 
 import * as shell from "../../lib/shell.ts";
@@ -24,5 +24,4 @@ export const NodeCookBook = new CookBook({
       await shell.touch(file, options);
     }
   },
-  container: ResLayout.vault(),
 });

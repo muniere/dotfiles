@@ -6,12 +6,11 @@ import * as shell from "../../lib/shell.ts";
 
 export const NeovimCookBook = new CookBook({
   name: "NeovimCookBook",
+  container: ResLayout.vault().join("nvim/"),
   prefs: [
     new PrefSpec({
-      src: "nvim/",
+      src: ".",
       dst: HomeLayout.config().join("nvim/"),
-    }, {
-      layout: "by-component",
     }),
   ],
   activate: async (options: shell.CallOptions) => {
@@ -26,5 +25,4 @@ export const NeovimCookBook = new CookBook({
 
     await shell.curl(url, { ...options, output: path });
   },
-  container: ResLayout.vault(),
 });

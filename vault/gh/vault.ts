@@ -3,13 +3,11 @@ import { CookBook, PrefSpec } from "../../lib/schema.ts";
 
 export const GitHubCookBook = new CookBook({
   name: "GitHubCookBook",
+  container: ResLayout.vault().join("gh/"),
   prefs: [
     new PrefSpec({
-      src: "gh/",
+      src: ".",
       dst: HomeLayout.data().join("gh/"),
-    }, {
-      layout: "by-component",
     }),
   ],
-  container: ResLayout.vault(),
 });

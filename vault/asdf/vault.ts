@@ -3,13 +3,11 @@ import { CookBook, PrefSpec } from "../../lib/schema.ts";
 
 export const AsdfCookBook = new CookBook({
   name: "AsdfCookBook",
+  container: ResLayout.vault().join("asdf/"),
   prefs: [
     new PrefSpec({
-      src: "asdf/",
+      src: ".",
       dst: HomeLayout.config().join("asdf/"),
-    }, {
-      layout: "by-component",
     }),
   ],
-  container: ResLayout.vault(),
 });

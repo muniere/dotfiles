@@ -55,10 +55,7 @@ export class PrefChain extends ChainBase {
   }
 }
 
-export type PrefSpecLayout = "by-platform" | "by-component";
-
 export type PrefSpecOptions = PrefLinkOptions & {
-  layout?: PrefSpecLayout;
   autoclean?: boolean;
 };
 

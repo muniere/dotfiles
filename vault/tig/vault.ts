@@ -6,12 +6,11 @@ import * as shell from "../../lib/shell.ts";
 
 export const TigCookBook = new CookBook({
   name: "TigCookBook",
+  container: ResLayout.vault().join("tig/"),
   prefs: [
     new PrefSpec({
-      src: "tig/",
+      src: ".",
       dst: HomeLayout.config().join("tig/"),
-    }, {
-      layout: "by-component",
     }),
   ],
   activate: async (options: shell.CallOptions) => {
@@ -32,5 +31,4 @@ export const TigCookBook = new CookBook({
       await shell.touch(file, options);
     }
   },
-  container: ResLayout.vault(),
 });

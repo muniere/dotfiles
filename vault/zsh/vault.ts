@@ -3,12 +3,11 @@ import { CookBook, PrefSpec, TmplSpec } from "../../lib/schema.ts";
 
 export const ZshCookBook = new CookBook({
   name: "ZshCookBook",
+  container: ResLayout.vault().join("zsh/"),
   prefs: [
     new PrefSpec({
-      src: "zsh/",
+      src: ".",
       dst: HomeLayout.config().join("zsh/"),
-    }, {
-      layout: "by-component",
     }),
   ],
   tmpls: [
@@ -25,5 +24,4 @@ export const ZshCookBook = new CookBook({
       },
     }),
   ],
-  container: ResLayout.vault(),
 });

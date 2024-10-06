@@ -6,12 +6,11 @@ import * as shell from "../../lib/shell.ts";
 
 export const YaziCookBook = new CookBook({
   name: "YaziCookBook",
+  container: ResLayout.vault().join("yazi/"),
   prefs: [
     new PrefSpec({
-      src: "yazi/",
+      src: ".",
       dst: HomeLayout.config().join("yazi/"),
-    }, {
-      layout: "by-component",
     }),
   ],
   activate: async (options: shell.CallOptions) => {
@@ -51,5 +50,4 @@ export const YaziCookBook = new CookBook({
       }
     }
   },
-  container: ResLayout.vault(),
 });

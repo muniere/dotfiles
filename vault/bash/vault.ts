@@ -3,12 +3,11 @@ import { CookBook, PrefSpec, TmplSpec } from "../../lib/schema.ts";
 
 export const BashCookBook = new CookBook({
   name: "BashCookBook",
+  container: ResLayout.vault().join("bash/"),
   prefs: [
     new PrefSpec({
-      src: "bash/",
+      src: ".",
       dst: HomeLayout.config().join("bash/"),
-    }, {
-      layout: "by-component",
     }),
   ],
   tmpls: [
@@ -25,5 +24,4 @@ export const BashCookBook = new CookBook({
       },
     }),
   ],
-  container: ResLayout.vault(),
 });

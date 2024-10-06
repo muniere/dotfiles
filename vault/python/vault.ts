@@ -3,13 +3,11 @@ import { CookBook, PrefSpec } from "../../lib/schema.ts";
 
 export const PythonCookBook = new CookBook({
   name: "PythonCookBook",
+  container: ResLayout.vault().join("python/"),
   prefs: [
     new PrefSpec({
-      src: "python/",
+      src: ".",
       dst: HomeLayout.config().join("python/"),
-    }, {
-      layout: "by-component",
     }),
   ],
-  container: ResLayout.vault(),
 });

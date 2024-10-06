@@ -3,13 +3,11 @@ import { CookBook, PrefSpec } from "../../lib/schema.ts";
 
 export const BinCookBook = new CookBook({
   name: "BinCookBook",
+  container: ResLayout.vault().join("bin/"),
   prefs: [
     new PrefSpec({
-      src: "bin/",
+      src: ".",
       dst: HomeLayout.bin(),
-    }, {
-      layout: "by-component",
     }),
   ],
-  container: ResLayout.vault(),
 });

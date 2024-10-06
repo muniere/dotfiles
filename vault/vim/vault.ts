@@ -6,12 +6,11 @@ import * as shell from "../../lib/shell.ts";
 
 export const VimCookBook = new CookBook({
   name: "VimCookBook",
+  container: ResLayout.vault().join("vim/"),
   prefs: [
     new PrefSpec({
-      src: "vim/",
+      src: ".",
       dst: HomeLayout.config().join("vim/"),
-    }, {
-      layout: "by-component",
     }),
   ],
   tmpls: [
@@ -32,5 +31,4 @@ export const VimCookBook = new CookBook({
 
     await shell.curl(url, { ...options, output: path });
   },
-  container: ResLayout.vault(),
 });
