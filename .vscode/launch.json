@@ -1,0 +1,81 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "status",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "outputCapture": "std",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "run",
+        "--allow-run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-env",
+        "--inspect-brk",
+        "app/cli.ts",
+        "status"
+      ],
+      "attachSimplePort": 9229
+    },
+    {
+      "name": "link",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "outputCapture": "std",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "run",
+        "--allow-run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-env",
+        "--inspect-brk",
+        "app/cli.ts",
+        "link"
+      ],
+      "attachSimplePort": 9229
+    },
+    {
+      "name": "unlink",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "outputCapture": "std",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "run",
+        "--allow-run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-env",
+        "--inspect-brk",
+        "app/cli.ts",
+        "unlink"
+      ],
+      "attachSimplePort": 9229
+    },
+    {
+      "name": "cleanup",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "outputCapture": "std",
+      "runtimeExecutable": "deno",
+      "runtimeArgs": [
+        "run",
+        "--allow-run",
+        "--allow-read",
+        "--allow-write",
+        "--allow-env",
+        "--inspect-brk",
+        "app/cli.ts",
+        "cleanup"
+      ],
+      "attachSimplePort": 9229
+    }
+  ]
+}
