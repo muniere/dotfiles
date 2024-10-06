@@ -68,7 +68,7 @@ abstract class Action<Context> {
       vault.NodeCookBook,
       vault.iTermCookBook,
       vault.XcodeCookBook,
-      vault.IntelliJCookBook,
+      vault.IntelliJIdeaCookBook,
       vault.AndroidStudioCookBook,
     ];
 

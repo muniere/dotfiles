@@ -12,6 +12,7 @@ export { DockerCookBook } from "../vault/docker/vault.ts";
 export { GitCookBook } from "../vault/git/vault.ts";
 export { GitHubCookBook } from "../vault/gh/vault.ts";
 export { iTermCookBook } from "../vault/iterm/vault.ts";
+export { IntelliJIdeaCookBook } from "../vault/IntelliJIdea/vault.ts";
 export { NeovimCookBook } from "../vault/nvim/vault.ts";
 export { NodeCookBook } from "../vault/node/vault.ts";
 export { PythonCookBook } from "../vault/python/vault.ts";
@@ -84,19 +85,6 @@ export const GradleCookBook = new CookBook({
       autoclean: false,
     }),
   ],
-});
-
-export const IntelliJCookBook = new CookBook({
-  name: "IntelliJCookBook",
-  prefs: [
-    ...PrefSpec.glob({
-      src: "cask/IntelliJIdea/",
-      dst: "~/Library/ApplicationSupport/JetBrains/IntelliJIdea*",
-    }, {
-      autoclean: false,
-    }),
-  ],
-  platforms: ["darwin"],
 });
 
 export const AndroidStudioCookBook = new CookBook({
