@@ -65,6 +65,7 @@ abstract class Action<Context> {
       vault.ShCookBook,
       vault.BashCookBook,
       vault.ZshCookBook,
+      vault.ZshSiteFunctionsCookBook,
       vault.VimCookBook,
       vault.NeovimCookBook,
       vault.GitCookBook,

@@ -107,10 +107,6 @@ export const ZshCookBook = new CookBook({
       src: "zsh/",
       dst: HomeLayout.config().join("zsh/"),
     }),
-    new PrefSpec({
-      src: "zsh-site-functions/",
-      dst: HomeLayout.data().join("zsh/site-functions/"),
-    }),
   ],
   tmpls: [
     new TmplSpec({
@@ -124,6 +120,16 @@ export const ZshCookBook = new CookBook({
         state: HomeLayout.state().transHome(),
         runtime: HomeLayout.runtime().transHome(),
       },
+    }),
+  ],
+});
+
+export const ZshSiteFunctionsCookBook = new CookBook({
+  name: "ZshSiteFunctionsCookBook",
+  prefs: [
+    new PrefSpec({
+      src: "zsh-site-functions/",
+      dst: HomeLayout.data().join("zsh/site-functions/"),
     }),
   ],
 });
