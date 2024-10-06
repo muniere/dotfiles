@@ -14,6 +14,7 @@ export { TigCookBook } from "../vault/tig/vault.ts";
 export { TmuxCookBook } from "../vault/tmux/vault.ts";
 export { VimCookBook } from "../vault/vim/vault.ts";
 export { YaziCookBook } from "../vault/yazi/vault.ts";
+export { ZshCookBook } from "../vault/zsh/vault.ts";
 export { ZshSiteFunctionsCookBook } from "../vault/zsh-site-functions/vault.ts";
 
 export const HomeCookBook = new CookBook({
@@ -97,30 +98,6 @@ export const BashCookBook = new CookBook({
     new TmplSpec({
       src: "bashrc",
       dst: "~/.bashrc",
-    }, {
-      values: {
-        cache: HomeLayout.cache().transHome(),
-        config: HomeLayout.config().transHome(),
-        data: HomeLayout.data().transHome(),
-        state: HomeLayout.state().transHome(),
-        runtime: HomeLayout.runtime().transHome(),
-      },
-    }),
-  ],
-});
-
-export const ZshCookBook = new CookBook({
-  name: "ZshCookBook",
-  prefs: [
-    new PrefSpec({
-      src: "zsh/",
-      dst: HomeLayout.config().join("zsh/"),
-    }),
-  ],
-  tmpls: [
-    new TmplSpec({
-      src: "zshenv",
-      dst: "~/.zshenv",
     }, {
       values: {
         cache: HomeLayout.cache().transHome(),
