@@ -3,21 +3,25 @@ import { Command, EnumType } from "@cliffy/command";
 import { Logger, LogLevel } from "@dotfiles/lib/logging.ts";
 import { ConsoleFiber } from "@dotfiles/lib/io.ts";
 
+import { ColorMode } from "./action.ts";
 import * as action from "./action.ts";
 
 // =====
 // Status
 // =====
-const ColorMode = new EnumType(["auto", "always", "never"]);
+type StatusOptionSet = {
+  long: boolean | undefined;
+  color: ColorMode;
+};
 
 const statusCommand = new Command()
   .description("Show link status")
-  .type("colorMode", ColorMode)
+  .type("colorMode", new EnumType(["auto", "always", "never"]))
   .option("-l, --long", "Show in long format")
   .option("--color <mode:colorMode>", "Choose colorize style", {
     default: "auto" as const,
   })
-  .action((options) => {
+  .action((options: StatusOptionSet) => {
     action.status({
       long: options.long ?? false,
       color: options.color,
@@ -29,16 +33,22 @@ const statusCommand = new Command()
 // =====
 // Link
 // =====
+type LinkOptionSet = {
+  cleanup: boolean | undefined;
+  activate: boolean | undefined;
+  dryRun: boolean | undefined;
+  verbose: boolean | undefined;
+};
 const linkCommand = new Command()
   .description("Link files")
   .option("--no-cleanup", "Skip cleanup aciton before link")
   .option("--no-activate", "Skip activation after each link")
   .option("-n, --dry-run", "Do not execute commands actually")
   .option("-v, --verbose", "Show verbose messages")
-  .action((options) => {
+  .action((options: LinkOptionSet) => {
     action.link({
-      cleanup: options.cleanup,
-      activate: options.activate,
+      cleanup: options.cleanup ?? true,
+      activate: options.activate ?? true,
       dryRun: options.dryRun ?? false,
       logger: _logger({ verbose: options.verbose ?? false }),
     });
@@ -47,16 +57,23 @@ const linkCommand = new Command()
 // =====
 // Unlink
 // =====
+type UnlinkOptionSet = {
+  cleanup: boolean | undefined;
+  deactivate: boolean | undefined;
+  dryRun: boolean | undefined;
+  verbose: boolean | undefined;
+};
+
 const unlinkCommand = new Command()
   .description("Unlink files")
   .option("--no-cleanup", "Skip cleanup aciton before link")
   .option("--no-deactivate", "Skip deactivation after each link")
   .option("-n, --dry-run", "Do not execute commands actually")
   .option("-v, --verbose", "Show verbose messages")
-  .action((options) => {
+  .action((options: UnlinkOptionSet) => {
     action.unlink({
-      cleanup: options.cleanup,
-      deactivate: options.deactivate,
+      cleanup: options.cleanup ?? true,
+      deactivate: options.deactivate ?? true,
       dryRun: options.dryRun ?? false,
       logger: _logger({ verbose: options.verbose ?? false }),
     });
@@ -65,11 +82,16 @@ const unlinkCommand = new Command()
 // =====
 // Cleanup
 // =====
+type CleanupOptionSet = {
+  dryRun: boolean | undefined;
+  verbose: boolean | undefined;
+};
+
 const cleanupCommand = new Command()
   .description("Cleanup broken links")
   .option("-n, --dry-run", "Do not execute commands actually")
   .option("-v, --verbose", "Show verbose messages")
-  .action((options) => {
+  .action((options: CleanupOptionSet) => {
     action.cleanup({
       dryRun: options.dryRun ?? false,
       logger: _logger({ verbose: options.verbose ?? false }),
