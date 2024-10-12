@@ -1,4 +1,4 @@
-import { Command, EnumType } from "cliffy/command/mod.ts";
+import { Command, EnumType } from "@cliffy/command";
 
 import { Logger, LogLevel } from "../lib/logging.ts";
 import { ConsoleFiber } from "../lib/io.ts";
