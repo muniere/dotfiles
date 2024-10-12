@@ -1,6 +1,6 @@
 import { sprintf } from "@std/fmt/printf";
 import * as colors from "@std/fmt/colors";
-import { Eta } from "eta/src/index.ts";
+import { Eta } from "@eta-dev/eta";
 
 import { Fiber } from "../lib/io.ts";
 import { Pipeline, Result, run } from "../lib/lang.ts";
