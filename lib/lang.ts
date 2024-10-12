@@ -24,7 +24,7 @@ export abstract class Result<T> {
       const result = fn();
       return new Success(result);
     } catch (error) {
-      return new Failure(error);
+      return new Failure(error as Error);
     }
   }
 
@@ -45,7 +45,7 @@ export abstract class Result<T> {
       const result = await fn();
       return new Success(result);
     } catch (error) {
-      return new Failure(error);
+      return new Failure(error as Error);
     }
   }
 
