@@ -2,11 +2,11 @@ import { sprintf } from "@std/fmt/printf";
 import * as colors from "@std/fmt/colors";
 import { Eta } from "@eta-dev/eta";
 
-import { Fiber } from "../lib/io.ts";
-import { Pipeline, Result, run } from "../lib/lang.ts";
-import { ResLayout } from "../lib/layout.ts";
-import { Logger } from "../lib/logging.ts";
-import { Path, PathFilter } from "../lib/path.ts";
+import { Fiber } from "@dotfiles/lib/io.ts";
+import { Pipeline, Result, run } from "@dotfiles/lib/lang.ts";
+import { ResLayout } from "@dotfiles/lib/layout.ts";
+import { Logger } from "@dotfiles/lib/logging.ts";
+import { Path, PathFilter } from "@dotfiles/lib/path.ts";
 import {
   ChainBase,
   CookBook,
@@ -15,12 +15,10 @@ import {
   SpecBase,
   TmplChain,
   TmplSpec,
-} from "../lib/schema.ts";
-
-import * as shell from "../lib/shell.ts";
-import * as unix from "../lib/unix.ts";
-
-import * as vault from "../vault/mod.ts";
+} from "@dotfiles/lib/schema.ts";
+import * as shell from "@dotfiles/lib/shell.ts";
+import * as unix from "@dotfiles/lib/unix.ts";
+import * as vault from "@dotfiles/vault/mod.ts";
 
 // =====
 // Shared
@@ -120,12 +118,12 @@ abstract class Action<Context> {
   ): TmplChain[] {
     if (spec.src.isAbsolute) {
       return this.travarseSync(spec);
-    } 
+    }
 
     const container = options.container ?? new Path();
 
-    return this.travarseSync(spec, { 
-      prefix: container.join("template"), 
+    return this.travarseSync(spec, {
+      prefix: container.join("template"),
     });
   }
 

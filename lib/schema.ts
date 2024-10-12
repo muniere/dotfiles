@@ -1,9 +1,8 @@
 import * as fs from "@std/fs";
 
-import { Path, PathLike } from "./path.ts";
-import { Platform } from "./unix.ts";
-
-import * as shell from "./shell.ts";
+import { Path, PathLike } from "@dotfiles/lib/path.ts";
+import { Platform } from "@dotfiles/lib/unix.ts";
+import * as shell from "@dotfiles/lib/shell.ts";
 
 // =====
 // Shared

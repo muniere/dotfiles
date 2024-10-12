@@ -1,5 +1,5 @@
-import { ResLayout } from "../../lib/layout.ts";
-import { CookBook, PrefSpec } from "../../lib/schema.ts";
+import { ResLayout } from "@dotfiles/lib/layout.ts";
+import { CookBook, PrefSpec } from "@dotfiles/lib/schema.ts";
 
 export const XcodeCookBook = new CookBook({
   name: "XcodeCookBook",

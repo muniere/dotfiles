@@ -1,7 +1,7 @@
 import { Command, EnumType } from "@cliffy/command";
 
-import { Logger, LogLevel } from "../lib/logging.ts";
-import { ConsoleFiber } from "../lib/io.ts";
+import { Logger, LogLevel } from "@dotfiles/lib/logging.ts";
+import { ConsoleFiber } from "@dotfiles/lib/io.ts";
 
 import * as action from "./action.ts";
 

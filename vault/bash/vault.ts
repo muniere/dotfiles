@@ -1,5 +1,5 @@
-import { HomeLayout, ResLayout } from "../../lib/layout.ts";
-import { CookBook, PrefSpec, TmplSpec } from "../../lib/schema.ts";
+import { HomeLayout, ResLayout } from "@dotfiles/lib/layout.ts";
+import { CookBook, PrefSpec, TmplSpec } from "@dotfiles/lib/schema.ts";
 
 export const BashCookBook = new CookBook({
   name: "BashCookBook",

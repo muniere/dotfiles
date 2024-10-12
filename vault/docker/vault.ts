@@ -1,6 +1,6 @@
-import { HomeLayout, ResLayout } from "../../lib/layout.ts";
-import { Path } from "../../lib/path.ts";
-import { CookBook, PrefSpec } from "../../lib/schema.ts";
+import { HomeLayout, ResLayout } from "@dotfiles/lib/layout.ts";
+import { Path } from "@dotfiles/lib/path.ts";
+import { CookBook, PrefSpec } from "@dotfiles/lib/schema.ts";
 
 const DockerResDir = new Path("/Applications/Docker.app/Contents/Resources");
 

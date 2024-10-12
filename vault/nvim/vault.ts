@@ -1,8 +1,7 @@
-import { Result } from "../../lib/lang.ts";
-import { HomeLayout, ResLayout } from "../../lib/layout.ts";
-import { CookBook, PrefSpec } from "../../lib/schema.ts";
-
-import * as shell from "../../lib/shell.ts";
+import { Result } from "@dotfiles/lib/lang.ts";
+import { HomeLayout, ResLayout } from "@dotfiles/lib/layout.ts";
+import { CookBook, PrefSpec } from "@dotfiles/lib/schema.ts";
+import * as shell from "@dotfiles/lib/shell.ts";
 
 export const NeovimCookBook = new CookBook({
   name: "NeovimCookBook",

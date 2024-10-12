@@ -1,5 +1,5 @@
-import { Logger } from "./logging.ts";
-import { Path } from "./path.ts";
+import { Logger } from "@dotfiles/lib/logging.ts";
+import { Path } from "@dotfiles/lib/path.ts";
 
 const decoder = new TextDecoder();
 

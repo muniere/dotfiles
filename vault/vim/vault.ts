@@ -1,8 +1,7 @@
-import { HomeLayout, ResLayout } from "../../lib/layout.ts";
-import { Result } from "../../lib/lang.ts";
-import { CookBook, PrefSpec, TmplSpec } from "../../lib/schema.ts";
-
-import * as shell from "../../lib/shell.ts";
+import { HomeLayout, ResLayout } from "@dotfiles/lib/layout.ts";
+import { Result } from "@dotfiles/lib/lang.ts";
+import { CookBook, PrefSpec, TmplSpec } from "@dotfiles/lib/schema.ts";
+import * as shell from "@dotfiles/lib/shell.ts";
 
 export const VimCookBook = new CookBook({
   name: "VimCookBook",

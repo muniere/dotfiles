@@ -8,7 +8,9 @@
     "@std/fmt": "jsr:@std/fmt@^1.0.2",
     "@std/fs": "jsr:@std/fs@^1.0.4",
     "@std/io": "jsr:@std/io@^0.225.0",
-    "@std/path": "jsr:@std/path@^1.0.6"
+    "@std/path": "jsr:@std/path@^1.0.6",
+    "@dotfiles/lib/": "./lib/", 
+    "@dotfiles/vault/": "./vault/"
   },
   "tasks": {
     "status": "deno run --allow-run --allow-read --allow-write --allow-env app/cli.ts status",

@@ -1,4 +1,4 @@
-import { Path } from "../lib/path.ts";
+import { Path } from "@dotfiles/lib/path.ts";
 
 export class HomeLayout {
   private constructor() {}

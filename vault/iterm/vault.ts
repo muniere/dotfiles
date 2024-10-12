@@ -1,10 +1,9 @@
-import { Result } from "../../lib/lang.ts";
-import { ResLayout } from "../../lib/layout.ts";
-import { Path } from "../../lib/path.ts";
-import { PlistBuddy } from "../../lib/plist.ts";
-import { CookBook } from "../../lib/schema.ts";
-
-import * as shell from "../../lib/shell.ts";
+import { Result } from "@dotfiles/lib/lang.ts";
+import { ResLayout } from "@dotfiles/lib/layout.ts";
+import { Path } from "@dotfiles/lib/path.ts";
+import { PlistBuddy } from "@dotfiles/lib/plist.ts";
+import { CookBook } from "@dotfiles/lib/schema.ts";
+import * as shell from "@dotfiles/lib/shell.ts";
 
 export const iTermCookBook = new CookBook({
   name: "iTermCookBook",

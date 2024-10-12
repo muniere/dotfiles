@@ -1,5 +1,5 @@
-import { Path, PathLike } from "./path.ts";
-import * as shell from "./shell.ts";
+import { Path, PathLike } from "@dotfiles/lib/path.ts";
+import * as shell from "@dotfiles/lib/shell.ts";
 
 export class PlistBuddy {
   private readonly path: Path;

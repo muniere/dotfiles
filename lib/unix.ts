@@ -1,4 +1,4 @@
-import * as shell from "./shell.ts";
+import * as shell from "@dotfiles/lib/shell.ts";
 
 export type Platform = "darwin" | "default";
 

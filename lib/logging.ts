@@ -1,7 +1,7 @@
 import * as colors from "@std/fmt/colors";
 
-import { Pipeline, run } from "./lang.ts";
-import { ConsoleFiber, Fiber } from "./io.ts";
+import { Pipeline, run } from "@dotfiles/lib/lang.ts";
+import { ConsoleFiber, Fiber } from "@dotfiles/lib/io.ts";
 
 export class LogLevel {
   static readonly DEBUG = new LogLevel({ value: 10, label: "DEBUG" });
