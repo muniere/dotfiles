@@ -1,4 +1,4 @@
-import * as io from "stdlib/io/mod.ts";
+import * as io from "@std/io";
 
 export interface Fiber {
   isTerminal(): boolean;

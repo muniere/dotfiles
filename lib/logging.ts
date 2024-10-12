@@ -1,4 +1,4 @@
-import * as colors from "stdlib/fmt/colors.ts";
+import * as colors from "@std/fmt/colors";
 
 import { Pipeline, run } from "./lang.ts";
 import { ConsoleFiber, Fiber } from "./io.ts";

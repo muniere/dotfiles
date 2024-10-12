@@ -1,4 +1,4 @@
-import * as fs from "stdlib/fs/mod.ts";
+import * as fs from "@std/fs";
 
 import { Path, PathLike } from "./path.ts";
 import { Platform } from "./unix.ts";

@@ -3,9 +3,12 @@
     "lineWidth": 100
   },
   "imports": {
+    "@std/fmt": "jsr:@std/fmt@^1.0.2",
+    "@std/fs": "jsr:@std/fs@^1.0.4",
+    "@std/io": "jsr:@std/io@^0.225.0",
+    "@std/path": "jsr:@std/path@^1.0.6",
     "cliffy/": "https://deno.land/x/cliffy@v0.25.4/",
-    "eta/": "https://deno.land/x/eta@v3.2.0/",
-    "stdlib/": "https://deno.land/std@0.214.0/"
+    "eta/": "https://deno.land/x/eta@v3.2.0/"
   },
   "tasks": {
     "status": "deno run --allow-run --allow-read --allow-write --allow-env app/cli.ts status",

@@ -1,5 +1,5 @@
-import { sprintf } from "stdlib/fmt/printf.ts";
-import * as colors from "stdlib/fmt/colors.ts";
+import { sprintf } from "@std/fmt/printf";
+import * as colors from "@std/fmt/colors";
 import { Eta } from "eta/src/index.ts";
 
 import { Fiber } from "../lib/io.ts";

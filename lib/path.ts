@@ -1,5 +1,5 @@
-import * as path from "stdlib/path/mod.ts";
-import * as fs from "stdlib/fs/mod.ts";
+import * as path from "@std/path";
+import * as fs from "@std/fs";
 
 export type PathLike = Path | string;
 
