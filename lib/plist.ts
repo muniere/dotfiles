@@ -76,6 +76,6 @@ export class PlistBuddy {
     const cmd = "/usr/libexec/PlistBuddy";
     const opts = ["-c", command];
     const args = this.path.toAbsolute().toString();
-    return shell.capture(cmd, [...opts, ...args], options);
+    return shell.capture(cmd, [...opts, args], options);
   }
 }
