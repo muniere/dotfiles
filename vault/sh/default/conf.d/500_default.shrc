@@ -88,9 +88,9 @@ if (which fzf &> /dev/null); then
     fi
   
     local selected
-    selected=$(history 1 | eval $tac | fzf  --query "$LBUFFER" | awk '{$1=""; print $0}' | xargs)
+    selected=$(history 1 | eval $tac | fzf  --query "$LBUFFER" | awk '{$1=""; sub(/^ +/, "", $0); print $0}')
     if [ -n "$selected" ]; then
-      BUFFER="${BUFFER}${selected}"
+      BUFFER="${selected}"
       CURSOR=$#BUFFER
     fi
     zle reset-prompt
