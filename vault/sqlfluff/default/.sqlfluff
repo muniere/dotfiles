@@ -1,0 +1,2 @@
+[sqlfluff]
+output_line_length = 180
