@@ -7,6 +7,7 @@ export { DockerCookBook } from "./docker/vault.ts";
 export { GitCookBook } from "./git/vault.ts";
 export { GitHubCookBook } from "./gh/vault.ts";
 export { GradleCookBook } from "./gradle/vault.ts";
+export { GhosttyCookBook } from "./ghostty/vault.ts";
 export { iTermCookBook } from "./iterm/vault.ts";
 export { IntelliJIdeaCookBook } from "./IntelliJIdea/vault.ts";
 export { NeovimCookBook } from "./nvim/vault.ts";

@@ -1,0 +1,28 @@
+# Shell
+shell-integration-features = no-cursor
+command = /usr/local/bin/zsh
+
+# Rendering
+macos-non-native-fullscreen = true
+
+# Cursor
+cursor-style = block
+cursor-style-blink = false
+
+# Theme
+theme = muniere
+
+# Font
+font-family = Ricty Discord
+font-size = 12
+
+# Layout
+adjust-cell-height = 10%
+
+# Quick Terminal
+quick-terminal-position = "center"
+quick-terminal-animation-duration = 0
+
+# Key Binding
+keybind = "global:ctrl+cmd+t=toggle_quick_terminal"
+
