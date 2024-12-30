@@ -1,6 +1,7 @@
 import { HomeLayout, ResLayout } from "@dotfiles/lib/layout.ts";
 import { Result } from "@dotfiles/lib/lang.ts";
 import { CookBook, PrefSpec, TmplSpec } from "@dotfiles/lib/schema.ts";
+import * as theme from "@dotfiles/lib/theme.ts";
 import * as shell from "@dotfiles/lib/shell.ts";
 
 export const VimCookBook = new CookBook({
@@ -376,19 +377,31 @@ export const VimCookBook = new CookBook({
     ];
 
     const lines = [`let g:colors_name="muniere"`, ""];
+    const palette = theme.Palette;
 
     for (const highlight of highlights) {
       const chunks = ["highlight", highlight.name];
 
       if (highlight.foreground !== undefined) {
         chunks.push(`ctermfg=${highlight.foreground}`);
+
+        const color = palette[highlight.foreground];
+        if (color !== undefined) {
+          chunks.push(`guifg=${color}`);
+        }
       }
       if (highlight.background !== undefined) {
         chunks.push(`ctermbg=${highlight.background}`);
+
+        const color = palette[highlight.background];
+        if (color !== undefined) {
+          chunks.push(`guibg=${color}`);
+        }
       }
       if (highlight.options) {
         chunks.push(`term=${highlight.options.join(",")}`);
         chunks.push(`cterm=${highlight.options.join(",")}`);
+        chunks.push(`gui=${highlight.options.join(",")}`);
       }
 
       lines.push(chunks.join(" "));
