@@ -1,0 +1,42 @@
+# See https://www.ditig.com/publications/256-colors-cheat-sheet
+#
+#  0: Black
+#  1: Maroon
+#  2: Green
+#  3: Olive
+#  4: Navy
+#  5: Purple
+#  6: Teal
+#  7: Silver
+#  8: Grey
+#  9: Red
+# 10: Lime
+# 11: Yellow
+# 12: Blue
+# 13: Fuchsia
+# 14: Aqua
+# 15: White
+
+palette = 0=<%= it[0] %>
+palette = 1=<%= it[1] %>
+palette = 2=<%= it[2] %>
+palette = 3=<%= it[3] %>
+palette = 4=<%= it[4] %>
+palette = 5=<%= it[5] %>
+palette = 6=<%= it[6] %>
+palette = 7=<%= it[7] %>
+palette = 8=<%= it[8] %>
+palette = 9=<%= it[9] %>
+palette = 10=<%= it[10] %>
+palette = 11=<%= it[11] %>
+palette = 12=<%= it[12] %>
+palette = 13=<%= it[13] %>
+palette = 14=<%= it[14] %>
+palette = 15=<%= it[15] %>
+
+background = 0c0c0c
+foreground = d9d9d9
+cursor-color = ffffff
+
+bold-is-bright = true
+
