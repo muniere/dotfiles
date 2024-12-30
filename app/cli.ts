@@ -31,10 +31,30 @@ const statusCommand = new Command()
   });
 
 // =====
+// Setup
+// =====
+type SetupOptionSet = {
+  dryRun: boolean | undefined;
+  verbose: boolean | undefined;
+};
+
+const setupCommand = new Command()
+  .description("Setup files for link")
+  .option("-n, --dry-run", "Do not execute commands actually")
+  .option("-v, --verbose", "Show verbose messages")
+  .action((options: SetupOptionSet) => {
+    action.setup({
+      dryRun: options.dryRun ?? false,
+      logger: _logger({ verbose: options.verbose ?? false }),
+    });
+  });
+
+// =====
 // Link
 // =====
 type LinkOptionSet = {
   cleanup: boolean | undefined;
+  setup: boolean | undefined;
   activate: boolean | undefined;
   dryRun: boolean | undefined;
   verbose: boolean | undefined;
@@ -42,12 +62,14 @@ type LinkOptionSet = {
 const linkCommand = new Command()
   .description("Link files")
   .option("--no-cleanup", "Skip cleanup aciton before link")
+  .option("--no-setup", "Skip setup before link")
   .option("--no-activate", "Skip activation after each link")
   .option("-n, --dry-run", "Do not execute commands actually")
   .option("-v, --verbose", "Show verbose messages")
   .action((options: LinkOptionSet) => {
     action.link({
       cleanup: options.cleanup ?? true,
+      setup: options.setup ?? true,
       activate: options.activate ?? true,
       dryRun: options.dryRun ?? false,
       logger: _logger({ verbose: options.verbose ?? false }),
@@ -112,8 +134,9 @@ function _logger(options: { verbose?: boolean } = {}): Logger {
 // =====
 async function main(args: string[]) {
   const root = new Command()
-    .name("xake")
+    .name("cli")
     .command("status", statusCommand)
+    .command("setup", setupCommand)
     .command("link", linkCommand)
     .command("unlink", unlinkCommand)
     .command("cleanup", cleanupCommand);

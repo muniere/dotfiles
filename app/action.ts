@@ -19,6 +19,7 @@ import {
 import * as shell from "@dotfiles/lib/shell.ts";
 import * as unix from "@dotfiles/lib/unix.ts";
 import * as vault from "@dotfiles/vault/mod.ts";
+import { OptionOptions } from "@cliffy/command";
 
 // =====
 // Shared
@@ -325,6 +326,41 @@ class StatusAction extends Action<StatusContext> {
 }
 
 // =====
+// Setup
+// =====
+export function setup(context: SetupContext): Promise<void> {
+  return new SetupAction(context).run();
+}
+
+export type SetupContext = {
+  dryRun: boolean;
+  logger?: Logger;
+};
+
+class SetupAction extends Action<SetupContext> {
+  private get shellOptions(): shell.CallOptions {
+    return {
+      dryRun: this.context.dryRun,
+      logger: this.context.logger,
+    };
+  }
+
+  override async run(): Promise<void> {
+    const platform = await unix.identify();
+
+    const books = this.books({ platform: platform });
+
+    for (const [i, book] of books.entries()) {
+      const format = "(%02d/%02d) %s Launched";
+      const message = sprintf(format, i + 1, books.length, book.name);
+      this.context.logger?.mark(message, { bold: true });
+
+      await book.setup(this.shellOptions);
+    }
+  }
+}
+
+// =====
 // Link
 // =====
 export function link(context: LinkContext): Promise<void> {
@@ -333,6 +369,7 @@ export function link(context: LinkContext): Promise<void> {
 
 export type LinkContext = {
   cleanup: boolean;
+  setup: boolean;
   activate: boolean;
   dryRun: boolean;
   logger?: Logger;
@@ -359,6 +396,10 @@ class LinkAction extends Action<LinkContext> {
       const format = "(%02d/%02d) %s Launched";
       const message = sprintf(format, i + 1, books.length, book.name);
       this.context.logger?.mark(message, { bold: true });
+
+      if (this.context.setup) {
+        await book.setup(this.shellOptions);
+      }
 
       for (const spec of book.prefs) {
         await this.linkPref(spec, {

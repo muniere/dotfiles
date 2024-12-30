@@ -14,6 +14,7 @@
   },
   "tasks": {
     "status": "deno run --allow-run --allow-read --allow-write --allow-env app/cli.ts status",
+    "setup": "deno run --allow-run --allow-read --allow-write --allow-env app/cli.ts setup",
     "link": "deno run --allow-run --allow-read --allow-write --allow-env app/cli.ts link",
     "unlink": "deno run --allow-run --allow-read --allow-write --allow-env app/cli.ts unlink",
     "relink": "deno task unlink && deno task link",
