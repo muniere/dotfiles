@@ -276,7 +276,9 @@ class StatusAction extends Action<StatusContext> {
   ): TmplChain[] {
     return this.books(options).flatMap((book) => {
       return book.tmpls.flatMap((tmpl) => {
-        return this.inflateTmplSpecSync(tmpl);
+        return this.inflateTmplSpecSync(tmpl, {
+          container: book.container,
+        });
       });
     });
   }
