@@ -1,3 +1,5 @@
+let g:colors_name="muniere"
+
 highlight SpecialKey    ctermfg=4               term=bold
 highlight NonText       ctermfg=12              term=bold
 highlight Directory     ctermfg=4               term=bold

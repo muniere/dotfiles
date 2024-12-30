@@ -28,7 +28,8 @@ if !has('nvim') | set viminfofile=$XDG_CACHE_HOME/vim/viminfo | endif
 " Default charset is utf-8
 set encoding=utf8
 
-" Use 256 true colors
+" Allows only 256 colors
+set notermguicolors
 set t_Co=256
 
 " Enable show other buffers without saving current buffer
