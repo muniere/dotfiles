@@ -208,4 +208,15 @@ if (which git-lift &> /dev/null); then
   }
 fi
 
+# <C-t>: tig
+if (which tig &> /dev/null); then
+  function tig-widget() {
+    </dev/tty tig
+    zle reset-prompt
+  }
+
+  zle -N tig-widget
+  bindkey '^t' tig-widget
+fi
+
 # vim: ft=zsh sw=2 ts=2 sts=2
