@@ -1,12 +1,4 @@
 # =====
-# Zsh : Keys
-# =====
-bindkey -d
-bindkey -e
-bindkey -rp "^["
-bindkey -rp "^X"
-
-# =====
 # Zsh : Hooks
 # =====
 function zshaddhistory() { 
@@ -91,9 +83,6 @@ zstyle ':completion:*:messages' format '%F{yellow}%d%f'$DEFAULT
 zstyle ':completion:*:warnings' format '%F{red}No matches for:%F{yellow}%d'$DEFAULT
 zstyle ':completion:*:descriptions' format '%F{cyan}%B%d%b%f'$DEFAULT
 
-bindkey -rp "^X"
-bindkey -rp "^["
-
 # =====
 # Zsh : Prompt
 # =====
@@ -131,6 +120,21 @@ setopt hist_reduce_blanks
 setopt extended_history
 setopt combining_chars
 setopt share_history
+
+# =====
+# Zsh : Keys
+# =====
+bindkey -d
+bindkey -e
+
+for x in {!..~}; do 
+  bindkey -r "^[${x}"
+  bindkey -r "^[^${x}"
+  bindkey -r "^[[${x}"
+  bindkey -r "^[O${x}"
+  bindkey -r "^X${x}"
+  bindkey -r "^X^${x}"
+done
 
 autoload history-search-end
 zle -N history-beginning-search-backward-end history-search-end
