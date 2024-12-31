@@ -18,13 +18,6 @@ function zshaddhistory() {
 } 
 
 function precmd() {
-  # update terminal title
-  if (echo $TERM | grep -i "xterm" 2>&1 >/dev/null); then
-    title="${PWD/$HOME/~}"
-    echo -ne "\033]0;${title}\007"
-  fi
-
-  # update vcs info
   psvar=()
   LANG=C vcs_info
   psvar[1]="$vcs_info_msg_0_"
