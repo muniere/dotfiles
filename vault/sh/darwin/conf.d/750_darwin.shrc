@@ -10,8 +10,14 @@ export PATH="$HOME/.local/bin:$PATH"
 
 # ls
 alias ls="ls -Gv"
-alias ll="ls -lhF"
-alias l="ls -lAhF"
+
+if (which eza &> /dev/null); then
+  alias ll="eza -lF --icons --time-style=long-iso"
+  alias l="eza -lAF --icons --time-style=long-iso"
+else
+  alias ll="ls -lhF"
+  alias l="ls -lAhF"
+fi
 
 # grep
 alias grep="grep --color=always"
