@@ -33,6 +33,15 @@ export class PlistBuddy {
     }
   }
 
+  async getReal(key: string): Promise<number | null> {
+    const result = await this.capture(`Print "${key}"`);
+    if (result.status.success) {
+      return parseFloat(result.stdout.trim());
+    } else {
+      return null;
+    }
+  }
+
   async setBoolean(
     key: string,
     value: boolean,
@@ -56,6 +65,19 @@ export class PlistBuddy {
       return this.call(`Set "${key}" ${value}`, options);
     } else {
       return this.call(`Add "${key}" string "${value}"`, options);
+    }
+  }
+
+  async setReal(
+    key: string,
+    value: number,
+    options: shell.CallOptions = {},
+  ): Promise<shell.CommandStatus> {
+    const hit = await this.exists(key);
+    if (hit) {
+      return this.call(`Set "${key}" ${value}`, options);
+    } else {
+      return this.call(`Add "${key}" real "${value}"`, options);
     }
   }
 
