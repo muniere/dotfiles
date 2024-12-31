@@ -164,7 +164,12 @@ if (which fzf &> /dev/null); then
   # <C-x><C-f>: find file
   function fzf-file () {
     local selected
-    selected=$(find . -maxdepth 20 | grep -v '/\.' | tail -n +2 | fzf)
+    if (which fd &> /dev/null); then
+      selected=$(fd --max-depth 20 --type f --hidden --exclude .git | fzf)
+    else
+      selected=$(find . -maxdepth 20 -type f -not -path '*/\.git/*' | fzf)
+    fi
+
     if [ -n "$selected" ]; then
       BUFFER="${BUFFER}${selected}"
       CURSOR=$#BUFFER
