@@ -35,7 +35,7 @@ export const iTermCookBook = new CookBook({
 
     {
       const key = "New Bookmarks:0:Non Ascii Font";
-      const value = "HackNerdFontComplete-Regular 12";
+      const value = "HackNFM-Regular 11";
 
       const result = await buddy.getString(key);
       if (result === value) {
