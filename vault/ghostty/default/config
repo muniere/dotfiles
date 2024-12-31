@@ -10,6 +10,11 @@ command = /usr/local/bin/zsh
 macos-non-native-fullscreen = true
 
 # =====
+# Selection
+# =====
+selection-invert-fg-bg = true
+
+# =====
 # Cursor
 # =====
 cursor-style = block
