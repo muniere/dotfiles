@@ -154,35 +154,73 @@ fi
 # fzf : Binding
 # =====
 
-# <C-x><C-f>: find file
-if (which fzf-file &> /dev/null); then
+if (which fzf &> /dev/null); then
+  # <C-x><C-f>: find file
+  function fzf-file () {
+    local selected
+    selected=$(find . -maxdepth 20 | grep -v '/\.' | tail -n +2 | fzf)
+    if [ -n "$selected" ]; then
+      BUFFER="${BUFFER}${selected}"
+      CURSOR=$#BUFFER
+    fi
+    zle reset-prompt
+  }
+
   zle -N fzf-file
   bindkey '^x^f' fzf-file
   bindkey '^xf' fzf-file
-fi
 
-# <C-]>: src with ghq
-if (which fzf-src &> /dev/null); then
+  # <C-]>: src with ghq
+  function fzf-src() {
+    local selected
+    selected=$(ghq list --full-path | sed -e "s|${HOME}|~|" | fzf)
+    if [ -n "$selected" ]; then
+      BUFFER="${BUFFER}${selected}"
+      CURSOR=$#BUFFER
+    fi
+    zle reset-prompt
+  }
+
   zle -N fzf-src
   bindkey '^]' fzf-src
-fi
 
-# <C-@>: git log
-if (which fzf-gitlog &> /dev/null); then
-  zle -N fzf-gitlog
-  bindkey '^x^l' fzf-gitlog
-  bindkey '^xl' fzf-gitlog
-fi
+  # <C-[>: git branch
+  function fzf-branch () {
+    if [[ ! "$BUFFER" =~ "\s*(git|tig)" ]]; then
+      return
+    fi
 
-# <C-[>: git branch
-if (which fzf-branch &> /dev/null); then
+    local selected
+    selected=$(git branch -vv | fzf | awk '$0 = substr($0, 3) { print $1 }')
+    if [ -n "$selected" ]; then
+      BUFFER="${BUFFER}${selected}"
+      CURSOR=$#BUFFER
+    fi
+    zle reset-prompt
+  }
+
   zle -N fzf-branch
   bindkey '^x^b' fzf-branch
   bindkey '^xb' fzf-branch
-fi
 
-# <C-r>: history
-if (which fzf-history &> /dev/null); then
+  # <C-r>: history
+  function fzf-history() {
+    local tac
+    if which tac &> /dev/null; then
+      tac="tac"
+    else
+      tac="tail -r"
+    fi
+  
+    local selected
+    selected=$(history 1 | eval $tac | fzf  --query "$LBUFFER" | awk '{$1=""; sub(/^ +/, "", $0); print $0}')
+    if [ -n "$selected" ]; then
+      BUFFER="${selected}"
+      CURSOR=$#BUFFER
+    fi
+    zle reset-prompt
+  }
+
   zle -N fzf-history
   bindkey '^r' fzf-history
 fi
