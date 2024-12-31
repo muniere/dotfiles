@@ -247,15 +247,16 @@ if (which git-lift &> /dev/null); then
   }
 fi
 
-# <C-t>: tig
+# <C-g>: git commands powered by tig
 if (which tig &> /dev/null); then
-  function tig-widget() {
+  function git-graph() {
     </dev/tty tig
     zle reset-prompt
   }
 
-  zle -N tig-widget
-  bindkey '^t' tig-widget
+  zle -N git-graph
+  bindkey '^g' git-graph
+  bindkey '^t' git-graph
 fi
 
 # vim: ft=zsh sw=2 ts=2 sts=2
