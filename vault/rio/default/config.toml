@@ -1,0 +1,16 @@
+# https://raphamorim.io/rio/ja/docs/config/
+
+# Global
+theme = "muniere"
+line-height = 1.1
+
+# Editor
+[editor]
+program = "/usr/local/bin/vim"
+
+[fonts]
+size = 12
+family = "Ricty Discord"
+
+[shell]
+program = "/usr/local/bin/zsh"

@@ -19,7 +19,6 @@ import {
 import * as shell from "@dotfiles/lib/shell.ts";
 import * as unix from "@dotfiles/lib/unix.ts";
 import * as vault from "@dotfiles/vault/mod.ts";
-import { OptionOptions } from "@cliffy/command";
 
 // =====
 // Shared
@@ -63,6 +62,7 @@ abstract class Action<Context> {
       vault.YaziCookBook,
       vault.TmuxCookBook,
       vault.GhosttyCookBook,
+      vault.RioCookBook,
       vault.GradleCookBook,
       vault.PythonCookBook,
       vault.NodeCookBook,

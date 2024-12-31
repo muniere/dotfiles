@@ -5,18 +5,18 @@ import { CookBook, PrefSpec } from "@dotfiles/lib/schema.ts";
 import * as theme from "@dotfiles/lib/theme.ts";
 import * as shell from "@dotfiles/lib/shell.ts";
 
-export const GhosttyCookBook = new CookBook({
-  name: "GhosttyCookBook",
-  container: ResLayout.vault().join("ghostty/"),
+export const RioCookBook = new CookBook({
+  name: "RioCookBook",
+  container: ResLayout.vault().join("rio/"),
   prefs: [
     new PrefSpec({
       src: ".",
-      dst: HomeLayout.config().join("ghostty/"),
+      dst: HomeLayout.config().join("rio/"),
     }),
   ],
   setup: async (options: shell.CallOptions) => {
-    const src = ResLayout.vault().join("ghostty", "template", "themes", "muniere");
-    const dst = ResLayout.vault().join("ghostty", "default", "themes", "muniere");
+    const src = ResLayout.vault().join("rio", "template", "themes", "muniere.toml");
+    const dst = ResLayout.vault().join("rio", "default", "themes", "muniere.toml");
     const template = await Deno.readTextFile(src.toFileUrl());
     const content = new Eta({ autoTrim: [false, false] }).renderString(template, theme.Palette);
 

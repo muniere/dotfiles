@@ -13,6 +13,7 @@ export { IntelliJIdeaCookBook } from "./IntelliJIdea/vault.ts";
 export { NeovimCookBook } from "./nvim/vault.ts";
 export { NodeCookBook } from "./node/vault.ts";
 export { PythonCookBook } from "./python/vault.ts";
+export { RioCookBook } from "./rio/vault.ts";
 export { ShCookBook } from "./sh/vault.ts";
 export { TigCookBook } from "./tig/vault.ts";
 export { TmuxCookBook } from "./tmux/vault.ts";
