@@ -4,7 +4,9 @@
 theme = "muniere"
 line-height = 1.1
 
-# Editor
+[window]
+decorations = "enabled"
+
 [editor]
 program = "/usr/local/bin/vim"
 
