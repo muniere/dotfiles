@@ -14,7 +14,7 @@ light-yellow    = "<%= it[11] %>"
 light-blue      = "<%= it[12] %>"
 light-magenta   = "<%= it[13] %>"
 light-cyan      = "<%= it[14] %>"
-light-white     = "<%= it[14] %>"
+light-white     = "<%= it[15] %>"
 
 background      = "#0c0c0c"
 foreground      = "#d9d9d9"

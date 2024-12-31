@@ -14,7 +14,7 @@ light-yellow    = "#fefb7e"
 light-blue      = "#6a71f6"
 light-magenta   = "#f07ef8"
 light-cyan      = "#6af5f6"
-light-white     = "#6af5f6"
+light-white     = "#ffffff"
 
 background      = "#0c0c0c"
 foreground      = "#d9d9d9"
