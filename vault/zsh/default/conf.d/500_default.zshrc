@@ -142,6 +142,7 @@ zle -N history-beginning-search-forward-end history-search-end
 bindkey "^P" history-beginning-search-backward-end
 bindkey "^N" history-beginning-search-forward-end 
 bindkey -r "^S"
+bindkey -r "^G"
 
 # =====
 # Zsh : Time
@@ -251,16 +252,25 @@ if (which git-lift &> /dev/null); then
   }
 fi
 
-# <C-g>: git commands powered by tig
 if (which tig &> /dev/null); then
+  # <C-g><C-g>: git graph powered by tig
   function git-graph() {
     </dev/tty tig
     zle reset-prompt
   }
-
   zle -N git-graph
-  bindkey '^g' git-graph
-  bindkey '^t' git-graph
+  bindkey '^g^g' git-graph
+  bindkey '^gg' git-graph
+
+  # <C-g><C-s>: git status powered by tig
+  function git-status() {
+    </dev/tty TIG_SCRIPT=<(echo :view-status) tig
+    zle reset-prompt
+  }
+
+  zle -N git-status
+  bindkey '^g^s' git-status
+  bindkey '^gs' git-status
 fi
 
 # vim: ft=zsh sw=2 ts=2 sts=2
