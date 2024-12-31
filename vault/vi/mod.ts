@@ -148,7 +148,6 @@ export const Muniere: ColorScheme = new ColorScheme({
     {
       name: "Visual",
       background: 7,
-      options: ["reverse"],
     },
     {
       name: "VisualNOS",

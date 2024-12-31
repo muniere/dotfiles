@@ -15,7 +15,7 @@ highlight StatusLine term=bold,reverse cterm=bold,reverse gui=bold,reverse
 highlight StatusLineNC term=reverse cterm=reverse gui=reverse
 highlight VertSplit term=reverse cterm=reverse gui=reverse
 highlight Title ctermfg=5 guifg=#e933f6 term=bold cterm=bold gui=bold
-highlight Visual ctermbg=7 guibg=#c7c7c7 term=reverse cterm=reverse gui=reverse
+highlight Visual ctermbg=7 guibg=#c7c7c7
 highlight VisualNOS term=bold,underline cterm=bold,underline gui=bold,underline
 highlight WarningMsg ctermfg=1 guifg=#ea3e24 term=standout cterm=standout gui=standout
 highlight WildMenu ctermfg=0 guifg=#000000 ctermbg=11 guibg=#fefb7e term=standout cterm=standout gui=standout
