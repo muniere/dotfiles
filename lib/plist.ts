@@ -12,20 +12,25 @@ export interface PropertyDict {
 
 export class PlistBuddy {
   private readonly path: Path;
+  private readonly root: string;
 
   constructor(nargs: {
     path: PathLike;
+    root?: string;
   }) {
     this.path = new Path(nargs.path);
+    this.root = nargs.root ?? "";
   }
 
   async exists(key: string): Promise<boolean> {
-    const result = await this.capture(`Print "${key}"`);
+    const entry = this.entry(key);
+    const result = await this.capture(["Print", `"${entry}"`].join(" "));
     return result.status.success;
   }
 
   async getBoolean(key: string): Promise<boolean | null> {
-    const result = await this.capture(`Print "${key}"`);
+    const entry = this.entry(key);
+    const result = await this.capture(["Print", `"${entry}"`].join(" "));
     if (result.status.success) {
       return result.stdout.trim() === "true";
     } else {
@@ -34,7 +39,8 @@ export class PlistBuddy {
   }
 
   async getString(key: string): Promise<string | null> {
-    const result = await this.capture(`Print "${key}"`);
+    const entry = this.entry(key);
+    const result = await this.capture(["Print", `"${entry}"`].join(" "));
     if (result.status.success) {
       return result.stdout.trim();
     } else {
@@ -43,7 +49,8 @@ export class PlistBuddy {
   }
 
   async getReal(key: string): Promise<number | null> {
-    const result = await this.capture(`Print "${key}"`);
+    const entry = this.entry(key);
+    const result = await this.capture(["Print", `"${entry}"`].join(" "));
     if (result.status.success) {
       return parseFloat(result.stdout.trim());
     } else {
@@ -52,7 +59,8 @@ export class PlistBuddy {
   }
 
   async getArray(key: string): Promise<PropertyArray | null> {
-    const result = await this.capture(`Print "${key}"`, "xml");
+    const entry = this.entry(key);
+    const result = await this.capture(["Print", `"${entry}"`].join(" "), "xml");
     if (result.status.success) {
       return plist.parse(result.stdout) as PropertyArray;
     } else {
@@ -61,7 +69,8 @@ export class PlistBuddy {
   }
 
   async getDict(key: string): Promise<PropertyDict | null> {
-    const result = await this.capture(`Print "${key}"`, "xml");
+    const entry = this.entry(key);
+    const result = await this.capture(["Print", `"${entry}"`].join(" "), "xml");
     if (result.status.success) {
       return plist.parse(result.stdout) as PropertyDict;
     } else {
@@ -75,10 +84,11 @@ export class PlistBuddy {
     options: shell.CallOptions = {},
   ): Promise<shell.CommandStatus> {
     const hit = await this.exists(key);
+    const entry = this.entry(key);
     if (hit) {
-      return this.call(`Set "${key}" ${value}`, options);
+      return this.call(`Set "${entry}" ${value}`, options);
     } else {
-      return this.call(`Add "${key}" bool ${value}`, options);
+      return this.call(`Add "${entry}" bool ${value}`, options);
     }
   }
 
@@ -88,10 +98,11 @@ export class PlistBuddy {
     options: shell.CallOptions = {},
   ): Promise<shell.CommandStatus> {
     const hit = await this.exists(key);
+    const entry = this.entry(key);
     if (hit) {
-      return this.call(`Set "${key}" ${value}`, options);
+      return this.call(`Set "${entry}" ${value}`, options);
     } else {
-      return this.call(`Add "${key}" string "${value}"`, options);
+      return this.call(`Add "${entry}" string "${value}"`, options);
     }
   }
 
@@ -101,10 +112,11 @@ export class PlistBuddy {
     options: shell.CallOptions = {},
   ): Promise<shell.CommandStatus> {
     const hit = await this.exists(key);
+    const entry = this.entry(key);
     if (hit) {
-      return this.call(`Set "${key}" ${value}`, options);
+      return this.call(`Set "${entry}" ${value}`, options);
     } else {
-      return this.call(`Add "${key}" real "${value}"`, options);
+      return this.call(`Add "${entry}" real "${value}"`, options);
     }
   }
 
@@ -137,5 +149,9 @@ export class PlistBuddy {
 
     const args = this.path.toAbsolute().toString();
     return shell.capture(cmd, [...opts, args], options);
+  }
+
+  private entry(key: string): string {
+    return [this.root, key].filter((x) => x !== "").join(":");
   }
 }
