@@ -1,5 +1,14 @@
 import { Path, PathLike } from "@dotfiles/lib/path.ts";
+import * as plist from "plist";
 import * as shell from "@dotfiles/lib/shell.ts";
+
+export type PropertyValue = boolean | number | string | PropertyArray | PropertyDict;
+
+export interface PropertyArray extends Array<PropertyValue> {}
+
+export interface PropertyDict {
+  [key: string]: PropertyValue;
+}
 
 export class PlistBuddy {
   private readonly path: Path;
@@ -37,6 +46,24 @@ export class PlistBuddy {
     const result = await this.capture(`Print "${key}"`);
     if (result.status.success) {
       return parseFloat(result.stdout.trim());
+    } else {
+      return null;
+    }
+  }
+
+  async getArray(key: string): Promise<PropertyArray | null> {
+    const result = await this.capture(`Print "${key}"`, "xml");
+    if (result.status.success) {
+      return plist.parse(result.stdout) as PropertyArray;
+    } else {
+      return null;
+    }
+  }
+
+  async getDict(key: string): Promise<PropertyDict | null> {
+    const result = await this.capture(`Print "${key}"`, "xml");
+    if (result.status.success) {
+      return plist.parse(result.stdout) as PropertyDict;
     } else {
       return null;
     }
@@ -93,10 +120,21 @@ export class PlistBuddy {
 
   private capture(
     command: string,
+    format: "plist" | "xml" = "plist",
     options: shell.CaptureOptions = {},
   ): Promise<shell.CommandResult> {
     const cmd = "/usr/libexec/PlistBuddy";
     const opts = ["-c", command];
+
+    switch (format) {
+      case "plist":
+        break;
+
+      case "xml":
+        opts.push("-x");
+        break;
+    }
+
     const args = this.path.toAbsolute().toString();
     return shell.capture(cmd, [...opts, args], options);
   }
