@@ -22,15 +22,15 @@ export class PlistBuddy {
     this.root = nargs.root ?? "";
   }
 
-  async exists(key: string): Promise<boolean> {
+  async exists(key: string, options: shell.CaptureOptions = {}): Promise<boolean> {
     const entry = this.entry(key);
-    const result = await this.capture(["Print", `"${entry}"`].join(" "));
+    const result = await this.get(entry, "raw", options);
     return result.status.success;
   }
 
-  async getBoolean(key: string): Promise<boolean | null> {
+  async getBoolean(key: string, options: shell.CaptureOptions = {}): Promise<boolean | null> {
     const entry = this.entry(key);
-    const result = await this.capture(["Print", `"${entry}"`].join(" "));
+    const result = await this.get(entry, "raw", options);
     if (result.status.success) {
       return result.stdout.trim() === "true";
     } else {
@@ -38,9 +38,9 @@ export class PlistBuddy {
     }
   }
 
-  async getString(key: string): Promise<string | null> {
+  async getString(key: string, options: shell.CaptureOptions = {}): Promise<string | null> {
     const entry = this.entry(key);
-    const result = await this.capture(["Print", `"${entry}"`].join(" "));
+    const result = await this.get(entry, "raw", options);
     if (result.status.success) {
       return result.stdout.trim();
     } else {
@@ -48,9 +48,9 @@ export class PlistBuddy {
     }
   }
 
-  async getReal(key: string): Promise<number | null> {
+  async getReal(key: string, options: shell.CaptureOptions = {}): Promise<number | null> {
     const entry = this.entry(key);
-    const result = await this.capture(["Print", `"${entry}"`].join(" "));
+    const result = await this.get(entry, "raw", options);
     if (result.status.success) {
       return parseFloat(result.stdout.trim());
     } else {
@@ -58,9 +58,9 @@ export class PlistBuddy {
     }
   }
 
-  async getArray(key: string): Promise<PropertyArray | null> {
+  async getArray(key: string, options: shell.CaptureOptions = {}): Promise<PropertyArray | null> {
     const entry = this.entry(key);
-    const result = await this.capture(["Print", `"${entry}"`].join(" "), "xml");
+    const result = await this.get(entry, "xml", options);
     if (result.status.success) {
       return plist.parse(result.stdout) as PropertyArray;
     } else {
@@ -68,9 +68,9 @@ export class PlistBuddy {
     }
   }
 
-  async getDict(key: string): Promise<PropertyDict | null> {
+  async getDict(key: string, options: shell.CaptureOptions = {}): Promise<PropertyDict | null> {
     const entry = this.entry(key);
-    const result = await this.capture(["Print", `"${entry}"`].join(" "), "xml");
+    const result = await this.get(entry, "xml", options);
     if (result.status.success) {
       return plist.parse(result.stdout) as PropertyDict;
     } else {
@@ -78,68 +78,43 @@ export class PlistBuddy {
     }
   }
 
-  async setBoolean(
+  setBoolean(
     key: string,
     value: boolean,
     options: shell.CallOptions = {},
   ): Promise<shell.CommandStatus> {
-    const hit = await this.exists(key);
     const entry = this.entry(key);
-    if (hit) {
-      return this.call(`Set "${entry}" ${value}`, options);
-    } else {
-      return this.call(`Add "${entry}" bool ${value}`, options);
-    }
+    return this.set(entry, "bool", value, options);
   }
 
-  async setString(
+  setString(
     key: string,
     value: string,
     options: shell.CallOptions = {},
   ): Promise<shell.CommandStatus> {
-    const hit = await this.exists(key);
     const entry = this.entry(key);
-    if (hit) {
-      return this.call(`Set "${entry}" ${value}`, options);
-    } else {
-      return this.call(`Add "${entry}" string "${value}"`, options);
-    }
+    return this.set(entry, "string", value, options);
   }
 
-  async setReal(
+  setReal(
     key: string,
     value: number,
     options: shell.CallOptions = {},
   ): Promise<shell.CommandStatus> {
-    const hit = await this.exists(key);
     const entry = this.entry(key);
-    if (hit) {
-      return this.call(`Set "${entry}" ${value}`, options);
-    } else {
-      return this.call(`Add "${entry}" real "${value}"`, options);
-    }
+    return this.set(entry, "real", value, options);
   }
 
-  private call(
-    command: string,
-    options: shell.CallOptions = {},
-  ): Promise<shell.CommandStatus> {
-    const cmd = "/usr/libexec/PlistBuddy";
-    const opts = ["-c", command];
-    const args = this.path.toAbsolute().toString();
-    return shell.call(cmd, [...opts, args], options);
-  }
-
-  private capture(
-    command: string,
-    format: "plist" | "xml" = "plist",
+  private get(
+    entry: string,
+    format: "raw" | "xml" = "raw",
     options: shell.CaptureOptions = {},
   ): Promise<shell.CommandResult> {
     const cmd = "/usr/libexec/PlistBuddy";
-    const opts = ["-c", command];
+    const opts = ["-c", `Print "${entry}"`];
 
     switch (format) {
-      case "plist":
+      case "raw":
         break;
 
       case "xml":
@@ -149,6 +124,22 @@ export class PlistBuddy {
 
     const args = this.path.toAbsolute().toString();
     return shell.capture(cmd, [...opts, args], options);
+  }
+
+  private async set(
+    entry: string,
+    type: string,
+    value: PropertyValue,
+    options: shell.CallOptions = {},
+  ): Promise<shell.CommandStatus> {
+    const result = await this.get(entry);
+
+    const cmd = "/usr/libexec/PlistBuddy";
+    const opts = result.status.success
+      ? ["-c", `Set "${entry}" ${value}`]
+      : ["-c", `Add "${entry}" ${type} ${value}`];
+    const args = this.path.toAbsolute().toString();
+    return shell.call(cmd, [...opts, args], options);
   }
 
   private entry(key: string): string {
