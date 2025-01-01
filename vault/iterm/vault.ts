@@ -1,7 +1,7 @@
 import { Result } from "@dotfiles/lib/lang.ts";
 import { ResLayout } from "@dotfiles/lib/layout.ts";
 import { Path } from "@dotfiles/lib/path.ts";
-import { PlistBuddy } from "@dotfiles/lib/plist.ts";
+import { PlistBuddy, PropertyDict } from "@dotfiles/lib/plist.ts";
 import { CookBook } from "@dotfiles/lib/schema.ts";
 import * as shell from "@dotfiles/lib/shell.ts";
 import * as theme from "@dotfiles/lib/theme.ts";
@@ -20,14 +20,20 @@ export const iTermCookBook = new CookBook({
 
     const buddy = new PlistBuddy({
       path: path.expandHome(),
+      root: "New Bookmarks:0",
     });
 
+    const profile = await buddy.getDict("");
+    if (!profile) {
+      options.logger?.info("iTerm 2 profile not found. skip.");
+      return;
+    }
+
     {
-      const key = "New Bookmarks:0:Use Non-ASCII Font";
+      const key = "Use Non-ASCII Font";
       const value = true;
 
-      const result = await buddy.getBoolean(key);
-      if (result === value) {
+      if (profile[key] === value) {
         options.logger?.info(`Nerd Font already enabled: ${value}`);
       } else {
         await buddy.setBoolean(key, value, options);
@@ -35,11 +41,10 @@ export const iTermCookBook = new CookBook({
     }
 
     {
-      const key = "New Bookmarks:0:Non Ascii Font";
+      const key = "Non Ascii Font";
       const value = "HackNFM-Regular 11";
 
-      const result = await buddy.getString(key);
-      if (result === value) {
+      if (profile[key] === value) {
         options.logger?.info(`Nerd Font already configured: ${value}`);
       } else {
         await buddy.setString(key, value, options);
@@ -47,13 +52,15 @@ export const iTermCookBook = new CookBook({
     }
 
     for (let i = 0; i < 16; i++) {
-      const prefixes = [
-        `New Bookmarks:0:Ansi ${i} Color`,
-        `New Bookmarks:0:Ansi ${i} Color (Light)`,
-        `New Bookmarks:0:Ansi ${i} Color (Dark)`,
+      const entries = [
+        `Ansi ${i} Color`,
+        `Ansi ${i} Color (Light)`,
+        `Ansi ${i} Color (Dark)`,
       ];
 
-      for (const prefix of prefixes) {
+      for (const entry of entries) {
+        const components = profile[entry] as PropertyDict;
+
         const [red, green, blue] = (() => {
           const hex = theme.Palette[i];
           const r = parseInt(hex.slice(1, 3), 16) / 255;
@@ -66,51 +73,51 @@ export const iTermCookBook = new CookBook({
 
         // red
         {
-          const key = `${prefix}:Red Component`;
+          const field = "Red Component";
           const value = red;
 
-          const result = await buddy.getReal(key);
-          if (result !== null && Math.abs(result - value) < 1 / 255) {
-            hits.push({ key: "red", value: result });
+          const property = components[field] as number;
+          if (Math.abs(property - value) < 1 / 255) {
+            hits.push({ key: "red", value: property });
           } else {
-            await buddy.setReal(key, value, options);
+            await buddy.setReal(`${entry}:${field}`, value, options);
           }
         }
 
         // green
         {
-          const key = `${prefix}:Green Component`;
+          const field = `Green Component`;
           const value = green;
 
-          const result = await buddy.getReal(key);
-          if (result !== null && Math.abs(result - value) < 1 / 255) {
-            hits.push({ key: "green", value: result });
+          const property = components[field] as number;
+          if (Math.abs(property - value) < 1 / 255) {
+            hits.push({ key: "green", value: property });
           } else {
-            await buddy.setReal(key, value, options);
+            await buddy.setReal(`${entry}:${field}`, value, options);
           }
         }
 
         // blue
         {
-          const key = `${prefix}:Blue Component`;
+          const field = `Blue Component`;
           const value = blue;
 
-          const result = await buddy.getReal(key);
-          if (result !== null && Math.abs(result - value) < 0.004) {
-            hits.push({ key: "blue", value: result });
+          const property = components[field] as number;
+          if (Math.abs(property - value) < 0.004) {
+            hits.push({ key: "blue", value: property });
           } else {
-            await buddy.setReal(key, value, options);
+            await buddy.setReal(`${entry}:${field}`, value, options);
           }
         }
 
         if (hits.length === 3) {
           const value = `[${hits.map((x) => x.value).join(", ")}]`;
-          options.logger?.info(`Ansi Color ${i} already configured: ${value}`);
+          options.logger?.info(`${entry} already configured: ${value}`);
           continue;
         }
 
         for (const hit of hits) {
-          options.logger?.info(`Ansi Color ${i} (${hit.key}) already configured: ${hit.value}`);
+          options.logger?.info(`${entry} (${hit.key}) already configured: ${hit.value}`);
         }
       }
     }
