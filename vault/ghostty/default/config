@@ -8,6 +8,7 @@ command = /usr/local/bin/zsh
 # Rendering
 # =====
 macos-non-native-fullscreen = true
+unfocused-split-fill = #808080
 
 # =====
 # Selection
