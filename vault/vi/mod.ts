@@ -54,8 +54,6 @@ export class ColorScheme {
       }
       if (highlight.options) {
         chunks.push(`term=${highlight.options.join(",")}`);
-        chunks.push(`cterm=${highlight.options.join(",")}`);
-        chunks.push(`gui=${highlight.options.join(",")}`);
       }
 
       lines.push(chunks.join(" "));
