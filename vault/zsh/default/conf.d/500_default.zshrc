@@ -84,6 +84,7 @@ zstyle ':completion:*:descriptions' format '%F{cyan}%B%d%b%f'$DEFAULT
 # =====
 # Zsh : Prompt
 # =====
+export ZLE_RPROMPT_INDENT=0
 
 autoload -Uz vcs_info
 setopt prompt_subst

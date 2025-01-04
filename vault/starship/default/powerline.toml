@@ -2,35 +2,35 @@ format = "${username}${hostname}${directory}${line_break}${character}"
 
 right_format = "$git_branch"
 
-add_newline = true
+add_newline = false
 
 palette = "powerline"
 
 [palettes.powerline]
-color_white = '#fbf1c7'
-color_blue = '#386d70'
-color_green = '#5c8a5e'
-color_orange = '#ab5800'
-color_purple = '#b16286'
+color_white = '#ffffff'
 color_red = '#cc241d'
-color_yellow = '#d79921'
+color_green = '#07694c'
+color_blue = '#1b3ea1'
+color_yellow = '#ffff00'
+color_orange = '#ab5800'
+color_black = '#282828'
 
 [username]
-format = "[ $user ]($style)[](fg:color_orange bg:color_green)"
-style_user = "fg:color_white bg:color_orange"
-style_root = "fg:color_white bg:color_orange bold"
+format = "[ $user ]($style)[](fg:color_green bg:color_blue)"
+style_user = "fg:color_white bg:color_green"
+style_root = "fg:color_white bg:color_green bold"
 disabled = false
 show_always = true
 
 [hostname]
-format = "[ $hostname ]($style)[](fg:color_green bg:color_blue)"
-style = "fg:color_white bg:color_green"
+format = "[ @$hostname ]($style)[](fg:color_blue bg:color_black)"
+style = "fg:color_white bg:color_blue"
 disabled = false
 ssh_only = false
 
 [directory]
-format = "[ $path ]($style)[](fg:color_blue)"
-style = "fg:color_white bg:color_blue"
+format = "[ $path ]($style)[](fg:color_black)"
+style = "fg:color_yellow bg:color_black bold"
 disabled = false
 truncation_length = 0
 truncate_to_repo = false
@@ -40,7 +40,7 @@ success_symbol = "%"
 error_symbol = "[!](fg:color_red bold)"
 
 [git_branch]
-format = "[](fg:color_purple)[ $symbol $branch ]($style)"
-style = "fg:color_white bg:color_purple bold"
+format = "[](fg:color_orange)[ $symbol $branch ]($style)"
+style = "fg:color_white bg:color_orange bold"
 symbol = ""
 disabled = false
