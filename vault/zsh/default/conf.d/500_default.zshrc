@@ -18,9 +18,11 @@ function zshaddhistory() {
 } 
 
 function precmd() {
-  psvar=()
+  # Export VCS info
   LANG=C vcs_info
-  psvar[1]="$vcs_info_msg_0_"
+
+  # Export Python virtualenv info
+  LANG=C venv_info
 }
 
 # =====
@@ -79,15 +81,6 @@ zstyle ':completion:*:descriptions' format '%F{cyan}%B%d%b%f'$DEFAULT
 # =====
 # Zsh : Prompt
 # =====
-function prefix() {
-  # print nothing
-}
-
-function suffix() {
-  if [[ -n "$VIRTUAL_ENV" && -n "$DIRENV_DIR" ]]; then
-    echo " ($(basename $VIRTUAL_ENV))"
-  fi
-}
 
 autoload -Uz vcs_info
 setopt prompt_subst
@@ -97,9 +90,17 @@ zstyle ':vcs_info:*' actionformats '[%b|%a]'
 if [ "$PROMPT_PROGRAM" == "starship" ] && (which starship &>/dev/null); then
   eval "$(starship init zsh)"
 else
-  PROMPT='$(prefix)%(?.%F{cyan}.%F{red})%n%f@%(?.%F{cyan}.%F{red})%m%f$(suffix): %F{yellow}%~%f
-%(!.#.%%) '
-  RPROMPT='%1(v|%F{magenta}%1v%f|)'
+  () {
+    local user='%(?.%F{cyan}.%F{red})%n%f'
+    local host='%(?.%F{cyan}.%F{red})%m%f'
+    local path='%F{yellow}%~%f'
+    local venv='%F{white}${venv_info_msg}%f'
+    local vcs='%F{magenta}${vcs_info_msg_0_}%f'
+    local lf=$'\n'
+
+    PROMPT="${user}@${host}${venv}: ${path}${lf}%(!.#.%%) "
+    RPROMPT="${vcs}"
+  }
 fi
 
 # =====
@@ -274,5 +275,22 @@ if (which tig &> /dev/null); then
   bindkey '^g^s' git-status
   bindkey '^gs' git-status
 fi
+
+# =====
+# Python
+# =====
+
+## venv_info - provide virtual env information
+##
+## This functions inspires `vcs_info` and `VCS_INFO_set`
+function venv_info() {
+  local format=" (%s)"
+
+  typeset -g venv_info_msg=
+
+  if [ -n "$VIRTUAL_ENV" ]; then
+    typeset -g venv_info_msg="$(printf "$format" "$(basename $VIRTUAL_ENV)")"
+  fi
+}
 
 # vim: ft=zsh sw=2 ts=2 sts=2
