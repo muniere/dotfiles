@@ -57,7 +57,9 @@ fi
 # =====
 # Bash : Prompt
 # =====
-if (type __git_ps1 &> /dev/null); then
+if [ "$PROMPT_PROGRAM" == "starship" ] && (which starship &>/dev/null); then
+  eval "$(starship init bash)"
+elif (type __git_ps1 &> /dev/null); then
   export GIT_PS1_SHOWDIRTYSTATE=true
   export PROMPT_COMMAND='status=$?; echo -ne "$(__title)";PS1="$(__color0)[$(__color1 $status)\u$(__color0)@$(__color1 $status)\h$(__color0): $(__color2)\w$(__color0)$(__color3)$(__git_ps1)$(__color0)]\n\$ "'
 else 

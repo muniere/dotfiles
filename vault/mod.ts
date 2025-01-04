@@ -16,6 +16,7 @@ export { NodeCookBook } from "./node/vault.ts";
 export { PythonCookBook } from "./python/vault.ts";
 export { RioCookBook } from "./rio/vault.ts";
 export { ShCookBook } from "./sh/vault.ts";
+export { StarshipCookBook } from "./starship/vault.ts";
 export { TigCookBook } from "./tig/vault.ts";
 export { TmuxCookBook } from "./tmux/vault.ts";
 export { VimCookBook } from "./vim/vault.ts";

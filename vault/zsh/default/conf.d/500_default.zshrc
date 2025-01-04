@@ -94,9 +94,13 @@ setopt prompt_subst
 setopt transient_rprompt
 zstyle ':vcs_info:*' formats '[%b]'
 zstyle ':vcs_info:*' actionformats '[%b|%a]'
-PROMPT='$(prefix)%(?.%F{cyan}.%F{red})%n%f@%(?.%F{cyan}.%F{red})%m%f$(suffix): %F{yellow}%~%f
+if [ "$PROMPT_PROGRAM" == "starship" ] && (which starship &>/dev/null); then
+  eval "$(starship init zsh)"
+else
+  PROMPT='$(prefix)%(?.%F{cyan}.%F{red})%n%f@%(?.%F{cyan}.%F{red})%m%f$(suffix): %F{yellow}%~%f
 %(!.#.%%) '
-RPROMPT='%1(v|%F{magenta}%1v%f|)'
+  RPROMPT='%1(v|%F{magenta}%1v%f|)'
+fi
 
 # =====
 # Zsh : History
