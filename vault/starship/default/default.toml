@@ -1,8 +1,5 @@
-format = """${username}@${hostname}: ${directory} ${status}
-% """
-
+format = "${username}@${hostname}: ${directory} ${status}$line_break$character"
 right_format = "[\\[$git_branch\\]](purple)"
-
 add_newline = false
 
 [username]
@@ -34,3 +31,7 @@ disabled = false
 format = "[\\[$status\\]]($style)"
 style = "bold red"
 disabled = false
+
+[character]
+success_symbol = "%"
+error_symbol = "[!](red bold)"

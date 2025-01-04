@@ -18,6 +18,9 @@ function zshaddhistory() {
 } 
 
 function precmd() {
+  # Skip if using custom prompt provider
+  if [ -n "$PROMPT_PROVIDER" ]; then return; fi
+
   # Export VCS info
   LANG=C vcs_info
 
@@ -87,8 +90,10 @@ setopt prompt_subst
 setopt transient_rprompt
 zstyle ':vcs_info:*' formats '[%b]'
 zstyle ':vcs_info:*' actionformats '[%b|%a]'
-if [ "$PROMPT_PROGRAM" == "starship" ] && (which starship &>/dev/null); then
+
+if [ -f "$STARSHIP_CONFIG" ] && (which starship &>/dev/null); then
   eval "$(starship init zsh)"
+  export PROMPT_PROVIDER="starship"
 else
   () {
     local user='%(?.%F{cyan}.%F{red})%n%f'
@@ -100,6 +105,8 @@ else
 
     PROMPT="${user}@${host}${venv}: ${path}${lf}%(!.#.%%) "
     RPROMPT="${vcs}"
+
+    export PROMPT_PROVIDER=
   }
 fi
 

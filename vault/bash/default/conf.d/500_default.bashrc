@@ -57,13 +57,16 @@ fi
 # =====
 # Bash : Prompt
 # =====
-if [ "$PROMPT_PROGRAM" == "starship" ] && (which starship &>/dev/null); then
+if [ -f "$STARSHIP_CONFIG" ] && (which starship &>/dev/null); then
   eval "$(starship init bash)"
+  export PROMPT_PROVIDER="starship"
 elif (type __git_ps1 &> /dev/null); then
   export GIT_PS1_SHOWDIRTYSTATE=true
   export PROMPT_COMMAND='status=$?; echo -ne "$(__title)";PS1="$(__color0)[$(__color1 $status)\u$(__color0)@$(__color1 $status)\h$(__color0): $(__color2)\w$(__color0)$(__color3)$(__git_ps1)$(__color0)]\n\$ "'
+  export PROMPT_PROVIDER=
 else 
   export PROMPT_COMMAND='status=$?; echo -ne "$(__title)";PS1="$(__color0)[$(__color1 $status)\u$(__color0)@$(__color1 $status)\h$(__color0): $(__color2)\w$(__color0)]\n\$ "'
+  export PROMPT_PROVIDER=
 fi
 
 set show-all-if-ambiguous on
