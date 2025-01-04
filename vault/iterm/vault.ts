@@ -76,64 +76,39 @@ export const iTermCookBook = new CookBook({
 
       for (const entry of entries) {
         const components = profile[entry] as PropertyDict;
+        const preferences = [
+          {
+            field: "Red Component",
+            value: parseInt(theme.Palette[i].slice(1, 3), 16) / 255,
+          },
+          {
+            field: "Green Component",
+            value: parseInt(theme.Palette[i].slice(3, 5), 16) / 255,
+          },
+          {
+            field: "Blue Component",
+            value: parseInt(theme.Palette[i].slice(5, 7), 16) / 255,
+          },
+        ];
 
-        const [red, green, blue] = (() => {
-          const hex = theme.Palette[i];
-          const r = parseInt(hex.slice(1, 3), 16) / 255;
-          const g = parseInt(hex.slice(3, 5), 16) / 255;
-          const b = parseInt(hex.slice(5, 7), 16) / 255;
-          return [r, g, b];
-        })();
-
-        const hits = [];
-
-        // red
-        {
-          const field = "Red Component";
-          const value = red;
-
+        const matches = [];
+        for (const { field, value } of preferences) {
           const property = components[field] as number;
           if (Math.abs(property - value) < 1 / 255) {
-            hits.push({ key: "red", value: property });
+            matches.push({ field: field, value: property });
           } else {
             await buddy.setReal(`${entry}:${field}`, value, options);
           }
         }
 
-        // green
-        {
-          const field = `Green Component`;
-          const value = green;
-
-          const property = components[field] as number;
-          if (Math.abs(property - value) < 1 / 255) {
-            hits.push({ key: "green", value: property });
-          } else {
-            await buddy.setReal(`${entry}:${field}`, value, options);
-          }
-        }
-
-        // blue
-        {
-          const field = `Blue Component`;
-          const value = blue;
-
-          const property = components[field] as number;
-          if (Math.abs(property - value) < 0.004) {
-            hits.push({ key: "blue", value: property });
-          } else {
-            await buddy.setReal(`${entry}:${field}`, value, options);
-          }
-        }
-
-        if (hits.length === 3) {
-          const value = `[${hits.map((x) => x.value).join(", ")}]`;
+        if (matches.length === preferences.length) {
+          const value = `[${matches.map((x) => x.value).join(", ")}]`;
           options.logger?.info(`${entry} already configured: ${value}`);
           continue;
         }
 
-        for (const hit of hits) {
-          options.logger?.info(`${entry} (${hit.key}) already configured: ${hit.value}`);
+        for (const { field, value } of matches) {
+          options.logger?.info(`${entry} (${field}) already configured: ${value}`);
         }
       }
     }
