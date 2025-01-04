@@ -22,11 +22,6 @@ disabled = false
 truncation_length = 0
 truncate_to_repo = false
 
-[git_branch]
-format = '[$branch(:$remote_branch)]($style)'
-style = 'none'
-disabled = false
-
 [status]
 format = "[\\[$status\\]]($style)"
 style = "bold red"
@@ -35,3 +30,8 @@ disabled = false
 [character]
 success_symbol = "%"
 error_symbol = "[!](red bold)"
+
+[git_branch]
+format = '[$branch(:$remote_branch)]($style)'
+style = 'none'
+disabled = false
