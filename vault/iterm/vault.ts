@@ -51,6 +51,22 @@ export const iTermCookBook = new CookBook({
       }
     }
 
+    {
+      const keys = [
+        "Brighten Bold Text (Light)",
+        "Brighten Bold Text (Dark)",
+      ];
+      const value = false;
+
+      for (const key of keys) {
+        if (profile[key] === value) {
+          options.logger?.info(`${key} already configured: ${value}`);
+        } else {
+          await buddy.setBoolean(key, value, options);
+        }
+      }
+    }
+
     for (let i = 0; i < 16; i++) {
       const entries = [
         `Ansi ${i} Color`,
