@@ -56,7 +56,7 @@ export const iTermCookBook = new CookBook({
         "Brighten Bold Text (Light)",
         "Brighten Bold Text (Dark)",
       ];
-      const value = false;
+      const value = true;
 
       for (const key of keys) {
         if (profile[key] === value) {
