@@ -1,4 +1,4 @@
-format = "${username}@${hostname}: ${directory} ${status}$line_break$character"
+format = "${username}@${hostname}: ${directory} ${status}${line_break}${character}"
 right_format = "[\\[$git_branch\\]](purple)"
 add_newline = false
 
