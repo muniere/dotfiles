@@ -52,17 +52,6 @@ if [ -d $HOMEBREW_PREFIX/share/git-core/contrib/diff-highlight/ ]; then
 fi
 
 # =====
-# Go
-# =====
-if [ -d $HOMEBREW_PREFIX/opt/go ]; then
-  export GOROOT=$HOMEBREW_PREFIX/opt/go/libexec
-  export GOPATH=$HOME/Projects
-
-  export PATH="$GOROOT/bin:$PATH"
-  export PATH="$GOPATH/bin:$PATH"
-fi
-
-# =====
 # Mint
 # =====
 if [ -n "$XDG_CACHE_HOME" ]; then

@@ -129,6 +129,17 @@ if [ -n "$XDG_CACHE_HOME" ]; then
 fi
 
 # =====
+# Go
+# =====
+if [ -n "$XDG_DATA_HOME" ]; then 
+  export GOPATH="$XDG_DATA_HOME/go"
+  export PATH="$GOPATH/bin:$PATH"
+fi
+if [ -n "$XDG_CACHE_HOME" ]; then
+  export GOMODCACHE="$XDG_CACHE_HOME/go/mod"
+fi
+
+# =====
 # Rust
 # =====
 if [ -n "$XDG_DATA_HOME" ]; then
