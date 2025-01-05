@@ -131,8 +131,8 @@ fi
 # =====
 # Rust
 # =====
-if [ -n "$XDG_CACHE_HOME" ]; then
-  export CARGO_HOME="$XDG_CACHE_HOME/cargo"
+if [ -n "$XDG_DATA_HOME" ]; then
+  export CARGO_HOME="$XDG_DATA_HOME/cargo"
   export PATH="$CARGO_HOME/bin:$PATH"
 fi
 
