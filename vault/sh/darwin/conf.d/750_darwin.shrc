@@ -98,6 +98,10 @@ fi
 # =====
 # Python
 # =====
+if ! (which python &> /dev/null) &&  [ -d $HOMEBREW_PREFIX/opt/python ]; then
+  export PATH="$HOMEBREW_PREFIX/opt/python/libexec/bin:$PATH"
+fi
+
 if [ -f $HOMEBREW_PREFIX/bin/virtualenvwrapper.sh ]; then
     export WORKON_HOME=$HOME/.virtualenvs
     source $HOMEBREW_PREFIX/bin/virtualenvwrapper.sh
