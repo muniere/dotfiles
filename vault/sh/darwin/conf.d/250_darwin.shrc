@@ -4,6 +4,10 @@
 export HOMEBREW_CASK_OPTS="--appdir=/Applications"
 
 if [ -x /usr/local/bin/brew ]; then
+  # HACK: Here needs to remove prefix "/usr/local/bin" and "/usr/local/sbin" from PATH;
+  #       `brew shellenv` do nothing if these paths already exists in PATH.`
+  export PATH="${PATH#'/usr/local/bin:'}"
+  export PATH="${PATH#'/usr/local/sbin:'}"
   eval "$(/usr/local/bin/brew shellenv)"
 fi
 

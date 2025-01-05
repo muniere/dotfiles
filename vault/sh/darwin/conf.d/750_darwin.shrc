@@ -5,9 +5,6 @@
 # Locale
 unset LC_ALL
 
-# PATH
-export PATH="$HOME/.local/bin:$PATH"
-
 # ls
 alias ls="ls -Gv"
 
@@ -112,6 +109,13 @@ fi
 # =====
 if [ -d $HOMEBREW_PREFIX/opt/ruby/bin ]; then
   export PATH="$HOMEBREW_PREFIX/opt/ruby/bin:$PATH"
+fi
+
+# =====
+# asdf
+# =====
+if [ -f $HOMEBREW_PREFIX/opt/asdf/libexec/asdf.sh ]; then
+  source $HOMEBREW_PREFIX/opt/asdf/libexec/asdf.sh
 fi
 
 # vim: ft=sh sw=2 ts=2 sts=2

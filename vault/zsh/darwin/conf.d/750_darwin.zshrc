@@ -1,11 +1,4 @@
 # =====
-# asdf : Completion
-# =====
-if [ -f $HOMEBREW_PREFIX/opt/asdf/libexec/asdf.sh ]; then
-  source $HOMEBREW_PREFIX/opt/asdf/libexec/asdf.sh
-fi
-
-# =====
 # Google Cloud : Completion
 # ===
 if [ -d $HOMEBREW_PREFIX/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/ ]; then
