@@ -96,19 +96,8 @@ if [ -f "$STARSHIP_CONFIG" ] && (which starship &>/dev/null); then
   eval "$(starship init zsh)"
   export PROMPT_PROVIDER="starship"
 else
-  () {
-    local user='%(?.%F{cyan}.%F{red})%n%f'
-    local host='%(?.%F{cyan}.%F{red})%m%f'
-    local path='%F{yellow}%~%f'
-    local venv='%F{white}${venv_info_msg}%f'
-    local vcs='%F{magenta}${vcs_info_msg_0_}%f'
-    local lf=$'\n'
-
-    PROMPT="${user}@${host}${venv}: ${path}${lf}%(!.#.%%) "
-    RPROMPT="${vcs}"
-
-    export PROMPT_PROVIDER=
-  }
+  prompter "default"
+  export PROMPT_PROVIDER=
 fi
 
 # =====
