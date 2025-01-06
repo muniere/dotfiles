@@ -92,12 +92,30 @@ setopt transient_rprompt
 zstyle ':vcs_info:*' formats '[%b]'
 zstyle ':vcs_info:*' actionformats '[%b|%a]'
 
+function chprompt() {
+  local dir="${ZSH_PROMPT_DIR:-$ZSH_DOTDIR/prompt}"
+
+  local theme="$1"
+  if [ -z "$theme" ]; then
+    echo "Usage: chprompt <theme>" >&2
+    return 1
+  fi
+
+  local path="$dir/$theme.zsh"
+  if [ ! -f "$path" ]; then
+    echo "File not found: $path" >&2
+    return 1
+  fi
+
+  source "$path"
+}
+
 if [ -f "$STARSHIP_CONFIG" ] && (which starship &>/dev/null); then
   eval "$(starship init zsh)"
   export PROMPT_PROVIDER="starship"
 else
-  prompter "default"
-  export PROMPT_PROVIDER=
+  export ZSH_PROMPT_DIR="$ZSH_DOTDIR/prompt"
+  chprompt "default"
 fi
 
 # =====

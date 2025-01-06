@@ -1,0 +1,18 @@
+#compdef chprompt
+
+_chprompt() {
+  local dir="${ZSH_PROMPT_DIR:-$ZSH_DOTDIR/prompt}"
+
+  local -a themes
+  themes=( $(ls ${dir} | xargs -I {} basename {} .zsh) )
+
+  _arguments '1: :->theme'
+
+  case "$state" in
+    theme)
+      _values 'theme' $themes
+      ;;
+  esac
+}
+
+_chprompt "$@"
