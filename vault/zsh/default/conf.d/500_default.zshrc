@@ -86,6 +86,7 @@ zstyle ':completion:*:descriptions' format '%F{cyan}%B%d%b%f'$DEFAULT
 # =====
 export ZLE_RPROMPT_INDENT=0
 export ZSH_PROMPT_DIR="$ZSH_DOTDIR/prompt"
+export ZSH_PROMPT_THEME="default"
 
 autoload -Uz vcs_info
 setopt prompt_subst
@@ -96,7 +97,7 @@ zstyle ':vcs_info:*' actionformats '[%b|%a]'
 function chprompt() {
   local dir="${ZSH_PROMPT_DIR:-$ZSH_DOTDIR/prompt}"
 
-  local theme="$1"
+  local theme="${1:-$ZSH_PROMPT_THEME}"
   if [ -z "$theme" ]; then
     echo "Usage: chprompt <theme>" >&2
     return 1
@@ -111,7 +112,7 @@ function chprompt() {
   source "$path"
 }
 
-chprompt "default"
+chprompt "$ZSH_PROMPT_THEME"
 
 # =====
 # Zsh : History
