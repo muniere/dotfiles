@@ -85,6 +85,7 @@ zstyle ':completion:*:descriptions' format '%F{cyan}%B%d%b%f'$DEFAULT
 # Zsh : Prompt
 # =====
 export ZLE_RPROMPT_INDENT=0
+export ZSH_PROMPT_DIR="$ZSH_DOTDIR/prompt"
 
 autoload -Uz vcs_info
 setopt prompt_subst
@@ -110,13 +111,7 @@ function chprompt() {
   source "$path"
 }
 
-if [ -f "$STARSHIP_CONFIG" ] && (which starship &>/dev/null); then
-  eval "$(starship init zsh)"
-  export PROMPT_PROVIDER="starship"
-else
-  export ZSH_PROMPT_DIR="$ZSH_DOTDIR/prompt"
-  chprompt "default"
-fi
+chprompt "default"
 
 # =====
 # Zsh : History

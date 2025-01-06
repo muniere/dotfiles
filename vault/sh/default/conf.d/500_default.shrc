@@ -41,13 +41,6 @@ fi
 
 export FZF_DEFAULT_OPTS='--height 50% --border --reverse --bind ctrl-k:kill-line --bind ctrl-j:execute::'
 
-# ====
-# starship
-# ====
-if [ -n "$XDG_CONFIG_HOME" ]; then
-  export STARSHIP_CONFIG="$XDG_CONFIG_HOME/starship/config.toml"
-fi
-
 # ===
 # yazi
 # ===
