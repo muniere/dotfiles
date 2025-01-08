@@ -10,7 +10,7 @@ export interface PropertyDict {
   [key: string]: PropertyValue;
 }
 
-export class PlistBuddy {
+export class PropertyList {
   private readonly path: Path;
   private readonly root: string;
 
@@ -78,31 +78,39 @@ export class PlistBuddy {
     }
   }
 
-  setBoolean(
+  async setBoolean(
     key: string,
     value: boolean,
     options: shell.CallOptions = {},
   ): Promise<shell.CommandStatus> {
     const entry = this.entry(key);
-    return this.set(entry, "bool", value, options);
+    return await this.set(entry, "bool", value, options);
   }
 
-  setString(
+  async setString(
     key: string,
     value: string,
     options: shell.CallOptions = {},
   ): Promise<shell.CommandStatus> {
     const entry = this.entry(key);
-    return this.set(entry, "string", value, options);
+    return await this.set(entry, "string", value, options);
   }
 
-  setReal(
+  async setReal(
     key: string,
     value: number,
     options: shell.CallOptions = {},
   ): Promise<shell.CommandStatus> {
     const entry = this.entry(key);
-    return this.set(entry, "real", value, options);
+    return await this.set(entry, "real", value, options);
+  }
+
+  async remove(
+    key: string,
+    options: shell.CallOptions = {},
+  ): Promise<shell.CommandStatus> {
+    const entry = this.entry(key);
+    return await this.delete(entry, options);
   }
 
   private get(
@@ -138,6 +146,25 @@ export class PlistBuddy {
     const opts = result.status.success
       ? ["-c", `Set "${entry}" ${value}`]
       : ["-c", `Add "${entry}" ${type} ${value}`];
+    const args = this.path.toAbsolute().toString();
+    return shell.call(cmd, [...opts, args], options);
+  }
+
+  private async delete(
+    entry: string,
+    options: shell.CallOptions = {},
+  ): Promise<shell.CommandStatus> {
+    const result = await this.get(entry);
+    if (!result.status.success) {
+      return {
+        code: 0,
+        success: true,
+        signal: null,
+      };
+    }
+
+    const cmd = "/usr/libexec/PlistBuddy";
+    const opts = ["-c", `Delete "${entry}"`];
     const args = this.path.toAbsolute().toString();
     return shell.call(cmd, [...opts, args], options);
   }
