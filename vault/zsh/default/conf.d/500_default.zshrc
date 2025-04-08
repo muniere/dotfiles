@@ -139,7 +139,6 @@ bindkey -e
 for x in {!..~}; do 
   bindkey -r "^[${x}"
   bindkey -r "^[^${x}"
-  bindkey -r "^[[${x}"
   bindkey -r "^[O${x}"
   bindkey -r "^X${x}"
   bindkey -r "^X^${x}"
