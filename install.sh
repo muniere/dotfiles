@@ -39,7 +39,7 @@ case "$OSTYPE" in
         fi
 
         # https://github.com/Homebrew/homebrew-bundle
-        brew bundle install --no-lock --file vault/brew/core/Brewfile
+        brew bundle install --file vault/brew/core/Brewfile
         ;;
 
     *) ;;
@@ -50,7 +50,7 @@ function bundle-more() {
 case "$OSTYPE" in
     darwin*)
         # https://github.com/Homebrew/homebrew-bundle
-        brew bundle install --no-lock --file vault/brew/more/Brewfile
+        brew bundle install --file vault/brew/more/Brewfile
         ;;
 
     *) ;;
