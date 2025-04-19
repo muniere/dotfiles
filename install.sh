@@ -3,7 +3,7 @@
 # ===
 # Variables
 # ===
-GHQ_ROOT_DEFAULT="${HOME}/Projects/src"
+GHQ_ROOT_DEFAULT="${HOME}/Projects"
 GHQ_ROOT_CONFIG="$(git config --get ghq.root)"
 GHQ_ROOT="${GHQ_ROOT:-"${GHQ_ROOT_CONFIG}"}"
 GHQ_ROOT="${GHQ_ROOT:-"${GHQ_ROOT_DEFAULT}"}"
@@ -39,7 +39,7 @@ case "$OSTYPE" in
         fi
 
         # https://github.com/Homebrew/homebrew-bundle
-        brew bundle install --file vault/brew/core/Brewfile
+        brew bundle install --file ${DOTFILES_DIR}/vault/brew/core/Brewfile
         ;;
 
     *) ;;
@@ -50,7 +50,7 @@ function bundle-more() {
 case "$OSTYPE" in
     darwin*)
         # https://github.com/Homebrew/homebrew-bundle
-        brew bundle install --file vault/brew/more/Brewfile
+        brew bundle install --file ${DOTFILES_DIR}/vault/brew/more/Brewfile
         ;;
 
     *) ;;
