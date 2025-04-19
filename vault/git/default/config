@@ -27,4 +27,4 @@
     br = branch -vv
     ba = branch -avv
 [ghq]
-    root = ~/Projects/src
+    root = ~/Projects
