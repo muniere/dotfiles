@@ -101,6 +101,16 @@ abstract class Action<Context> {
           prefix: container.join("default"),
         });
 
+      case "linux":
+        return [
+          ...this.travarseSync(spec, {
+            prefix: container.join(platform),
+          }),
+          ...this.travarseSync(spec, {
+            prefix: container.join("default"),
+          }),
+        ];
+
       case "darwin":
         return [
           ...this.travarseSync(spec, {
