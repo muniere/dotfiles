@@ -4,10 +4,6 @@
 function zshaddhistory() { 
   emulate -L zsh
 
-  if (! whence ${${(z)1}[1]} >| /dev/null); then
-    return 1
-  fi
-
   if [[ ${1%%$'\n'} =~ ${~HISTORY_IGNORE} ]]; then
     # hit: return 1; DO NOT push to history
     return 1
