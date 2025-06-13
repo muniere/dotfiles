@@ -5,5 +5,18 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
-url="$(gh browse --branch $1 --no-browser)"
-open "${url/tree/commit}"
+tree_url="$(gh browse --branch $1 --no-browser)"
+commit_url="${tree_url/tree/commit}"
+
+if [ -n "$GH_BROWSER" ]; then
+    eval "$GH_BROWSER \"$commit_url\""
+    exit $?
+fi
+
+if [ -n "$BROWSER" ]; then
+    eval "$BROWSER \"$commit_url\""
+    exit $?
+fi
+
+open "$commit_url"
+exit $?
