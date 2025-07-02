@@ -263,24 +263,15 @@ if (which git-lift &> /dev/null); then
 fi
 
 if (which tig &> /dev/null); then
-  # <C-g><C-g>: git graph powered by tig
-  function git-graph() {
-    </dev/tty tig
-    zle reset-prompt
-  }
-  zle -N git-graph
-  bindkey '^g^g' git-graph
-  bindkey '^gg' git-graph
-
-  # <C-g><C-s>: git status powered by tig
+  # <C-g><C-g>: git status powered by tig
   function git-status() {
     </dev/tty TIG_SCRIPT=<(echo :view-status) tig
     zle reset-prompt
   }
 
   zle -N git-status
-  bindkey '^g^s' git-status
-  bindkey '^gs' git-status
+  bindkey '^g^g' git-status
+  bindkey '^gg' git-status
 fi
 
 # =====
