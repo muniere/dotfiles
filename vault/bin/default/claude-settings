@@ -1,0 +1,189 @@
+#!/usr/bin/env -S deno run --allow-read --allow-write --allow-env
+
+class Permissions {
+  public readonly allow: string[];
+  public readonly deny: string[];
+
+  constructor(args: { allow?: string[]; deny?: string[] } = {}) {
+    this.allow = args.allow ?? [];
+    this.deny = args.deny ?? [];
+  }
+
+  merge(other: Permissions): Permissions {
+    return new Permissions({
+      allow: [...new Set([...this.allow, ...other.allow])].sort(),
+      deny: [...new Set([...this.deny, ...other.deny])].sort(),
+    });
+  }
+
+  static from(obj?: { allow?: string[]; deny?: string[] }): Permissions {
+    return new Permissions(obj ?? {});
+  }
+
+  toJSON(): { allow: string[]; deny: string[] } {
+    return {
+      allow: this.allow,
+      deny: this.deny,
+    };
+  }
+}
+
+class Settings {
+  public readonly permissions: Permissions;
+  public readonly other: Record<string, unknown>;
+
+  constructor(args: { permissions?: Permissions; other?: Record<string, unknown> } = {}) {
+    this.permissions = args.permissions ?? new Permissions();
+    this.other = args.other ?? {};
+  }
+
+  static async load(path: string, ctx?: Context): Promise<Settings> {
+    ctx?.verbose && console.log("[VERBOSE] Reading:", path);
+    const text = await Deno.readTextFile(path);
+    const json = JSON.parse(text);
+
+    const { permissions, ...rest } = json;
+    return new Settings({
+      permissions: Permissions.from(permissions),
+      other: rest,
+    });
+  }
+
+  merge(other: Settings): Settings {
+    return new Settings({
+      permissions: this.permissions.merge(other.permissions),
+      other: { ...this.other, ...other.other },
+    });
+  }
+
+  toJSON(): object {
+    return {
+      ...this.other,
+      permissions: this.permissions.toJSON(),
+    };
+  }
+}
+
+class Context {
+  dryRun: boolean;
+  verbose: boolean;
+  globalPath: string;
+  localPath: string;
+  outputPath: string;
+
+  private constructor(args: {
+    dryRun: boolean;
+    verbose: boolean;
+    globalPath: string;
+    localPath: string;
+    outputPath: string;
+  }) {
+    this.dryRun = args.dryRun;
+    this.verbose = args.verbose;
+    this.globalPath = args.globalPath;
+    this.localPath = args.localPath;
+    this.outputPath = args.outputPath;
+  }
+
+  static parse(args: string[]): Context {
+    const envHome = Deno.env.get("HOME") ?? "";
+
+    let dryRun = false;
+    let verbose = false;
+    let globalPath = `${envHome}/.claude/settings.json`;
+    let localPath = `.claude/settings.local.json`;
+    let outputPath = localPath;
+
+    for (let i = 0; i < args.length; i++) {
+      const arg = args[i];
+      switch (arg) {
+        case "-n":
+        case "--dry-run":
+          dryRun = true;
+          break;
+        case "-v":
+        case "--verbose":
+          verbose = true;
+          break;
+        case "-g":
+        case "--global":
+          if (i + 1 >= args.length) {
+            Context.usage(`Missing value for ${arg}`);
+          }
+          globalPath = args[++i];
+          break;
+        case "-l":
+        case "--local":
+          if (i + 1 >= args.length) {
+            Context.usage(`Missing value for ${arg}`);
+          }
+          localPath = args[++i];
+          break;
+        case "-o":
+        case "--output":
+          if (i + 1 >= args.length) {
+            Context.usage(`Missing value for ${arg}`);
+          }
+          outputPath = args[++i];
+          break;
+        default:
+          Context.usage(`Unknown option: ${arg}`);
+      }
+    }
+
+    return new Context({
+      dryRun,
+      verbose,
+      globalPath,
+      localPath,
+      outputPath,
+    });
+  }
+
+  private static usage(msg?: string): never {
+    if (msg) {
+      console.error(`Error: ${msg}`);
+    }
+    console.error([
+      "Usage: merge-settings.ts [options]",
+      "Options:",
+      "  -g, --global <file>    Global settings file (default: $HOME/.claude/settings.json)",
+      "  -l, --local <file>     Local settings file (default: .claude/settings.local.json)",
+      "  -o, --output <file>    Output file path (default: same as local settings file)",
+      "  -n, --dry-run          Print merged result instead of writing file",
+      "  -v, --verbose          Verbose logging",
+    ].join("\n"));
+    Deno.exit(1);
+  }
+}
+
+class Application {
+  public async run(args: string[]): Promise<void> {
+    const ctx = Context.parse(args);
+
+    const globalSettings = await Settings.load(ctx.globalPath, ctx);
+    const localSettings = await Settings.load(ctx.localPath, ctx);
+
+    const merged = globalSettings.merge(localSettings);
+
+    const output = JSON.stringify(merged.toJSON(), null, 2);
+
+    if (ctx.dryRun) {
+      console.log(output);
+    } else {
+      this.log(ctx, `Writing merged JSON to: ${ctx.outputPath}`);
+      await Deno.writeTextFile(ctx.outputPath, output);
+    }
+  }
+
+  private log(ctx: Context, ...msg: unknown[]): void {
+    if (ctx.verbose) {
+      console.log("[VERBOSE]", ...msg);
+    }
+  }
+}
+
+new Application().run(Deno.args).catch((e) => {
+  console.error("Fatal error:", e);
+  Deno.exit(1);
+});
