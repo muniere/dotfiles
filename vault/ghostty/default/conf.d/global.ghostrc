@@ -1,0 +1,52 @@
+# =====
+# Shell
+# =====
+shell-integration-features = no-cursor
+command = /bin/zsh
+
+# =====
+# Rendering
+# =====
+macos-non-native-fullscreen = true
+unfocused-split-fill = #808080
+
+# =====
+# Selection
+# =====
+selection-invert-fg-bg = true
+
+# =====
+# Cursor
+# =====
+cursor-style = block
+cursor-style-blink = false
+
+# =====
+# Font
+# =====
+font-family = Menlo
+font-size = 12
+
+# =====
+# Theme
+# =====
+theme = muniere
+
+# =====
+# Layout
+# =====
+adjust-cell-height = 10%
+
+# =====
+# Quick Terminal
+# =====
+quick-terminal-position = "center"
+quick-terminal-animation-duration = 0
+keybind = "global:ctrl+cmd+t=toggle_quick_terminal"
+
+# =====
+# Input
+# =====
+# https://github.com/ghostty-org/ghostty/discussions/3586
+keybind = "ctrl+i=text:\t"
+keybind = "ctrl+m=text:\n"
