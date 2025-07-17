@@ -1,2 +1,8 @@
 [sqlfluff]
-output_line_length = 180
+dialect = bigquery
+
+[sqlfluff.indentation]
+indented_width = 4
+
+[sqlfluff.rules]
+max_line_length = 180
