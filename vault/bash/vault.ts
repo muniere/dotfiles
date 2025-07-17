@@ -12,6 +12,18 @@ export const BashCookBook = new CookBook({
   ],
   tmpls: [
     new TmplSpec({
+      src: "bash_profile",
+      dst: "~/.bash_profile",
+    }, {
+      values: {
+        cache: HomeLayout.cache().transHome(),
+        config: HomeLayout.config().transHome(),
+        data: HomeLayout.data().transHome(),
+        state: HomeLayout.state().transHome(),
+        runtime: HomeLayout.runtime().transHome(),
+      },
+    }),
+    new TmplSpec({
       src: "bashrc",
       dst: "~/.bashrc",
     }, {

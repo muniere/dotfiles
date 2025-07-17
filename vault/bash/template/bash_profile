@@ -1,0 +1,14 @@
+export XDG_CACHE_HOME="<%= it.cache %>"
+export XDG_CONFIG_HOME="<%= it.config %>"
+export XDG_DATA_HOME="<%= it.data %>"
+export XDG_STATE_HOME="<%= it.state %>"
+export XDG_RUNTIME_DIR="<%= it.runtime %>"
+
+export XDG_CONFIG_DIRS="/etc/xdg"
+export XDG_DATA_DIRS="/usr/local/share:/usr/share"
+
+export SH_DOTDIR="$XDG_CONFIG_HOME/sh"
+export BASH_DOTDIR="$XDG_CONFIG_HOME/bash"
+
+[ -f $BASH_DOTDIR/config.bash_profile ] && . $BASH_DOTDIR/config.bash_profile
+[ -f $BASH_DOTDIR/config.bashrc ] && . $BASH_DOTDIR/config.bashrc 
