@@ -6,7 +6,7 @@ fi
 if [ -f /etc/zshrc ]; then
   . /etc/zshrc
 fi
-for conf in `ls -d $ZSH_DOTDIR/conf.d/*.zshrc`; do
+for conf in `ls -d $ZSH_DOTDIR/rc.d/*.zsh`; do
   . $conf
 done
 

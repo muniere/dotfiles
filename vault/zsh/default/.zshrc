@@ -1,1 +1,1 @@
-[ -f $ZSH_DOTDIR/config.zshrc ] && . $ZSH_DOTDIR/config.zshrc
+[ -f $ZSH_DOTDIR/rc.zsh ] && . $ZSH_DOTDIR/rc.zsh
