@@ -10,4 +10,4 @@ export XDG_DATA_DIRS="/usr/local/share:/usr/share"
 export SH_DOTDIR="$XDG_CONFIG_HOME/sh"
 export BASH_DOTDIR="$XDG_CONFIG_HOME/bash"
 
-[ -f $BASH_DOTDIR/config.bashrc ] && . $BASH_DOTDIR/config.bashrc
+[ -f $BASH_DOTDIR/rc.bash ] && . $BASH_DOTDIR/rc.bash

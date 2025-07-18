@@ -1,7 +1,7 @@
 if [ -f $SH_DOTDIR/profile.sh ]; then
   . $SH_DOTDIR/profile.sh
 fi
-for conf in `ls -d $BASH_DOTDIR/conf.d/*.bash_profile`; do
+for conf in `ls -d $BASH_DOTDIR/profile.d/*.bash`; do
   . $conf
 done
 
