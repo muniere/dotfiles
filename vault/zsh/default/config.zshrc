@@ -1,7 +1,7 @@
 setopt nonomatch
 
-if [ -f $SH_DOTDIR/config.shrc ]; then
-  . $SH_DOTDIR/config.shrc
+if [ -f $SH_DOTDIR/rc.sh ]; then
+  . $SH_DOTDIR/rc.sh
 fi
 if [ -f /etc/zshrc ]; then
   . /etc/zshrc

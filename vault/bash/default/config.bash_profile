@@ -1,5 +1,5 @@
-if [ -f $SH_DOTDIR/config.profile ]; then
-  . $SH_DOTDIR/config.profile
+if [ -f $SH_DOTDIR/profile.sh ]; then
+  . $SH_DOTDIR/profile.sh
 fi
 for conf in `ls -d $BASH_DOTDIR/conf.d/*.bash_profile`; do
   . $conf
