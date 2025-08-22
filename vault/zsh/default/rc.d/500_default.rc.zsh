@@ -157,7 +157,7 @@ TIMEFMT=$'\nreal\t%E\nuser\t%U\nsys\t%S'
 # =====
 # direnv : Completion
 # =====
-if (which direnv &> /dev/null); then
+if command -v direnv &> /dev/null; then
   eval "$(direnv hook zsh)"
 fi
 
@@ -165,11 +165,11 @@ fi
 # fzf : Binding
 # =====
 
-if (which fzf &> /dev/null); then
+if command -v fzf &> /dev/null; then
   # <C-x><C-f>: find file
   function fzf-file () {
     local selected
-    if (which fd &> /dev/null); then
+    if command -v fd &> /dev/null; then
       selected=$(fd --max-depth 20 --type f --hidden --exclude .git | fzf)
     else
       selected=$(find . -maxdepth 20 -type f -not -path '*/\.git/*' | fzf)
@@ -222,7 +222,7 @@ if (which fzf &> /dev/null); then
   # <C-r>: history
   function fzf-history() {
     local tac
-    if which tac &> /dev/null; then
+    if command -v tac &> /dev/null; then
       tac="tac"
     else
       tac="tail -r"
@@ -244,25 +244,25 @@ fi
 # =====
 # Git : Completion
 # =====
-if (which git-numdiff &> /dev/null); then
+if command -v git-numdiff &> /dev/null; then
   function _git_numdiff() {
     _git_diff $@
   }
 fi
 
-if (which git-delta &> /dev/null); then
+if command -v git-delta &> /dev/null; then
   function _git_delta() {
     _git_diff $@
   }
 fi
 
-if (which git-lift &> /dev/null); then
+if command -v git-lift &> /dev/null; then
   function _git_lift() {
     _git_rebase $@
   }
 fi
 
-if (which tig &> /dev/null); then
+if command -v tig &> /dev/null; then
   # <C-g><C-g>: git status powered by tig
   function git-status() {
     </dev/tty TIG_SCRIPT=<(echo :view-status) tig

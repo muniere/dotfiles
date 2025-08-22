@@ -8,7 +8,7 @@ unset LC_ALL
 # ls
 alias ls="ls -Gv"
 
-if (which eza &> /dev/null); then
+if command -v eza &> /dev/null; then
   alias ll="eza -lF --icons --time-style=long-iso"
   alias l="eza -lAF --icons --time-style=long-iso"
 else
@@ -23,7 +23,7 @@ alias egrep="egrep --color=always"
 # ===
 # Java
 # ===
-if (which java &> /dev/null); then
+if command -v java &> /dev/null; then
   export JAVA_HOME=$(/usr/libexec/java_home)
   export JAVA_OPTS="-Dfile.encoding=UTF-8"
 fi
@@ -62,15 +62,15 @@ fi
 # =====
 # MySQL
 # =====
-if ! (which mysql &> /dev/null) && [ -d $HOMEBREW_PREFIX/opt/mysql ]; then
+if ! command -v mysql &> /dev/null && [ -d $HOMEBREW_PREFIX/opt/mysql ]; then
   export PATH="$HOMEBREW_PREFIX/opt/mysql/bin:$PATH"
 fi
 
-if ! (which mysql &> /dev/null) && [ -d $HOMEBREW_PREFIX/opt/mysql@5.7 ]; then
+if ! command -v mysql &> /dev/null && [ -d $HOMEBREW_PREFIX/opt/mysql@5.7 ]; then
   export PATH="$HOMEBREW_PREFIX/opt/mysql@5.7/bin:$PATH"
 fi
 
-if ! (which mysql &> /dev/null) && [ -d $HOMEBREW_PREFIX/opt/mysql-client ]; then
+if ! command -v mysql &> /dev/null && [ -d $HOMEBREW_PREFIX/opt/mysql-client ]; then
   export PATH="$HOMEBREW_PREFIX/opt/mysql-client/bin:$PATH"
 fi
 
@@ -84,7 +84,7 @@ fi
 # =====
 # Python
 # =====
-if ! (which python &> /dev/null) &&  [ -d $HOMEBREW_PREFIX/opt/python ]; then
+if ! command -v python &> /dev/null &&  [ -d $HOMEBREW_PREFIX/opt/python ]; then
   export PATH="$HOMEBREW_PREFIX/opt/python/libexec/bin:$PATH"
 fi
 

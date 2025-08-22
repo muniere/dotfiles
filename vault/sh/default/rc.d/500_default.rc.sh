@@ -9,7 +9,7 @@ fi
 # ====
 # man
 # ====
-if (which bat &> /dev/null); then
+if command -v bat &> /dev/null; then
   export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 fi
 
@@ -34,9 +34,9 @@ fi
 # =====
 # fzf
 # =====
-if (which fd &> /dev/null); then
+if command -v fd &> /dev/null; then
   export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
-elif (which rg &> /dev/null); then
+elif command -v rg &> /dev/null; then
   export FZF_DEFAULT_COMMAND='rg --files --hidden --glob "!.git"'
 fi
 
@@ -47,7 +47,7 @@ export FZF_DEFAULT_OPTS='--height 50% --border --reverse --bind ctrl-k:kill-line
 # ===
 
 # https://yazi-rs.github.io/docs/quick-start
-if (which yazi &> /dev/null); then
+if command -v yazi &> /dev/null; then
   function y() {
     local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
     yazi "$@" --cwd-file="$tmp"

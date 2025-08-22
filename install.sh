@@ -24,7 +24,7 @@ function bundle-core() {
 case "$OSTYPE" in
     darwin*)
         # https://brew.sh
-        if ! (which brew &> /dev/null); then
+        if ! command -v brew &> /dev/null; then
             /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
             # for intel chip
