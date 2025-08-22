@@ -59,6 +59,7 @@ abstract class Action<Context> {
       vault.GitHubCookBook,
       vault.DockerCookBook,
       vault.AsdfCookBook,
+      vault.MiseCookBook,
       vault.SqlfluffCookBook,
       vault.YaziCookBook,
       vault.TmuxCookBook,

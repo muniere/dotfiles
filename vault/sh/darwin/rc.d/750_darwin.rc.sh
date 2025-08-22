@@ -101,9 +101,15 @@ if [ -d $HOMEBREW_PREFIX/opt/ruby/bin ]; then
 fi
 
 # =====
-# asdf
+# mise / asdf
 # =====
-if [ -f $HOMEBREW_PREFIX/opt/asdf/libexec/asdf.sh ]; then
+if command -v mise &> /dev/null; then
+  if [ -n "$ZSH_VERSION" ]; then
+    eval "$(mise activate zsh)"
+  elif [ -n "$BASH_VERSION" ]; then
+    eval "$(mise activate bash)"
+  fi
+elif [ -f $HOMEBREW_PREFIX/opt/asdf/libexec/asdf.sh ]; then
   source $HOMEBREW_PREFIX/opt/asdf/libexec/asdf.sh
 fi
 
