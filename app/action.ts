@@ -159,7 +159,7 @@ abstract class Action<Context> {
 
     const dst = spec.dst.expandHome().toAbsolute();
 
-    const stat = Result.run(() => src.lstatSync()).value;
+    const stat = Result.run(() => src.statSync()).value;
 
     if (!stat) {
       return [];
