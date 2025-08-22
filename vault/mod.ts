@@ -11,7 +11,7 @@ export { GradleCookBook } from "./gradle/vault.ts";
 export { GhosttyCookBook } from "./ghostty/vault.ts";
 export { iTermCookBook } from "./iterm/vault.ts";
 export { IntelliJIdeaCookBook } from "./IntelliJIdea/vault.ts";
-export { MiseCookBook } from "./mise/vault.ts";
+export { MiseCompletionCookBook, MiseCookBook } from "./mise/vault.ts";
 export { NeovimCookBook } from "./nvim/vault.ts";
 export { NodeCookBook } from "./node/vault.ts";
 export { PythonCookBook } from "./python/vault.ts";
