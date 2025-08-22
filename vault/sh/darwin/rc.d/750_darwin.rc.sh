@@ -112,12 +112,3 @@ if command -v mise &> /dev/null; then
 elif [ -f $HOMEBREW_PREFIX/opt/asdf/libexec/asdf.sh ]; then
   source $HOMEBREW_PREFIX/opt/asdf/libexec/asdf.sh
 fi
-
-# =====
-# Claude Code
-# =====
-if [ -d $HOME/.claude/local ]; then
-  export PATH="$HOME/.claude/local:$PATH"
-fi
-
-# vim: ft=sh sw=2 ts=2 sts=2
