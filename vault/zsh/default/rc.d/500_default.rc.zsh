@@ -219,6 +219,21 @@ if command -v fzf &> /dev/null; then
   bindkey '^x^b' fzf-branch
   bindkey '^xb' fzf-branch
 
+  # <C-@>: git worktreee
+  function fzf-worktree() {
+    local selected
+    selected=$(git worktree list 2>/dev/null | awk '{print $1}' | fzf)
+
+    if [ -n "$selected" ]; then
+      BUFFER="${BUFFER}${selected}"
+      CURSOR=$#BUFFER
+    fi
+    zle reset-prompt
+  }
+
+  zle -N fzf-worktree
+  bindkey '^@' fzf-worktree
+
   # <C-r>: history
   function fzf-history() {
     local tac
