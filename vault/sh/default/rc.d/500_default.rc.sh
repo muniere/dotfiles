@@ -61,7 +61,17 @@ fi
 # ===
 # Git
 # ===
-alias t='tig'
+alias t='tig status'
+alias g='tig status'
+alias s='tig status'
+
+tig() {
+  if [ $# -eq 0 ]; then
+    command tig status
+  else
+    command tig "$@"
+  fi
+}
 
 # =====
 # Python
