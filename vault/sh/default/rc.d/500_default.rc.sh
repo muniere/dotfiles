@@ -61,17 +61,7 @@ fi
 # ===
 # Git
 # ===
-alias t='tig status'
-alias g='tig status'
-alias s='tig status'
-
-tig() {
-  if [ $# -eq 0 ]; then
-    command tig status
-  else
-    command tig "$@"
-  fi
-}
+export TIG_SCRIPT="$XDG_CONFIG_HOME/tig/startup"
 
 # =====
 # Python
