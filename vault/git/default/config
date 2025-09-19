@@ -1,0 +1,4 @@
+[include]
+    path = conf.d/config.default
+[include]
+    path = conf.d/config.extension
