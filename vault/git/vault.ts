@@ -6,8 +6,12 @@ export const GitCookBook = new CookBook({
   container: ResLayout.vault().join("git/"),
   prefs: [
     new PrefSpec({
-      src: ".",
+      src: "conf.d",
       dst: HomeLayout.config().join("git/"),
+    }),
+    new PrefSpec({
+      src: "bin",
+      dst: HomeLayout.bin(),
     }),
   ],
 });
