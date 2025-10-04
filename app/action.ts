@@ -63,6 +63,7 @@ abstract class Action<Context> {
       vault.MiseCookBook,
       vault.MiseCompletionCookBook,
       vault.SqlfluffCookBook,
+      vault.TerminalPaletteCookBook,
       vault.YaziCookBook,
       vault.TmuxCookBook,
       vault.GhosttyCookBook,

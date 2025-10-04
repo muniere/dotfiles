@@ -19,6 +19,7 @@ export { PythonCookBook } from "./python/vault.ts";
 export { RioCookBook } from "./rio/vault.ts";
 export { ShCookBook } from "./sh/vault.ts";
 export { SqlfluffCookBook } from "./sqlfluff/vault.ts";
+export { TerminalPaletteCookBook } from "./terminal-palette/vault.ts";
 export { TigCookBook } from "./tig/vault.ts";
 export { TmuxCookBook } from "./tmux/vault.ts";
 export { VimCookBook } from "./vim/vault.ts";

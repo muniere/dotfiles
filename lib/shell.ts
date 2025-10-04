@@ -149,6 +149,16 @@ export function rm(
   return call(cmd, [...opts, ...args], options);
 }
 
+export function chmod(
+  path: Path,
+  mode: number | string,
+  options: CallOptions = {},
+) : Promise<CommandStatus> {
+  const cmd = "chmod";
+  const args = [mode.toString(), path.toString()];
+  return call(cmd, args, options);
+}
+
 export type TouchOptions = CallOptions;
 
 export function touch(
