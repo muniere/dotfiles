@@ -682,8 +682,15 @@ class CleanupAction extends Action<CleanupContext> {
       .toSorted((a, b) => a.dst.expandHome() < b.dst.expandHome() ? -1 : 1);
 
     const found: Path[] = [];
+    const visited: Set<string> = new Set();
     for (const spec of specs) {
       const path = spec.dst.expandHome();
+
+      if (visited.has(path.toString())) {
+        continue;
+      }
+
+      visited.add(path.toString());
 
       if (spec.options?.autoclean == false && options.force != true) {
         this.context.logger?.debug(`Skipping ${path}`);
