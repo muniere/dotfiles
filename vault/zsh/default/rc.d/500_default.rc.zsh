@@ -24,6 +24,39 @@ function precmd() {
   LANG=C venv_info
 }
 
+##
+# Invalidate completion cache when fpath changed
+#
+# This hook will be used as a part of precmd_functions.
+##
+function _fpath_hook() {
+  # Global cache memory
+  typeset -g _fpath_ghost
+
+  local ghost="${_fpath_ghost}"
+
+  # Init at first time
+  if [[ -z $ghost ]]; then
+    _fpath_ghost="$FPATH"
+    return 0
+  fi
+
+  # Noop when not changed
+  if [[ "$FPATH" == "$ghost" ]]; then
+    return 0
+  fi
+
+  _fpath_ghost="$FPATH"
+  autoload -Uz compinit
+  compinit -u
+  echo "fpath: compinit" >&2
+}
+
+# NOTE: here needs to register as postrc_functions too,
+#       in order to initialize `_fpath_ghost`.
+precmd_functions+=(_fpath_hook)
+postrc_functions+=(_fpath_hook)
+
 # =====
 # Zsh : Overrides
 # =====
