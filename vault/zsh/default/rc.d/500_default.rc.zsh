@@ -1,7 +1,7 @@
 # =====
 # Zsh : Hooks
 # =====
-function zshaddhistory() { 
+function _histignore_hook() { 
   emulate -L zsh
 
   if [[ ${1%%$'\n'} =~ ${~HISTORY_IGNORE} ]]; then
@@ -12,6 +12,8 @@ function zshaddhistory() {
     return 0
   fi
 } 
+
+zshaddhistory_functions+=(_histignore_hook)
 
 function precmd() {
   # Skip if using custom prompt provider
@@ -158,6 +160,7 @@ setopt hist_reduce_blanks
 setopt extended_history
 setopt combining_chars
 setopt share_history
+setopt inc_append_history
 
 # =====
 # Zsh : Keys
