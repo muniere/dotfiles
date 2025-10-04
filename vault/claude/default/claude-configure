@@ -145,7 +145,7 @@ class Context {
       console.error(`Error: ${msg}`);
     }
     console.error([
-      "Usage: merge-settings.ts [options]",
+      "Usage: claude-configure.ts [options]",
       "Options:",
       "  -g, --global <file>    Global settings file (default: $HOME/.claude/settings.json)",
       "  -l, --local <file>     Local settings file (default: .claude/settings.local.json)",

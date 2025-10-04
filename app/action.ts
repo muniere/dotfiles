@@ -46,7 +46,6 @@ abstract class Action<Context> {
     const books = [
       vault.HomeCookBook,
       vault.LibraryCookBook,
-      vault.BinCookBook,
       vault.ShCookBook,
       vault.BashCookBook,
       vault.ZshCookBook,
@@ -71,6 +70,7 @@ abstract class Action<Context> {
       vault.GradleCookBook,
       vault.PythonCookBook,
       vault.NodeCookBook,
+      vault.ClaudeCookBook,
       vault.iTermCookBook,
       vault.XcodeCookBook,
       vault.IntelliJIdeaCookBook,

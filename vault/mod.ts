@@ -3,7 +3,7 @@ export { AndroidStudioCookBook } from "./AndroidStudio/vault.ts";
 export { AsdfCookBook } from "./asdf/vault.ts";
 export { BashCookBook } from "./bash/vault.ts";
 export { BatCookBook } from "./bat/vault.ts";
-export { BinCookBook } from "./bin/vault.ts";
+export { ClaudeCookBook } from "./claude/vault.ts";
 export { DockerCookBook } from "./docker/vault.ts";
 export { GitCookBook } from "./git/vault.ts";
 export { GitHubCookBook } from "./gh/vault.ts";

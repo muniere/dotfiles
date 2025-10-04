@@ -1,9 +1,9 @@
 import { HomeLayout, ResLayout } from "@dotfiles/lib/layout.ts";
 import { CookBook, PrefSpec } from "@dotfiles/lib/schema.ts";
 
-export const BinCookBook = new CookBook({
-  name: "BinCookBook",
-  container: ResLayout.vault().join("bin/"),
+export const ClaudeCookBook = new CookBook({
+  name: "ClaudeCookBook",
+  container: ResLayout.vault().join("claude/"),
   prefs: [
     new PrefSpec({
       src: ".",
