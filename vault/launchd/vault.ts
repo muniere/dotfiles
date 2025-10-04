@@ -1,9 +1,9 @@
 import { HomeLayout, ResLayout } from "@dotfiles/lib/layout.ts";
 import { CookBook, PrefSpec } from "@dotfiles/lib/schema.ts";
 
-export const ZshSiteFunctionsCookBook = new CookBook({
-  name: "ZshSiteFunctionsCookBook",
-  container: ResLayout.vault().join("zsh-site-functions/"),
+export const LaunchdCookBook = new CookBook({
+  name: "LaunchdCookBook",
+  container: ResLayout.vault().join("launchd/"),
   prefs: [
     new PrefSpec({
       src: ".",
