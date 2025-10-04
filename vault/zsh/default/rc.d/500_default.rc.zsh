@@ -15,17 +15,6 @@ function _histignore_hook() {
 
 zshaddhistory_functions+=(_histignore_hook)
 
-function precmd() {
-  # Skip if using custom prompt provider
-  if [ -n "$PROMPT_PROVIDER" ]; then return; fi
-
-  # Export VCS info
-  LANG=C vcs_info
-
-  # Export Python virtualenv info
-  LANG=C venv_info
-}
-
 ##
 # Invalidate completion cache when fpath changed
 #
@@ -58,6 +47,24 @@ function _fpath_hook() {
 #       in order to initialize `_fpath_ghost`.
 precmd_functions+=(_fpath_hook)
 postrc_functions+=(_fpath_hook)
+
+##
+# Configure prompt info before each prompt rendering
+#
+# This hook will be used as a part of precmd_functions.
+##
+function _prompt_hook() {
+  # Skip if using custom prompt provider
+  if [ -n "$PROMPT_PROVIDER" ]; then return; fi
+
+  # Export VCS info
+  LANG=C vcs_info
+
+  # Export Python virtualenv info
+  LANG=C venv_info
+}
+
+precmd_functions+=(_prompt_hook)
 
 # =====
 # Zsh : Overrides
