@@ -1,10 +1,11 @@
 #compdef chprompt
 
 _chprompt() {
-  local dir="${ZSH_PROMPT_DIR:-$ZSH_DOTDIR/prompt}"
+  local home="${XDG_DATA_HOME:-$HOME/.local/share}"
+  local dir="${ZSH_PROMPT_DIR:-$home/zsh/prompt}"
 
   local -a themes
-  themes=( $(ls ${dir} | xargs -I {} basename {} .zsh) )
+  themes=( $(ls "$dir/themes" | xargs -I {} basename {} .zsh) )
 
   _arguments '1: :->theme'
 

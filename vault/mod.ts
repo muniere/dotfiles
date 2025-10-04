@@ -24,4 +24,5 @@ export { VimCookBook } from "./vim/vault.ts";
 export { YaziCookBook } from "./yazi/vault.ts";
 export { XcodeCookBook } from "./Xcode/vault.ts";
 export { ZshCookBook } from "./zsh/vault.ts";
+export { ZshPromptCookBook } from "./zsh-prompt/vault.ts";
 export { ZshSiteFunctionsCookBook } from "./zsh-site-functions/vault.ts";

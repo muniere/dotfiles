@@ -123,8 +123,6 @@ zstyle ':completion:*:descriptions' format '%F{cyan}%B%d%b%f'$DEFAULT
 # Zsh : Prompt
 # =====
 export ZLE_RPROMPT_INDENT=0
-export ZSH_PROMPT_DIR="$ZSH_DOTDIR/prompt"
-export ZSH_PROMPT_THEME="default"
 
 autoload -Uz vcs_info
 setopt prompt_subst
@@ -132,25 +130,12 @@ setopt transient_rprompt
 zstyle ':vcs_info:*' formats '[%b]'
 zstyle ':vcs_info:*' actionformats '[%b|%a]'
 
-function chprompt() {
-  local dir="${ZSH_PROMPT_DIR:-$ZSH_DOTDIR/prompt}"
+export ZSH_PROMPT_DIR="$XDG_DATA_HOME/zsh/prompt"
+export ZSH_PROMPT_THEME="default"
 
-  local theme="${1:-$ZSH_PROMPT_THEME}"
-  if [ -z "$theme" ]; then
-    echo "Usage: chprompt <theme>" >&2
-    return 1
-  fi
-
-  local path="$dir/$theme.zsh"
-  if [ ! -f "$path" ]; then
-    echo "File not found: $path" >&2
-    return 1
-  fi
-
-  source "$path"
-}
-
-chprompt "$ZSH_PROMPT_THEME"
+if [ -f "$ZSH_PROMPT_DIR/zprompt.zsh" ]; then
+  source "$ZSH_PROMPT_DIR/zprompt.zsh"
+fi
 
 # =====
 # Zsh : History
