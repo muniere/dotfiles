@@ -9,7 +9,7 @@ export const GitCookBook = new CookBook({
   prefs: [
     new PrefSpec({
       src: "config",
-      dst: HomeLayout.config().join("git/"),
+      dst: HomeLayout.config().join("git/config"),
     }),
     new PrefSpec({
       src: "conf.d",
