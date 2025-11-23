@@ -1,0 +1,22 @@
+{
+  "name": "muniere-vscode-theme",
+  "displayName": "Monokai Muniere",
+  "description": "Monokai color theme customized by Muniere",
+  "version": "1.0.0",
+  "publisher": "muniere",
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "categories": [
+    "Themes"
+  ],
+  "contributes": {
+    "themes": [
+      {
+        "label": "Monokai Muniere",
+        "uiTheme": "vs-dark",
+        "path": "./themes/monokai-muniere-color-theme.json"
+      }
+    ]
+  }
+}
