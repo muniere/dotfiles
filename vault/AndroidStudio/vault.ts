@@ -1,6 +1,6 @@
-import { XMLBuilder, XMLParser } from "fast-xml-parser";
 import { ResLayout } from "@dotfiles/lib/layout.ts";
 import { CookBook, PrefSpec } from "@dotfiles/lib/schema.ts";
+import { IdeaColorSchemeDocument } from "@dotfiles/lib/idea.ts";
 import * as shell from "@dotfiles/lib/shell.ts";
 import * as theme from "@dotfiles/lib/theme.ts";
 
@@ -18,7 +18,7 @@ export const AndroidStudioCookBook = new CookBook({
     const path = ResLayout.vault().join("AndroidStudio/darwin/colors/Monokai.icls");
     const source = await Deno.readTextFile(path.toString());
 
-    const doc = ColorSchemeDocument.parse(source);
+    const doc = IdeaColorSchemeDocument.parse(source);
     doc.applyDefaults({
       "BLOCK_TERMINAL_DEFAULT_FOREGROUND": theme.Palette[7],
     });
@@ -67,119 +67,3 @@ export const AndroidStudioCookBook = new CookBook({
   },
   platforms: ["darwin"],
 });
-
-class ColorSchemeDocument {
-  // deno-lint-ignore no-explicit-any
-  constructor(private doc: any) {}
-
-  static parse(xml: string): ColorSchemeDocument {
-    const parser = new XMLParser({
-      ignoreAttributes: false,
-      attributeNamePrefix: "@_",
-      textNodeName: "#text",
-    });
-    return new ColorSchemeDocument(parser.parse(xml));
-  }
-
-  private formatColorHex(hex: string): string {
-    return hex.replace("#", "").toLowerCase().replace(/^0+/, "") || "0";
-  }
-
-  /**
-   * Apply default colors to options without values.
-   * 
-   * For example, 
-   * 
-   * ```xml
-   * <scheme name="Monokai" version="142">
-   *   <colors>
-   *     <option name="BLOCK_TERMINAL_DEFAULT_FOREGROUND" value="ffffff" />
-   *   </colors>
-   *   <attributes>
-   *     ...
-   *   </attributes>
-   * </scheme>
-   * ``` 
-   */
-  applyDefaults(palette: Record<string, string>): void {
-    if (!this.doc.scheme?.attributes?.option) {
-      return;
-    }
-
-    const options = [this.doc.scheme.attributes.option].flat();
-
-    for (const option of options) {
-      const name = option["@_name"];
-      if (!name || !palette[name]) {
-        continue;
-      }
-      option["@_value"] = this.formatColorHex(palette[name]);
-    }
-  }
-
-  /**
-   * Apply colors to options with existing values.
-   * 
-   * For example,
-   * 
-   * ```xml
-   * <scheme name="Monokai" version="142">
-   *   <colors> 
-   *   ...
-   *   </colors>
-   *   <attributes>
-   *     <option name="BLOCK_TERMINAL_BLACK">
-   *       <value>
-   *         <option name="FOREGROUND" value="000000" />
-   *       </value>
-   *     </option>
-   *   </attributes>
-   * </scheme>
-   * ```
-   */
-  applyAttributes(palette: Record<string, string>): void {
-    if (!this.doc.scheme?.attributes?.option) {
-      return;
-    }
-
-    const options = [this.doc.scheme.attributes.option].flat();
-
-    for (const option of options) {
-      const name = option["@_name"];
-      if (!name || !palette[name] || !option.value?.option) {
-        continue;
-      }
-
-      const valueOptions = [option.value.option].flat();
-
-      for (const valueOption of valueOptions) {
-        if (valueOption["@_name"] === "FOREGROUND") {
-          valueOption["@_value"] = this.formatColorHex(palette[name]);
-        }
-      }
-    }
-  }
-
-  build(options?: { trailingNewline?: boolean }): string {
-    const builder = new XMLBuilder({
-      ignoreAttributes: false,
-      attributeNamePrefix: "@_",
-      textNodeName: "#text",
-      format: true,
-      indentBy: "  ",
-      suppressEmptyNode: true,
-    });
-
-    const xml = builder.build(this.doc).replace(/([^>\s])\/>/g, "$1 />");
-
-    const trailingNewline = options?.trailingNewline ?? true;
-    if (!trailingNewline && xml.endsWith("\n")) {
-      return xml.slice(0, -1);
-    }
-    if (trailingNewline && !xml.endsWith("\n")) {
-      return xml + "\n";
-    }
-
-    return xml;
-  }
-}
