@@ -183,9 +183,46 @@
       }
     },
     {
-      "scope": ["markup.heading"],
+      "scope": ["heading.1.markdown", "markup.heading.atx.1.markdown"],
       "settings": {
         "foreground": "#f92772",
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "scope": ["heading.2.markdown", "markup.heading.atx.2.markdown"],
+      "settings": {
+        "foreground": "#f5256f",
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "scope": ["heading.3.markdown", "markup.heading.atx.3.markdown"],
+      "settings": {
+        "foreground": "#f2236c"
+      }
+    },
+    {
+      "scope": ["heading.4.markdown", "markup.heading.atx.4.markdown"],
+      "settings": {
+        "foreground": "#ef2169"
+      }
+    },
+    {
+      "scope": ["heading.5.markdown", "markup.heading.atx.5.markdown"],
+      "settings": {
+        "foreground": "#ec1f66"
+      }
+    },
+    {
+      "scope": ["heading.6.markdown", "markup.heading.atx.6.markdown"],
+      "settings": {
+        "foreground": "#e91d63"
+      }
+    },
+    {
+      "scope": ["markup.heading.markdown"],
+      "settings": {
         "fontStyle": "bold"
       }
     },
