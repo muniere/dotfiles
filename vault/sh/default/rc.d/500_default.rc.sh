@@ -14,17 +14,6 @@ if command -v bat &> /dev/null; then
 fi
 
 # =====
-# asdf
-# =====
-if [ -n "$XDG_CONFIG_HOME" ]; then
-  export ASDF_CONFIG_FILE="$XDG_CONFIG_HOME/asdf/config"
-fi
-if [ -n "$XDG_DATA_HOME" ]; then
-  export ASDF_DATA_DIR="$XDG_DATA_HOME/asdf"
-  export PATH="$ASDF_DATA_DIR/shims:$PATH"
-fi
-
-# =====
 # gibo
 # =====
 if [ -n "$XDG_CACHE_HOME" ]; then
