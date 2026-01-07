@@ -1,0 +1,300 @@
+#!/usr/bin/env -S deno run --allow-run
+interface TeamListNode {
+  name: string;
+  parent: string | null;
+}
+
+interface TeamTreeNode {
+  name: string;
+  children: TeamTreeNode[];
+}
+
+type Format = "tree" | "list";
+
+type ParseResult =
+  | { type: "success"; org: string; format: Format }
+  | { type: "error"; message: string }
+  | { type: "help" };
+
+async function load(org: string): Promise<TeamListNode[]> {
+  const command = new Deno.Command("gh", {
+    args: [
+      "api",
+      `orgs/${org}/teams`,
+      "--paginate",
+      "--jq",
+      ".[] | {name: .name, parent: .parent.name}",
+    ],
+    stdout: "piped",
+    stderr: "piped",
+  });
+
+  const { code, stdout, stderr } = await command.output();
+
+  if (code !== 0) {
+    const errorString = new TextDecoder().decode(stderr);
+    console.error(`Error: ${errorString}`);
+    Deno.exit(1);
+  }
+
+  const output = new TextDecoder().decode(stdout);
+  const nodes: TeamListNode[] = [];
+
+  for (const line of output.trim().split("\n")) {
+    if (line) {
+      nodes.push(JSON.parse(line));
+    }
+  }
+
+  return nodes;
+}
+
+function structure(org: string, nodes: TeamListNode[]): TeamTreeNode {
+  const treeNodeMap = new Map<string, TeamTreeNode>();
+
+  for (const node of nodes) {
+    treeNodeMap.set(node.name, {
+      name: node.name,
+      children: [],
+    });
+  }
+
+  const root: TeamTreeNode = {
+    name: org,
+    children: [],
+  };
+
+  for (const listNode of nodes) {
+    const treeNode = treeNodeMap.get(listNode.name)!;
+
+    if (listNode.parent) {
+      const parent = treeNodeMap.get(listNode.parent);
+      if (parent) {
+        parent.children.push(treeNode);
+      }
+    } else {
+      root.children.push(treeNode);
+    }
+  }
+
+  return sortTree(root);
+}
+
+function flatten(
+  node: TeamTreeNode,
+  parent: string | null = null
+): TeamListNode[] {
+  const result: TeamListNode[] = [{ name: node.name, parent }];
+
+  for (const child of node.children) {
+    result.push(...flatten(child, node.name));
+  }
+
+  return result;
+}
+
+function sortTree(node: TeamTreeNode): TeamTreeNode {
+  return {
+    name: node.name,
+    children: node.children
+      .toSorted((a, b) => a.name.localeCompare(b.name))
+      .map((child) => sortTree(child)),
+  };
+}
+
+function countNodes(node: TeamTreeNode): number {
+  return node.children.reduce(
+    (sum, child) => sum + countNodes(child),
+    node.children.length
+  );
+}
+
+function printTree(root: TeamTreeNode): void {
+  type PrintOptions = {
+    prefix?: string;
+    style?: "root" | "node-middle" | "node-last";
+  };
+
+  const printRecursive = (
+    node: TeamTreeNode,
+    { prefix = "", style = "node-middle" }: PrintOptions = {}
+  ): void => {
+    const label = node.children.length > 0 ? `${node.name}/` : node.name;
+
+    const line = (() => {
+      switch (style) {
+        case "root":
+          return label;
+        case "node-middle":
+          return prefix + "├── " + label;
+        case "node-last":
+          return prefix + "└── " + label;
+      }
+    })();
+
+    console.log(line);
+
+    const childPrefix = (() => {
+      switch (style) {
+        case "root":
+          return "";
+        case "node-middle":
+          return prefix + "│   ";
+        case "node-last":
+          return prefix + "    ";
+      }
+    })();
+
+    for (const [i, child] of node.children.entries()) {
+      const childStyle =
+        i === node.children.length - 1 ? "node-last" : "node-middle";
+      printRecursive(child, {
+        prefix: childPrefix,
+        style: childStyle,
+      });
+    }
+  };
+
+  printRecursive(root, { style: "root" });
+  console.log();
+  console.log(`Total teams: ${countNodes(root)}`);
+}
+
+function printList(root: TeamTreeNode): void {
+  // Skip the organization root and flatten all teams
+  const flatList = root.children
+    .flatMap((node) => flatten(node))
+    .toSorted((a, b) => a.name.localeCompare(b.name));
+
+  for (const item of flatList) {
+    if (item.parent) {
+      console.log(`${item.name} (parent: ${item.parent})`);
+    } else {
+      console.log(item.name);
+    }
+  }
+
+  console.log();
+  console.log(`Total teams: ${countNodes(root)}`);
+}
+
+function help(): string {
+  return `
+Display GitHub organization team structure
+
+Usage:
+  gh team <organization> [options]
+
+Arguments:
+  <organization>    GitHub organization name (required)
+
+Options:
+  --format=<type>   Output format: tree (default) or list
+  --help, -h        Show this help message
+
+Examples:
+  gh team your-org
+  gh team your-org --format=tree
+  gh team your-org --format=list
+`;
+}
+
+function parse(args: string[]): ParseResult {
+  const argv = args.flatMap((arg) => {
+    if (arg.startsWith("--") && arg.includes("=")) {
+      return arg.split("=", 2);
+    } else {
+      return [arg];
+    }
+  });
+
+  let format = "tree";
+  let help = false;
+  const positional: string[] = [];
+
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
+
+    if (arg === "--help" || arg === "-h") {
+      help = true;
+      continue;
+    }
+
+    if (arg === "--format") {
+      i++;
+      if (i < argv.length) {
+        format = argv[i];
+      }
+      continue;
+    }
+
+    if (!arg.startsWith("-")) {
+      positional.push(arg);
+      continue;
+    }
+  }
+
+  if (help) {
+    return { type: "help" };
+  }
+
+  const org = positional[0];
+
+  if (!org) {
+    return { type: "error", message: "Organization name is required" };
+  }
+
+  if (format !== "tree" && format !== "list") {
+    return {
+      type: "error",
+      message: `Invalid format "${format}". Use "tree" or "list".`,
+    };
+  }
+
+  return { type: "success", org, format: format as Format };
+}
+
+async function main(args: string[]) {
+  const result = parse(args);
+
+  switch (result.type) {
+    case "success": {
+      const { org, format } = result;
+
+      const nodes = await load(org);
+      const root = structure(org, nodes);
+
+      switch (format) {
+        case "tree":
+          printTree(root);
+          Deno.exit(0);
+          return;
+
+        case "list":
+          printList(root);
+          Deno.exit(0);
+          return;
+
+        default:
+          console.error(`Unknown format: ${format}`);
+          Deno.exit(1);
+          return;
+      }
+    }
+
+    case "error":
+      console.error(`Error: ${result.message}\n`);
+      console.error(help());
+      Deno.exit(1);
+      return;
+
+    case "help":
+      console.log(help());
+      Deno.exit(0);
+      return;
+  }
+}
+
+if (import.meta.main) {
+  main(Deno.args);
+}
