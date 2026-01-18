@@ -50,6 +50,8 @@ fi
 # ===
 # Git
 # ===
+export GHQ_ROOT="$HOME/Projects"
+
 export TIG_SCRIPT="$XDG_CONFIG_HOME/tig/startup"
 
 # =====
