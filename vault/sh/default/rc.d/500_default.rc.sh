@@ -52,7 +52,9 @@ fi
 # ===
 export GHQ_ROOT="$HOME/Projects"
 
-export TIG_SCRIPT="$XDG_CONFIG_HOME/tig/startup"
+if [ -n "$XDG_CONFIG_HOME" ]; then
+  export TIG_SCRIPT="$XDG_CONFIG_HOME/tig/startup"
+fi
 
 # =====
 # Python
