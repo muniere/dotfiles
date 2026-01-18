@@ -1,5 +1,26 @@
 #!/usr/bin/env bash
 
+# NAME
+#   git-cutoff - Delete local branches whose upstream is gone
+#
+# SYNOPSIS
+#   git cutoff [-f|--force]
+#
+# DESCRIPTION
+#   Deletes local branches that are tracking remote branches which no longer exist.
+#   Uses `git branch -d` by default, which only deletes fully merged branches.
+#
+# OPTIONS
+#   -f, --force
+#       Force delete branches using `git branch -D`, even if not fully merged.
+#
+# EXAMPLES
+#   $ git cutoff
+#   Deleted branch feature/old (was a1b2c3d).
+#
+#   $ git cutoff --force
+#   Deleted branch feature/unmerged (was b2c3d4e).
+
 force=false
 
 while [[ "$#" -gt 0 ]]; do
