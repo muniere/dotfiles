@@ -1,5 +1,19 @@
 #!/usr/bin/env bash
 
+# NAME
+#   git-author - List all refs sorted by author
+#
+# SYNOPSIS
+#   git author
+#
+# DESCRIPTION
+#   Displays all refs with hash, date, author name, and ref name in a formatted table.
+#
+# EXAMPLES
+#   $ git author
+#   a1b2c3d 2024-01-01 12:00:00 +0900  john   refs/heads/feature
+#   b2c3d4e 2024-01-02 15:30:00 +0900  alice  refs/heads/main
+
 tab='%09'
 hash='%(color:magenta)%(objectname:short)%(color:reset)'
 date='%(color:blue)%(authordate:iso)%(color: reset)'
