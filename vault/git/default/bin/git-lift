@@ -1,3 +1,18 @@
 #!/usr/bin/env bash
 
+# NAME
+#   git-lift - Interactive rebase preserving original committer metadata
+#
+# SYNOPSIS
+#   git lift <commit>
+#
+# DESCRIPTION
+#   Performs an interactive rebase while preserving the original committer
+#   date, name, and email for each commit. Useful for editing commit messages
+#   or reordering commits without changing committer information.
+#
+# EXAMPLES
+#   $ git lift HEAD~3
+#   $ git lift main
+
 git -c rebase.instructionFormat='%s%nexec GIT_COMMITTER_DATE="%cD" GIT_COMMITTER_NAME="%cn" GIT_COMMITTER_EMAIL="%ce" git commit --amend --no-edit' rebase -i "$@"
