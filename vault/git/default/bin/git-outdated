@@ -1,5 +1,20 @@
 #!/usr/bin/env bash
 
+# NAME
+#   git-outdated - List branches merged into develop
+#
+# SYNOPSIS
+#   git outdated
+#
+# DESCRIPTION
+#   Displays refs that have been merged into the develop branch.
+#   Shows hash, date, author name, and ref name in a formatted table.
+#
+# EXAMPLES
+#   $ git outdated
+#   a1b2c3d 2024-01-01 12:00:00 +0900  john   refs/heads/feature/old
+#   b2c3d4e 2024-01-02 15:30:00 +0900  alice  refs/heads/feature/done
+
 tab='%09'
 hash='%(color:magenta)%(objectname:short)%(color:reset)'
 date='%(color:blue)%(authordate:iso)%(color: reset)'
