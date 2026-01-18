@@ -1,3 +1,18 @@
 #!/usr/bin/env bash
 
+# NAME
+#   git-delta - Show diff using delta with side-by-side view
+#
+# SYNOPSIS
+#   git delta [<diff-options>]
+#
+# DESCRIPTION
+#   Runs git diff and displays the output using delta with side-by-side view
+#   and navigation enabled. All arguments are passed to git diff.
+#
+# EXAMPLES
+#   $ git delta
+#   $ git delta HEAD~3
+#   $ git delta --staged
+
 git diff "$@" | delta --side-by-side --navigate
