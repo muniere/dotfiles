@@ -1,3 +1,17 @@
 #!/usr/bin/env bash
 
+# NAME
+#   git-save - Amend last commit with current user as author
+#
+# SYNOPSIS
+#   git save
+#
+# DESCRIPTION
+#   Amends the last commit, resetting the author to the current user
+#   without changing the commit message. Useful for updating the author
+#   after changing git config user settings.
+#
+# EXAMPLES
+#   $ git save
+
 git commit --amend --reset-author --no-edit
