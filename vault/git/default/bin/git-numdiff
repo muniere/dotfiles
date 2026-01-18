@@ -1,5 +1,23 @@
 #!/usr/bin/env bash
 
+# NAME
+#   git-numdiff - Show diff statistics with colored output
+#
+# SYNOPSIS
+#   git numdiff [<diff-options>]
+#
+# DESCRIPTION
+#   Displays additions and deletions count per file using git diff --numstat.
+#   When output is a terminal, additions are shown in green and deletions in red.
+#   When piped, shows plain output without colors.
+#
+# EXAMPLES
+#   $ git numdiff
+#   +10  -5   src/main.c
+#   +3   -0   README.md
+#
+#   $ git numdiff HEAD~3
+
 if [ -t 1 ]; then
     git diff --numstat $@ | awk '{
         add = $1 > 0 ? "\033[32m" "+" $1 "\033[0m" : $1
