@@ -1,3 +1,0 @@
-#compdef git-space
-
-_wtp "$@"
