@@ -3,7 +3,7 @@
     <option name="ADDED_LINES_COLOR" value="295622" />
     <option name="CARET_COLOR" value="bbbbbb" />
     <option name="CARET_ROW_COLOR" value="" />
-    <option name="CONSOLE_BACKGROUND_KEY" value="272822" />
+    <option name="CONSOLE_BACKGROUND_KEY" value="191a1c" />
     <option name="DOCUMENTATION_COLOR" value="" />
     <option name="FILESTATUS_ADDED" value="629755" />
     <option name="FILESTATUS_DELETED" value="6c6c6c" />
@@ -20,7 +20,7 @@
     <option name="FILESTATUS_addedOutside" value="629755" />
     <option name="FILESTATUS_changelistConflict" value="d5756c" />
     <option name="FILESTATUS_modifiedOutside" value="6897bb" />
-    <option name="GUTTER_BACKGROUND" value="272822" />
+    <option name="GUTTER_BACKGROUND" value="191a1c" />
     <option name="HTML_TAG_TREE_LEVEL0" value="0" />
     <option name="INDENT_GUIDE" value="373737" />
     <option name="LOOKUP_COLOR" value="" />
@@ -102,7 +102,6 @@
     <option name="CONSOLE_NORMAL_OUTPUT">
       <value>
         <option name="FOREGROUND" value="ffffff" />
-        <option name="BACKGROUND" value="272822" />
       </value>
     </option>
     <option name="CONSOLE_RED_OUTPUT">
@@ -300,7 +299,6 @@
     <option name="DEFAULT_KEYWORD">
       <value>
         <option name="FOREGROUND" value="f92772" />
-        <option name="BACKGROUND" value="272822" />
       </value>
     </option>
     <option name="DEFAULT_LABEL">
@@ -381,7 +379,7 @@
     </option>
     <option name="DELETED_TEXT_ATTRIBUTES">
       <value>
-        <option name="FOREGROUND" value="272822" />
+        <option name="FOREGROUND" value="191a1c" />
         <option name="BACKGROUND" value="ffffff" />
       </value>
     </option>
@@ -606,7 +604,6 @@
     <option name="RUBY_HEREDOC_CONTENT">
       <value>
         <option name="FOREGROUND" value="e6da74" />
-        <option name="BACKGROUND" value="272822" />
       </value>
     </option>
     <option name="RUBY_HEREDOC_ID">
@@ -688,7 +685,7 @@
     <option name="TEXT">
       <value>
         <option name="FOREGROUND" value="f6f6f6" />
-        <option name="BACKGROUND" value="272822" />
+        <option name="BACKGROUND" value="191a1c" />
       </value>
     </option>
     <option name="TEXT_SEARCH_RESULT_ATTRIBUTES">
