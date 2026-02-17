@@ -7,7 +7,11 @@
 # - emulate -L zsh (prevents breakage under ksh emulation from _git)
 # - words normalization: _git dispatch (words[1]==git) only adjusts CURRENT
 # - (list|ls) pattern: expanded to avoid parse error
+# - _describe replaced with compadd (_describe breaks under _git dispatch)
 # - Self-call: _git_gtr
+#
+# NOTE: This file handles `git gtr` via _git dispatch.
+# Direct `gtr` / `git-gtr` invocation is handled by _gtr.
 #
 # See: https://github.com/coderabbitai/git-worktree-runner/issues/83
 
@@ -27,25 +31,31 @@ _git_gtr() {
 
   local -a commands
   commands=(
-    'new:Create a new worktree'
-    'go:Navigate to worktree'
-    'run:Execute command in worktree'
-    'copy:Copy files between worktrees'
-    'rm:Remove worktree(s)'
-    'mv:Rename worktree and branch'
-    'rename:Rename worktree and branch'
-    'editor:Open worktree in editor'
-    'ai:Start AI coding tool'
-    'ls:List all worktrees'
-    'list:List all worktrees'
-    'clean:Remove stale worktrees'
-    'doctor:Health check'
-    'adapter:List available adapters'
-    'config:Manage configuration'
-    'completion:Generate shell completions'
-    'init:Generate shell integration for cd support'
-    'version:Show version'
-    'help:Show help'
+    new go run copy rm mv rename editor ai
+    ls list clean doctor adapter config completion init version help
+  )
+
+  local -a command_descs
+  command_descs=(
+    'new        -- Create a new worktree'
+    'go         -- Navigate to worktree'
+    'run        -- Execute command in worktree'
+    'copy       -- Copy files between worktrees'
+    'rm         -- Remove worktree(s)'
+    'mv         -- Rename worktree and branch'
+    'rename     -- Rename worktree and branch'
+    'editor     -- Open worktree in editor'
+    'ai         -- Start AI coding tool'
+    'ls         -- List all worktrees'
+    'list       -- List all worktrees'
+    'clean      -- Remove stale worktrees'
+    'doctor     -- Health check'
+    'adapter    -- List available adapters'
+    'config     -- Manage configuration'
+    'completion -- Generate shell completions'
+    'init       -- Generate shell integration for cd support'
+    'version    -- Show version'
+    'help       -- Show help'
   )
 
   local -a branches all_options
@@ -94,18 +104,12 @@ _git_gtr() {
 
   # Complete the gtr subcommand (new, go, editor, etc.)
   if (( CURRENT == 3 )); then
-    _describe 'commands' commands
+    compadd -l -d command_descs -a commands
   # Complete arguments to the subcommand
   elif (( CURRENT == 4 )); then
     case "$words[3]" in
-      go|run|rm|mv|rename|copy)
-        _describe 'branch names' all_options
-        ;;
-      editor)
-        _describe 'branch names' all_options
-        ;;
-      ai)
-        _describe 'branch names' all_options
+      go|run|rm|mv|rename|copy|editor|ai)
+        compadd -a all_options
         ;;
       config)
         # Complete action or scope flags
@@ -145,7 +149,7 @@ _git_gtr() {
           '--from[Source worktree]:source:->worktrees' \
           '*:target:->worktrees'
         case "$state" in
-          worktrees) _describe 'branch names' all_options ;;
+          worktrees) compadd -a all_options ;;
         esac
         ;;
       config)
