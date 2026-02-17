@@ -305,6 +305,12 @@ if command -v git-lift &> /dev/null; then
   }
 fi
 
+if command -v git-gtr &> /dev/null; then
+  zstyle ':completion:*:*:git:*' user-commands gtr:'Git worktree management'
+  autoload -Uz _gtr
+  compdef _gtr gtr
+fi
+
 if command -v tig &> /dev/null; then
   # <C-g><C-g>: git status powered by tig
   function git-status() {
