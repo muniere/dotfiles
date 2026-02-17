@@ -21,6 +21,16 @@ alias grep="grep --color=always"
 alias egrep="egrep --color=always"
 
 # ===
+# coreutils
+# ===
+if [ -d $HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin ]; then
+  alias gfind="$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin/find"
+  alias ggrep="$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin/grep"
+  alias gsed="$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin/sed"
+  alias gsort="$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin/sort"
+fi
+
+# ===
 # Java
 # ===
 if command -v java &> /dev/null; then

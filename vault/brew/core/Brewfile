@@ -6,7 +6,7 @@ brew "bash"
 brew "bash-completion@2"
 brew "bat"
 brew "colordiff"
-brew "coreutils"
+brew "coreutils", link: false
 brew "curl"
 brew "direnv"
 brew "deno"
