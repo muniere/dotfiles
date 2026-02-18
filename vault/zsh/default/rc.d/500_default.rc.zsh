@@ -228,12 +228,8 @@ if command -v fzf &> /dev/null; then
   zle -N fzf-src
   bindkey '^]' fzf-src
 
-  # <C-[>: git branch
+  # <C-x><C-b>: git branch
   function fzf-branch () {
-    if [[ ! "$BUFFER" =~ "\s*(git|tig)" ]]; then
-      return
-    fi
-
     local selected
     selected=$(git branch -vv | fzf | awk '$0 = substr($0, 3) { print $1 }')
     if [ -n "$selected" ]; then
@@ -246,21 +242,6 @@ if command -v fzf &> /dev/null; then
   zle -N fzf-branch
   bindkey '^x^b' fzf-branch
   bindkey '^xb' fzf-branch
-
-  # <C-@>: git worktreee
-  function fzf-worktree() {
-    local selected
-    selected=$(git worktree list 2>/dev/null | awk '{print $1}' | fzf)
-
-    if [ -n "$selected" ]; then
-      BUFFER="${BUFFER}${selected}"
-      CURSOR=$#BUFFER
-    fi
-    zle reset-prompt
-  }
-
-  zle -N fzf-worktree
-  bindkey '^@' fzf-worktree
 
   # <C-r>: history
   function fzf-history() {
@@ -309,6 +290,26 @@ if command -v git-gtr &> /dev/null; then
   zstyle ':completion:*:*:git:*' user-commands gtr:'Git worktree management'
   autoload -Uz _gtr
   compdef _gtr gtr
+
+  alias gat=gtr
+
+  if command -v fzf &> /dev/null; then
+    # <C-x><C-t>: git worktreee branch
+    function fzf-worktree-branch() {
+      local selected
+      selected=$(gtr list --porcelain 2>/dev/null | awk '{print $2}' | fzf)
+
+      if [ -n "$selected" ]; then
+        BUFFER="${BUFFER}${selected}"
+        CURSOR=$#BUFFER
+      fi
+      zle reset-prompt
+    }
+
+    zle -N fzf-worktree-branch
+    bindkey '^x^t' fzf-worktree-branch
+    bindkey '^xt' fzf-worktree-branch
+  fi
 fi
 
 if command -v tig &> /dev/null; then
