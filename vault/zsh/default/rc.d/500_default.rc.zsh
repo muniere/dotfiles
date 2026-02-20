@@ -286,32 +286,6 @@ if command -v git-lift &> /dev/null; then
   }
 fi
 
-if command -v git-gtr &> /dev/null; then
-  zstyle ':completion:*:*:git:*' user-commands gtr:'Git worktree management'
-  autoload -Uz _gtr
-  compdef _gtr gtr
-
-  alias gat=gtr
-
-  if command -v fzf &> /dev/null; then
-    # <C-x><C-t>: git worktreee branch
-    function fzf-worktree-branch() {
-      local selected
-      selected=$(gtr list --porcelain 2>/dev/null | awk '{print $2}' | fzf)
-
-      if [ -n "$selected" ]; then
-        BUFFER="${BUFFER}${selected}"
-        CURSOR=$#BUFFER
-      fi
-      zle reset-prompt
-    }
-
-    zle -N fzf-worktree-branch
-    bindkey '^x^t' fzf-worktree-branch
-    bindkey '^xt' fzf-worktree-branch
-  fi
-fi
-
 if command -v tig &> /dev/null; then
   # <C-g><C-g>: git status powered by tig
   function git-status() {

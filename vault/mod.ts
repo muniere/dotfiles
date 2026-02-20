@@ -7,7 +7,7 @@ export { ClaudeCookBook } from "./claude/vault.ts";
 export { CodeCookBook } from "./Code/vault.ts";
 export { DockerCookBook } from "./docker/vault.ts";
 export { GitCookBook } from "./git/vault.ts";
-export { GitGtrCookBook } from "./git-gtr/vault.ts";
+export { GinCookBook } from "./gin/vault.ts";
 export { GitHubCookBook } from "./gh/vault.ts";
 export { GradleCookBook } from "./gradle/vault.ts";
 export { GhosttyCookBook } from "./ghostty/vault.ts";
