@@ -1,0 +1,49 @@
+#compdef gin
+
+_gin() {
+  emulate -L zsh
+
+  local -a commands command_descs
+  commands=(list ls add find remove rm help)
+  command_descs=(
+    'list     -- List all worktrees'
+    'ls       -- Alias for list'
+    'find     -- Find existing worktree path'
+    'add      -- Create a worktree for a branch'
+    'remove   -- Remove a worktree by branch name'
+    'rm       -- Alias for remove'
+    'help     -- Show help'
+  )
+
+  if (( CURRENT == 2 )); then
+    # Standalone completion path (same strategy as former _gtr):
+    # show command list with descriptions without relying on _describe state machinery.
+    compadd -l -d command_descs -a commands
+    return
+  fi
+
+  local subcmd="$words[2]"
+  local -a branches worktree_branches
+
+  case "$subcmd" in
+    list|ls)
+      if (( CURRENT == 3 )); then
+        compadd -S '' -- --porcelain
+      fi
+      ;;
+    add)
+      branches=(${(f)"$(git branch --format='%(refname:short)' 2>/dev/null)"})
+      if (( CURRENT == 3 )); then
+        compadd -a branches
+      fi
+      ;;
+    find)
+      branches=(${(f)"$(git branch --format='%(refname:short)' 2>/dev/null)"})
+      (( CURRENT == 3 )) && compadd -a branches
+      ;;
+    remove|rm)
+      worktree_branches=(${(f)"$(gin list 2>/dev/null | awk '{print $NF}')"})
+      (( CURRENT >= 3 )) && compadd -a worktree_branches
+      ;;
+  esac
+}
