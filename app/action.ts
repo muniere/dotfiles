@@ -56,7 +56,6 @@ abstract class Action<Context> {
       vault.BatCookBook,
       vault.GitCookBook,
       vault.TigCookBook,
-      vault.GinCookBook,
       vault.GitHubCookBook,
       vault.DockerCookBook,
       vault.AsdfCookBook,
