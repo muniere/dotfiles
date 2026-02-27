@@ -12,8 +12,8 @@ bind stage H :set vertical-split = horizontal
 bind main <Ctrl-R> !git rebase -i %(commit)^
 bind diff <Ctrl-R> !git rebase -i %(commit)^
 
-bind main O !@gh inspect %(commit)
-bind diff O !@gh inspect %(commit)
+bind main O !@gh browse %(commit)
+bind diff O !@gh browse %(commit)
 
 set diff-options = -m --first-parent
 set diff-highlight = true
