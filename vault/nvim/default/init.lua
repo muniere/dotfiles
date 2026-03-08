@@ -1,3 +1,5 @@
+---@diagnostic disable-next-line: undefined-global
+local vim = vim
 --
 -- Functions
 --
@@ -13,7 +15,7 @@ end
 
 --
 -- Config
--- 
+--
 
 -- This file's encoding is utf-8
 vim.opt.encoding = "utf-8"
@@ -22,7 +24,7 @@ vim.opt.encoding = "utf-8"
 vim.opt.fileencoding = "utf-8"
 
 -- Enable show other buffers without saving current buffer
-vim.opt.hidden = true 
+vim.opt.hidden = true
 
 -- Enable commandline completion
 vim.opt.wildmenu = true
@@ -50,7 +52,7 @@ vim.opt.smartcase = true
 vim.opt.backspace = { "indent", "eol", "start" }
 
 -- Enable autoindent
-vim.opt.autoindent = true 
+vim.opt.autoindent = true
 
 -- Do not move to start of line when move to other line
 vim.opt.startofline = false
@@ -62,12 +64,12 @@ vim.opt.ruler = true
 vim.opt.laststatus = 2
 
 -- Confirm save or not if buffer has changed
-vim.opt.confirm = true 
+vim.opt.confirm = true
 
 -- Use visual bell instead of beap
-vim.opt.visualbell = true 
+vim.opt.visualbell = true
 
--- Enable mouse 
+-- Enable mouse
 vim.opt.mouse = "a"
 
 -- Set command line height
@@ -78,8 +80,7 @@ vim.opt.number = true
 
 -- Set timeout length of keycode
 vim.opt.timeout = false
-vim.opt.ttimeout = false
-vim.opt.ttimeoutlen = 200
+vim.opt.timeoutlen = 200
 
 -- Turn off IME when switch to insert mode
 vim.opt.iminsert = 0
@@ -96,7 +97,7 @@ vim.opt.modelines = 5
 vim.opt.shiftwidth = 4
 vim.opt.softtabstop = 4
 vim.opt.tabstop = 4
-vim.opt.expandtab = true 
+vim.opt.expandtab = true
 
 -- Set new window directions
 vim.opt.splitbelow = true
@@ -108,9 +109,9 @@ vim.g["is_bash"] = true
 -- Move to last edit position
 vim.api.nvim_create_autocmd("BufReadPost", {
   pattern = "*",
-  callback = function () 
+  callback = function()
     if vim.fn.line("'\"") > 0 and vim.fn.line("'\"") <= vim.fn.line("$") then
-     vim.cmd("normal g'\"")
+      vim.cmd("normal g'\"")
     end
   end
 })
@@ -118,14 +119,14 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 -- Do not continue comment line
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "*",
-  callback = function () 
+  callback = function()
     vim.opt.formatoptions:remove { "r", "o" }
   end,
 })
 
 --
 -- Keymaps
--- 
+--
 
 -- Move in visual line
 vim.keymap.set("n", "j", "gk")
@@ -138,10 +139,10 @@ local plug = {
   begin = vim.fn["plug#begin"],
   end_ = vim.fn["plug#end"],
   call = vim.fn["plug#"],
-  sync = function ()
+  sync = function()
     vim.cmd("PlugInstall --sync")
   end,
-  miss = function ()
+  miss = function()
     local plugs = vim.g["plugs"]
     local count = 0
 
@@ -157,7 +158,7 @@ local plug = {
 
     return count
   end,
-  test = function (name) 
+  test = function(name)
     local plugs = vim.g["plugs"]
 
     local plug = plugs[name]
@@ -209,7 +210,7 @@ plug.end_()
 
 vim.api.nvim_create_autocmd("VimEnter", {
   pattern = "*",
-  callback = function ()
+  callback = function()
     if plug.miss() > 0 then
       plug.sync()
     end
@@ -219,16 +220,16 @@ vim.api.nvim_create_autocmd("VimEnter", {
 -- lightline
 if plug.test("lightline.vim") then
   vim.g["lightline"] = {
-    active  = { 
-      left = { {"mode"}, {"relativepath"}, {"modified"} } 
+    active   = {
+      left = { { "mode" }, { "relativepath" }, { "modified" } }
     },
     inactive = {
-      left = { {"mode"}, {"relativepath"}, {"modified"} }
+      left = { { "mode" }, { "relativepath" }, { "modified" } }
     }
   }
 end
 
--- fern 
+-- fern
 if plug.test("fern.vim") then
   vim.g["fern#renderer"] = "nerdfont"
   vim.g["fern#default_hidden"] = true
@@ -240,7 +241,7 @@ if plug.test("fern.vim") then
 
   vim.api.nvim_create_autocmd("FileType", {
     pattern = "fern",
-    callback = function () 
+    callback = function()
       vim.opt_local.number = false
       vim.opt_local.relativenumber = false
       vim.keymap.set("n", "<Plug>(fern-action-open-or-enter)", "<Plug>(fern-action-open-or-expand)", { buffer = true })
