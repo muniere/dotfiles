@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# NAME
+#   git-drop - Delete local branches already merged into HEAD
+#
+# SYNOPSIS
+#   git drop [-n|--dry-run] [-f|--force]
+#
+# DESCRIPTION
+#   Deletes local branches that have already been merged into the current branch.
+#   Uses `git branch -d` by default, which only deletes fully merged branches.
+#   The current branch is always excluded.
+#
+# OPTIONS
+#   -n, --dry-run
+#       Print branches that would be deleted without actually deleting them.
+#
+#   -f, --force
+#       Force delete branches using `git branch -D`, even if not fully merged.
+#
+# EXAMPLES
+#   $ git drop
+#   Deleted branch feature/old (was a1b2c3d).
+#
+#   $ git drop --force
+#   Deleted branch feature/unmerged (was b2c3d4e).
+
+usage() {
+    awk '
+        /^[^#]/ { if (f) exit }
+        /^# NAME/ { f = 1 }
+        f { sub(/^# ?/, ""); print }
+    ' "$0"
+}
+
+dry_run=false
+force=false
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -h|--help)
+            usage
+            exit 0 ;;
+
+        -n|--dry-run)
+            dry_run=true
+            shift ;;
+
+        -f|--force)
+            force=true
+            shift ;;
+
+        *) echo "Unknown parameter passed: $1"
+           exit 1 ;;
+    esac
+done
+
+current=$(git branch --show-current)
+branches=$(git for-each-ref --format='%(refname:short)' --merged HEAD refs/heads/ | grep -v "^${current}$" || true)
+
+if [[ -z "$branches" ]]; then
+    exit 0
+fi
+
+if $dry_run; then
+    for branch in $branches; do
+        echo "Would delete branch $branch"
+    done
+    exit 0
+fi
+
+flags=(-d)
+
+if $force; then
+    flags+=(-f)
+fi
+
+echo "$branches" | xargs git branch "${flags[@]}"
