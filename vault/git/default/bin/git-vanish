@@ -2,10 +2,10 @@
 set -euo pipefail
 
 # NAME
-#   git-weed - Delete local branches whose upstream is gone
+#   git-vanish - Delete local branches whose upstream is gone
 #
 # SYNOPSIS
-#   git weed [-n|--dry-run] [-f|--force]
+#   git vanish [-n|--dry-run] [-f|--force]
 #
 # DESCRIPTION
 #   Deletes local branches that are tracking remote branches which no longer exist.
@@ -19,10 +19,10 @@ set -euo pipefail
 #       Force delete branches using `git branch -D`, even if not fully merged.
 #
 # EXAMPLES
-#   $ git weed
+#   $ git vanish
 #   Deleted branch feature/old (was a1b2c3d).
 #
-#   $ git weed --force
+#   $ git vanish --force
 #   Deleted branch feature/unmerged (was b2c3d4e).
 
 usage() {
