@@ -39,21 +39,6 @@
     br = branch -vv
 
     # NAME
-    #   ls-branches - List branch names without decorations
-    #
-    # SYNOPSIS
-    #   git ls-branches
-    #
-    # DESCRIPTION
-    #   Lists all local branch names, one per line, without decorations.
-    #   Useful for piping into other commands.
-    #
-    # EXAMPLES
-    #   $ git ls-branches
-    #   $ git ls-branches | xargs -I{} git log --oneline -1 {}
-    ls-branches = for-each-ref --format='%(refname:short)' refs/heads/
-
-    # NAME
     #   save - Amend last commit with current user as author
     #
     # SYNOPSIS

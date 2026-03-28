@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# NAME
+#   git-ls-branches - List branch names without decorations
+#
+# SYNOPSIS
+#   git ls-branches [<pattern>]
+#
+# DESCRIPTION
+#   Lists all local branch names, one per line, without decorations.
+#   Useful for piping into other commands.
+#   If <pattern> is given, only branches matching the glob pattern are shown.
+#
+# EXAMPLES
+#   $ git ls-branches
+#   $ git ls-branches 'feature/*'
+#   $ git ls-branches | xargs -I{} git log --oneline -1 {}
+
+usage() {
+    awk '
+        /^[^#]/ { if (f) exit }
+        /^# NAME/ { f = 1 }
+        f { sub(/^# ?/, ""); print }
+    ' "$0"
+}
+
+pattern=""
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -h|--help)
+            usage
+            exit 0 ;;
+
+        -*)
+            echo "Unknown option: $1"
+            exit 1 ;;
+
+        *)
+            if [[ -n "$pattern" ]]; then
+                echo "Too many arguments"
+                exit 1
+            fi
+            pattern="$1"
+            shift ;;
+    esac
+done
+
+if [[ -n "$pattern" ]]; then
+    git for-each-ref --format='%(refname:short)' "refs/heads/${pattern}"
+else
+    git for-each-ref --format='%(refname:short)' refs/heads/
+fi
