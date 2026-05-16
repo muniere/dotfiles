@@ -70,6 +70,7 @@ abstract class Action<Context> {
       vault.GradleCookBook,
       vault.PythonCookBook,
       vault.NodeCookBook,
+      vault.ClaudeCookBook,
       vault.CodeCookBook,
       vault.iTermCookBook,
       vault.XcodeCookBook,

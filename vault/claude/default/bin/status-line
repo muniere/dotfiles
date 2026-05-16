@@ -1,0 +1,426 @@
+#!/usr/bin/env -S deno run --allow-env --ext=ts
+
+/**
+ * Data structure for the status line, based on the available data from the API.
+ *
+ * https://code.claude.com/docs/en/statusline#available-data
+ */
+type Payload = {
+  cwd: string;
+  session_id: string;
+  session_name?: string;
+  transcript_path: string;
+  version: string;
+  model: {
+    id: string;
+    display_name: string;
+  };
+  workspace: {
+    current_dir: string;
+    project_dir: string;
+    added_dirs: string[];
+    git_worktree?: string;
+  };
+  output_style: {
+    name: string;
+  };
+  cost: {
+    total_cost_usd: number;
+    total_duration_ms: number;
+    total_api_duration_ms: number;
+    total_lines_added: number;
+    total_lines_removed: number;
+  };
+  context_window: {
+    total_input_tokens: number;
+    total_output_tokens: number;
+    context_window_size: number;
+    used_percentage: number | null;
+    remaining_percentage: number | null;
+    current_usage: {
+      input_tokens: number;
+      output_tokens: number;
+      cache_creation_input_tokens: number;
+      cache_read_input_tokens: number;
+    } | null;
+  };
+  exceeds_200k_tokens: boolean;
+  effort?: {
+    level: "low" | "medium" | "high" | "xhigh" | "max";
+  };
+  thinking: {
+    enabled: boolean;
+  };
+  rate_limits?: {
+    five_hour?: {
+      used_percentage: number;
+      resets_at: number;
+    };
+    seven_day?: {
+      used_percentage: number;
+      resets_at: number;
+    };
+  };
+  vim?: {
+    mode: "NORMAL" | "INSERT" | "VISUAL" | "VISUAL LINE";
+  };
+  agent?: {
+    name: string;
+  };
+  worktree?: {
+    name: string;
+    path: string;
+    branch?: string;
+    original_cwd: string;
+    original_branch?: string;
+  };
+};
+
+function rgb(r: number, g: number, b: number): (text: string) => string {
+  return (text: string) => `\x1b[38;2;${r};${g};${b}m${text}\x1b[0m`;
+}
+
+class Chart {
+  time(milliseconds: number): string {
+    if (milliseconds < 1000) {
+      return `${milliseconds}ms`;
+    }
+
+    const seconds = milliseconds / 1000;
+    if (seconds < 60) {
+      const s = Math.floor(seconds);
+      return `${s}s`;
+    }
+
+    const minutes = seconds / 60;
+    if (minutes < 60) {
+      const m = Math.floor(minutes);
+      const s = Math.floor(seconds % 60);
+      return `${m}m ${s}s`;
+    }
+    const hours = minutes / 60;
+    const h = Math.floor(hours);
+    const m = Math.floor(minutes % 60);
+    const s = Math.floor(seconds % 60);
+    return `${h}h ${m}m ${s}s`;
+  }
+
+  text(percentage: number | null): string {
+    const gradient = this.gradient(percentage);
+    const block = this.block(percentage);
+    const label = this.label(percentage);
+    return gradient(`${block} ${label}`);
+  }
+
+  private gradient(percentage: number | null): (text: string) => string {
+    percentage = percentage ?? 0;
+
+    if (percentage < 50) {
+      const red = Math.floor(percentage * 5.1);
+      return rgb(red, 200, 80);
+    } else {
+      const green = Math.max(Math.floor(200 - (percentage - 50) * 4), 0);
+      return rgb(255, green, 60);
+    }
+  }
+
+  private block(percentage: number | null): string {
+    percentage = percentage ?? 0;
+
+    const WIDTH = 10;
+    const length = (percentage * WIDTH) / 100;
+    const filled = Math.floor(length);
+    if (filled >= WIDTH) {
+      return "█".repeat(WIDTH);
+    }
+
+    const BLOCKS = " ▏▎▍▌▋▊▉█";
+    const position = Math.floor((length - filled) * (BLOCKS.length - 1));
+
+    const leading = "█".repeat(filled);
+    const center = BLOCKS[position];
+    const trailing = "░".repeat(WIDTH - filled - 1);
+    return leading + center + trailing;
+  }
+
+  private label(percentage: number | null): string {
+    return percentage == null ? "--%" : `${Math.round(percentage)}%`;
+  }
+}
+
+function render(payload: Payload): void {
+  const home = Deno.env.get("HOME") ?? "";
+  const cwd = payload.cwd.replace(home, "~");
+
+  const chart = new Chart();
+  const cyan = rgb(60, 200, 255);
+  const yellow = rgb(255, 200, 60);
+
+  const first = [
+    payload.model.display_name,
+    chart.time(payload.cost.total_duration_ms),
+    "ctx " + chart.text(payload.context_window.used_percentage),
+    "5h " + chart.text(payload.rate_limits?.five_hour?.used_percentage ?? null),
+    "7d " + chart.text(payload.rate_limits?.seven_day?.used_percentage ?? null),
+  ];
+  const second = [
+    yellow(cwd) + " [" + cyan(payload.session_id) + "]",
+  ];
+
+  console.log(first.join(" | "));
+  console.log(second.join(": "));
+}
+
+async function main() {
+  if (Deno.stdin.isTerminal()) {
+    showcase();
+  } else {
+    const payload: Payload = await new Response(Deno.stdin.readable).json();
+    render(payload);
+  }
+}
+
+main();
+
+function showcase() {
+  const base: Payload = {
+    cwd: "/current/working/directory",
+    session_id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    session_name: "my-session",
+    transcript_path: "/path/to/transcript.jsonl",
+    model: {
+      id: "claude-opus-4-7",
+      display_name: "Opus",
+    },
+    workspace: {
+      current_dir: "/current/working/directory",
+      project_dir: "/original/project/directory",
+      added_dirs: [],
+      git_worktree: "feature-xyz",
+    },
+    version: "2.1.90",
+    output_style: {
+      name: "default",
+    },
+    cost: {
+      total_cost_usd: 0.01234,
+      total_duration_ms: 45000,
+      total_api_duration_ms: 2300,
+      total_lines_added: 156,
+      total_lines_removed: 23,
+    },
+    context_window: {
+      total_input_tokens: 15500,
+      total_output_tokens: 1200,
+      context_window_size: 200000,
+      used_percentage: 8,
+      remaining_percentage: 92,
+      current_usage: {
+        input_tokens: 8500,
+        output_tokens: 1200,
+        cache_creation_input_tokens: 5000,
+        cache_read_input_tokens: 2000,
+      },
+    },
+    exceeds_200k_tokens: false,
+    effort: {
+      level: "high",
+    },
+    thinking: {
+      enabled: true,
+    },
+    rate_limits: {
+      five_hour: {
+        used_percentage: 23.5,
+        resets_at: 1738425600,
+      },
+      seven_day: {
+        used_percentage: 41.2,
+        resets_at: 1738857600,
+      },
+    },
+    vim: {
+      mode: "NORMAL",
+    },
+    agent: {
+      name: "security-reviewer",
+    },
+    worktree: {
+      name: "my-feature",
+      path: "/path/to/.claude/worktrees/my-feature",
+      branch: "worktree-my-feature",
+      original_cwd: "/path/to/project",
+      original_branch: "main",
+    },
+  };
+
+  type Variant = {
+    label: string;
+    payload: Payload;
+  };
+
+  const variants: Variant[] = [];
+
+  const append = (label: string, overrides: Partial<Payload>) => {
+    variants.push({
+      label,
+      payload: { ...base, ...overrides },
+    });
+  };
+
+  append("Schema default (docs example)", {
+    ...base,
+  });
+
+  append("Minimal (no optional fields)", {
+    session_id: "00000000-0000-0000-0000-000000000000",
+    session_name: undefined,
+    model: {
+      id: "claude-sonnet-4-6",
+      display_name: "Claude Sonnet 4.6",
+    },
+    workspace: {
+      current_dir: "/current/working/directory",
+      project_dir: "/current/working/directory",
+      added_dirs: [],
+    },
+    cost: {
+      total_cost_usd: 0,
+      total_duration_ms: 0,
+      total_api_duration_ms: 0,
+      total_lines_added: 0,
+      total_lines_removed: 0,
+    },
+    context_window: {
+      total_input_tokens: 0,
+      total_output_tokens: 0,
+      context_window_size: 200000,
+      used_percentage: null,
+      remaining_percentage: null,
+      current_usage: null,
+    },
+    effort: undefined,
+    thinking: {
+      enabled: false,
+    },
+    rate_limits: undefined,
+    vim: undefined,
+    agent: undefined,
+    worktree: undefined,
+  });
+
+  append("Early session (null percentages, no rate_limits)", {
+    context_window: {
+      total_input_tokens: 0,
+      total_output_tokens: 0,
+      context_window_size: 200000,
+      used_percentage: null,
+      remaining_percentage: null,
+      current_usage: null,
+    },
+    rate_limits: undefined,
+  });
+
+  append("High usage (ctx 85%, 5h 90%, 7d 75%)", {
+    cost: {
+      total_cost_usd: 0.01234,
+      total_duration_ms: 7_500_000,
+      total_api_duration_ms: 2300,
+      total_lines_added: 156,
+      total_lines_removed: 23,
+    },
+    context_window: {
+      total_input_tokens: 170000,
+      total_output_tokens: 8000,
+      context_window_size: 200000,
+      used_percentage: 85,
+      remaining_percentage: 15,
+      current_usage: {
+        input_tokens: 90000,
+        output_tokens: 8000,
+        cache_creation_input_tokens: 50000,
+        cache_read_input_tokens: 30000,
+      },
+    },
+    rate_limits: {
+      five_hour: {
+        used_percentage: 90,
+        resets_at: 1738425600,
+      },
+      seven_day: {
+        used_percentage: 75,
+        resets_at: 1738857600,
+      },
+    },
+  });
+
+  append("Full context (100%, exceeds_200k_tokens: true)", {
+    context_window: {
+      total_input_tokens: 200000,
+      total_output_tokens: 10000,
+      context_window_size: 200000,
+      used_percentage: 100,
+      remaining_percentage: 0,
+      current_usage: {
+        input_tokens: 100000,
+        output_tokens: 10000,
+        cache_creation_input_tokens: 60000,
+        cache_read_input_tokens: 40000,
+      },
+    },
+    exceeds_200k_tokens: true,
+  });
+
+  append("Extended context model (1M window, 50% used)", {
+    model: {
+      id: "claude-opus-4-7",
+      display_name: "Opus (1M ctx)",
+    },
+    context_window: {
+      total_input_tokens: 500000,
+      total_output_tokens: 20000,
+      context_window_size: 1000000,
+      used_percentage: 50,
+      remaining_percentage: 50,
+      current_usage: {
+        input_tokens: 300000,
+        output_tokens: 20000,
+        cache_creation_input_tokens: 120000,
+        cache_read_input_tokens: 80000,
+      },
+    },
+  });
+
+  append("Worktree session", {
+    cwd: "/path/to/.claude/worktrees/my-feature",
+    workspace: {
+      current_dir: "/path/to/.claude/worktrees/my-feature",
+      project_dir: "/path/to/project",
+      added_dirs: [],
+      git_worktree: "my-feature",
+    },
+    worktree: {
+      name: "my-feature",
+      path: "/path/to/.claude/worktrees/my-feature",
+      branch: "worktree-my-feature",
+      original_cwd: "/path/to/project",
+      original_branch: "main",
+    },
+  });
+
+  append("Sub-second duration", {
+    cost: {
+      total_cost_usd: 0.01234,
+      total_duration_ms: 450,
+      total_api_duration_ms: 2300,
+      total_lines_added: 156,
+      total_lines_removed: 23,
+    },
+  });
+
+  for (const { label, payload } of variants) {
+    console.log(`\x1b[1m── ${label} ${"─".repeat(Math.max(0, 60 - label.length))}\x1b[0m`);
+    render(payload);
+    console.log();
+  }
+}
