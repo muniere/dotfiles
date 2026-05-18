@@ -18,12 +18,13 @@ export const iTermCookBook = new CookBook({
       return;
     }
 
-    const plist = new PropertyList({
+    // for default profile
+    const defaults = new PropertyList({
       path: path.expandHome(),
       root: "New Bookmarks:0",
     });
 
-    const profile = await plist.getDict("");
+    const profile = await defaults.getDict("");
     if (!profile) {
       options.logger?.info("iTerm 2 profile not found. skip.");
       return;
@@ -36,7 +37,7 @@ export const iTermCookBook = new CookBook({
       if (profile[key] === value) {
         options.logger?.info(`Non-ASCII Font already enabled: ${value}`);
       } else {
-        await plist.setBoolean(key, value, options);
+        await defaults.setBoolean(key, value, options);
       }
     }
 
@@ -47,7 +48,7 @@ export const iTermCookBook = new CookBook({
       if (profile[key] === value) {
         options.logger?.info(`Nerd Font already configured: ${value}`);
       } else {
-        await plist.setString(key, value, options);
+        await defaults.setString(key, value, options);
       }
     }
 
@@ -58,7 +59,7 @@ export const iTermCookBook = new CookBook({
       if (profile[key] === value) {
         options.logger?.info(`Separate Colors already disabled: ${value}`);
       } else {
-        await plist.setBoolean(key, value, options);
+        await defaults.setBoolean(key, value, options);
       }
     }
 
@@ -69,7 +70,7 @@ export const iTermCookBook = new CookBook({
       if (profile[key] === value) {
         options.logger?.info(`Brighten Bold Text already enabled: ${value}`);
       } else {
-        await plist.setBoolean(key, value, options);
+        await defaults.setBoolean(key, value, options);
       }
     }
 
@@ -80,7 +81,7 @@ export const iTermCookBook = new CookBook({
       if (profile[key] === value) {
         options.logger?.info(`Bright Bold already enabled: ${value}`);
       } else {
-        await plist.setBoolean(key, value, options);
+        await defaults.setBoolean(key, value, options);
       }
     }
 
@@ -109,7 +110,7 @@ export const iTermCookBook = new CookBook({
         if (Math.abs(property - value) < 1 / 255) {
           matches.push({ field: field, value: property });
         } else {
-          await plist.setReal(`${entry}:${field}`, value, options);
+          await defaults.setReal(`${entry}:${field}`, value, options);
         }
       }
 
@@ -125,7 +126,51 @@ export const iTermCookBook = new CookBook({
 
     for (const key in profile) {
       if (key.includes("(Light)") || key.includes("(Dark)")) {
-        await plist.remove(key, options);
+        await defaults.remove(key, options);
+      }
+    }
+
+    // for global
+    const global = new PropertyList({
+      path: path,
+      root: "GlobalKeyMap",
+    });
+
+    {
+      const bindings = [
+        {
+          shortcut: {
+            label: "⌘Return↵",
+            value: "0xd-0x100000-0x24",
+          },
+          action: {
+            label: "Ignore",
+            value: 13,
+          },
+          attributes: {
+            "Apply Mode": 0,
+            "Escaping": 2,
+            "Text": "",
+            "Version": 2,
+          },
+        },
+      ];
+
+      for (const binding of bindings) {
+        const { shortcut, action, attributes } = binding;
+
+        const current = await global.getDict(shortcut.value);
+        if (current !== null && current["Action"] === action.value) {
+          options.logger?.info(`Binding for ${shortcut.label} already configured: ${action.label}`);
+          continue;
+        }
+
+        const attrs = {
+          "Action": action.value,
+          ...attributes,
+        };
+        await global.setDict(shortcut.value, attrs, options);
+        options.logger?.info(`Set binding for ${shortcut.label} to ${action.label}`);
       }
     }
   },

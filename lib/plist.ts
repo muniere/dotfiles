@@ -96,6 +96,15 @@ export class PropertyList {
     return await this.set(entry, "string", value, options);
   }
 
+  async setInteger(
+    key: string,
+    value: number,
+    options: shell.CallOptions = {},
+  ): Promise<shell.CommandStatus> {
+    const entry = this.entry(key);
+    return await this.set(entry, "integer", value, options);
+  }
+
   async setReal(
     key: string,
     value: number,
@@ -103,6 +112,27 @@ export class PropertyList {
   ): Promise<shell.CommandStatus> {
     const entry = this.entry(key);
     return await this.set(entry, "real", value, options);
+  }
+
+  async setDict(
+    key: string,
+    value: PropertyDict,
+    options: shell.CallOptions = {},
+  ): Promise<shell.CommandStatus> {
+    const entry = this.entry(key);
+    await this.delete(entry, options);
+
+    const cmd = "/usr/libexec/PlistBuddy";
+    const path = this.path.toAbsolute().toString();
+
+    let status = await shell.call(cmd, ["-c", `Add "${entry}" dict`, path], options);
+    for (const [k, v] of Object.entries(value)) {
+      const type = typeof v === "boolean" ? "bool"
+        : typeof v === "number" ? (Number.isInteger(v) ? "integer" : "real")
+        : "string";
+      status = await shell.call(cmd, ["-c", `Add "${entry}:${k}" ${type} ${v}`, path], options);
+    }
+    return status;
   }
 
   async remove(
