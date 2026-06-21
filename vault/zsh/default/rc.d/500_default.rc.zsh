@@ -243,6 +243,30 @@ if command -v fzf &> /dev/null; then
   bindkey '^x^b' fzf-branch
   bindkey '^xb' fzf-branch
 
+  # <C-x><C-t>: git worktree
+  function fzf-worktree () {
+    local selected
+    selected=$(
+      git worktree list --porcelain \
+      | awk -v pwd="$PWD" '
+        /^worktree / { path = $2; gsub(pwd, ".", path) }
+        /^HEAD /     { sha = substr($2, 1, 10) }
+        /^branch /   { branch = $2; sub(/^refs\/heads\//, "", branch); if (!skip) print path, branch, sha }
+        /^detached$/ { if (!skip) print path, "(detached)", sha }
+      ' \
+      | column -t | fzf | awk '{print $1}'
+    )
+    if [ -n "$selected" ]; then
+      BUFFER="${BUFFER}${selected}"
+      CURSOR=$#BUFFER
+    fi
+    zle reset-prompt
+  }
+
+  zle -N fzf-worktree
+  bindkey '^x^;' fzf-worktree
+  bindkey '^x;' fzf-worktree
+
   # <C-r>: history
   function fzf-history() {
     local tac
