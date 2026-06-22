@@ -214,59 +214,6 @@ if command -v fzf &> /dev/null; then
   bindkey '^x^f' fzf-file
   bindkey '^xf' fzf-file
 
-  # <C-]>: ghq
-  function fzf-ghq() {
-    local selected
-    selected=$(ghq list --full-path | sed -e "s|${HOME}|~|" | fzf)
-    if [ -n "$selected" ]; then
-      BUFFER="${BUFFER}${selected}"
-      CURSOR=$#BUFFER
-    fi
-    zle reset-prompt
-  }
-
-  zle -N fzf-ghq
-  bindkey '^]' fzf-ghq
-
-  # <C-g><C-b>: git branch
-  function fzf-git-branch () {
-    local selected
-    selected=$(git branch -vv | fzf | awk '$0 = substr($0, 3) { print $1 }')
-    if [ -n "$selected" ]; then
-      BUFFER="${BUFFER}${selected}"
-      CURSOR=$#BUFFER
-    fi
-    zle reset-prompt
-  }
-
-  zle -N fzf-git-branch
-  bindkey '^g^b' fzf-git-branch
-  bindkey '^gb' fzf-git-branch
-
-  # <C-g><C-;>: git worktree
-  function fzf-git-worktree () {
-    local selected
-    selected=$(
-      git worktree list --porcelain \
-      | awk -v pwd="$PWD" '
-        /^worktree / { path = $2; gsub(pwd, ".", path) }
-        /^HEAD /     { sha = substr($2, 1, 10) }
-        /^branch /   { branch = $2; sub(/^refs\/heads\//, "", branch); if (!skip) print path, branch, sha }
-        /^detached$/ { if (!skip) print path, "(detached)", sha }
-      ' \
-      | column -t | fzf | awk '{print $1}'
-    )
-    if [ -n "$selected" ]; then
-      BUFFER="${BUFFER}${selected}"
-      CURSOR=$#BUFFER
-    fi
-    zle reset-prompt
-  }
-
-  zle -N fzf-git-worktree
-  bindkey '^g^t' fzf-git-worktree
-  bindkey '^gt' fzf-git-worktree
-
   # <C-r>: history
   function fzf-history() {
     local tac
@@ -310,6 +257,50 @@ if command -v git-lift &> /dev/null; then
   }
 fi
 
+# =====
+# Git : Binding
+# =====
+if command -v git &> /dev/null && command -v fzf &> /dev/null; then
+  # <C-g><C-b>: git branch
+  function fzf-git-branch () {
+    local selected
+    selected=$(git branch -vv | fzf | awk '$0 = substr($0, 3) { print $1 }')
+    if [ -n "$selected" ]; then
+      BUFFER="${BUFFER}${selected}"
+      CURSOR=$#BUFFER
+    fi
+    zle reset-prompt
+  }
+
+  zle -N fzf-git-branch
+  bindkey '^g^b' fzf-git-branch
+  bindkey '^gb' fzf-git-branch
+
+  # <C-g><C-;>: git worktree
+  function fzf-git-worktree () {
+    local selected
+    selected=$(
+      git worktree list --porcelain \
+      | awk -v pwd="$PWD" '
+        /^worktree / { path = $2; gsub(pwd, ".", path) }
+        /^HEAD /     { sha = substr($2, 1, 10) }
+        /^branch /   { branch = $2; sub(/^refs\/heads\//, "", branch); if (!skip) print path, branch, sha }
+        /^detached$/ { if (!skip) print path, "(detached)", sha }
+      ' \
+      | column -t | fzf | awk '{print $1}'
+    )
+    if [ -n "$selected" ]; then
+      BUFFER="${BUFFER}${selected}"
+      CURSOR=$#BUFFER
+    fi
+    zle reset-prompt
+  }
+
+  zle -N fzf-git-worktree
+  bindkey '^g^t' fzf-git-worktree
+  bindkey '^gt' fzf-git-worktree
+fi
+
 if command -v tig &> /dev/null; then
   # <C-g><C-g>: git status powered by tig
   function git-status() {
@@ -320,6 +311,44 @@ if command -v tig &> /dev/null; then
   zle -N git-status
   bindkey '^g^g' git-status
   bindkey '^gg' git-status
+fi
+
+# =====
+# ghq
+# =====
+if command -v ghq &> /dev/null && command -v fzf &> /dev/null; then
+  # <C-]>: ghq
+  function fzf-ghq() {
+    local selected
+    selected=$(ghq list --full-path | sed -e "s|${HOME}|~|" | fzf)
+    if [ -n "$selected" ]; then
+      BUFFER="${BUFFER}${selected}"
+      CURSOR=$#BUFFER
+    fi
+    zle reset-prompt
+  }
+
+  zle -N fzf-ghq
+  bindkey '^]' fzf-ghq
+fi
+
+# =====
+# Zellij
+# =====
+if command -v zellij &> /dev/null && command -v fzf &> /dev/null; then
+  # <C-x><C-j>: zellij attach
+  function fzf-zellij-session() {
+    local selected
+    selected=$(zellij list-sessions --no-formatting | fzf | awk '{print $1}')
+    if [ -n "$selected" ]; then
+      BUFFER="${BUFFER}${selected}"
+      CURSOR=$#BUFFER
+    fi
+    zle reset-prompt
+  }
+
+  zle -N fzf-zellij-session
+  bindkey '^x^j' fzf-zellij-session
 fi
 
 # =====
