@@ -214,8 +214,8 @@ if command -v fzf &> /dev/null; then
   bindkey '^x^f' fzf-file
   bindkey '^xf' fzf-file
 
-  # <C-]>: src with ghq
-  function fzf-src() {
+  # <C-]>: ghq
+  function fzf-ghq() {
     local selected
     selected=$(ghq list --full-path | sed -e "s|${HOME}|~|" | fzf)
     if [ -n "$selected" ]; then
@@ -225,11 +225,11 @@ if command -v fzf &> /dev/null; then
     zle reset-prompt
   }
 
-  zle -N fzf-src
-  bindkey '^]' fzf-src
+  zle -N fzf-ghq
+  bindkey '^]' fzf-ghq
 
-  # <C-x><C-b>: git branch
-  function fzf-branch () {
+  # <C-g><C-b>: git branch
+  function fzf-git-branch () {
     local selected
     selected=$(git branch -vv | fzf | awk '$0 = substr($0, 3) { print $1 }')
     if [ -n "$selected" ]; then
@@ -239,12 +239,12 @@ if command -v fzf &> /dev/null; then
     zle reset-prompt
   }
 
-  zle -N fzf-branch
-  bindkey '^x^b' fzf-branch
-  bindkey '^xb' fzf-branch
+  zle -N fzf-git-branch
+  bindkey '^g^b' fzf-git-branch
+  bindkey '^gb' fzf-git-branch
 
-  # <C-x><C-t>: git worktree
-  function fzf-worktree () {
+  # <C-g><C-;>: git worktree
+  function fzf-git-worktree () {
     local selected
     selected=$(
       git worktree list --porcelain \
@@ -263,9 +263,9 @@ if command -v fzf &> /dev/null; then
     zle reset-prompt
   }
 
-  zle -N fzf-worktree
-  bindkey '^x^[[59;5u' fzf-worktree
-  bindkey '^x;' fzf-worktree
+  zle -N fzf-git-worktree
+  bindkey '^g^t' fzf-git-worktree
+  bindkey '^gt' fzf-git-worktree
 
   # <C-r>: history
   function fzf-history() {
