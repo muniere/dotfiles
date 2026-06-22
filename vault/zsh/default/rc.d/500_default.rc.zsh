@@ -264,7 +264,7 @@ if command -v fzf &> /dev/null; then
   }
 
   zle -N fzf-worktree
-  bindkey '^x^;' fzf-worktree
+  bindkey '^x^[[59;5u' fzf-worktree
   bindkey '^x;' fzf-worktree
 
   # <C-r>: history
