@@ -198,7 +198,7 @@ keybinds clear-defaults=true {
         bind "Alt Shift p" { ToggleGroupMarking; }
     }
     shared_except "locked" "renametab" "renamepane" {
-        bind "Ctrl q" { Quit; }
+        bind "Ctrl q" { Detach; }
     }
     shared_except "locked" "entersearch" {
         bind "enter" { SwitchToMode "locked"; }
@@ -357,7 +357,7 @@ default_mode "locked"
 //   - detach (Default)
 //   - quit
 // 
-// on_force_close "quit"
+on_force_close "detach"
  
 // Configure the scroll back buffer size
 // This is the number of lines zellij stores for each pane in the scroll back
@@ -423,7 +423,7 @@ default_mode "locked"
 //   - true (default)
 //   - false
 // 
-// session_serialization false
+session_serialization false
  
 // Whether pane viewports are serialized along with the session, default is false
 // Options:
