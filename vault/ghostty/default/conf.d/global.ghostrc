@@ -45,8 +45,15 @@ quick-terminal-animation-duration = 0
 keybind = "global:ctrl+cmd+t=toggle_quick_terminal"
 
 # =====
-# Input
+# Keymap
 # =====
+
+# https://github.com/ghostty-org/ghostty/discussions/3483
+keybind = alt+left=unbind
+keybind = alt+right=unbind
+macos-option-as-alt = left
+
 # https://github.com/ghostty-org/ghostty/discussions/3586
 keybind = "ctrl+i=text:\t"
 keybind = "ctrl+m=text:\n"
+
