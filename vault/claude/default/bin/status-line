@@ -158,11 +158,21 @@ function render(payload: Payload): void {
 
   const first = [
     payload.model.display_name,
-    chart.time(payload.cost.total_duration_ms),
     "ctx " + chart.text(payload.context_window.used_percentage),
-    "5h " + chart.text(payload.rate_limits?.five_hour?.used_percentage ?? null),
-    "7d " + chart.text(payload.rate_limits?.seven_day?.used_percentage ?? null),
   ];
+
+  const fiveHourLimit = payload.rate_limits?.five_hour;
+  if (fiveHourLimit) {
+    const reset = new Date(fiveHourLimit.resets_at * 1000).toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit", hour12: false });
+    first.push(`5h (~${reset}) ` + chart.text(fiveHourLimit.used_percentage));
+  }
+
+  const sevenDayLimit = payload.rate_limits?.seven_day;
+  if (sevenDayLimit) {
+    const reset = new Date(sevenDayLimit.resets_at * 1000).toLocaleDateString("ja-JP", { year: "numeric", month: "2-digit", day: "2-digit" });
+    first.push(`7d (~${reset}) ` + chart.text(sevenDayLimit.used_percentage));
+  }
+
   const second = [
     yellow(cwd) + " [" + cyan(payload.session_id) + "]",
   ];
