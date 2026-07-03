@@ -351,6 +351,11 @@ if command -v zellij &> /dev/null && command -v fzf &> /dev/null; then
   bindkey '^x^j' fzf-zellij-session
 fi
 
+# ====
+# Herdr
+# ====
+alias h="herdr"
+
 # =====
 # Python
 # =====

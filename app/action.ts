@@ -66,6 +66,7 @@ abstract class Action<Context> {
       vault.YaziCookBook,
       vault.TmuxCookBook,
       vault.ZellijCookBook,
+      vault.HerdrCookBook,
       vault.GhosttyCookBook,
       vault.RioCookBook,
       vault.GradleCookBook,
