@@ -44,7 +44,6 @@ manifest_check = true
 [keys]
 # Reference: https://herdr.dev/docs/configuration/#keybindings
 # Guidance:  https://herdr.dev/docs/keyboard/
-# Prefix key to enter prefix mode. Unified with tmux (C-t) and zellij (Ctrl t).
 prefix = "ctrl+t"
 
 # Prefix-mode actions

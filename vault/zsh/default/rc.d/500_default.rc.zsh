@@ -332,25 +332,6 @@ if command -v ghq &> /dev/null && command -v fzf &> /dev/null; then
   bindkey '^]' fzf-ghq
 fi
 
-# =====
-# Zellij
-# =====
-if command -v zellij &> /dev/null && command -v fzf &> /dev/null; then
-  # <C-x><C-j>: zellij attach
-  function fzf-zellij-session() {
-    local selected
-    selected=$(zellij list-sessions --no-formatting | fzf | awk '{print $1}')
-    if [ -n "$selected" ]; then
-      BUFFER="${BUFFER}${selected}"
-      CURSOR=$#BUFFER
-    fi
-    zle reset-prompt
-  }
-
-  zle -N fzf-zellij-session
-  bindkey '^x^j' fzf-zellij-session
-fi
-
 # ====
 # Herdr
 # ====
