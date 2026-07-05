@@ -150,7 +150,7 @@ class Chart {
 
 function render(payload: Payload): void {
   const home = Deno.env.get("HOME") ?? "";
-  const cwd = payload.cwd.replace(home, "~");
+  const cwd = payload.workspace.current_dir.replace(home, "~");
 
   const chart = new Chart();
   const cyan = rgb(60, 200, 255);
