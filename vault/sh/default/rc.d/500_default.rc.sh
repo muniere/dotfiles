@@ -47,6 +47,13 @@ if command -v yazi &> /dev/null; then
   }
 fi
 
+# ====
+# Herdr
+# ====
+if command -v herdr &> /dev/null; then
+  alias h="herdr"
+fi
+
 # ===
 # Git
 # ===

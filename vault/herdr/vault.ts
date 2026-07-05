@@ -8,8 +8,12 @@ export const HerdrCookBook = new CookBook({
   container: ResLayout.vault().join("herdr/"),
   prefs: [
     new PrefSpec({
-      src: ".",
+      src: "conf.d/",
       dst: HomeLayout.config().join("herdr/"),
+    }),
+    new PrefSpec({
+      src: "completion/",
+      dst: HomeLayout.data().join("zsh/site-functions/"),
     }),
   ],
 });

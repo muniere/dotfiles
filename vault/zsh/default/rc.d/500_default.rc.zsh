@@ -177,6 +177,10 @@ bindkey "^[[Z" reverse-menu-complete
 bindkey -r "^S"
 bindkey -r "^G"
 
+if [[ -o interactive ]]; then
+  stty -ixon
+fi
+
 # =====
 # Zsh : Time
 # =====
@@ -335,7 +339,21 @@ fi
 # ====
 # Herdr
 # ====
-alias h="herdr"
+if command -v herdr &> /dev/null && command -v fzf &> /dev/null; then
+  # <C-q>: herdr session attach
+  function fzf-herdr-session() {
+    local selected
+    selected=$(herdr session list | tail -n +2 | fzf | awk '{print $1}')
+    if [ -n "$selected" ]; then
+      BUFFER="${BUFFER}${selected}"
+      CURSOR=$#BUFFER
+    fi
+    zle reset-prompt
+  }
+
+  zle -N fzf-herdr-session
+  bindkey '^q' fzf-herdr-session
+fi
 
 # =====
 # Python
