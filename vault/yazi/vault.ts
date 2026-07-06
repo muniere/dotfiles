@@ -45,7 +45,7 @@ export const YaziCookBook = new CookBook({
       if (installed.has(pkg.dest)) {
         options.logger?.info(`Plugin already installed: ${pkg.name}`);
       } else {
-        await shell.call(cmd, ["pack", "-a", pkg.src], options);
+        await shell.call(cmd, ["pkg", "add", pkg.src], options);
       }
     }
   },
