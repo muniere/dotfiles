@@ -7,8 +7,12 @@ export const ClaudeCookBook = new CookBook({
   container: ResLayout.vault().join("claude/"),
   prefs: [
     new PrefSpec({
-      src: ".",
-      dst: new Path("~/.claude").expandHome(),
+      src: "bin/",
+      dst: new Path("~/.claude/bin").expandHome(),
+    }),
+    new PrefSpec({
+      src: "hooks/",
+      dst: new Path("~/.claude/hooks").expandHome(),
     }),
   ],
 });
