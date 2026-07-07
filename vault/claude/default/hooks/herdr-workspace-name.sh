@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # Rename this herdr workspace (and tab) to the work in progress *right now*.
 # Custom hook, installed beside the herdr-managed herdr-agent-state.sh. Wired as a
 # global UserPromptSubmit hook (async): it fires the instant a prompt is
@@ -97,8 +97,15 @@ summary="$(env -u HERDR_ENV -u HERDR_PANE_ID -u HERDR_SOCKET_PATH HERDR_RENAME=1
   | head -n1 | tr -d '\r' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
 [ -n "$summary" ] || exit 0
 
-# KEEP means the topic is unchanged — nothing to do, and no label churn.
-[ "$summary" = "KEEP" ] && exit 0
+# KEEP means the topic is unchanged — nothing to do, and no label churn. The
+# summarizer does not always emit the bare token: it may wrap it (e.g. "🔒 KEEP",
+# "\"KEEP\"", or "KEEP.") while still meaning "keep". Strip any leading run of
+# non-letters (emoji, quotes, spaces) and trailing non-letters, then compare
+# case-insensitively so those variants no longer leak through as a "KEEP" label.
+core="$(printf '%s' "$summary" | sed 's/^[^[:alpha:]]*//; s/[^[:alpha:]]*$//')"
+case "$core" in
+  [Kk][Ee][Ee][Pp]) exit 0 ;;
+esac
 
 # Validate the shape before trusting it as a label: require two space-separated
 # tokens (the intended "<emoji> <words>") and reject preambles, refusals, or full
