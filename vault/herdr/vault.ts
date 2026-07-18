@@ -12,6 +12,10 @@ export const HerdrCookBook = new CookBook({
       dst: HomeLayout.config().join("herdr/"),
     }),
     new PrefSpec({
+      src: "bin/",
+      dst: HomeLayout.bin(),
+    }),
+    new PrefSpec({
       src: "completion/",
       dst: HomeLayout.data().join("zsh/site-functions/"),
     }),

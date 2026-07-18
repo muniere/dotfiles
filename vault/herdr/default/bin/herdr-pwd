@@ -1,0 +1,51 @@
+#!/bin/sh
+
+# NAME
+#   herdr-pwd - Print the active herdr pane's foreground cwd
+#
+# SYNOPSIS
+#   herdr-pwd
+#
+# DESCRIPTION
+#   Prints the directory the active pane's foreground process is currently in,
+#   for use as `cd "$(herdr-pwd)"`. Intended to be run from a herdr
+#   keys.command, where herdr injects HERDR_BIN_PATH and HERDR_ACTIVE_*.
+#
+#   The value comes from `herdr pane get` (.foreground_cwd), because
+#   HERDR_ACTIVE_PANE_CWD only records the pane's launch cwd and does not
+#   follow the shell as it cd's around. Falls back to that launch cwd, then
+#   $PWD, skipping any tier that is not a reachable directory. The output is
+#   therefore always an existing path, so callers can `cd "$(herdr-pwd)"`
+#   without guarding against failure.
+#
+# EXAMPLES
+#   command = "cd \"$(herdr-pwd)\"; exec \"${SHELL:-sh}\""
+#   command = "cd \"$(herdr-pwd)\"; exec tig"
+#
+# SEE ALSO
+#   https://herdr.dev/docs/configuration/#custom-command-keybindings
+#   https://herdr.dev/docs/cli-reference/#panes
+
+if [ -z "$HERDR_ENV" ] || [ -z "$HERDR_BIN_PATH" ]; then
+  printf '%s\n' "herdr-pwd: must be run from a herdr keys.command" >&2
+  exit 1
+fi
+
+if ! command -v jq >/dev/null 2>&1; then
+  printf '%s\n' "herdr-pwd: jq is required" >&2
+  exit 1
+fi
+
+foreground_cwd="$("$HERDR_BIN_PATH" pane get "$HERDR_ACTIVE_PANE_ID" 2>/dev/null | jq -r '.result.pane.foreground_cwd // empty')"
+
+if [ -d "$foreground_cwd" ]; then
+  printf '%s\n' "$foreground_cwd"
+  exit 0
+fi
+
+if [ -d "$HERDR_ACTIVE_PANE_CWD" ]; then
+  printf '%s\n' "$HERDR_ACTIVE_PANE_CWD"
+  exit 0
+fi
+
+printf '%s\n' "$PWD"

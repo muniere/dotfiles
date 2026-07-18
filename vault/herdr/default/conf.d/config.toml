@@ -104,6 +104,22 @@ tabs = ""
 workspaces = ""
 agents = ""
 
+[[keys.command]]
+key = ["prefix+space"]
+type = "popup"
+command = "cd \"$(herdr-pwd)\"; exec \"${SHELL:-sh}\""
+description = "open scratch terminal"
+width = "98%"
+height = "98%"
+
+[[keys.command]]
+key = ["prefix+ctrl+g"]
+type = "popup"
+command = "cd \"$(herdr-pwd)\"; exec tig"
+description = "open tig"
+width = "98%"
+height = "98%"
+
 [worktrees]
 # Reference: https://herdr.dev/docs/configuration/#worktrees
 directory = "~/.herdr/worktrees"
