@@ -1,0 +1,71 @@
+" vim: filetype=vifm :
+"
+" muniere color scheme for vifm, mirroring the Neovim 'muniere' theme.
+" It keeps the terminal's own background (ctermbg=default) for maximum
+" contrast and uses the vivid muniere palette for accents.
+"
+" Palette (guifg):
+"   blue   #4ea5f8   green  #5cc93b   cyan    #68e1e5
+"   red    #ea3e24   orange #af5f00   magenta #e933f6
+"   yellow #fefb7e   white  #ffffff   black   #000000
+
+highlight clear
+
+" --- Panes and chrome (transparent background = terminal's own) ---
+hi Win        cterm=none ctermfg=default ctermbg=default
+hi OtherWin   cterm=none ctermfg=default ctermbg=default
+hi AuxWin     cterm=none ctermfg=default ctermbg=default
+hi Border     cterm=none ctermfg=default ctermbg=default
+hi OddLine    cterm=none ctermfg=default ctermbg=default
+hi LineNr     cterm=none ctermfg=130     ctermbg=default guifg=#af5f00
+
+" --- Cursor / selection (high contrast) ---
+hi CurrLine   cterm=bold,reverse
+hi OtherLine  cterm=reverse ctermfg=default
+hi Selected   cterm=bold ctermfg=black ctermbg=yellow guifg=#000000 guibg=#fefb7e
+
+" --- Top / status / tabs ---
+hi TopLine    cterm=none ctermfg=default ctermbg=default
+hi TopLineSel cterm=bold ctermfg=yellow ctermbg=default guifg=#fefb7e
+hi TabLine    cterm=none ctermfg=default ctermbg=default
+hi TabLineSel cterm=bold,reverse ctermfg=blue guifg=#4ea5f8
+hi StatusLine cterm=bold,reverse
+hi JobLine    cterm=bold,reverse
+hi CmdLine    cterm=none ctermfg=default ctermbg=default
+hi ErrorMsg   cterm=bold ctermfg=white ctermbg=red guifg=#ffffff guibg=#ea3e24
+
+" --- Completion / suggestions ---
+hi WildMenu     cterm=bold ctermfg=black ctermbg=yellow guifg=#000000 guibg=#fefb7e
+hi SuggestBox   cterm=bold ctermfg=cyan ctermbg=default guifg=#68e1e5
+hi CmpMismatch  cterm=bold ctermfg=white ctermbg=red guifg=#ffffff guibg=#ea3e24
+hi CmpUnmatched cterm=bold ctermfg=black ctermbg=green guifg=#000000 guibg=#5cc93b
+hi CmpBlank     cterm=none ctermfg=default ctermbg=default
+
+" --- File kinds (vivid muniere accents) ---
+hi Directory  cterm=bold ctermfg=blue    ctermbg=default guifg=#4ea5f8
+hi Executable cterm=bold ctermfg=green   ctermbg=default guifg=#5cc93b
+hi Link       cterm=bold ctermfg=cyan    ctermbg=default guifg=#68e1e5
+hi BrokenLink cterm=bold ctermfg=red     ctermbg=default guifg=#ea3e24
+hi HardLink   cterm=none ctermfg=yellow  ctermbg=default guifg=#fefb7e
+hi Socket     cterm=bold ctermfg=magenta ctermbg=default guifg=#e933f6
+hi Device     cterm=bold ctermfg=magenta ctermbg=default guifg=#e933f6
+hi Fifo       cterm=bold ctermfg=magenta ctermbg=default guifg=#e933f6
+
+" --- File patterns ---
+" images / media
+highlight {*.png,*.jpg,*.jpeg,*.gif,*.bmp,*.webp,*.tiff,*.svg,*.ico,*.heic,
+          \*.mp3,*.flac,*.m4a,*.wav,*.aac,*.ogg,*.opus,
+          \*.mp4,*.mov,*.mkv,*.webm,*.avi,*.wmv,*.m4v,*.mpg,*.mpeg}
+        \ cterm=none ctermfg=magenta ctermbg=default guifg=#e933f6
+" archives
+highlight {*.zip,*.tar,*.gz,*.tgz,*.bz2,*.xz,*.zst,*.7z,*.rar,*.dmg,*.pkg,
+          \*.iso,*.jar}
+        \ cterm=none ctermfg=red ctermbg=default guifg=#ea3e24
+" documents
+highlight {*.pdf,*.doc,*.docx,*.xls,*.xlsx,*.ppt,*.pptx,*.key,*.numbers,
+          \*.pages,*.odt,*.ods,*.odp,*.md,*.txt}
+        \ cterm=none ctermfg=yellow ctermbg=default guifg=#fefb7e
+" build / config
+highlight {Makefile,Makefile.*,*.mk,CMakeLists.txt,*.cmake,*.toml,*.yaml,
+          \*.yml,*.json,*.ini,*.conf,.gitignore,Dockerfile,*.lock}
+        \ cterm=none ctermfg=130 ctermbg=default guifg=#af5f00

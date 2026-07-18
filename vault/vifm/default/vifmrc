@@ -1,0 +1,183 @@
+" vim: filetype=vifm :
+"
+" fern.vim-like terminal file explorer configuration.
+" - Left pane shows a tree; the right pane previews the selected file.
+" - Text files open in $EDITOR; media/documents open with the OS default app.
+" - Directories fold/unfold in place with 'zx' (like fern expand/collapse).
+
+" ------------------------------------------------------------------------------
+" Main settings
+" ------------------------------------------------------------------------------
+
+" Editor used to open text files (l / Enter / e). Prefer $EDITOR.
+if $EDITOR != ''
+    let &vicmd = $EDITOR
+elseif executable('nvim')
+    set vicmd=nvim
+elseif executable('vim')
+    set vicmd=vim
+elseif executable('vi')
+    set vicmd=vi
+endif
+
+" Let vifm perform file operations itself (faster, supports progress).
+set syscalls
+
+" Move files to the trash on dd / :d instead of deleting them permanently.
+set trash
+
+" What to persist across restarts. 'savedirs' is intentionally omitted so vifm
+" does NOT restore the last visited directory: it always starts at the CWD (or
+" the path given as an argument).
+set vifminfo=dhistory,chistory,state,tui,shistory,ehistory,
+            \phistory,fhistory,dirstack,registers,bookmarks,bmarks,mchistory
+set history=100
+
+set nofollowlinks
+set sortnumbers
+set undolevels=100
+set vimhelp
+
+" Don't run executables on l / Enter; open them instead.
+set norunexec
+
+set timefmt='%Y/%m/%d %H:%M'
+
+" Command-line completion menu.
+set wildmenu
+set wildstyle=popup
+set suggestoptions=normal,visual,view,otherpane,keys,marks,registers
+
+" Searching.
+set ignorecase
+set smartcase
+set nohlsearch
+set incsearch
+
+set scrolloff=4
+
+colorscheme muniere Default-256 Default
+
+" ------------------------------------------------------------------------------
+" Nerd Font icons
+" ------------------------------------------------------------------------------
+" File-type icons shown as a prefix (needs a Nerd Font, e.g. Hack Nerd Font).
+" Format is '{prefix}:{type}:{suffix}' or '{prefix}::{pattern}::{suffix}';
+" commas inside a pattern list are doubled. Name patterns win over type rules.
+set classify=' :dir:/'
+set classify+=' :exe:'
+set classify+=' :link:'
+set classify+=' :reg:'
+set classify+=' ::*.c,,*.h,,*.cc,,*.cpp,,*.hpp,,*.cxx,,*.hxx::'
+set classify+=' ::*.py,,*.pyc::'
+set classify+=' ::*.js,,*.mjs,,*.cjs,,*.ts,,*.tsx,,*.jsx::'
+set classify+=' ::*.rs::'
+set classify+=' ::*.go::'
+set classify+=' ::*.rb::'
+set classify+=' ::*.lua::'
+set classify+=' ::*.vim,,.vimrc,,vifmrc::'
+set classify+=' ::*.sh,,*.bash,,*.zsh,,.zshrc,,.bashrc::'
+set classify+=' ::*.md,,*.markdown::'
+set classify+=' ::*.json,,*.yml,,*.yaml,,*.toml,,*.ini,,*.conf::'
+set classify+=' ::*.html,,*.htm,,*.xml::'
+set classify+=' ::*.css,,*.scss,,*.sass::'
+set classify+=' ::*.png,,*.jpg,,*.jpeg,,*.gif,,*.bmp,,*.webp,,*.svg,,*.ico::'
+set classify+=' ::*.pdf::'
+set classify+=' ::*.zip,,*.tar,,*.gz,,*.tgz,,*.bz2,,*.xz,,*.zst,,*.7z,,*.rar,,*.dmg::'
+set classify+=' ::.git,,.gitignore,,.gitconfig::'
+
+" ------------------------------------------------------------------------------
+" fern-like layout: tree on the left, live preview on the right
+" ------------------------------------------------------------------------------
+
+" Turn the current (left) pane into a tree rooted at the current directory.
+" 'depth' 1 keeps subdirectories folded at startup (expand them with zx / l).
+tree depth=1
+
+" Remember the launch directory: 'h' never walks the tree above it.
+let $VIFM_TREE_ROOT = expand('%d')
+
+" Restored TUI state may activate the right pane, which would build the tree
+" on the right. If the active pane isn't the left one, swap them so the tree
+" stays on the left and the preview on the right.
+if !paneisat('left') | execute "normal x" | endif
+
+" Show a live preview of the selected file in the other (right) pane.
+set quickview
+
+" Visible pane borders (zellij-like framing): side borders on, drawn with
+" box-drawing characters. 'u' enables Unicode glyphs in the TUI.
+set tuioptions=psuv
+set fillchars=vborder:│,hborder:─,millersep:│
+
+" ------------------------------------------------------------------------------
+" File handlers
+" ------------------------------------------------------------------------------
+" Media and documents open with the OS default application. Everything else
+" (text, code, unknown) falls back to 'vicmd' ($EDITOR) on l / Enter, because
+" there is intentionally no catch-all `filetype * open` rule.
+
+filetype {*.pdf,*.ps,*.eps,*.djvu},<application/pdf,application/postscript>
+       \ open
+filetype {*.png,*.jpg,*.jpeg,*.gif,*.bmp,*.webp,*.tiff,*.svg,*.ico,*.heic},
+        \<image/*>
+       \ open
+filetype {*.mp3,*.flac,*.m4a,*.wav,*.wma,*.aac,*.ogg,*.opus},<audio/*>
+       \ open
+filetype {*.mp4,*.mov,*.mkv,*.webm,*.avi,*.wmv,*.m4v,*.mpg,*.mpeg,*.flv},
+        \<video/*>
+       \ open
+filetype {*.doc,*.docx,*.xls,*.xlsx,*.ppt,*.pptx,*.key,*.numbers,*.pages,
+         \*.odt,*.ods,*.odp}
+       \ open
+filetype {*.zip,*.tar,*.gz,*.tgz,*.bz2,*.xz,*.zst,*.7z,*.rar,*.dmg,*.pkg,
+         \*.iso}
+       \ open
+
+" Text previewer with syntax highlighting when bat is available.
+if executable('bat')
+    fileviewer {*[^/]} bat --color=always --style=plain --paging=never %c
+endif
+
+" ------------------------------------------------------------------------------
+" Key mappings (fern-like)
+" ------------------------------------------------------------------------------
+
+" o: force-open the current file with the OS default handler (like broot's 'o').
+nnoremap o :!open %c<cr>
+
+" e: edit the current file in $EDITOR regardless of its type.
+nnoremap e :edit<cr>
+
+" Go up in the tree, but never above the launch root ($VIFM_TREE_ROOT).
+" Built-in 'h' at the tree root leaves tree view; detect that and re-root one
+" level up (unless already at the launch root) so we always stay in a tree.
+command! TreeUp :execute 'normal! h' | if getpanetype() != 'tree' | if expand('%d') != $VIFM_TREE_ROOT | execute 'cd ..' | endif | execute 'tree depth=1' | endif
+
+" l / Enter / space: forward direction only.
+"   - file        -> open it
+"   - folded dir  -> expand it in place
+"   - expanded dir-> step into its first child
+" Expanded state is detected by peeking at the entry below (a child if its
+" parent path equals the current directory).
+nnoremap l :if filetype('.') != 'dir' | execute 'normal! l' | else | let $VIFM_CUR = expand('%c:p') | execute 'normal! j' | if expand('%c:p:h') != $VIFM_CUR | execute 'normal! kzx' | endif | endif<cr>
+nnoremap <cr> :if filetype('.') != 'dir' | execute 'normal! l' | else | let $VIFM_CUR = expand('%c:p') | execute 'normal! j' | if expand('%c:p:h') != $VIFM_CUR | execute 'normal! kzx' | endif | endif<cr>
+nnoremap <space> :if filetype('.') != 'dir' | execute 'normal! l' | else | let $VIFM_CUR = expand('%c:p') | execute 'normal! j' | if expand('%c:p:h') != $VIFM_CUR | execute 'normal! kzx' | endif | endif<cr>
+
+" h: backward direction.
+"   - expanded dir -> collapse it in place
+"   - otherwise    -> go to the parent node (bounded by the launch root)
+nnoremap h :if filetype('.') == 'dir' | let $VIFM_CUR = expand('%c:p') | execute 'normal! j' | if expand('%c:p:h') == $VIFM_CUR | execute 'normal! kzx' | else | execute 'normal! k' | TreeUp | endif | else | TreeUp | endif<cr>
+
+" L: descend into the selected directory, making it the new tree root.
+nnoremap L :if filetype('.') == 'dir' | execute 'cd '.fnameescape(expand('%c:p')) | execute 'tree depth=1' | endif<cr>
+
+" w: toggle the preview pane on/off.
+nnoremap w :view<cr>
+vnoremap w :view<cr>gv
+
+" ,c: edit this config and reload it.
+nnoremap ,c :write | edit $MYVIFMRC | restart full<cr>
+
+" s: open a shell in the current directory.
+nnoremap s :shell<cr>

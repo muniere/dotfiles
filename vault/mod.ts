@@ -24,6 +24,7 @@ export { SqlfluffCookBook } from "./sqlfluff/vault.ts";
 export { TerminalPaletteCookBook } from "./terminal-palette/vault.ts";
 export { TigCookBook } from "./tig/vault.ts";
 export { TmuxCookBook } from "./tmux/vault.ts";
+export { VifmCookBook } from "./vifm/vault.ts";
 export { VimCookBook } from "./vim/vault.ts";
 export { YaziCookBook } from "./yazi/vault.ts";
 export { XcodeCookBook } from "./Xcode/vault.ts";
