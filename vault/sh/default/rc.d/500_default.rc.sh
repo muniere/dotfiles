@@ -31,22 +31,6 @@ fi
 
 export FZF_DEFAULT_OPTS='--height 50% --border --reverse --bind ctrl-k:kill-line --bind ctrl-j:execute::'
 
-# ===
-# yazi
-# ===
-
-# https://yazi-rs.github.io/docs/quick-start
-if command -v yazi &> /dev/null; then
-  function y() {
-    local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
-    yazi "$@" --cwd-file="$tmp"
-    if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-      builtin cd -- "$cwd"
-    fi
-    rm -f -- "$tmp"
-  }
-fi
-
 # ====
 # Herdr
 # ====
