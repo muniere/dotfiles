@@ -93,7 +93,7 @@ Name what is being worked on right now. Output exactly one line, nothing else:
 # sibling agent-state hook cannot remap this pane, and set the recursion guard so
 # this hook no-ops in the child. Bound it with a timeout.
 summary="$(env -u HERDR_ENV -u HERDR_PANE_ID -u HERDR_SOCKET_PATH HERDR_RENAME=1 \
-  timeout 30 claude -p "$instruction" </dev/null 2>/dev/null \
+  timeout 30 claude --print --model haiku "$instruction" </dev/null 2>/dev/null \
   | head -n1 | tr -d '\r' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
 [ -n "$summary" ] || exit 0
 
