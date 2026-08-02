@@ -131,4 +131,11 @@ if [ -n "$XDG_DATA_HOME" ]; then
   export MYSQL_HISTFILE="$XDG_DATA_HOME/mysql/history"
 fi
 
+# =====
+# Docker
+# =====
+if [ -d $HOME/.docker/bin ]; then
+  export PATH="$HOME/.docker/bin:$PATH"
+fi
+
 # vim: ft=sh sw=2 ts=2 sts=2
