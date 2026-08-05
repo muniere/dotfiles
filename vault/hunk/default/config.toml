@@ -1,0 +1,64 @@
+theme = "custom"
+mode = "auto"
+line_numbers = true
+wrap_lines = false
+menu_bar = true
+
+# High-contrast theme: pure black canvas, saturated primary diff colors,
+# Monokai-style syntax. Row and content backgrounds are kept identical so that
+# Hunk derives the word-level highlight from the sign colors on top of them.
+[custom_theme]
+label = "Vivid High Contrast"
+base = "monokai"
+
+background = "#000000"
+panel = "#000000"
+panelAlt = "#0d0d0d"
+border = "#444444"
+accent = "#00d7ff"
+accentMuted = "#00738a"
+text = "#f8f8f2"
+muted = "#8a8a8a"
+
+addedBg = "#002800"
+addedContentBg = "#002800"
+removedBg = "#3f0001"
+removedContentBg = "#3f0001"
+movedAddedBg = "#002438"
+movedRemovedBg = "#2c2400"
+contextBg = "#000000"
+contextContentBg = "#000000"
+
+addedSignColor = "#00e000"
+removedSignColor = "#ff1a1a"
+lineNumberBg = "#000000"
+lineNumberFg = "#6a6a6a"
+selectedHunk = "#004c66"
+
+badgeAdded = "#00e000"
+badgeRemoved = "#ff1a1a"
+badgeNeutral = "#ffd400"
+
+fileNew = "#00e000"
+fileDeleted = "#ff1a1a"
+fileRenamed = "#00d7ff"
+fileModified = "#ffd400"
+fileUntracked = "#be84ff"
+
+noteBorder = "#be84ff"
+noteBackground = "#140020"
+noteTitleBackground = "#2c0048"
+noteTitleText = "#f8f8f2"
+
+[custom_theme.syntax]
+default = "#f8f8f2"
+keyword = "#f92672"
+string = "#e6db74"
+comment = "#75715e"
+number = "#be84ff"
+function = "#a6e22e"
+property = "#f8f8f2"
+type = "#66d9ef"
+variable = "#f8f8f2"
+operator = "#f92672"
+punctuation = "#f8f8f2"
