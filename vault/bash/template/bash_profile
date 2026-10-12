@@ -1,8 +1,8 @@
-export XDG_CACHE_HOME="<%= it.cache %>"
-export XDG_CONFIG_HOME="<%= it.config %>"
-export XDG_DATA_HOME="<%= it.data %>"
-export XDG_STATE_HOME="<%= it.state %>"
-export XDG_RUNTIME_DIR="<%= it.runtime %>"
+export XDG_CACHE_HOME="{{ .cache }}"
+export XDG_CONFIG_HOME="{{ .config }}"
+export XDG_DATA_HOME="{{ .data }}"
+export XDG_STATE_HOME="{{ .state }}"
+export XDG_RUNTIME_DIR="{{ .runtime }}"
 
 export XDG_CONFIG_DIRS="/etc/xdg"
 export XDG_DATA_DIRS="/usr/local/share:/usr/share"

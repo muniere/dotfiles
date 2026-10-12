@@ -2,7 +2,8 @@
 
 ## Prerequisites
 
-- [Deno](https://deno.land/) runtime
+- [Go](https://go.dev/) toolchain
+- `make`
 
 ## Installation
 
@@ -20,38 +21,50 @@ $ git clone https://github.com/muniere/dotfiles.git
 $ cd dotfiles
 
 # Initial setup
-$ deno task setup
+$ make setup
 
 # Create symlinks
-$ deno task link
+$ make link
 ```
 
 ## Tasks
 
-Each task has following options:
+The tasks run with `go run`, so there is no need to build beforehand.
+The dependencies get fetched on the first run.
+
+```bash
+# Show current link status
+make status
+
+# Initial setup
+make setup
+
+# Create symlinks
+make link
+
+# Remove symlinks
+make unlink
+
+# Recreate symlinks
+make relink
+
+# Clean up broken links
+make cleanup
+```
+
+Each task has following options, which are passed with `ARGS`:
 
 - `-n`: dry-run
 - `-v`: verbose
 
 ```bash
-# Show current link status
-deno task status
+make link ARGS="-n -v"
 
-# Initial setup
-deno task setup
-
-# Create symlinks
-deno task link
-
-# Remove symlinks
-deno task unlink
-
-# Recreate symlinks
-deno task relink
-
-# Clean up broken links
-deno task cleanup
+# Or without make
+go run . link -n -v
 ```
+
+`make` also provides the tasks for development: `test` and `fmt`.
 
 ## Vaults
 
@@ -75,13 +88,30 @@ vault/<tool>/
 └── template/  # Template files
 ```
 
+### Templates
+
+A template gets rendered into a file such as `~/.bashrc`, which other tools may write as well.
+So the rendered text is kept as a section of the file, enclosed by the marker lines below,
+and the lines outside of it are left as they are. Unlinking removes only the section.
+
+```bash
+# >>> muniere/dotfiles >>>
+...
+# <<< muniere/dotfiles <<<
+```
+
 ## Structure
 
 ```
 .
-├── app/                  # CLI application entry point
-├── lib/                  # Shared library modules
-└── vault/                # Configuration files for various tools
+├── main.go               # CLI application entry point
+├── Makefile              # Tasks to run the commands, and to develop
+├── internal/             # Packages of the CLI
+│   ├── action/           # Commands: status, setup, link, unlink, cleanup
+│   ├── chef/             # Types to define how a tool gets installed
+│   └── ...               # Supporting packages: fspath, shell, logging, plist, idea, ...
+└── vault/                # Configuration files for various tools, each with its cook book
+    ├── mod.go            # List of the cook books
     ├── AndroidStudio/    # Android Studio configurations
     ├── asdf/             # asdf version manager
     ├── bash/             # Bash shell

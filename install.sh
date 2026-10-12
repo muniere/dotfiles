@@ -59,7 +59,7 @@ esac
 
 function link-files() {
 cd "${DOTFILES_DIR}" 
-deno task link
+make link
 cd -
 }
 
