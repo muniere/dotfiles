@@ -40,7 +40,7 @@ brew "zsh"
 brew "zsh-completions"
 brew "zsh-autosuggestions"
 brew "zsh-syntax-highlighting"
-brew "muniere/priv/glide"
+brew "muniere/glide/glide"
 
 cask "temurin"
 cask "font-hack-nerd-font"
