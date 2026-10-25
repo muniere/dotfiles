@@ -1,0 +1,37 @@
+id = "muniere.workspace-meta"
+name = "Workspace Meta"
+version = "0.1.0"
+# [[startup]] hooks came in 0.7.5; workspace metadata and Space rows in 0.7.4.
+min_herdr_version = "0.7.5"
+description = "Report tab labels as sidebar tokens."
+platforms = ["linux", "macos"]
+
+# Restore the tokens after a server start or handoff, which drops them.
+[[startup]]
+command = ["sh", "report.sh"]
+
+# Every event that changes what tabs a workspace has, their labels or order, or
+# the workspace name, which decides the indent.
+[[events]]
+on = "workspace.created"
+command = ["sh", "report.sh"]
+
+[[events]]
+on = "workspace.renamed"
+command = ["sh", "report.sh"]
+
+[[events]]
+on = "tab.created"
+command = ["sh", "report.sh"]
+
+[[events]]
+on = "tab.closed"
+command = ["sh", "report.sh"]
+
+[[events]]
+on = "tab.renamed"
+command = ["sh", "report.sh"]
+
+[[events]]
+on = "tab.moved"
+command = ["sh", "report.sh"]

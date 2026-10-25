@@ -4,8 +4,9 @@
 # Reference: https://herdr.dev/docs/configuration/
 #
 # Every value is written explicitly, even when it matches the herdr default.
-# Intentional deviations from the default: keys.prefix and the [experimental]
-# CJK IME settings; everything else mirrors the shipped defaults.
+# Intentional deviations from the default: keys.prefix, the [experimental]
+# CJK IME settings, and the custom tokens in ui.sidebar.spaces.rows;
+# everything else mirrors the shipped defaults.
 
 # Show first-run notification setup on startup.
 # Reference: https://herdr.dev/docs/configuration/#config-file
@@ -143,6 +144,16 @@ show_agent_labels_on_pane_borders = true
 agent_panel_sort = "spaces"
 # Accent color: hex (#89b4fa), named colors (cyan, blue, magenta), or rgb(r,g,b).
 accent = "cyan"
+
+[ui.sidebar.spaces]
+# Reference: https://herdr.dev/docs/configuration/#ui-and-sidebar
+# $tabs (the tab labels joined by " / ", indented under a leading emoji in the
+# workspace name) is reported by the plugin in plugins/workspace-meta.
+row_gap = 0
+rows = [
+  ["state_icon", "workspace"],
+  ["$tabs"],
+]
 
 [ui.toast]
 # Reference: https://herdr.dev/docs/configuration/#notifications
