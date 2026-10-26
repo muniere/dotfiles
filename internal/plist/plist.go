@@ -164,7 +164,7 @@ func FormatNumber(value float64) string {
 }
 
 func parse(source string) (Value, error) {
-	decoder := xml.NewDecoder(strings.NewReader(source))
+	decoder := xml.NewDecoder(strings.NewReader(sanitize(source)))
 	for {
 		token, err := decoder.Token()
 		if err != nil {
@@ -265,4 +265,19 @@ func parseText(decoder *xml.Decoder) (string, error) {
 			return text.String(), nil
 		}
 	}
+}
+
+// sanitize replaces characters that XML 1.0 forbids with U+FFFD.
+// PlistBuddy prints control characters as they are, e.g. "^T" for a Ctrl+T hotkey in iTerm 2.
+func sanitize(source string) string {
+	return strings.Map(func(r rune) rune {
+		switch {
+		case r == '\t', r == '\n', r == '\r':
+			return r
+		case r < 0x20, r == 0xFFFE, r == 0xFFFF:
+			return '�'
+		default:
+			return r
+		}
+	}, source)
 }
