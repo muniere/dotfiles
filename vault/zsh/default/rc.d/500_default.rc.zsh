@@ -202,9 +202,9 @@ if command -v fzf &> /dev/null; then
   function fzf-file () {
     local selected
     if command -v fd &> /dev/null; then
-      selected=$(fd --max-depth 20 --type f --hidden --exclude .git | fzf)
+      selected=$(fd --max-depth 20 --type f --hidden --no-ignore-vcs --exclude '**/.git/' --exclude '**/.tmp/' --exclude '**/.worktrees/' --exclude '**/.claude/worktrees/' --exclude '**/node_modules/' | fzf)
     else
-      selected=$(find . -maxdepth 20 -type f -not -path '*/\.git/*' | fzf)
+      selected=$(find . -maxdepth 20 -type f -not -path '*/.git/*' -not -path '*/.tmp/*' -not -path '*/.worktrees/*' -not -path '*/.claude/worktrees/*' -not -path '*/node_modules/*' | fzf)
     fi
 
     if [ -n "$selected" ]; then
