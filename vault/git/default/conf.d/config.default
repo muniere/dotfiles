@@ -26,19 +26,6 @@
     diff = diff-highlight | less
 [alias]
     # NAME
-    #   br - Show branches with tracking info
-    #
-    # SYNOPSIS
-    #   git br
-    #
-    # DESCRIPTION
-    #   Lists all local branches with verbose tracking information.
-    #
-    # EXAMPLES
-    #   $ git br
-    br = branch -vv
-
-    # NAME
     #   save - Amend last commit with current user as author
     #
     # SYNOPSIS

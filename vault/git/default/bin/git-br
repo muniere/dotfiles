@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# NAME
+#   git-br - Show branches with tracking info and shortened worktree paths
+#
+# SYNOPSIS
+#   git br [<git-branch-options>...]
+#
+# DESCRIPTION
+#   Runs `git branch -vv` and shortens the worktree paths it shows.
+#   Paths under the current worktree become relative (./...),
+#   and paths under $HOME start with ~.
+#   Other arguments are passed to `git branch` as they are.
+#
+# EXAMPLES
+#   $ git br
+#   $ git br -a
+#   $ git br 'feature/*'
+
+usage() {
+    awk '
+        /^[^#]/ { if (f) exit }
+        /^# NAME/ { f = 1 }
+        f { sub(/^# ?/, ""); print }
+    ' "$0"
+}
+
+case "${1:-}" in
+    -h|--help)
+        usage
+        exit 0 ;;
+esac
+
+root=$(git rev-parse --show-toplevel)
+
+if [[ -t 1 ]]; then
+    color=always
+else
+    color=never
+fi
+
+# "(" may be followed by a color code before the path
+open=$'(\\((\033\\[[0-9;]*m)?)'
+
+git branch --list -vv --color="$color" "$@" | sed -E \
+    -e "s|${open}${root}/|\\1./|" \
+    -e "s|${open}${HOME}/|\\1~/|"
