@@ -10,6 +10,9 @@ set -euo pipefail
 # DESCRIPTION
 #   Deletes local branches that are tracking remote branches which no longer exist.
 #   Uses `git branch -d` by default, which only deletes fully merged branches.
+#   If a branch is checked out in a linked worktree, the worktree is removed
+#   first. Worktrees with modified or untracked files are left as they are,
+#   and their branches are skipped.
 #
 # OPTIONS
 #   -n, --dry-run
@@ -70,8 +73,36 @@ fi
 
 flags=(-d)
 
-if $force; then 
+if $force; then
     flags+=(-f)
 fi
 
-echo "$branches" | xargs git branch "${flags[@]}"
+# Print the path of the linked worktree that has the branch checked out.
+# The main worktree is excluded because it cannot be removed.
+worktree_of() {
+    git worktree list --porcelain | awk -v ref="refs/heads/$1" '
+        /^worktree / { n++; path = substr($0, 10) }
+        /^branch / && n > 1 && $2 == ref { print path; exit }
+    '
+}
+
+targets=()
+
+for branch in $branches; do
+    worktree=$(worktree_of "$branch")
+
+    if [[ -n "$worktree" ]]; then
+        # Refuses worktrees with modified or untracked files, so no work is lost.
+        if ! git worktree remove "$worktree"; then
+            echo "Skipped branch $branch (worktree $worktree is not clean)" >&2
+            continue
+        fi
+        echo "Removed worktree $worktree"
+    fi
+
+    targets+=("$branch")
+done
+
+if [[ "${#targets[@]}" -gt 0 ]]; then
+    git branch "${flags[@]}" "${targets[@]}"
+fi
